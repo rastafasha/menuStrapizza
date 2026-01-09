@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Output } from '@angular/core';
 import { HeaderComponent } from "../../shared/header/header.component";
 import { SliderComponent } from "../../components/slider/slider.component";
 import { FreeDeliveryComponent } from "../../components/free-delivery/free-delivery.component";
@@ -10,10 +10,13 @@ import { FooterComponent } from "../../shared/footer/footer.component";
 
 @Component({
   selector: 'app-home',
-  imports: [HeaderComponent, SliderComponent, FreeDeliveryComponent, CasProductsComponent, ProducListSliderComponent, HeroComponent, ProducListComponent, FooterComponent],
+  imports: [HeaderComponent, SliderComponent, FreeDeliveryComponent, CasProductsComponent, 
+     HeroComponent, ProducListComponent, FooterComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })
 export class HomeComponent {
+
+  @Output() tiendaSelected: string = 'Pizzería'
 
 }

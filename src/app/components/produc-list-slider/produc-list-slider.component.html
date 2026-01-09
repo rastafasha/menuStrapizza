@@ -1,21 +1,22 @@
 <section class="pastas-section" id="pastas">
         <div class="container">
             <h2 class="section-title">Pastichos</h2>
-            <div class="products-slider">
+            <div class="products-slider" *ngFor="let prod of products">
                 <div class="product-card">
                     <div class="product-image">
-                        <img src="assets/images/products/pizza1.jpeg" alt="Pizza Margherita">
+                        <img [src]="prod.img" [alt]="prod.titulo">
                     </div>
                     <div class="product-content">
-                        <h5> Margherita</h5>
-                        <div class="product-price">$12.99</div>
+                        <h5>{{prod.titulo}}</h5>
+                        <div class="product-price">{{prod.precio_antes| currency}}</div>
+                        <div class="product-price">{{prod.precio_ahora| currency}}</div>
                        <div class="botones">
                          <button class="btn-secondary btn"><i class="fa fa-eye"></i></button>
                         <button class="btn-success btn"><i class="fa fa-shopping-bag"></i></button>
                        </div>
                     </div>
                 </div>
-                <div class="product-card">
+                <!-- <div class="product-card">
                     <div class="product-image">
                         <img src="assets/images/products/pizza1.jpeg" alt="Pizza Pepperoni">
                     </div>
@@ -53,7 +54,7 @@
                         <button class="btn-success btn"><i class="fa fa-shopping-bag"></i></button>
                        </div>
                     </div>
-                </div>
+                </div> -->
             </div>
         </div>
     </section>

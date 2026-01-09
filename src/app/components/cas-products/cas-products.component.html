@@ -2,23 +2,20 @@
         <div class="container">
             <h2 class="section-title">Carta Pizza</h2>
             <div class="tab-content-set">
-                <ul class="nav">
+                <ul class="nav" *ngFor="let category of subcategories"
+                 [class.active]="activeCategory === category.nombre">
                     <li>
                         <a href="#" onclick="return false;" [ngClass]="{'active': option_selectedd == 1}"
-                            (click)="optionSelected(1)">Clasicas</a>
-                    </li>
-                    <li>
-                        <a href="#" onclick="return false;" [ngClass]="{'active': option_selectedd == 2}"
-                            (click)="optionSelected(2)">Especiales</a>
-                    </li>
-                    <li>
-                        <a href="#" onclick="return false;" [ngClass]="{'active': option_selectedd == 3}"
-                            (click)="optionSelected(3)">Vegetariana</a>
+                            (click)="selectCategory(category.nombre)">{{ category.nombre }}</a>
                     </li>
                 </ul>
             </div>
-
-            <app-produc-list></app-produc-list>
+            <div class="product-card" *ngFor="let product of todo; let i = index" cdkDrag>
+            <app-product-item [product]="product" (productSelected)="openModal($event)"></app-product-item>
+            </div>
+                    
         </div>
     </section>
     <div class="clear"></div>
+
+    <app-modalproduct [product]="selectedProduct" *ngIf="!isLoading"></app-modalproduct>

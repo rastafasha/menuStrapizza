@@ -1,46 +1,50 @@
-<div class="products-grid">
-                <div class="product-card">
-                    <div class="product-image">
-                        <img src="assets/images/products/pizza1.jpeg" alt="Pizza Margherita">
-                    </div>
-                    <div class="product-content">
-                        <h4>Pizza Margherita</h4>
-                        <div class="product-price">$12.99</div>
-                        <button class="btn-secondary btn"><i class="fa fa-eye"></i></button>
-                        <button class="btn-success btn"><i class="fa fa-shopping-bag"></i></button>
-                    </div>
-                </div>
-                <div class="product-card">
-                    <div class="product-image">
-                        <img src="assets/images/products/pizza1.jpeg" alt="Pizza Pepperoni">
-                    </div>
-                    <div class="product-content">
-                        <h4>Pizza Pepperoni</h4>
-                        <div class="product-price">$14.99</div>
-                        <button class="btn-secondary btn"><i class="fa fa-eye"></i></button>
-                        <button class="btn-success btn"><i class="fa fa-shopping-bag"></i></button>
-                    </div>
-                </div>
-                <div class="product-card">
-                    <div class="product-image">
-                        <img src="assets/images/products/pizza1.jpeg" alt="Pizza Hawaiana">
-                    </div>
-                    <div class="product-content">
-                        <h4>Pizza Hawaiana</h4>
-                        <div class="product-price">$13.99</div>
-                        <button class="btn-secondary btn"><i class="fa fa-eye"></i></button>
-                        <button class="btn-success btn"><i class="fa fa-shopping-bag"></i></button>
-                    </div>
-                </div>
-                <div class="product-card">
-                    <div class="product-image">
-                        <img src="assets/images/products/pizza1.jpeg" alt="Pizza Cuatro Quesos">
-                    </div>
-                    <div class="product-content">
-                        <h4>Pizza Cuatro Quesos</h4>
-                        <div class="product-price">$15.99</div>
-                        <button class="btn-secondary btn"><i class="fa fa-eye"></i></button>
-                        <button class="btn-success btn"><i class="fa fa-shopping-bag"></i></button>
-                    </div>
-                </div>
-            </div>
+<div class="products-grid" *ngFor="let prod of products">
+    <div class="product-card">
+        <div class="product-image">
+            <img [src]="prod.img" [alt]="prod.titulo">
+        </div>
+        <div class="product-content">
+            <h4>{{prod.titulo}}</h4>
+            <div class="product-price text-danger">{{prod.precio_antes| currency}}</div>
+            <div class="product-price">{{prod.precio_ahora| currency}}</div>
+            <button class="btn-secondary btn"><i class="fa fa-eye"></i></button>
+            <button class="btn-success btn"><i class="fa fa-shopping-bag"></i></button>
+        </div>
+    </div>
+    <!-- <div class="product-card">
+        <div class="product-image">
+            <img src="assets/images/products/pizza1.jpeg" alt="Pizza Pepperoni">
+        </div>
+        <div class="product-content">
+            <h4>Pizza Pepperoni</h4>
+            <div class="product-price">$14.99</div>
+            <button class="btn-secondary btn"><i class="fa fa-eye"></i></button>
+            <button class="btn-success btn"><i class="fa fa-shopping-bag"></i></button>
+        </div>
+    </div>
+    <div class="product-card">
+        <div class="product-image">
+            <img src="assets/images/products/pizza1.jpeg" alt="Pizza Hawaiana">
+        </div>
+        <div class="product-content">
+            <h4>Pizza Hawaiana</h4>
+            <div class="product-price">$13.99</div>
+            <button class="btn-secondary btn"><i class="fa fa-eye"></i></button>
+            <button class="btn-success btn"><i class="fa fa-shopping-bag"></i></button>
+        </div>
+    </div>
+    <div class="product-card">
+        <div class="product-image">
+            <img src="assets/images/products/pizza1.jpeg" alt="Pizza Cuatro Quesos">
+        </div>
+        <div class="product-content">
+            <h4>Pizza Cuatro Quesos</h4>
+            <div class="product-price">$15.99</div>
+            <button class="btn-secondary btn"><i class="fa fa-eye"></i></button>
+            <button class="btn-success btn"><i class="fa fa-shopping-bag"></i></button>
+        </div>
+    </div> -->
+</div>
+
+
+<!-- <app-modalproduct [product]="selectedProduct" *ngIf="!isLoading"></app-modalproduct> -->
