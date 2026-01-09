@@ -1,0 +1,24 @@
+<section class="categories-section" id="categorias">
+        <div class="container">
+            <h2 class="section-title">Carta Pizza</h2>
+            <div class="tab-content-set">
+                <ul class="nav">
+                    <li>
+                        <a href="#" onclick="return false;" [ngClass]="{'active': option_selectedd == 1}"
+                            (click)="optionSelected(1)">Clasicas</a>
+                    </li>
+                    <li>
+                        <a href="#" onclick="return false;" [ngClass]="{'active': option_selectedd == 2}"
+                            (click)="optionSelected(2)">Especiales</a>
+                    </li>
+                    <li>
+                        <a href="#" onclick="return false;" [ngClass]="{'active': option_selectedd == 3}"
+                            (click)="optionSelected(3)">Vegetariana</a>
+                    </li>
+                </ul>
+            </div>
+
+            <app-produc-list></app-produc-list>
+        </div>
+    </section>
+    <div class="clear"></div>

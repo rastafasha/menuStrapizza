@@ -1,0 +1,99 @@
+@import url('./carrousel.css');
+@import url('./header.css');
+@import url('./hero.css');
+@import url('./products-list.css');
+@import url('./fonts.css');
+@import url('./footer.css');
+@import url('./pastasypastichos.css');
+/* Variables CSS */
+:root {
+    --primary-color: #e63946;
+    --secondary-color: #1d3557;
+    --accent-color: #f4a261;
+    --light-bg: #fefae0;
+    --dark-text: #2b2d42;
+    --white: #ffffff;
+    --font-primary: 'Poppins', sans-serif;
+}
+
+.clear {
+    clear: both;
+    visibility: hidden;
+    margin: 0px;
+    padding: 0px;
+    height: 0;
+}
+
+/* Reset y base */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-primary);
+    background-color: var(--light-bg);
+    color: var(--dark-text);
+    line-height: 1.6;
+}
+.delivery-icon img,
+.product-image img, 
+.category-image img{
+width: 100%;
+height: auto;
+display: block;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5{
+    font-family: 'Retro Team';
+    color: #333;
+}
+
+
+.free-delivery-section{
+    width: 100vw;
+    float: right;
+}
+
+.delivery-icon{
+    width: 70vw;
+    float: right;
+}
+
+.delivery-text{
+    width: 98vw;
+    float: left;
+    padding-top: 15px;
+    padding-bottom: 20px;
+}
+
+
+.tab-content-set .nav{
+        display: flex;
+        justify-content:space-between;
+        align-items: center;
+        padding: 10px;
+        gap: 5px;
+}
+
+.tab-content-set .nav li{
+            padding: 5px;
+            font-size: 16px;
+            
+        }
+
+.tab-content-set .nav li  a{
+                color: var(--azulclaro);
+                font-family: 'Retro Team';
+            }
+
+.container{
+    margin: 0 auto;
+    width: 98%;
+
+}

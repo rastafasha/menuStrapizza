@@ -1,0 +1,43 @@
+.pastas-section{
+    height: auto;
+    padding: 15px;
+    display: flex;
+    margin-bottom: 15px;
+    padding-bottom: 15px;
+    margin-bottom: 5px;
+}
+
+/* productos tipo slider */
+
+
+.products-slider {
+   display: flex;
+   flex-direction: row;
+  
+   width: 98%;
+   height: auto;
+   padding-bottom: 40px;
+   overflow: hidden;
+   overflow-x: scroll;
+   gap: 5px;
+   justify-content: space-between;
+}
+
+.products-slider .product-card{
+ display: flex;
+ flex-direction: column;
+ border-bottom: none;
+    background-color: rgb(234, 234, 234);
+    border: 1px solid rgb(156, 156, 156);
+    height: 240px;
+
+}
+.products-slider .product-image{
+margin-bottom: 15px;
+
+}
+
+.botones{
+    display: flex;
+    gap: 5px;
+}

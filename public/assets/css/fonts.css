@@ -1,0 +1,11 @@
+
+@font-face {
+	font-family: 'Retro Team';
+	src: url('../fonts/Retro Team.eot');
+	src: local('☺'), url('../fonts/Retro Team.woff') format('woff'), 
+        url('../fonts/Retro Team.ttf') format('truetype'), 
+        url('../fonts/Retro Team.svg') format('svg');
+	font-weight: normal;
+	font-style: normal;
+}
+
