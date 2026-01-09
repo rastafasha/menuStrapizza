@@ -5,6 +5,8 @@
 @import url('./fonts.css');
 @import url('./footer.css');
 @import url('./pastasypastichos.css');
+@import url('./orden.css');
+@import url('./checkout.css');
 /* Variables CSS */
 :root {
     --primary-color: #e63946;

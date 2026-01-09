@@ -1,0 +1,22 @@
+.card-body {
+    border-radius: 16px;
+    & a{
+        display: flex;
+        justify-content: center;
+        flex-direction: column;
+        align-items: center;
+        gap:10px;
+        color: var(--darkblue);
+    }
+    & a:hover{
+        text-decoration: none;
+        transition: all 3s ease;
+    }
+    & a:hover .fa{
+        color: var(--azul);
+    }
+    &  .fa{
+        font-size: 30px;
+        
+    }
+}

@@ -1,0 +1,147 @@
+<app-header></app-header>
+<section class="sub-header d-flex justify-content-center mt-5" style="padding-top: 30px;">
+    <img class="rellax bg-overlay" src="images/sub-header/05.jpg" alt="">
+    <div class="overlay-call-to-action"></div>
+    <h3 class="heading-style-3">My Profile</h3>
+</section>
+<!-- Page Content-->
+<div class="container pb-5 mb-2 mb-md-3">
+    <div class="row">
+        <!-- Sidebar-->
+        <aside class="col-lg-4 pt-4 pt-lg-0">
+            <app-aside-cuenta></app-aside-cuenta>
+        </aside>
+
+        <!-- Content  -->
+        <section class="col-lg-8">
+            <!-- Toolbar-->
+            <div class="d-none d-lg-flex justify-content-between align-items-center pt-lg-3 pb-4 pb-lg-5 mb-lg-3">
+                <h6 class="font-size-base text-light mb-0">Actualiza los datos de tu perfíl:</h6>
+            </div>
+            <!-- Profile form-->
+            <form [formGroup]="perfilForm" (ngSubmit)="actualizarPerfil()" autocomplete="off">
+                
+                <div class="row">
+                    <div class="col-xs-12 col-sm-3 media">
+                        <img [src]="(identity.img ?? '') | imagenPipe: 'usuarios'"  alt="user.first_name">
+                        
+                    </div>
+                    <div class="col-xs-12 col-sm-">
+                        <div class="form-group">
+                            <div class="cz-file-drop-area">
+                                <!-- <div class="cz-file-drop-preview img-thumbnail rounded">
+                                    <img *ngIf="!imgTemp" [src]="identity.imagenUrl" style="width: 100px;">
+                                    <img *ngIf="imgTemp" [src]="imgTemp" style="width: 100px;">
+                                </div> -->
+                                <span class="cz-file-drop-message">Suelta la imagen aquí</span>
+                                <input type="file" class="cz-file-drop-input" (change)="cambiarImagen($event)">
+                                <br>
+                                <br>
+                                <button type="button" [disabled]="!imagenSubir" (click)="subirImagen()" class="btn btn-success waves-effect waves-light m-r-10 ">
+                                  <i class="fa fa-save"></i> Cambiar imagen
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-sm-12" *ngIf="msm_error">
+                        <div class="form-group">
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert" (click)="close_alert()">
+                                <span class="font-weight-medium">Error:</span> Por favor complete el formulario correctamente.
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-12" *ngIf="msm_success">
+                        <div class="form-group">
+                            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                <span class="font-weight-medium">Mensaje:</span> Se actualizó sus datos correctamente.
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close" (click)="close_alert()">
+                        <span aria-hidden="true">&times;</span>
+                      </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label for="account-fn">Nombres completos</label>
+                            <input class="form-control" type="text" formControlName="first_name" required>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label for="account-ln">Apellidos Completos</label>
+                            <input class="form-control" type="text" formControlName="last_name" required>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label for="account-email">Correo Electrónico</label>
+                            <input class="form-control" type="email" readonly value="{{identity.email}}">
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label for="account-phone">Telefono</label>
+                            <input class="form-control" type="text" formControlName="telefono" required>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label for="account-phone">País</label>
+                            <select class="form-control" formControlName="pais" required>
+                      <option value="" selected disabled>SELECCIONAR</option>
+                      <option value="{{item}}" *ngFor="let item of data_paises">{{item}}</option>
+                  </select>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label for="account-phone">Número de documento</label>
+                            <input autocomplete="off" class="form-control" type="number" #numdoc="ngModel" name="numdoc" [(ngModel)]="user.numdoc">
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label for="account-pass">Nueva contraseña</label>
+                            <div class="password-toggle">
+                                <input class="form-control" type="password" id="password" name="new_password" [(ngModel)]="new_password" placeholder="Nueva contraseña">
+                                <label class="password-toggle-btn">
+                    <input class="custom-control-input" type="button" (click)="view_password();" autocomplete="nope">
+                    <i class="czi-eye password-toggle-indicator"></i><span class="sr-only">Show password</span>
+                  </label>
+                                <div class="invalid-feedback" *ngIf="pass_error">Las contraseñas no coinciden.</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label for="account-confirm-pass">Confirmar contraseña</label>
+                            <div class="password-toggle">
+                                <input class="form-control" type="password" id="password_dos" name="comfirm_password" [(ngModel)]="comfirm_password" placeholder="Repita la contraseña">
+                                <label class="password-toggle-btn">
+                    <input class="custom-control-input" (click)="view_password2();" type="checkbox"><i class="czi-eye password-toggle-indicator"></i><span class="sr-only">Show password</span>
+                  </label>
+                                <div class="invalid-feedback" *ngIf="pass_error">Las contraseñas no coinciden.</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-12">
+                        <hr class="mt-2 mb-3">
+                        <div class="d-flex flex-wrap justify-content-between align-items-center">
+                            <div class="custom-control custom-checkbox d-block">
+
+                            </div>
+                            <button class="btn btn-primary mt-3 mt-sm-0" type="submit">Actualizar perfíl</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </section>
+    </div>
+</div>

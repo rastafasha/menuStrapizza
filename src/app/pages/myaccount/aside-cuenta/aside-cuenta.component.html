@@ -1,0 +1,34 @@
+<div class="cz-sidebar-static rounded-lg box-shadow-lg px-0 pb-0 mb-5 mb-lg-0">
+    <div class="px-4 mb-4">
+        <div class="media align-items-center">
+            <div class="img-thumbnail " style="width: 6.375rem;">
+                <img  [src]="(identity.img || '') | imagenPipe: 'usuarios'" alt="{{identity.first_name}}">
+            </div>
+            <div class="media-body pl-3">
+                <h3 class="font-size-base mb-0">{{identity.first_name}}</h3><span class="text-accent font-size-sm">{{identity.email}}</span>
+            </div>
+        </div>
+    </div>
+
+    
+    <ul class="list-unstyled mb-0">
+        <li class="border-bottom mb-0">
+            <a class="nav-link-style d-flex align-items-center px-4 py-3" [routerLink]="['/my-account/perfil/', identity.uid]" routerLinkActive="active">
+                <i class="czi-user opacity-60 mr-2"></i> Mis datos
+            </a>
+        </li>
+        
+        <li class="border-bottom mb-0"><a class="nav-link-style d-flex align-items-center px-4 py-3" [routerLink]="['/my-account/ordenes']" routerLinkActive="active"><i class="czi-bag opacity-60 mr-2"></i>Ordenes</a></li>
+
+        <li class="border-bottom mb-0">
+            <!-- <a class="nav-link-style d-flex align-items-center px-4 py-3" [routerLink]="['/my-account/cart']" routerLinkActive="active">
+                <i class="czi-cart opacity-60 mr-2"></i>Mi carrito
+            </a> -->
+            <a class="nav-link-style d-flex align-items-center px-4 py-3" [routerLink]="['/cart']" routerLinkActive="active">
+                <i class="czi-cart opacity-60 mr-2"></i>Mi carrito
+            </a>
+        </li>
+        
+        <li class="d-lg-none border-top mb-0"><a class="nav-link-style d-flex align-items-center px-4 py-3"><i class="czi-sign-out opacity-60 mr-2"></i>Sign out</a></li>
+    </ul>
+</div>

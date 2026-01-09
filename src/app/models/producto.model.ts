@@ -13,6 +13,7 @@ export class Producto {
   detalle!: string;
   slug!: string;
   stock!: number;
+  cantidad!:number;
   categoria!: Categoria;
   subcategoria!: string;
   isFeatured!: boolean;

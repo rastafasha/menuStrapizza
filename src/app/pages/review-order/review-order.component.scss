@@ -1,0 +1,61 @@
+.featured-image img {
+  width: 100%;
+  height: auto;
+  border-radius: 0.5rem;
+  /* box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); */
+   z-index: 20;
+    position: relative;
+    animation: reduce linear both;
+        animation-timeline: view();
+        animation-range: entry 30% cover 10%;
+}
+
+.burbleinfo{
+    display: flex;
+    border-radius: 30px;
+    background-color: whitesmoke;
+    padding: 10px;
+    margin-top: 10px;
+}
+
+.tray-image {
+    position: absolute;
+    /* top: 0; */
+    /* left: 0; */
+    width: 70%;
+    height: auto;
+    z-index: 10;
+    pointer-events: none;
+    display: flex
+;
+    align-self: center;
+    margin: 0 auto;
+}
+
+
+@keyframes reveal {
+    from { 
+        opacity: 0;
+        translate: 0 100px;
+        scale: .5;
+    }
+    to {
+        opacity: 1;
+        translate: 0 0;
+        scale: 1;
+    }
+}
+
+@keyframes reduce {
+    from { 
+        opacity: 1;
+        translate: 0 0;
+        scale: 1;
+    }
+    to {
+        
+        opacity: 1;
+        translate: 0 100px;
+        scale: .5;
+    }
+}

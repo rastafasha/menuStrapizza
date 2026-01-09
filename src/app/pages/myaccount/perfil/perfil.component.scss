@@ -1,0 +1,17 @@
+.breadcrumb-light .breadcrumb-item::before {
+    display: none !important;
+}
+
+.media {
+    
+    width: 100%;
+    position: relative;
+    border-radius: 100px;
+    & img{
+        width: 100%;
+        height: auto;
+        object-fit: cover;
+        border-radius: 100px;
+
+    }
+}

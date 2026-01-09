@@ -1,16 +1,24 @@
 <!-- Header -->
-    <header class="header">
-        <div class="header-container">
-            <div class="logo">
+<header class="header">
+    <div class="header-container">
+        <div class="logo">
 
-                <span class="logo-icon">
-                   <i class="fa fa-user" aria-hidden="true"></i>
-                   <i class="fa fa-shopping-cart" aria-hidden="true"></i>
-                </span>
-                <span class="logo-text">Strapizza</span>
-                <img src="assets/images/logo.png" alt="Strapizza Logo">
-            </div>
-            <!-- <nav>
+            <span class="logo-icon">
+                <a routerLink="/my-account"  *ngIf="user" style="color: var(--black);">
+                    <i class="fa fa-user "></i>
+                </a>
+                <span class="cart-count-badge" *ngIf="bandejaList.length > 0 && bandejaList.length <= 10">
+                    {{totalList}}</span>
+                <i class="fa fa-shopping-cart  cursor" *ngIf="bandejaList.length > 0 && bandejaList.length <= 10"
+                    routerLink="/review"></i>
+            </span>
+            <span class="logo-text">Strapizza</span>
+            <a routerLink="/" >
+                    <img src="assets/images/logo.png" alt="Strapizza Logo">
+                </a>
+            
+        </div>
+        <!-- <nav>
                 <ul class="nav-menu">
                     <li><a href="#inicio">Inicio</a></li>
                     <li><a href="#menu">Menú</a></li>
@@ -19,14 +27,14 @@
                     <li><a href="#contacto">Contacto</a></li>
                 </ul>
             </nav> -->
-            <!-- <a href="#perfil" class="btn-primary" style="width: 50px; display: flex;"><i class="fa fa-user"></i></a> -->
-            <!-- <a href="#pedir" class="btn-primary"><i class="fa fa-bars"></i></a> -->
-        </div>
-        <!-- <div class="menulateral">
+        <!-- <a href="#perfil" class="btn-primary" style="width: 50px; display: flex;"><i class="fa fa-user"></i></a> -->
+        <!-- <a href="#pedir" class="btn-primary"><i class="fa fa-bars"></i></a> -->
+    </div>
+    <!-- <div class="menulateral">
         <ul>
             <li>home</li>
             <li>perfil</li>
             <li>contacto</li>
         </ul>
     </div> -->
-    </header>
+</header>

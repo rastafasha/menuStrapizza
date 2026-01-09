@@ -1,0 +1,75 @@
+<app-header></app-header>
+<main class="container">
+    <div class="hero">
+        <h1>Confirmar Pedido</h1>
+    </div>
+    <div class="hero" *ngIf="!isbandejaList">
+        <h1>Cesta vacia</h1>
+    </div>
+
+    
+
+    
+    <div class="order-list" *ngIf="isbandejaList">
+        <div class="order-list-bar"></div>
+        <div class="list-box">
+            <!-- <h3>Pedido</h3> -->
+            <div class="clear"></div>
+            <div class="overf">
+                <!-- itemlist -->
+                <div class="top-item">
+                    <div class="list-item-left">
+
+                        <span class="burbleinfo">
+                            <!-- <i class="fa fa-shopping-bag icon-small" ></i> -->
+                            Orden No.{{randomNum}}
+                        </span>
+
+                    </div>
+                    <div class="list-item-right">
+                        <span class="burbleinfo">Hoy es: {{fechaHoy}}</span>
+
+                    </div>
+                </div>
+                <div class="list-item" *ngFor="let item of bandejaList; let i = index">
+                    <div class="clear"></div>
+                    <div class="info-item">
+                        <img [src]="item.img | imagenPipe:'productos' " alt="">
+                        <h2>{{item.titulo}}</h2>
+                        <div class="add-items justify-content-center">
+                            <i class="fa fa-minus icon-small" (click)="removeItem(item,i )"></i>
+                            <span>{{item.cantidad}}</span>
+                            <i class="fa fa-plus icon-small" (click)="addItem(item, i)"></i>
+                        </div>
+                        <div class="price">
+                            <p >{{item.precio_ahora * item.cantidad |number:'1.2-2'|currency}}</p>
+                            <!-- <p >{{item.precio_ahora | currency}}</p> -->
+                        </div>
+                    </div>
+                </div>
+                <!-- itemlist -->
+                <div class="d-flex justify-content-between mb-4 total">
+                    <p>
+                        <b>Total</b>
+                    </p>
+                    <p>
+                        <b>{{total() |number:'1.2-2'|currency}}</b>
+                    </p>
+                </div>
+
+
+
+            </div>
+        </div>
+    </div>
+    <div class="order-button-container">
+        <button class="check-button" routerLink="/">
+            <i class="fa fa-chevron-left icon-small"></i>
+            Volver
+        </button>
+        <button class="check-button" routerLink="/checkout" *ngIf="total() > 0">
+            Checkout
+            <i class="fa fa-chevron-right icon-small"></i>
+        </button>
+    </div>
+</main>
