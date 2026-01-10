@@ -5,7 +5,7 @@
 <!-- Free Delivery Section -->
 <app-free-delivery></app-free-delivery>
 <!-- Categories Section -->
-<app-cas-products></app-cas-products>
+<app-cas-products (msm_success)="onMsmSuccess($event)"></app-cas-products>
 <!-- Pastas Products -->
 <!-- <app-produc-list-slider></app-produc-list-slider> -->
 <!-- Hero Section -->
@@ -22,4 +22,4 @@
 </section> -->
 
 <!-- Footer -->
-<app-footer></app-footer>
+<app-footer [msm_success]="msm_success_value"></app-footer>

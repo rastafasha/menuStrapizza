@@ -1,15 +1,13 @@
 <app-header></app-header>
 <main class="container">
-    <div class="hero">
+    <div class="title-top">
         <h1>Confirmar Pedido</h1>
     </div>
-    <div class="hero" *ngIf="!isbandejaList">
+    <div class="title-top" *ngIf="!isbandejaList">
         <h1>Cesta vacia</h1>
     </div>
 
-    
 
-    
     <div class="order-list" *ngIf="isbandejaList">
         <div class="order-list-bar"></div>
         <div class="list-box">
@@ -42,7 +40,7 @@
                             <i class="fa fa-plus icon-small" (click)="addItem(item, i)"></i>
                         </div>
                         <div class="price">
-                            <p >{{item.precio_ahora * item.cantidad |number:'1.2-2'|currency}}</p>
+                            <p>{{item.precio_ahora * item.cantidad |number:'1.2-2'|currency}}</p>
                             <!-- <p >{{item.precio_ahora | currency}}</p> -->
                         </div>
                     </div>
@@ -68,7 +66,7 @@
             Volver
         </button>
         <button class="check-button" routerLink="/checkout" *ngIf="total() > 0">
-            Checkout
+            Hacer pedido
             <i class="fa fa-chevron-right icon-small"></i>
         </button>
     </div>

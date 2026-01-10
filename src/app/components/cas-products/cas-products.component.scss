@@ -6,6 +6,13 @@
     margin-top: 5px;
     border-radius: 100px;
 }
+.title-section{
+    display: flex;
+    flex-direction: row;
+    gap: 15px;
+    justify-content: center;
+    align-items: center;
+}
 
 .tab-content-set{
     display: flex;

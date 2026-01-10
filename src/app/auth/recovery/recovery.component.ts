@@ -10,7 +10,6 @@ import { NgIf } from '@angular/common';
   imports:[
     RouterModule,
     FormsModule,
-    HeaderComponent,
     NgIf
   ],
   templateUrl: './recovery.component.html',

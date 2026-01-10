@@ -7,6 +7,14 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
+                <!-- mensaje -->
+            <div class="alert alert-success alert-dismissible fade show" role="alert" *ngIf="msm_success">
+                Artículo agregado al <a [routerLink]="['/review']"><b>Carrito!</b></a>.
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <!-- mensaje -->
                 <div class="ft-recipe">
                     <div class="ft-recipe__thumb">
                         <span id="close-modal">
@@ -33,7 +41,8 @@
                                 </li>
                                 <li class="recipe-details-item servings">
                                     <i class="fa fa-users icon-small"></i>
-                                    <span class="value" style="text-decoration: line-through;">{{product.precio_antes |number:'1.2-2'|currency}}</span>
+                                    <span class="value" style="text-decoration: line-through;">{{product.precio_antes
+                                        |number:'1.2-2'|currency}}</span>
                                     <span class="value">{{product.precio_ahora |number:'1.2-2'|currency}}</span>
                                 </li>
                             </ul>
@@ -45,7 +54,7 @@
                             <i class="fa fa-plus icon-small" (click)="addItem(product)"></i>
                         </div>
                         <div class="price">
-                            <p >{{product.precio_ahora * product.cantidad |number:'1.2-2'|currency}}</p>
+                            <p>{{product.precio_ahora * product.cantidad |number:'1.2-2'|currency}}</p>
                             <!-- <p >{{item.precio_ahora | currency}}</p> -->
                         </div>
                         <!-- <button class="add-button btn-primary" (click)="addProduct(product)" >
@@ -59,6 +68,7 @@
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 <button type="button" class="btn btn-primary">Save changes</button>
             </div> -->
+            
         </div>
     </div>
 </div>

@@ -2,11 +2,13 @@ import { CommonModule } from '@angular/common';
 import { Component, inject, Input } from '@angular/core';
 import { Producto } from '../../models/producto.model';
 import { StorageService } from '../../services/storage.service';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-modalproduct',
   imports: [
-    CommonModule
+    CommonModule,
+    RouterModule
   ],
   templateUrl: './modalproduct.component.html',
   styleUrl: './modalproduct.component.scss'
@@ -14,7 +16,8 @@ import { StorageService } from '../../services/storage.service';
 export class ModalproductComponent {
   @Input() product!:Producto|null;
   bandejaList: Producto[] = [];
-
+public msm_error = false;
+  public msm_success = false;
   private storageService = inject(StorageService);
 
   
@@ -34,6 +37,7 @@ export class ModalproductComponent {
   }
 
   addItem(producto:Producto){
+    this.msm_success = false;
     const index = this.bandejaList.findIndex(item =>
       item === producto ||
       ((item as any).id && (producto as any).id && (item as any).id === (producto as any).id) ||
@@ -52,7 +56,11 @@ export class ModalproductComponent {
     }
 
     this.saveBandejaListToLocalStorage();
-
+    setTimeout(()=>{
+      this.msm_success = true;
+      
+    }, 500)
+    this.msm_success = false;
   }
 removeItem(producto:Producto){
   const index = this.bandejaList.findIndex(item =>

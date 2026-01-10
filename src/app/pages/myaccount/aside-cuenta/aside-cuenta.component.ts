@@ -22,6 +22,7 @@ export class AsideCuentaComponent implements OnInit {
 
   constructor(
     private usuarioService: UsuarioService,
+    
   ) {
     let USER = localStorage.getItem('user');
     if(USER){
@@ -33,4 +34,7 @@ export class AsideCuentaComponent implements OnInit {
   ngOnInit(): void {
   }
 
+  slir(){
+    this.usuarioService.logout()
+  }
 }

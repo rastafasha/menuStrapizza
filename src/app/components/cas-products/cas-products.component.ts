@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, inject, Output, EventEmitter } from '@angular/core';
 import { ProducListComponent } from "../produc-list/produc-list.component";
 import { Categoria } from '../../models/categoria.model';
 import { CategoryService } from '../../services/category.service';
@@ -9,14 +9,16 @@ import { Tienda } from '../../models/tienda.model';
 import { ProductoService } from '../../services/product.service';
 import { ProductItemComponent } from "../product-item/product-item.component";
 import { ModalproductComponent } from "../modalproduct/modalproduct.component";
+import { LoadingComponent } from '../../shared/loading/loading.component';
 
 @Component({
   selector: 'app-cas-products',
-  imports: [CommonModule, ProducListComponent, ProductItemComponent, ModalproductComponent],
+  imports: [CommonModule, LoadingComponent, ProductItemComponent, ModalproductComponent],
   templateUrl: './cas-products.component.html',
   styleUrl: './cas-products.component.scss'
 })
 export class CasProductsComponent {
+  @Output() msm_success: EventEmitter<boolean> = new EventEmitter<boolean>();
   option_selectedd: number = 1;
   solicitud_selectedd: any = null;
 
@@ -127,6 +129,14 @@ private tiendasService = inject(TiendaService);
       const modal = new (window as any).bootstrap.Modal(modalElement);
       modal.show();
     }
+  }
+
+public PageSize(): void {
+        this.getProductosCatName();
+      }
+
+  onMsmSuccess(value: boolean): void {
+    this.msm_success.emit(value);
   }
 
 }

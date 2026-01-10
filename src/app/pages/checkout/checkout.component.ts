@@ -36,6 +36,7 @@ export class CheckoutComponent {
   fechaHoy: string = new Date().toISOString().split('T')[0];
   randomNum:number = 0;
   isbandejaList:boolean = false;
+  identitys:boolean = false;
   iva:number = 12;
   public identity:any;
    public localId!:string;
@@ -59,6 +60,7 @@ export class CheckoutComponent {
   public msm_success_cupon=false;
   public precio_envio:any;
   public msm_error = '';
+  public whatsapp = '+584241874370';
 
   // public socket = io(environment.soketServer);
   public data_direccionLocal : any = {};

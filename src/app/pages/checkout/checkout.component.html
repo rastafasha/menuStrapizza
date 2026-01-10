@@ -1,7 +1,7 @@
 <app-header></app-header>
 
 <main class="container">
-  <div class="hero">
+  <div class="title-top">
     <h1>Checkout</h1>
   </div>
 
@@ -14,9 +14,12 @@
       <div class=" d-flex justify-content-center  mb-3 col-12 ">
         <div class="row g-3 w-100">
           <div class="col-12">
-            <span>Resumen</span>
+            <!-- <span>Resumen</span> -->
 
             <div class="card ">
+              <p>Hola, Soy <b>{{identity.first_name}} {{identity.last_name}}</b>,
+                y quiero hacer un pedido con la lista, solicito informacion para realizar el pago y cofirmar la compra.
+              </p>
 
               <hr class="mt-0 line">
               <div class="p-1 pt-0 pb-0 d-flex justify-content-between ">
@@ -44,6 +47,21 @@
       <!-- !!identity -->
 
       <div class="col-12" *ngIf="identity">
+        <div class="order-button-container">
+          <a href="`https://wa.me/`{{whatsapp}}`?text=Estoy%20interesado%20en%20el%20producto%20en%20la%elMenu,%20favor%20ampliar%20informacion`"
+            target="_blank" rel="noopener noreferrer">
+            <button class="check-button">
+              <i class="fa fa-envelope"></i>
+              Mensaje a Nuestro Whatsapp
+            </button>
+          </a>
+        </div>
+      </div>
+
+
+      <div class="col-12" *ngIf="identitys">
+
+
         <!-- <span>Metodos de Pago</span> -->
         <div class="card p-3" id="card-pay">
           <label class="form-label">Seleccione el método de pago</label>
@@ -69,9 +87,8 @@
               <!-- Tipo de Transferencia -->
               <div class="mb-3 mt-2 col-12">
                 <label class="form-label">Tipo de Transferencia</label>
-                <select formControlName="metodo_pago" 
-                class="form-control" (change)="onChangePayment($event)"
-                 name="metodo_pago" id="metodo_pago">
+                <select formControlName="metodo_pago" class="form-control" (change)="onChangePayment($event)"
+                  name="metodo_pago" id="metodo_pago">
                   <option value=" ">Seleccione Tipo de Transferencia</option>
                   <option [value]="metodo_pago._id" *ngFor="let metodo_pago of paymentMethods">
                     {{metodo_pago.tipo}}
@@ -110,14 +127,14 @@
                     id="referencia">
                 </div>
                 <!-- botones -->
-              <div class="d-flex justify-content-center gap-2">
+                <div class="d-flex justify-content-center gap-2">
 
 
-                <button class="check-button " type="submit">
-                  <i class="fa fa-money-check"></i>
-                  Procesar pago
-                </button>
-              </div>
+                  <button class="check-button " type="submit">
+                    <i class="fa fa-money-check"></i>
+                    Procesar pago
+                  </button>
+                </div>
               </div>
 
 
@@ -138,53 +155,53 @@
                   <input type="number" formControlName="phone" class="form-control" name="phone" id="phone">
                 </div>
                 <!-- botones -->
-              <div class="d-flex justify-content-center gap-2">
+                <div class="d-flex justify-content-center gap-2">
 
 
-                <button class="check-button " type="submit">
-                  <i class="fa fa-money-check"></i>
-                  Procesar pago
-                </button>
-              </div>
+                  <button class="check-button " type="submit">
+                    <i class="fa fa-money-check"></i>
+                    Procesar pago
+                  </button>
+                </div>
               </div>
 
               <div *ngIf="paymentSelected && paymentSelected?.tipo === 'zelle'">
                 <div class="row">
                   <!-- numero de referencia -->
-                <div class="mb-3 col-xs-12 col-sm-6">
-                  <label for="email" class="form-label">Email</label>
-                  <input type="text" formControlName="email" class="form-control" name="email" id="email">
-                </div>
-                <!-- nombre del banco -->
-                <div class="mb-3 col-xs-12 col-sm-6">
-                  <label for="bankName" class="form-label">Banco</label>
-                  <input type="text" formControlName="bankName" class="form-control" name="bankName" id="bankName">
-                </div>
+                  <div class="mb-3 col-xs-12 col-sm-6">
+                    <label for="email" class="form-label">Email</label>
+                    <input type="text" formControlName="email" class="form-control" name="email" id="email">
+                  </div>
+                  <!-- nombre del banco -->
+                  <div class="mb-3 col-xs-12 col-sm-6">
+                    <label for="bankName" class="form-label">Banco</label>
+                    <input type="text" formControlName="bankName" class="form-control" name="bankName" id="bankName">
+                  </div>
                 </div>
 
                 <div class="row">
                   <!-- numero de referencia -->
-                <div class="mb-3 col-xs-12 col-sm-6">
-                  <label for="referencia" class="form-label">Num. referencia</label>
-                  <input type="text" formControlName="referencia" class="form-control" name="referencia"
-                    id="referencia">
-                </div>
+                  <div class="mb-3 col-xs-12 col-sm-6">
+                    <label for="referencia" class="form-label">Num. referencia</label>
+                    <input type="text" formControlName="referencia" class="form-control" name="referencia"
+                      id="referencia">
+                  </div>
 
-                <!-- monto -->
-                <div class="mb-3 col-xs-12 col-sm-6">
-                  <label for="amount" class="form-label">Monto</label>
-                  <input type="number" formControlName="amount" class="form-control" name="amount" id="amount">
-                </div>
+                  <!-- monto -->
+                  <div class="mb-3 col-xs-12 col-sm-6">
+                    <label for="amount" class="form-label">Monto</label>
+                    <input type="number" formControlName="amount" class="form-control" name="amount" id="amount">
+                  </div>
                 </div>
                 <!-- botones -->
-              <div class="d-flex justify-content-center gap-2">
+                <div class="d-flex justify-content-center gap-2">
 
 
-                <button class="check-button " type="submit">
-                  <i class="fa fa-money-check"></i>
-                  Procesar pago
-                </button>
-              </div>
+                  <button class="check-button " type="submit">
+                    <i class="fa fa-money-check"></i>
+                    Procesar pago
+                  </button>
+                </div>
 
 
               </div>
@@ -192,7 +209,7 @@
             </form>
           </div>
 
-          
+
         </div>
 
       </div>
