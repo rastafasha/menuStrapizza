@@ -41,7 +41,13 @@ export class MyaccountComponent implements OnInit {
     if(USER){
       this.identity = JSON.parse(USER);
       console.log(this.identity);
+    }else{
+     this.router.navigateByUrl('/login');
     }
+  }
+
+  slir(){
+    this.usuarioService.logout()
   }
 
 

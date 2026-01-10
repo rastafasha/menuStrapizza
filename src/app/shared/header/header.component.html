@@ -7,10 +7,13 @@
                 <a routerLink="/my-account"  *ngIf="user" style="color: var(--black);">
                     <i class="fa fa-user "></i>
                 </a>
-                <span class="cart-count-badge" *ngIf="bandejaList.length > 0 && bandejaList.length <= 10">
-                    {{totalList}}</span>
-                <i class="fa fa-shopping-cart  cursor" *ngIf="bandejaList.length > 0 && bandejaList.length <= 10"
-                    routerLink="/review"></i>
+                <span *ngIf="user">
+                    <span class="cart-count-badge" *ngIf="bandejaList.length > 0 && bandejaList.length <= 10">
+                        {{totalList}}</span>
+                    <i class="fa fa-shopping-cart  cursor" *ngIf="bandejaList.length > 0 && bandejaList.length <= 10"
+                        routerLink="/review"></i>
+
+                </span>
             </span>
             <span class="logo-text">Strapizza</span>
             <a routerLink="/" >

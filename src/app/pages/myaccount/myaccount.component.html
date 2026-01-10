@@ -5,59 +5,73 @@
 <div class="about" id="page" *ngIf="identity">
 
     <section class="sub-header d-flex justify-content-center mt-5" style="padding-top: 50px;">
-        
+
         <div class="overlay-call-to-action"></div>
-        
-        <h3 class="heading-style-3" >Mi Perfil </h3>
+
+        <h3 class="heading-style-3">Mi Perfil </h3>
     </section>
     <section class="boxed-sm" style="height: calc(100vh - 100px); margin-top: 100px;">
         <div class="container">
             <div class="row blog-v reverse">
-               <div class="col-sm-4">
-                <!-- <app-aside-cuenta></app-aside-cuenta> -->
-               </div>
+                <div class="col-sm-4">
+                    <!-- <app-aside-cuenta></app-aside-cuenta> -->
+                </div>
                 <div class="col-md-8">
                     <h1>Hola, {{identity.first_name}}!</h1>
                     <h2>Gracias por Registrarte</h2>
                 </div>
-                
+
             </div>
             <div class="row ">
                 <div class="d-flex justify-content-between gap-5">
                     <div class="d-flex align-items-center ">
-                    <div class="card">
-                        <div class="card-body">
-                            <a [routerLink]="['/my-account/perfil', identity.uid]">
-                                <i class="fa fa-user"></i>
-                                <p>Mis Datos</p>
-                            </a>
+                        <div class="card">
+                            <div class="card-body">
+                                <a [routerLink]="['/my-account/perfil', identity.uid]">
+                                    <i class="fa fa-user"></i>
+                                    <p>Mis Datos</p>
+                                </a>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="d-flex align-items-center ">
-                    <div class="card">
-                        <div class="card-body">
-                            <a [routerLink]="['/my-account/ordenes']">
-                                <i class="fa fa-shopping-basket"></i>
-                                <p>Ordenes</p>
+                    <div class="d-flex align-items-center ">
+                        <div class="card">
+                            <div class="card-body">
+                                <a [routerLink]="['/my-account/ordenes']">
+                                    <i class="fa fa-shopping-basket"></i>
+                                    <p>Ordenes</p>
 
-                            </a>
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="d-flex align-items-center ">
-                    <div class="card">
-                        <div class="card-body">
-                            <a [routerLink]="['/review']">
-                                <i class="fa fa-shopping-cart"></i>
-                                <p>Mi Carrito</p>
+                <div class="d-flex justify-content-between gap-5">
+                   
+                    <div class="d-flex align-items-center ">
+                        <div class="card">
+                            <div class="card-body">
+                                <a [routerLink]="['/review']">
+                                    <i class="fa fa-shopping-cart"></i>
+                                    <p>Mi Carrito</p>
 
-                            </a>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center ">
+                        <div class="card">
+                            <div class="card-body">
+                                <a (click)="slir()">
+                                    <i class="fa fa-power-off"></i>
+                                    <p>Salir</p>
+
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
-                </div>
-                
+
             </div>
         </div>
     </section>
