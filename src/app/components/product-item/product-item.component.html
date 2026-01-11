@@ -20,7 +20,7 @@
             <div class="infpr">
                 <h4>{{product.titulo}}</h4>
                 <div class="product-price text-danger">{{product.precio_antes| currency:'EUR'}}</div>
-                <div class="product-price">{{product.precio_ahora| currency}}</div>
+                <div class="product-price">{{product.precio_ahora| currency:'EUR'}}</div>
             </div>
             <div class="botns">
                 <button class="btn-secondary btn" (click)="openPaymentsModal(product)"><i
