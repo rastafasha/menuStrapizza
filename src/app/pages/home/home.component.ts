@@ -15,7 +15,7 @@ import { FooterComponent } from "../../shared/footer/footer.component";
 })
 export class HomeComponent {
 
-  @Output() tiendaSelected: string = 'Pizzería';
+  @Output() tiendaSelected!: string ;
   @Output() msm_success: EventEmitter<boolean> = new EventEmitter<boolean>();
   @Input() msm_success_value: boolean = false;
 

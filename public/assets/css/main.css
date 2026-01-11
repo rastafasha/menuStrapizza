@@ -102,3 +102,28 @@ h5{
     width: 98%;
 
 }
+
+.aviso{
+    display: flex;
+    flex-direction: row-reverse;
+    padding: 15px;
+    border-right: 1px solid #dcb50b;
+    background-color: #edaa73f6;
+    color: #f3f0eb;
+    margin-bottom: 5px;
+    border-radius: 12px;
+    width: 98vw;
+    position: fixed;
+    z-index: 1500;
+    bottom: 0;
+    left: 0;
+    top: auto;
+    gap: 10px;
+    justify-content: space-between;
+}
+
+.aviso-sucess{
+    border-right: 1px solid #167f05;
+    background-color: #19a264f2;
+    color: #f3f0eb;
+}

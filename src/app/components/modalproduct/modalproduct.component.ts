@@ -3,6 +3,9 @@ import { Component, inject, Input } from '@angular/core';
 import { Producto } from '../../models/producto.model';
 import { StorageService } from '../../services/storage.service';
 import { RouterModule } from '@angular/router';
+import { Usuario } from '../../models/usuario.model';
+import { TiendaService } from '../../services/tienda.service';
+import { Tienda } from '../../models/tienda.model';
 
 @Component({
   selector: 'app-modalproduct',
@@ -18,7 +21,27 @@ export class ModalproductComponent {
   bandejaList: Producto[] = [];
 public msm_error = false;
   public msm_success = false;
-  private storageService = inject(StorageService);
+  private tiendaService = inject(TiendaService);
+user!:Usuario;
+
+tiendaSelected!:Tienda;
+  ngOnInit(): void {
+     let USER = localStorage.getItem("user");
+    this.user = USER ? JSON.parse(USER) : null;
+    console.log(this.tiendaSelected)
+
+
+    // Load bandejaList from localStorage
+    const storedItems = localStorage.getItem("bandejaItems");
+    if (storedItems) {
+      try {
+        this.bandejaList = JSON.parse(storedItems);
+      } catch (e) {
+        console.error('Error parsing bandejaList from localStorage', e);
+        this.bandejaList = [];
+      }
+    }
+  }
 
   
   saveBandejaListToLocalStorage() {
@@ -40,7 +63,7 @@ public msm_error = false;
     this.msm_success = false;
     const index = this.bandejaList.findIndex(item =>
       item === producto ||
-      ((item as any).id && (producto as any).id && (item as any).id === (producto as any).id) ||
+      ((item as any)._id && (producto as any)._id && (item as any).id === (producto as any)._id) ||
       ((item as any).name && (producto as any).name && (item as any).name === (producto as any).name)
     );
 
@@ -80,6 +103,10 @@ removeItem(producto:Producto){
 
   
 }
+
+ closeAviso(){
+    this.msm_success = false;
+  }
 
 
   

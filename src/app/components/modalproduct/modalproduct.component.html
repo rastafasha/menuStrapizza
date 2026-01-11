@@ -7,14 +7,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <!-- mensaje -->
-            <div class="alert alert-success alert-dismissible fade show" role="alert" *ngIf="msm_success">
-                Artículo agregado al <a [routerLink]="['/review']"><b>Carrito!</b></a>.
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <!-- mensaje -->
+              
                 <div class="ft-recipe">
                     <div class="ft-recipe__thumb">
                         <span id="close-modal">
@@ -42,24 +35,38 @@
                                 <li class="recipe-details-item servings">
                                     <i class="fa fa-users icon-small"></i>
                                     <span class="value" style="text-decoration: line-through;">{{product.precio_antes
-                                        |number:'1.2-2'|currency}}</span>
-                                    <span class="value">{{product.precio_ahora |number:'1.2-2'|currency}}</span>
+                                        |number:'1.2-2'|currency:'EUR'}}</span>
+                                    <span class="value">{{product.precio_ahora |number:'1.2-2'|currency:'EUR'}}</span>
                                 </li>
                             </ul>
                         </header>
                         <p class="description" [innerHTML]="product.detalle"></p>
-                        <div class="add-items justify-content-center">
+                        <div *ngIf="!user" class="aviso">
+                            <p>Debes Iniciar Sesión ó Registrarte para solicitar un pedido</p>
+                        </div>
+
+                         
+                        <!-- <div class="add-items justify-content-center" *ngIf="user">
                             <i class="fa fa-minus icon-small" (click)="removeItem(product)"></i>
                             <span>{{product.cantidad}}</span>
                             <i class="fa fa-plus icon-small" (click)="addItem(product)"></i>
-                        </div>
-                        <div class="price">
+                        </div> -->
+                        <button class="btn-success btn" *ngIf="user" (click)="addItem(product)"><i class="fa fa-shopping-bag"></i></button>
+                        <div class="price" *ngIf="user">
                             <p>{{product.precio_ahora * product.cantidad |number:'1.2-2'|currency}}</p>
                             <!-- <p >{{item.precio_ahora | currency}}</p> -->
                         </div>
                         <!-- <button class="add-button btn-primary" (click)="addProduct(product)" >
                             <i class="fa fa-plus icon-small"></i>
                         </button> -->
+
+                         <!-- mensaje -->
+                        <div class="aviso aviso-sucess" role="alert" *ngIf="msm_success">
+                            <i class="fa fa-close" (click)="closeAviso()"></i>
+                            <!-- al <a [routerLink]="['/review']"><b>Carrito!</b></a> -->
+                            <p>Artículo agregado! </p>
+                        </div>
+                        <!-- mensaje -->
                     </div>
                 </div>
             </div>

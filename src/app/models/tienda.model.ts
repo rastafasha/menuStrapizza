@@ -17,6 +17,7 @@ export class Tienda{
     public direccion?: string,
     public pais?: string,
     public ciudad?: string,
+    public moneda?: string,
     public zip?: string,
     public user?: string,
     public categoria?: Categoria,

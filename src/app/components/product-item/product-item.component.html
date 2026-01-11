@@ -11,7 +11,7 @@
 </div> -->
 
 
-<div class="products-grid" >
+<div class="products-grid">
     <div class="product-card">
         <div class="product-image" (click)="openPaymentsModal(product)">
             <img [src]="product.img" [alt]="product.titulo">
@@ -19,16 +19,24 @@
         <div class="product-content">
             <div class="infpr">
                 <h4>{{product.titulo}}</h4>
-            <div class="product-price text-danger">{{product.precio_antes| currency}}</div>
-            <div class="product-price">{{product.precio_ahora| currency}}</div>
+                <div class="product-price text-danger">{{product.precio_antes| currency:'EUR'}}</div>
+                <div class="product-price">{{product.precio_ahora| currency}}</div>
             </div>
             <div class="botns">
-                <button class="btn-secondary btn" (click)="openPaymentsModal(product)"><i class="fa fa-eye"></i></button>
+                <button class="btn-secondary btn" (click)="openPaymentsModal(product)"><i
+                        class="fa fa-eye"></i></button>
                 <button class="btn-success btn" (click)="addItem(product)"><i class="fa fa-shopping-bag"></i></button>
             </div>
         </div>
     </div>
-    
+
+</div>
+<div *ngIf="isUserLogged" class="aviso">
+    <i class="fa fa-close" (click)="closeAviso()"></i>
+    <p>Debes Iniciar Sesión ó Registrarte para solicitar un pedido</p>
 </div>
 
-
+<div *ngIf="isProductAdded" class="aviso aviso-sucess">
+    <i class="fa fa-close" (click)="closeAviso()"></i>
+    <p>Producto Agregado al <a [routerLink]="['/review']"><b>Carrito!</b></a></p>
+</div>

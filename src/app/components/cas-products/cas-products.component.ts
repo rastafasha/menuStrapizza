@@ -96,7 +96,7 @@ private tiendasService = inject(TiendaService);
         products: productos.filter((product: any) => product.subcategoria === subcategoria),
         }));
         this.subcategories = categorias || [];
-        console.log(this.selectCategory)
+        // console.log(this.selectCategory)
     })
     this.isLoading = false
   }
