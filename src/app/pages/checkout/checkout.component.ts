@@ -17,6 +17,7 @@ import { CartItemModel } from '../../models/cart-item-model';
 import { environment } from '../../environments/environment';
 import { Producto } from '../../models/producto.model';
 import { Usuario } from '../../models/usuario.model';
+import { ImagenPipe } from '../../pipes/imagen-pipe.pipe';
 
 declare var $:any;
 // declare var paypal;
@@ -26,6 +27,7 @@ declare var $:any;
   imports: [
     HeaderComponent, CommonModule, RouterModule,
     ReactiveFormsModule, FormsModule,
+    ImagenPipe
     //  NgxPayPalModule
   ],
   templateUrl: './checkout.component.html',
@@ -73,10 +75,11 @@ export class CheckoutComponent {
 
   public url!:string;
   public postales:any;
-  tiendaSelect:any;
 
-  tienda!:any;
-
+  tienda!:Tienda;
+  tiendas: Tienda[] = [];
+  nombreSelected = 'Strapizza';
+tiendaSelected:any;
   selectedMethod: string = 'Selecciona un método de pago';
   public clienteSeleccionado: any;
 
@@ -131,7 +134,7 @@ export class CheckoutComponent {
 
     }
     ngOnInit(){
-      this.loadBandejaListFromLocalStorage();
+      
       this.geneardorOrdeneNumero();
       this.obtenerMetodosdePago();
       this.total();
@@ -140,22 +143,34 @@ export class CheckoutComponent {
         this.identity = JSON.parse(USER);
         // console.log(this.identity);
       }
+     this.getTiendas();
+     this.loadBandejaListFromLocalStorage();
 
-      let TIENDA = localStorage.getItem('tiendaSelected');
-      if(TIENDA){
-        this.tienda = JSON.parse(TIENDA);
-        // console.log(this.tienda);
-
-        this.data_direccionLocal = this.tienda;
-        this.localId = this.tienda._id;
-
-      }
-
-       this.direccionTienda();
-       this.loadTiendaFromLocalStorage();
-      
       // this.listar_carrito();
     }
+
+    getTiendas() {
+        this._tiendaService.cargarTiendas().subscribe((resp: Tienda[]) => {
+          // Asignamos el array filtrado directamente
+          this.tiendas = resp.filter((tienda: Tienda) => tienda.categoria && tienda.categoria.nombre === 'Alimentos');
+          // console.log(this.tiendas);
+    
+          this.setTiendaDefault();
+    
+        })
+      }
+    
+    
+    
+      setTiendaDefault() {
+        // Set default tiendaSelected to "Panaderia SlideDish" if not already set
+        const defaultTienda = this.tiendas.find(tienda => tienda.nombre === this.nombreSelected);
+        this.tiendaSelected = defaultTienda;
+
+         this.data_direccionLocal = this.tiendaSelected;
+        this.localId = this.tiendaSelected._id;
+        // console.log(defaultTienda)
+      }
 
     private listAndIdentify(){
     // this.listar_direcciones();
@@ -255,7 +270,7 @@ export class CheckoutComponent {
   }
 
 
-    loadBandejaListFromLocalStorage() {
+  loadBandejaListFromLocalStorage() {
     const storedItems = localStorage.getItem('bandejaItems');
     if (storedItems) {
       this.bandejaList = JSON.parse(storedItems);
@@ -276,7 +291,7 @@ export class CheckoutComponent {
             color: '#fff',
             selector : 'unico'
           })
-          // console.log(this.carrito);
+          console.log(this.bandejaList);
 
         });
   }
@@ -488,24 +503,24 @@ export class CheckoutComponent {
     // }.bind(this));
   }
 
-   loadTiendaFromLocalStorage() {
-    const storedLocal = localStorage.getItem('tiendaSelected');
-    if (storedLocal) {
-      this.tiendaSelect = JSON.parse(storedLocal);
-      console.log(this.tiendaSelect)
+  //  loadTiendaFromLocalStorage() {
+  //   const storedLocal = localStorage.getItem('tiendaSelected');
+  //   if (storedLocal) {
+  //     this.tiendaSelect = JSON.parse(storedLocal);
+  //     console.log(this.tiendaSelect)
 
-    }
-  }
+  //   }
+  // }
 
-  direccionTienda(){
-    this._tiendaService.getTiendaById(this.localId).subscribe(
-      tienda =>{
-        this.data_direccionLocal = tienda;
-        console.log('direccion del local', this.data_direccionLocal);
-      }
-    );
+  // direccionTienda(){
+  //   this._tiendaService.getTiendaById(this.localId).subscribe(
+  //     tienda =>{
+  //       this.data_direccionLocal = tienda;
+  //       console.log('direccion del local', this.data_direccionLocal);
+  //     }
+  //   );
 
-  }
+  // }
 
    verify_dataComplete(total_pagado: number){debugger
     if(this.localId){
@@ -613,11 +628,12 @@ export class CheckoutComponent {
 
   // Generate WhatsApp message with order items
   getWhatsAppMessage(): string {
+
     if (!this.identity || this.bandejaList.length === 0) {
       return '';
     }
 
-    let message = `*Nuevo Pedido #${this.randomNum}*\n\n`;
+    let message = `*Nuevo Pedido desde app Menu #${this.randomNum}*\n\n`;
     message += `*Cliente:* ${this.identity.first_name} ${this.identity.last_name}\n`;
     message += `*Teléfono:* ${this.identity.telefono || 'No registrado'}\n\n`;
     message += `*Detalles del Pedido:*\n`;
@@ -625,7 +641,7 @@ export class CheckoutComponent {
 
     this.bandejaList.forEach((item: any) => {
       const itemTotal = (item.precio_ahora * item.cantidad).toFixed(2);
-      message += `• ${item.nombre || item.name}\n`;
+      message += `• ${item.titulo || item.titulo}\n`;
       message += `  Cant: ${item.cantidad} x ${item.precio_ahora.toFixed(2)} = ${itemTotal}\n\n`;
     });
 

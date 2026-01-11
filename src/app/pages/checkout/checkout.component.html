@@ -20,12 +20,26 @@
               <p>Hola, Soy <b>{{identity.first_name}} {{identity.last_name}}</b>,
                 y quiero hacer un pedido con la lista, solicito informacion para realizar el pago y cofirmar la compra.
               </p>
+              <div class="list-item" *ngFor="let item of bandejaList; let i = index">
+                    <div class="clear"></div>
+                    <div class="info-item">
+                        <img [src]="item.img | imagenPipe:'productos' " alt="">
+                        <h2>{{item.titulo}}</h2>
+                        <div class="add-items justify-content-center">
+                            <span>{{item.cantidad}}</span>
+                        </div>
+                        <div class="price">
+                            <p>{{item.precio_ahora * item.cantidad |number:'1.2-2'| currency:'EUR'}}</p>
+                            <!-- <p >{{item.precio_ahora | currency}}</p> -->
+                        </div>
+                    </div>
+                </div>
 
               <hr class="mt-0 line">
               <div class="p-1 pt-0 pb-0 d-flex justify-content-between ">
-
+                
                 <div class="d-flex flex-column">
-
+                  
                   <span>Total a Pagar</span>
 
                 </div>
