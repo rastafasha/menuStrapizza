@@ -1,10 +1,12 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnDestroy } from '@angular/core';
 import { TiendaService } from '../../services/tienda.service';
+import { CarritoService } from '../../services/carrito.service';
 import { Tienda } from '../../models/tienda.model';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Usuario } from '../../models/usuario.model';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-header',
@@ -13,55 +15,57 @@ import { Usuario } from '../../models/usuario.model';
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss'
 })
-export class HeaderComponent {
+export class HeaderComponent implements OnDestroy {
 
-  totalList : number = 0;
-   tiendas: Tienda[] = [];
-  tienda!:Tienda;
-  tiendaSelected!:Tienda;
-   bandejaList: any[] = [];
+  totalList: number = 0;
+  tiendas: Tienda[] = [];
+  tienda!: Tienda;
+  tiendaSelected!: Tienda;
+  bandejaList: any[] = [];
 
-   year: number = new Date().getFullYear();
-    public user!: Usuario;
+  year: number = new Date().getFullYear();
+  public user!: Usuario;
 
   private tiendaService = inject(TiendaService);
+  private carritoService = inject(CarritoService);
+  private cartSubscription!: Subscription;
 
-
-   ngOnInit(): void {
-     let USER = localStorage.getItem("user");
+  ngOnInit(): void {
+    let USER = localStorage.getItem("user");
     this.user = USER ? JSON.parse(USER) : null;
-    
-    this.loadBandejaListFromLocalStorage();
-      this.getTiendas();
-      this.setTiendaDefault();
-    }
 
-      loadBandejaListFromLocalStorage() {
-    const storedItems = localStorage.getItem('bandejaItems');
-    if (storedItems) {
-      this.bandejaList = JSON.parse(storedItems);
-      //contamos el total de items
-      this.totalList = this.bandejaList.length;
+    // Subscribe to cart changes
+    this.cartSubscription = this.carritoService.bandejaList$.subscribe(items => {
+      this.bandejaList = items;
+      this.totalList = items.length;
+    });
 
+    this.getTiendas();
+    this.setTiendaDefault();
+  }
+
+  ngOnDestroy(): void {
+    if (this.cartSubscription) {
+      this.cartSubscription.unsubscribe();
     }
   }
 
-    getTiendas(){
+  getTiendas() {
     this.tiendaService.cargarTiendas().subscribe((resp: Tienda[]) => {
       // Asignamos el array filtrado directamente
-      this.tiendas = resp.filter((tienda: Tienda) => tienda.categoria && tienda.categoria.nombre=== 'Alimentos');
+      this.tiendas = resp.filter((tienda: Tienda) => tienda.categoria && tienda.categoria.nombre === 'Alimentos');
       // console.log(this.tiendas);
 
-      setTimeout(()=>{
+      setTimeout(() => {
         this.setTiendaDefault();
-      },1000)
+      }, 1000)
 
     })
   }
 
- 
 
-  setTiendaDefault(){
+
+  setTiendaDefault() {
     // Check if default tienda has already been set
     if (localStorage.getItem('defaultTiendaSet')) return;
 
@@ -78,10 +82,10 @@ export class HeaderComponent {
   }
 
 
-   onSelectStore(tienda:any){
+  onSelectStore(tienda: any) {
     this.tiendaSelected = tienda;
     this.tiendaService.setSelectedTienda(this.tiendaSelected);
-    this.tiendaService.getTiendaById(this.tiendaSelected._id).subscribe((resp:any)=>{
+    this.tiendaService.getTiendaById(this.tiendaSelected._id).subscribe((resp: any) => {
       // console.log(this.tiendaSelected.subcategoria);
       localStorage.setItem('tiendaSelected', JSON.stringify(this.tiendaSelected.subcategoria));
 
@@ -91,7 +95,7 @@ export class HeaderComponent {
 
   get iconBagColorClass(): string {
     const colors = ['icon-bag-red', 'icon-bag-black', 'icon-bag-yellow'];
-    if(this.totalList > 0){
+    if (this.totalList > 0) {
       return colors[this.totalList % colors.length];
     }
     return '';

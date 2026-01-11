@@ -5,12 +5,12 @@
 
             <span class="logo-icon">
                 <a routerLink="/my-account"  *ngIf="user" style="color: var(--black);">
-                    <i class="fa fa-user "></i>
+                    <i class="fa fa-user  animated tada"></i>
                 </a>
                 <span *ngIf="user">
                     <span class="cart-count-badge" *ngIf="bandejaList.length > 0 && bandejaList.length <= 10">
                         {{totalList}}</span>
-                    <i class="fa fa-shopping-cart  cursor" *ngIf="bandejaList.length > 0 && bandejaList.length <= 10"
+                    <i class="fa fa-shopping-cart animated tada  cursor" *ngIf="bandejaList.length > 0 && bandejaList.length <= 10"
                         routerLink="/review"></i>
 
                 </span>
