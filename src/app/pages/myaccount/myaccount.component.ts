@@ -8,13 +8,15 @@ import { HeaderComponent } from "../../shared/header/header.component";
 import { AsideCuentaComponent } from './aside-cuenta/aside-cuenta.component';
 import { environment } from '../../environments/environment';
 import { NgIf } from '@angular/common';
+import { MenuFooterComponent } from "../../shared/menu-footer/menu-footer.component";
 
 @Component({
   selector: 'app-myaccount',
   imports: [
     RouterModule,
     NgIf,
-    HeaderComponent
+    HeaderComponent,
+    MenuFooterComponent
 ],
   templateUrl: './myaccount.component.html',
   styleUrls: ['./myaccount.component.scss'],

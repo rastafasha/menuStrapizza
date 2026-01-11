@@ -1,6 +1,5 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, Output, EventEmitter } from '@angular/core';
-import { ProducListComponent } from "../produc-list/produc-list.component";
 import { Categoria } from '../../models/categoria.model';
 import { CategoryService } from '../../services/category.service';
 import { TiendaService } from '../../services/tienda.service';

@@ -46,18 +46,17 @@
       </button>
       <!-- !!identity -->
 
+      <!-- !!enviar whatsapp -->
+
       <div class="col-12" *ngIf="identity">
         <div class="order-button-container">
-          <a href="`https://wa.me/`{{whatsapp}}`?text=Estoy%20interesado%20en%20el%20producto%20en%20la%elMenu,%20favor%20ampliar%20informacion`"
-            target="_blank" rel="noopener noreferrer">
-            <button class="check-button">
-              <i class="fa fa-envelope"></i>
-              Mensaje a Nuestro Whatsapp
-            </button>
-          </a>
+          <button class="check-button" (click)="sendWhatsAppOrder()">
+            <i class="fa fa-whatsapp"></i>
+            Enviar Pedido por WhatsApp
+          </button>
         </div>
       </div>
-
+    <!-- !!enviar whatsapp -->
 
       <div class="col-12" *ngIf="identitys">
 

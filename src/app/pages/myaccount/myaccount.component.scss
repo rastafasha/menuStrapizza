@@ -1,22 +1,42 @@
 .card-body {
-    border-radius: 16px;
+    border: none;
     & a{
         display: flex;
         justify-content: center;
         flex-direction: column;
         align-items: center;
         gap:10px;
-        color: var(--darkblue);
+        color: var(--black);
+        text-decoration: none;
+        font-family: var( --font-Title);
+        font-size: 1.5em;
     }
     & a:hover{
         text-decoration: none;
         transition: all 3s ease;
     }
     & a:hover .fa{
-        color: var(--azul);
+        color: var(--primary-color);
     }
     &  .fa{
         font-size: 30px;
+        color: var(--primary-color);
+
+        
+    }
+}
+
+.opciones{
+    display: flex;
+    justify-content: center;
+    gap: 25px;
+    flex-wrap: wrap;
+
+    &.iconop{
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
         
     }
 }

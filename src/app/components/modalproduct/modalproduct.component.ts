@@ -33,7 +33,7 @@ export class ModalproductComponent implements OnInit {
   ngOnInit(): void {
      let USER = localStorage.getItem("user");
     this.user = USER ? JSON.parse(USER) : null;
-    console.log(this.tiendaSelected)
+    // console.log(this.tiendaSelected)
 
     // Subscribe to cart changes to keep local copy updated
     this.carritoService.bandejaList$.subscribe(items => {

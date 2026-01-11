@@ -1,0 +1,27 @@
+<div class="menu-footer">
+        <ul>
+
+            <li>
+                <a [routerLink]="['/']" routerLinkActive="active">
+                    <i class="fa fa-home"></i>
+                </a>
+            </li>
+           
+            <li>
+                <a [routerLink]="['/review']" routerLinkActive="active">
+                    <!-- <i class="fa fa-shopping-bag"></i> -->
+                    <span class="cart-count-badge" *ngIf="bandejaList.length > 0 && bandejaList.length <= 10">
+                        {{totalList}}</span>
+                    <i class="fa fa-shopping-cart animated tada cursor" *ngIf="bandejaList.length > 0 && bandejaList.length <= 10"
+                        routerLink="/review"></i>
+                </a>
+            </li>
+            
+            <li>
+                <a [routerLink]="['/my-account']" routerLinkActive="active">
+                    <i class="fa fa-user"></i>
+                </a>
+            </li>
+
+        </ul>
+    </div>

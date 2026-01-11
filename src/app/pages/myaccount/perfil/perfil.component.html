@@ -21,29 +21,7 @@
             <!-- Profile form-->
             <form [formGroup]="perfilForm" (ngSubmit)="actualizarPerfil()" autocomplete="off">
                 
-                <div class="row">
-                    <div class="col-xs-12 col-sm-3 media">
-                        <img [src]="(identity.img ?? '') | imagenPipe: 'usuarios'"  alt="user.first_name">
-                        
-                    </div>
-                    <div class="col-xs-12 col-sm-">
-                        <div class="form-group">
-                            <div class="cz-file-drop-area">
-                                <!-- <div class="cz-file-drop-preview img-thumbnail rounded">
-                                    <img *ngIf="!imgTemp" [src]="identity.imagenUrl" style="width: 100px;">
-                                    <img *ngIf="imgTemp" [src]="imgTemp" style="width: 100px;">
-                                </div> -->
-                                <span class="cz-file-drop-message">Suelta la imagen aquí</span>
-                                <input type="file" class="cz-file-drop-input" (change)="cambiarImagen($event)">
-                                <br>
-                                <br>
-                                <button type="button" [disabled]="!imagenSubir" (click)="subirImagen()" class="btn btn-success waves-effect waves-light m-r-10 ">
-                                  <i class="fa fa-save"></i> Cambiar imagen
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                
                 
                 <div class="row">
                     <div class="col-sm-12" *ngIf="msm_error">
@@ -138,6 +116,30 @@
 
                             </div>
                             <button class="btn btn-primary mt-3 mt-sm-0" type="submit">Actualizar perfíl</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-xs-12 col-sm-3 media">
+                        <img [src]="(identity.img ?? '') | imagenPipe: 'usuarios'"  alt="user.first_name">
+                        
+                    </div>
+                    <div class="col-xs-12 col-sm-">
+                        <div class="form-group">
+                            <div class="cz-file-drop-area">
+                                <!-- <div class="cz-file-drop-preview img-thumbnail rounded">
+                                    <img *ngIf="!imgTemp" [src]="identity.imagenUrl" style="width: 100px;">
+                                    <img *ngIf="imgTemp" [src]="imgTemp" style="width: 100px;">
+                                </div> -->
+                                <span class="cz-file-drop-message">Suelta la imagen aquí</span>
+                                <input type="file" class="cz-file-drop-input" (change)="cambiarImagen($event)">
+                                <br>
+                                <br>
+                                <button type="button" [disabled]="!imagenSubir" (click)="subirImagen()" class="btn btn-success waves-effect waves-light m-r-10 ">
+                                  <i class="fa fa-save"></i> Cambiar imagen
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>

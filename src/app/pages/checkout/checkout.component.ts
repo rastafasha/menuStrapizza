@@ -16,6 +16,7 @@ import { Tienda } from '../../models/tienda.model';
 import { CartItemModel } from '../../models/cart-item-model';
 import { environment } from '../../environments/environment';
 import { Producto } from '../../models/producto.model';
+import { Usuario } from '../../models/usuario.model';
 
 declare var $:any;
 // declare var paypal;
@@ -38,7 +39,7 @@ export class CheckoutComponent {
   isbandejaList:boolean = false;
   identitys:boolean = false;
   iva:number = 12;
-  public identity:any;
+  public identity!:Usuario;
    public localId!:string;
    paypal: boolean = false;
   //DATA
@@ -590,11 +591,11 @@ export class CheckoutComponent {
       });
 
       // Enviar mensaje de WhatsApp a la tienda
-      // if(this.tienda && this.tienda.telefono){
-      //   const message = `Haz recibido una compra ${this.randomNum}, favor verifica y, procesala pronto !`;
-      //   const url = `https://wa.me/${this.tienda.telefono}?text=${encodeURIComponent(message)}`;
-      //   window.open(url, '_blank');
-      // }
+      if(this.tienda && this.tienda.telefono){
+        const message = `Haz recibido una compra ${this.randomNum}, favor verifica y, procesala pronto !`;
+        const url = `https://wa.me/${this.tienda.telefono}?text=${encodeURIComponent(message)}`;
+        window.open(url, '_blank');
+      }
 
     },)
   }
@@ -608,6 +609,43 @@ export class CheckoutComponent {
     const random = Math.floor(Math.random() * (max - min + 1)) + min
     this.randomNum = random;
     // return random;
+  }
+
+  // Generate WhatsApp message with order items
+  getWhatsAppMessage(): string {
+    if (!this.identity || this.bandejaList.length === 0) {
+      return '';
+    }
+
+    let message = `*Nuevo Pedido #${this.randomNum}*\n\n`;
+    message += `*Cliente:* ${this.identity.first_name} ${this.identity.last_name}\n`;
+    message += `*Teléfono:* ${this.identity.telefono || 'No registrado'}\n\n`;
+    message += `*Detalles del Pedido:*\n`;
+    message += `─────────────────────\n`;
+
+    this.bandejaList.forEach((item: any) => {
+      const itemTotal = (item.precio_ahora * item.cantidad).toFixed(2);
+      message += `• ${item.nombre || item.name}\n`;
+      message += `  Cant: ${item.cantidad} x ${item.precio_ahora.toFixed(2)} = ${itemTotal}\n\n`;
+    });
+
+    message += `─────────────────────\n`;
+    message += `*TOTAL:* $${this.total().toFixed(2)}\n\n`;
+    message += `Por favor confirmar disponibilidad y método de pago.`;
+
+    return encodeURIComponent(message);
+  }
+
+  // Open WhatsApp with pre-filled message
+  sendWhatsAppOrder(): void {
+    const phone = this.whatsapp.replace(/\D/g, '');
+    const message = this.getWhatsAppMessage();
+    
+    if (message) {
+      const url = `https://wa.me/${phone}?text=${message}`;
+      window.open(url, '_blank');
+    }
+    console.log(message)
   }
 
 

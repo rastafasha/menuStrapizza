@@ -9,3 +9,14 @@
 
     }
 }
+
+
+.list-unstyled{
+    display: flex;
+    justify-content: space-between;
+    font-family: var( --font-Title);
+    & a{
+        color: #333;
+        text-decoration: none;
+    }
+}

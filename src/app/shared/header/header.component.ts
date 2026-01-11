@@ -1,4 +1,4 @@
-import { Component, inject, OnDestroy } from '@angular/core';
+import { Component, inject, OnDestroy, Output } from '@angular/core';
 import { TiendaService } from '../../services/tienda.service';
 import { CarritoService } from '../../services/carrito.service';
 import { Tienda } from '../../models/tienda.model';
@@ -17,10 +17,10 @@ import { Subscription } from 'rxjs';
 })
 export class HeaderComponent implements OnDestroy {
 
+  @Output()tiendaSelected!: Tienda;
   totalList: number = 0;
   tiendas: Tienda[] = [];
   tienda!: Tienda;
-  tiendaSelected!: Tienda;
   bandejaList: any[] = [];
 
   year: number = new Date().getFullYear();
@@ -29,6 +29,7 @@ export class HeaderComponent implements OnDestroy {
   private tiendaService = inject(TiendaService);
   private carritoService = inject(CarritoService);
   private cartSubscription!: Subscription;
+  nombreSelected = 'Strapizza';
 
   ngOnInit(): void {
     let USER = localStorage.getItem("user");
@@ -56,9 +57,7 @@ export class HeaderComponent implements OnDestroy {
       this.tiendas = resp.filter((tienda: Tienda) => tienda.categoria && tienda.categoria.nombre === 'Alimentos');
       // console.log(this.tiendas);
 
-      setTimeout(() => {
-        this.setTiendaDefault();
-      }, 1000)
+      this.setTiendaDefault();
 
     })
   }
@@ -67,18 +66,19 @@ export class HeaderComponent implements OnDestroy {
 
   setTiendaDefault() {
     // Check if default tienda has already been set
-    if (localStorage.getItem('defaultTiendaSet')) return;
+    // if (localStorage.getItem('defaultTiendaSet')) return;
 
     // Set default tiendaSelected to "Panaderia SlideDish" if not already set
     if (!this.tiendaSelected) {
-      const defaultTienda = this.tiendas.find(tienda => tienda.nombre === 'Strapizza');
+      const defaultTienda = this.tiendas.find(tienda => tienda.nombre === this.nombreSelected);
       if (defaultTienda) {
         this.tiendaSelected = defaultTienda;
         this.tiendaService.setSelectedTienda(this.tiendaSelected);
-        localStorage.setItem('tiendaSelected', JSON.stringify(this.tiendaSelected.subcategoria));
+        localStorage.setItem('tiendaSelected', JSON.stringify(this.tiendaSelected.nombre));
         localStorage.setItem('defaultTiendaSet', 'true');
       }
     }
+    // console.log(this.tiendaSelected)
   }
 
 

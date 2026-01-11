@@ -1,3 +1,4 @@
+/* imports CSS */
 @import url('./carrousel.css');
 @import url('./header.css');
 @import url('./hero.css');
@@ -7,6 +8,7 @@
 @import url('./pastasypastichos.css');
 @import url('./orden.css');
 @import url('./checkout.css');
+@import url('./menufooter.css');
 /* Variables CSS */
 :root {
     --primary-color: #e63946;
@@ -15,7 +17,9 @@
     --light-bg: #fefae0;
     --dark-text: #2b2d42;
     --white: #ffffff;
+    --light-brown: #0e5b04;
     --font-primary: 'Poppins', sans-serif;
+    --font-Title: 'Retro Team';
 }
 
 .clear {
@@ -52,7 +56,7 @@ h2,
 h3,
 h4,
 h5{
-    font-family: 'Retro Team';
+    font-family: var( --font-Title);
     color: #333;
 }
 
@@ -127,6 +131,32 @@ h5{
     background-color: #19a264f2;
     color: #f3f0eb;
 }
+
+.cart-count-badge {
+  position: relative;
+  top: auto;
+  right: 0;
+  bottom: 30px;
+  background-color: #ff0000;
+  color: white;
+  font-size: 0.75rem;
+  font-weight: bold;
+  border-radius: 50%;
+  padding: 2px 6px;
+  line-height: 1;
+  pointer-events: none;
+  transform: translate(50%, -50%);
+  z-index: 3;
+}
+/* .fa-shopping-cart{
+  position: relative;
+  z-index: 1;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #047e0c;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+} */
 
 /* animaciones */
 

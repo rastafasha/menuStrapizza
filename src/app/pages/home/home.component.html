@@ -4,6 +4,8 @@
 <app-slider></app-slider>
 <!-- Free Delivery Section -->
 <app-free-delivery></app-free-delivery>
+<div class="clear"></div>
+<br>
 <!-- Categories Section -->
 <app-cas-products (msm_success)="onMsmSuccess($event)"></app-cas-products>
 <!-- Pastas Products -->
@@ -22,4 +24,5 @@
 </section> -->
 
 <!-- Footer -->
-<app-footer ></app-footer>
+ <app-menu-footer *ngIf="user" ></app-menu-footer>
+<app-footer [tiendaSelected]="tiendaSelected"></app-footer >

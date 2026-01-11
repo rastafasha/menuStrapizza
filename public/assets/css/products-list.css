@@ -39,7 +39,7 @@
     height: 140px;
     padding-bottom: 15px;
     margin-bottom: 5px;
-    border-bottom: 1px solid var(--primary-color);
+    /* border-bottom: 1px solid var(--primary-color); */
 
 }
 
