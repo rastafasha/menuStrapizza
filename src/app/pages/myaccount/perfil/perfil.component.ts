@@ -11,6 +11,8 @@ import { HeaderComponent } from '../../../shared/header/header.component';
 import { AsideCuentaComponent } from '../aside-cuenta/aside-cuenta.component';
 import { ImagenPipe } from '../../../pipes/imagen-pipe.pipe';
 import { environment } from '../../../environments/environment';
+import { PaisService } from '../../../services/pais.service';
+import { Pais } from '../../../models/pais.model';
 
 declare var jQuery:any;
 declare var $:any;
@@ -37,7 +39,6 @@ interface HtmlInputEvent extends Event{
 export class PerfilComponent implements OnInit {
 
   public url;
-  public user : any = {};
   public paises:any;
   public file !:File;
   public imgSelect !: String | ArrayBuffer;
@@ -45,12 +46,17 @@ export class PerfilComponent implements OnInit {
   public msm_error = false;
   public msm_success = false;
   public pass_error = false;
-
+  
+  public user!: Usuario;
   public identity!: Usuario;
+  public user_id: any;
+
+  public pais!: Pais;
 
   public perfilForm!: FormGroup;
   public imagenSubir!: File;
   public imgTemp: any = null;
+
 
   //DATA
   public new_password = '';
@@ -59,17 +65,14 @@ export class PerfilComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private usuarioService: UsuarioService,
+    private paisService: PaisService,
     private _router : Router,
     private _route :ActivatedRoute,
     private http: HttpClient,
     private fileUploadService: FileUploadService
   ) {
     // this.usuario = usuarioService.usuario;
-    let USER = localStorage.getItem('user');
-    if(USER){
-      this.identity = JSON.parse(USER);
-      console.log(this.identity);
-    }
+    
     this.url = environment.baseUrl;
 
   }
@@ -77,8 +80,33 @@ export class PerfilComponent implements OnInit {
   ngOnInit(): void {
     window.scrollTo(0,0);
 
+     let USER = localStorage.getItem('user');
+    if(USER){
+      this.user = JSON.parse(USER);
+      this.user_id = this.user.uid
+      console.log(this.user);
+      this. getUser();
+    }
+   
+  }
+
+  getUser(){
+    this.usuarioService.get_user(this.user_id).subscribe((resp:any)=>{
+      this.identity = resp.usuario;
+      console.log(this.identity)
+      if(this.identity){
+        this.getPaises();
+        this.iniciarFormulario()
+      }else{
+      this._router.navigate(['/']);
+    }
+    })
+  }
+
+  iniciarFormulario(){
     this.perfilForm = this.fb.group({
-      email: [ this.identity.email, Validators.required ],
+      uid: [ this.identity.uid,  Validators.required ],
+      email: [ this.identity.email],
       first_name: [ this.identity.first_name, Validators.required ],
       last_name: [ this.identity.last_name, Validators.required ],
       numdoc: [ this.identity.numdoc ],
@@ -86,22 +114,19 @@ export class PerfilComponent implements OnInit {
       pais: [ this.identity.pais],
       google: [ this.identity.google],
       role: [ this.identity.role],
+      password: [ ''],
     });
-    if(this.identity){
-      this.http.get('https://restcountries.com/v2/all').subscribe(
-        data => {
+    
+  }
 
-          this.paises = data;
-          // this.paises.forEach(element => {
-          //     this.data_paises.push(element.name);
 
-          // });
+  getPaises() {
+    this.paisService.getPaises().subscribe(
+      (resp:any) => {
+        this.paises = resp;
 
-        }
-      );
-    }else{
-      this._router.navigate(['/']);
-    }
+      }
+    )
   }
 
   close_alert(){
@@ -133,14 +158,10 @@ export class PerfilComponent implements OnInit {
 
   actualizarPerfil(){
 
-    this.usuarioService.actualizarPerfil(this.perfilForm.value)
-    .subscribe(resp => {
-      const {first_name, last_name, telefono, pais,  numdoc, email} = this.perfilForm.value;
-      this.identity.first_name = first_name;
-      this.identity.last_name = last_name;
-      this.identity.telefono = telefono;
-      this.identity.numdoc = numdoc;
-      this.identity.pais = pais;
+    const {first_name, last_name, telefono, pais,  numdoc, email, role, uid} = this.perfilForm.value;
+    this.usuarioService.actualizarP(this.perfilForm.value)
+    .subscribe((resp:any) => {
+      
       Swal.fire('Guardado', 'Los cambios fueron actualizados', 'success');
     }, (err)=>{
       Swal.fire('Error', err.error.msg, 'error');

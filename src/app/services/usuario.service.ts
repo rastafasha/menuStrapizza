@@ -39,7 +39,7 @@ export class UsuarioService {
   }
 
   get uid(): string {
-    return this.usuario.uid || '';
+    return this.usuario?.uid || '';
   }
 
   get headers() {
@@ -145,9 +145,12 @@ export class UsuarioService {
   }
 
   actualizarPerfil(data: { email: string; nombre: string; role: string }) {
+    // Ensure usuario is loaded from localStorage before accessing properties
+    this.getLocalStorage();
+    
     data = {
       ...data,
-      role: this.usuario.role ?? 'USER',
+      role: this.usuario?.role ?? 'USER',
     };
 
     return this.http.put(
@@ -210,6 +213,14 @@ export class UsuarioService {
   guardarUsuario(usuario: Usuario) {
     return this.http.put(
       `${base_url}/usuarios/${usuario.uid}`,
+      usuario,
+      this.headers
+    );
+  }
+
+  actualizarP(usuario: Usuario) {
+    return this.http.put(
+      `${base_url}/usuarios/update/${usuario.uid}`,
       usuario,
       this.headers
     );

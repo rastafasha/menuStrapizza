@@ -62,6 +62,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    console.log('Strapizza - Landing page initialized successfully');
+    console.log('Strapizza - Menu App initialized successfully');
 });
 
