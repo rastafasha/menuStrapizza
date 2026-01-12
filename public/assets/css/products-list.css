@@ -2,10 +2,12 @@
 
 .products-grid {
    display: flex;
-   flex-direction: column;
-   gap: 5px;
-   height: auto;
-   padding-bottom: 40px;
+    flex-direction: column;
+    gap: 5px;
+    height: auto;
+    padding-bottom: 0px;
+    width: fit-content;
+    position: relative;
 }
 
 .product-content{
@@ -24,23 +26,27 @@
     flex-direction: column;
 }
 .botns{
-    display: flex;
+   display: flex;
     flex-direction: column;
+    justify-content: end;
+    align-self: flex-start;
+    flex-wrap: nowrap;
 }
 
 .product-card{
  display: grid;
-    /* grid-template-columns: repeat(2, 1fr); */
-    grid-template-columns: 100px 1fr;
+  grid-template-columns: 100px 1fr;
     grid-template-rows: 1fr;
     grid-column-gap: 10px;
     grid-row-gap: 0px;
+    height: 130px;
+    width: 102%;
     padding: 10px;
-    height: 140px;
     padding-bottom: 15px;
     margin-bottom: 5px;
-    /* border-bottom: 1px solid var(--primary-color); */
-
+    border-radius: 14px;
+    background-color: rgb(245 245 245 / 59%);
+    /* border-bottom: 2px solid #ddd; */
 }
 
 .favoritesdiv1 p {

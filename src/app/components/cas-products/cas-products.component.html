@@ -2,30 +2,29 @@
     <div class="container">
         <div class="title-section">
             <h2 class="section-title">Carta Pizza</h2>
-        <a href="javascript:;" (click)="PageSize()" class="btn btn-primary doctor-refresh ms-2 circle"><i
-                class="fa fa-refresh"></i>
+            <a href="javascript:;" (click)="PageSize()" class="btn btn-primary doctor-refresh ms-2 circle"><i
+                    class="fa fa-refresh"></i>
             </a>
         </div>
 
-                <app-loading *ngIf="isLoading"></app-loading>
-            <div *ngIf="!isLoading">
-                 <div class="tab-content-set" >
-            <ul class="nav" *ngFor="let category of subcategories" [class.active]="activeCategory === category.nombre">
-                <li>
-                    <a href="#" onclick="return false;" [ngClass]="{'active': option_selectedd == 1}"
-                        (click)="selectCategory(category.nombre)">{{ category.nombre }}</a>
-                </li>
-            </ul>
-        </div>
-        <div class="product-card" *ngFor="let product of todo; let i = index" cdkDrag>
-<app-product-item 
-            [product]="product" 
-            (productSelected)="openModal($event)"
-            (msm_success)="onMsmSuccess($event)">
-        </app-product-item>
-        </div>
+        <app-loading *ngIf="isLoading"></app-loading>
+        <div *ngIf="!isLoading">
+            <div class="tab-content-set">
+                <ul class="nav" *ngFor="let category of subcategories"
+                    [class.active]="activeCategory === category.nombre">
+                    <li>
+                        <a href="#" onclick="return false;" [ngClass]="{'active': option_selectedd == 1}"
+                            (click)="selectCategory(category.nombre)">{{ category.nombre }}</a>
+                    </li>
+                </ul>
             </div>
-       
+            <div  *ngFor="let product of todo; let i = index" cdkDrag>
+                <app-product-item [product]="product" (productSelected)="openModal($event)"
+                    (msm_success)="onMsmSuccess($event)">
+                </app-product-item>
+            </div>
+        </div>
+
 
     </div>
 </section>

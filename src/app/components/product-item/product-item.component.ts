@@ -5,12 +5,15 @@ import { Usuario } from '../../models/usuario.model';
 import { Tienda } from '../../models/tienda.model';
 import { RouterModule } from '@angular/router';
 import { CarritoService } from '../../services/carrito.service';
+import { TiendaService } from '../../services/tienda.service';
+import { ImagenPipe } from '../../pipes/imagen-pipe.pipe';
 
 @Component({
   selector: 'app-product-item',
   imports: [
     CommonModule,
-    RouterModule
+    RouterModule,
+    ImagenPipe
   ],
   templateUrl: './product-item.component.html',
   styleUrl: './product-item.component.scss'
@@ -24,9 +27,13 @@ export class ProductItemComponent {
   user!:Usuario;
   isUserLogged=false;
   isProductAdded=false;
-  tiendaSelected!:Tienda;
+  tiendaSelected:any;
+
+  tiendas: Tienda[] = [];
+    nombreSelected = 'Strapizza';
 
   private carritoService = inject(CarritoService);
+  private tiendaService = inject(TiendaService);
 
   ngOnInit(): void {
      let USER = localStorage.getItem("user");
@@ -64,4 +71,24 @@ export class ProductItemComponent {
     this.isUserLogged = false;
     this.isProductAdded = false;
   }
+
+   getTiendas() {
+      this.tiendaService.cargarTiendas().subscribe((resp: Tienda[]) => {
+        // Asignamos el array filtrado directamente
+        this.tiendas = resp.filter((tienda: Tienda) => tienda.categoria && tienda.categoria.nombre === 'Alimentos');
+        // console.log(this.tiendas);
+  
+        this.setTiendaDefault();
+  
+      })
+    }
+
+    setTiendaDefault() {
+    // Set default tiendaSelected to "Panaderia SlideDish" if not already set
+    const defaultTienda = this.tiendas.find(tienda => tienda.nombre === this.nombreSelected);
+    this.tiendaSelected = defaultTienda;
+
+    console.log(defaultTienda)
+  }
+  
 }

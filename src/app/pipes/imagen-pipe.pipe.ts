@@ -12,7 +12,7 @@ export class ImagenPipe implements PipeTransform {
   |'promocions'|'galerias'|'ingresos'|'blogs' |'pages' |'cursos'|'sliders'|'tiendas'): string {
 
     if(!img){
-      return `${base_url}/uploads/categorias/no-image.jpg`;
+      return `${base_url}/assets/images/no-image.jpg`;
     } else if(img.includes('https')){
       return img;
     } else if(img){

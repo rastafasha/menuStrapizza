@@ -14,12 +14,12 @@
 <div class="products-grid">
     <div class="product-card">
         <div class="product-image" (click)="openPaymentsModal(product)">
-            <img [src]="product.img" [alt]="product.titulo">
+            <img [src]="product.img | imagenPipe: 'productos'" [alt]="product.titulo  ">
         </div>
         <div class="product-content">
             <div class="infpr">
                 <h4>{{product.titulo}}</h4>
-                <div class="product-price text-danger">{{product.precio_antes| currency:'EUR'}}</div>
+                <div class="product-price text-danger " style="text-decoration: line-through;" *ngIf="product.precio_antes > product.precio_ahora">{{product.precio_antes| currency:'EUR'}}</div>
                 <div class="product-price">{{product.precio_ahora| currency:'EUR'}}</div>
             </div>
             <div class="botns">

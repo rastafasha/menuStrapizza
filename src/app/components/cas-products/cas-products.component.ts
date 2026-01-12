@@ -103,7 +103,9 @@ private tiendasService = inject(TiendaService);
   selectCategory(category: string) {
     // console.log('selectCategory called with:', category);
     this.activeCategory = category;
+    this.isLoading = true
     this.updateTodo();
+    this.isLoading = false
   }
 
   updateTodo() {
