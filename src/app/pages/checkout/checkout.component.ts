@@ -135,7 +135,7 @@ export class CheckoutComponent {
 
   }
   ngOnInit() {
-
+      this.getTiendas();
     this.geneardorOrdeneNumero();
     this.obtenerMetodosdePago();
     this.total();
@@ -144,7 +144,7 @@ export class CheckoutComponent {
       this.identity = JSON.parse(USER);
       // console.log(this.identity);
     }
-    this.getTiendas();
+  
     this.loadBandejaListFromLocalStorage();
 
     // this.listar_carrito();
@@ -168,10 +168,17 @@ export class CheckoutComponent {
     const defaultTienda = this.tiendas.find(tienda => tienda.nombre === this.nombreSelected);
     this.tiendaSelected = defaultTienda;
 
-    this.data_direccionLocal = this.tiendaSelected;
-    this.tienda_moneda = this.tiendaSelected.moneda;
-    this.localId = this.tiendaSelected._id;
-    // console.log(defaultTienda)
+    if (this.tiendaSelected) {
+      this.data_direccionLocal = this.tiendaSelected;
+      this.tienda_moneda = this.tiendaSelected.moneda?.toString() ?? '';
+      this.localId = this.tiendaSelected._id;
+      // console.log(this.tienda_moneda);
+    } else {
+      this.data_direccionLocal = {};
+      this.tienda_moneda = '';
+      this.localId = '';
+      console.log('No tiendaSelected found');
+    }
   }
 
   private listAndIdentify() {
@@ -293,7 +300,7 @@ export class CheckoutComponent {
         color: '#fff',
         selector: 'unico'
       })
-      console.log(this.bandejaList);
+      // console.log(this.bandejaList);
 
     });
   }
@@ -664,7 +671,7 @@ export class CheckoutComponent {
       const url = `https://wa.me/${phone}?text=${message}`;
       window.open(url, '_blank');
     }
-    console.log(message)
+    // console.log(message)
   }
 
 
