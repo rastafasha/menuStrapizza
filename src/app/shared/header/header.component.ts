@@ -1,4 +1,4 @@
-import { Component, inject, OnDestroy, Output } from '@angular/core';
+import { Component, inject, OnDestroy, Output, EventEmitter, HostListener } from '@angular/core';
 import { TiendaService } from '../../services/tienda.service';
 import { CarritoService } from '../../services/carrito.service';
 import { Tienda } from '../../models/tienda.model';
@@ -18,6 +18,7 @@ import { Subscription } from 'rxjs';
 export class HeaderComponent implements OnDestroy {
 
   @Output()tiendaSelected!: Tienda;
+  @Output() refreshApp: EventEmitter<void> = new EventEmitter<void>();
   totalList: number = 0;
   tiendas: Tienda[] = [];
   tienda!: Tienda;
@@ -26,10 +27,37 @@ export class HeaderComponent implements OnDestroy {
   year: number = new Date().getFullYear();
   public user!: Usuario;
 
+  // Pull-to-refresh tracking
+  private touchStartY: number = 0;
+  private touchStartX: number = 0;
+  private readonly PULL_THRESHOLD = 100; // pixels needed to trigger refresh
+
+  isReloadig=false;
+
   private tiendaService = inject(TiendaService);
   private carritoService = inject(CarritoService);
   private cartSubscription!: Subscription;
   nombreSelected = 'Strapizza';
+
+  @HostListener('touchstart', ['$event'])
+  onTouchStart(event: TouchEvent) {
+    this.touchStartY = event.touches[0].clientY;
+    this.touchStartX = event.touches[0].clientX;
+  }
+
+  @HostListener('touchend', ['$event'])
+  onTouchEnd(event: TouchEvent) {
+    const touchEndY = event.changedTouches[0].clientY;
+    const touchEndX = event.changedTouches[0].clientX;
+
+    const deltaY = touchEndY - this.touchStartY;
+    const deltaX = Math.abs(touchEndX - this.touchStartX);
+
+    // Detect downward pull (jale hacia abajo) with minimal horizontal movement
+    if (deltaY > this.PULL_THRESHOLD && deltaX < 50) {
+      this.onPullRefresh();
+    }
+  }
 
   ngOnInit(): void {
     let USER = localStorage.getItem("user");
@@ -101,10 +129,17 @@ export class HeaderComponent implements OnDestroy {
     return '';
   }
 
-  openMenu() {
+openMenu() {
     const menuLateral = document.getElementsByClassName("sidemenu");
     for (let i = 0; i < menuLateral.length; i++) {
       menuLateral[i].classList.add("active");
     }
+  }
+
+  onPullRefresh() {
+    this.isReloadig = true;
+    this.refreshApp.emit();
+    location.reload()
+    this.isReloadig = false;
   }
 }

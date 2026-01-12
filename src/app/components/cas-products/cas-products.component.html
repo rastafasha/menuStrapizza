@@ -18,7 +18,7 @@
                     </li>
                 </ul>
             </div>
-            <div  *ngFor="let product of todo; let i = index" cdkDrag>
+            <div class="product-card" *ngFor="let product of todo; let i = index" cdkDrag>
                 <app-product-item [product]="product" (productSelected)="openModal($event)"
                     (msm_success)="onMsmSuccess($event)">
                 </app-product-item>

@@ -1,21 +1,23 @@
-<app-header></app-header>
-<p>home works!</p>
+<app-header (refreshApp)="onRefreshFromHeader()"></app-header>
+<!-- <p>home works!</p> -->
 <!-- Carrousel Section -->
-<app-slider></app-slider>
-<!-- Free Delivery Section -->
-<app-free-delivery></app-free-delivery>
-<div class="clear"></div>
-<br>
-<!-- Categories Section -->
-<app-cas-products (msm_success)="onMsmSuccess($event)"></app-cas-products>
-<!-- Pastas Products -->
-<!-- <app-produc-list-slider></app-produc-list-slider> -->
-<!-- Hero Section -->
-<app-hero></app-hero>
+<app-loading *ngIf="isReloadig"></app-loading>
+<div *ngIf="!isReloadig">
+    <app-slider></app-slider>
+    <!-- Free Delivery Section -->
+    <app-free-delivery></app-free-delivery>
+    <div class="clear"></div>
+    <br>
+    <!-- Categories Section -->
+    <app-cas-products (msm_success)="onMsmSuccess($event)" [refreshCasProducts]="refreshCasProducts"></app-cas-products>
+    <!-- Pastas Products -->
+    <!-- <app-produc-list-slider></app-produc-list-slider> -->
+    <!-- Hero Section -->
+    <app-hero></app-hero>
 
-<!-- Featured Products -->
+    <!-- Featured Products -->
 
-<!-- <section class="featured-section" id="menu">
+    <!-- <section class="featured-section" id="menu">
     <div class="featured-container">
         <h2 class="section-title">Los Más Populares</h2>
 
@@ -23,6 +25,7 @@
     </div>
 </section> -->
 
-<!-- Footer -->
- <app-menu-footer *ngIf="user" ></app-menu-footer>
-<app-footer [tiendaSelected]="tiendaSelected"></app-footer >
+    <!-- Footer -->
+    <app-menu-footer *ngIf="user"></app-menu-footer>
+    <app-footer [tiendaSelected]="tiendaSelected"></app-footer>
+</div>

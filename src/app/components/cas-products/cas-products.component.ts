@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, Output, EventEmitter } from '@angular/core';
+import { Component, inject, Output, EventEmitter, TrackByFunction, Input, OnInit, OnDestroy } from '@angular/core';
 import { Categoria } from '../../models/categoria.model';
 import { CategoryService } from '../../services/category.service';
 import { TiendaService } from '../../services/tienda.service';
@@ -9,23 +9,34 @@ import { ProductoService } from '../../services/product.service';
 import { ProductItemComponent } from "../product-item/product-item.component";
 import { ModalproductComponent } from "../modalproduct/modalproduct.component";
 import { LoadingComponent } from '../../shared/loading/loading.component';
+import { InfiniteScrollDirective } from 'ngx-infinite-scroll';
 
 @Component({
   selector: 'app-cas-products',
-  imports: [CommonModule, LoadingComponent, ProductItemComponent, ModalproductComponent],
+  imports: [CommonModule, LoadingComponent,
+    ProductItemComponent, ModalproductComponent,
+    InfiniteScrollDirective,
+  ],
   templateUrl: './cas-products.component.html',
   styleUrl: './cas-products.component.scss'
 })
-export class CasProductsComponent {
+export class CasProductsComponent implements OnInit, OnDestroy {
   @Output() msm_success: EventEmitter<boolean> = new EventEmitter<boolean>();
+  @Input() refreshCasProducts: EventEmitter<void> | null = null;
+
   option_selectedd: number = 1;
   solicitud_selectedd: any = null;
+
+  isRefreshing = false;
+  isEdnOfList = false;
+  nextUrl:string = '';
+  loadingTitle:string = '';
 
   categories: Categoria[] = [];
   subcategories: any[] = [];
   activeCategory: string = 'all';
-  catname!:string;
-  isLoading:boolean = false;
+  catname!: string;
+  isLoading: boolean = false;
   products: Producto[] = [];
   tiendaSelected: Tienda | null = null;
   todo: Producto[] = [];
@@ -34,13 +45,22 @@ export class CasProductsComponent {
 
   private categoryService = inject(CategoryService);
   private productoService = inject(ProductoService);
-private tiendasService = inject(TiendaService);
+  private tiendasService = inject(TiendaService);
 
 
- ngOnInit(){
+  ngOnInit() {
     this.updateTodo();
-      this.getProductosCatName();
-      this.getCategories();
+    this.getProductosCatName();
+    this.getCategories();
+
+    // Listen for refresh trigger from parent (header pull)
+    if (this.refreshCasProducts) {
+      this.refreshCasProducts.subscribe(() => this.refreshData());
+    }
+  }
+
+  ngOnDestroy() {
+    // No need to unsubscribe from EventEmitter as it's managed by Angular
   }
 
 
@@ -62,13 +82,13 @@ private tiendasService = inject(TiendaService);
   }
 
 
-  
+
 
   getProductosCatName() {
     this.catname = this.tiendaSelected?.subcategoria ?? 'Pizzería'
     this.isLoading = true
     this.categoryService.find_by_nombre(this.catname).subscribe(
-      (resp:any) => {
+      (resp: any) => {
         this.products = resp.productos || [];
         // console.log(this.products)
         this.updateTodo();
@@ -82,9 +102,9 @@ private tiendasService = inject(TiendaService);
   //obtenemos las subcategorias de los productos
   getCategories() {
     this.isLoading = true
-    this.productoService.getProductosActivos().subscribe((resp:any)=>{
+    this.productoService.getProductosActivos().subscribe((resp: any) => {
       //filtramos los productos donde sea igual a la categoria Panaderia
-      const productos = resp.filter((producto: any) => producto.categoria.nombre ===  this.catname);
+      const productos = resp.filter((producto: any) => producto.categoria.nombre === this.catname);
       //extraemos el campo subcategoria
       const subcategorias = productos.map((producto: any) => producto.subcategoria);
       //eliminamos los duplicados
@@ -93,9 +113,9 @@ private tiendasService = inject(TiendaService);
       const categorias = subcategoriasUnicas.map((subcategoria: any) => ({
         nombre: subcategoria,
         products: productos.filter((product: any) => product.subcategoria === subcategoria),
-        }));
-        this.subcategories = categorias || [];
-        // console.log(this.selectCategory)
+      }));
+      this.subcategories = categorias || [];
+      // console.log(this.selectCategory)
     })
     this.isLoading = false
   }
@@ -122,7 +142,7 @@ private tiendasService = inject(TiendaService);
   }
 
 
-   openModal(product: Producto) {
+  openModal(product: Producto) {
     this.selectedProduct = product;
     // Use Bootstrap's modal method to show modal programmatically
     const modalElement = document.getElementById('exampleModal');
@@ -132,12 +152,52 @@ private tiendasService = inject(TiendaService);
     }
   }
 
-public PageSize(): void {
-        this.getProductosCatName();
-      }
+  public PageSize(): void {
+    this.getProductosCatName();
+  }
 
   onMsmSuccess(value: boolean): void {
     this.msm_success.emit(value);
   }
+
+
+
+
+  onScrollDown() {
+    if (!this.nextUrl || this.isLoading) return;
+    this.categoryService.find_by_nombre(this.nextUrl).subscribe({
+      next: (resp: any) => {
+        if (resp.info.next) {
+          this.nextUrl = resp.info.next;
+          this.products = [...this.products, ...resp.results];
+        } else {
+          this.isEdnOfList = true;
+          this.loadingTitle = 'No hay más personajes para mostrar';
+          alert('ultima pagina');
+        }
+      },
+      error: () => {
+        this.isLoading = false;
+      }
+    });
+  }
+
+  onScrollUp() {
+    this.refreshData();
+  }
+
+  trackByCharacterId: TrackByFunction<any> = (index: number, character: any) => character.id;
+
+
+  refreshData() {
+    this.isRefreshing = true;
+    // Simulate data fetching 
+    setTimeout(() => {
+      this.isRefreshing = false;
+      // Update your data here 
+      this.getProductosCatName();
+    }, 2000);
+  }
+
 
 }
