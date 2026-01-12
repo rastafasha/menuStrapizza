@@ -2,9 +2,9 @@
     <div class="container">
         <div class="title-section">
             <h2 class="section-title">{{title}}</h2>
-            <!-- <a href="javascript:;" (click)="PageSize()" class="btn btn-primary doctor-refresh ms-2 circle"><i
+            <a href="javascript:;" *ngIf="isVisible" (click)="PageSize()" class="btn btn-primary circle"><i
                     class="fa fa-refresh"></i>
-            </a> -->
+            </a>
         </div>
 
         <app-loading *ngIf="isLoading"></app-loading>

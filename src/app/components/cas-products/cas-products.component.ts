@@ -15,7 +15,6 @@ import { InfiniteScrollDirective } from 'ngx-infinite-scroll';
   selector: 'app-cas-products',
   imports: [CommonModule, LoadingComponent,
     ProductItemComponent, ModalproductComponent,
-    InfiniteScrollDirective,
   ],
   templateUrl: './cas-products.component.html',
   styleUrl: './cas-products.component.scss'
@@ -25,6 +24,7 @@ export class CasProductsComponent implements OnInit, OnDestroy {
   @Input() refreshCasProducts: EventEmitter<void> | null = null;
   @Input() activeCategory: string = 'all';
   @Input() title!: string ;
+  @Input() isVisible = false;
 
   option_selectedd: number = 1;
   solicitud_selectedd: any = null;
@@ -101,6 +101,22 @@ export class CasProductsComponent implements OnInit, OnDestroy {
       }
     );
   }
+
+  getProductosCatName1() {
+    this.catname = this.tiendaSelected?.subcategoria ?? 'Pizzería'
+    this.isLoading = true
+    this.categoryService.find_by_nombre(this.catname).subscribe(
+      (resp: any) => {
+        this.products = resp.productos || [];
+        // console.log(this.products)
+        this.updateTodo();
+        this.isLoading = false
+      },
+      (error) => {
+        console.error('Error al obtener los productos', error);
+      }
+    );
+  }
   //obtenemos las subcategorias de los productos
   getCategories() {
     this.isLoading = true
@@ -155,7 +171,7 @@ export class CasProductsComponent implements OnInit, OnDestroy {
   }
 
   public PageSize(): void {
-    this.getProductosCatName();
+    this.getProductosCatName1();
   }
 
   onMsmSuccess(value: boolean): void {

@@ -14,8 +14,7 @@ import { ProducListSliderComponent } from '../../components/produc-list-slider/p
 @Component({
   selector: 'app-home',
   imports: [HeaderComponent, SliderComponent, FreeDeliveryComponent, CasProductsComponent,
-    HeroComponent, FooterComponent, MenuFooterComponent, NgIf, LoadingComponent,
-    ProducListSliderComponent
+    HeroComponent, FooterComponent, MenuFooterComponent, NgIf, LoadingComponent
   ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
@@ -27,6 +26,7 @@ export class HomeComponent {
   @Input() msm_success_value: boolean = false;
   user!:Usuario;
   isReloadig=false;
+  isVisible=false;
   activeCategory!:string;
 
   // Event emitter for refreshing cas-products
