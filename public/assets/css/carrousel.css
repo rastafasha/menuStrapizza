@@ -76,7 +76,7 @@
 
 .pizza-grande{
     display: block;
-    z-index: 1500;
+    z-index: 15;
     top: 0;
     left: 0;
     position: absolute;
