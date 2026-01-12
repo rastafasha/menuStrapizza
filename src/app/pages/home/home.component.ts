@@ -10,11 +10,13 @@ import { Usuario } from '../../models/usuario.model';
 import { NgIf } from '@angular/common';
 import { LoadingComponent } from "../../shared/loading/loading.component";
 import { ProducListSliderComponent } from '../../components/produc-list-slider/produc-list-slider.component';
+import { PwaNotifInstallerComponent } from '../../shared/pwa-notif-installer/pwa-notif-installer.component';
 
 @Component({
   selector: 'app-home',
   imports: [HeaderComponent, SliderComponent, FreeDeliveryComponent, CasProductsComponent,
-    HeroComponent, FooterComponent, MenuFooterComponent, NgIf, LoadingComponent
+    HeroComponent, FooterComponent, MenuFooterComponent, NgIf, LoadingComponent,
+    PwaNotifInstallerComponent
   ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
