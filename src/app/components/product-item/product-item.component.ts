@@ -38,7 +38,9 @@ export class ProductItemComponent {
   ngOnInit(): void {
      let USER = localStorage.getItem("user");
     this.user = USER ? JSON.parse(USER) : null;
-    this.getTiendas()
+    setTimeout(()=>{
+      this.getTiendas()
+    }, 300)
   }
 
   openPaymentsModal(product: any): void {

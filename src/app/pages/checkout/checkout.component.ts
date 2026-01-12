@@ -135,7 +135,7 @@ export class CheckoutComponent {
 
   }
   ngOnInit() {
-      this.getTiendas();
+     
     this.geneardorOrdeneNumero();
     this.obtenerMetodosdePago();
     this.total();
@@ -146,6 +146,9 @@ export class CheckoutComponent {
     }
   
     this.loadBandejaListFromLocalStorage();
+     setTimeout(()=>{
+      this.getTiendas()
+    }, 300)
 
     // this.listar_carrito();
   }

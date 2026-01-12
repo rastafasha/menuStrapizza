@@ -29,7 +29,7 @@
                             <span>{{item.cantidad}}</span>
                         </div>
                         <div class="price">
-                            <p>{{item.precio_ahora * item.cantidad |number:'1.2-2'| currency:'EUR'}}</p>
+                            <p>{{item.precio_ahora * item.cantidad |number:'1.2-2'| currency:tiendaSelected?.moneda}}</p>
                             <!-- <p >{{item.precio_ahora | currency}}</p> -->
                         </div>
                     </div>
@@ -43,7 +43,7 @@
                   <span>Total a Pagar</span>
 
                 </div>
-                <span>{{total() |number:'1.2-2'| currency:'EUR'}}</span>
+                <span>{{total() |number:'1.2-2'| currency:tiendaSelected?.moneda}}</span>
               </div>
             </div>
           </div>

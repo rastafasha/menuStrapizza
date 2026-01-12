@@ -42,7 +42,9 @@ export class ModalproductComponent implements OnInit {
     this.carritoService.bandejaList$.subscribe(items => {
       this.bandejaList = items;
     });
-    this.getTiendas()
+     setTimeout(()=>{
+      this.getTiendas()
+    }, 500)
   }
 
   

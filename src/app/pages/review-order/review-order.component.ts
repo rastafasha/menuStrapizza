@@ -1,9 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { HeaderComponent } from '../../shared/header/header.component';
 import { CommonModule } from '@angular/common';
 import { Route, Router, RouterModule } from '@angular/router';
 import { ImagenPipe } from '../../pipes/imagen-pipe.pipe';
 import { Producto } from '../../models/producto.model';
+import { Tienda } from '../../models/tienda.model';
+import { TiendaService } from '../../services/tienda.service';
 
 
 @Component({
@@ -23,7 +25,13 @@ export class ReviewOrderComponent {
   fechaHoy: string = new Date().toISOString().split('T')[0];
   randomNum:number = 0;
   isbandejaList:boolean = false;
+
+  tiendaSelected:any;
   
+    tiendas: Tienda[] = [];
+      nombreSelected = 'Strapizza';
+  private tiendaService = inject(TiendaService);
+
     constructor(
       private router: Router
     ) {
@@ -32,6 +40,10 @@ export class ReviewOrderComponent {
     ngOnInit(){
       this.loadBandejaListFromLocalStorage();
       this.geneardorOrdeneNumero();
+
+       setTimeout(()=>{
+      this.getTiendas()
+    }, 300)
 
     }
 
@@ -119,5 +131,26 @@ geneardorOrdeneNumero(){
   this.randomNum = random;
   // return random;
 }
+
+
+
+getTiendas() {
+      this.tiendaService.cargarTiendas().subscribe((resp: Tienda[]) => {
+        // Asignamos el array filtrado directamente
+        this.tiendas = resp.filter((tienda: Tienda) => tienda.categoria && tienda.categoria.nombre === 'Alimentos');
+        // console.log(this.tiendas);
+  
+        this.setTiendaDefault();
+  
+      })
+    }
+
+    setTiendaDefault() {
+    // Set default tiendaSelected to "Panaderia SlideDish" if not already set
+    const defaultTienda = this.tiendas.find(tienda => tienda.nombre === this.nombreSelected);
+    this.tiendaSelected = defaultTienda;
+
+    // console.log(defaultTienda)
+  }
 
 }
