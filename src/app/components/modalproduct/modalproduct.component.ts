@@ -28,7 +28,10 @@ export class ModalproductComponent implements OnInit {
   
   user!:Usuario;
   bandejaList: any[] = [];
-  tiendaSelected!:Tienda;
+  tiendaSelected:any;
+
+   tiendas: Tienda[] = [];
+    nombreSelected = 'Strapizza';
 
   ngOnInit(): void {
      let USER = localStorage.getItem("user");
@@ -39,6 +42,7 @@ export class ModalproductComponent implements OnInit {
     this.carritoService.bandejaList$.subscribe(items => {
       this.bandejaList = items;
     });
+    this.getTiendas()
   }
 
   
@@ -65,5 +69,25 @@ removeItem(producto:Producto){
 
  closeAviso(){
     this.msm_success = false;
+  }
+
+
+  getTiendas() {
+      this.tiendaService.cargarTiendas().subscribe((resp: Tienda[]) => {
+        // Asignamos el array filtrado directamente
+        this.tiendas = resp.filter((tienda: Tienda) => tienda.categoria && tienda.categoria.nombre === 'Alimentos');
+        // console.log(this.tiendas);
+  
+        this.setTiendaDefault();
+  
+      })
+    }
+
+    setTiendaDefault() {
+    // Set default tiendaSelected to "Panaderia SlideDish" if not already set
+    const defaultTienda = this.tiendas.find(tienda => tienda.nombre === this.nombreSelected);
+    this.tiendaSelected = defaultTienda;
+
+    // console.log(defaultTienda)
   }
 }

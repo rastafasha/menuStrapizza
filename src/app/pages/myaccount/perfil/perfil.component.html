@@ -19,10 +19,7 @@
                 <h6 class="font-size-base text-light mb-0">Actualiza los datos de tu perfíl:</h6>
             </div>
             <!-- Profile form-->
-            <form [formGroup]="perfilForm" (ngSubmit)="actualizarPerfil()" autocomplete="off">
-
-                <div class="row">
-                    <div class="col-sm-12" *ngIf="msm_error">
+              <div class="col-sm-12" *ngIf="msm_error">
                         <div class="form-group">
                             <div class="alert alert-danger alert-dismissible fade show" role="alert"
                                 (click)="close_alert()">
@@ -34,7 +31,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-sm-12" *ngIf="msm_success">
+                     <div class="col-sm-12" *ngIf="msm_success">
                         <div class="form-group">
                             <div class="alert alert-success alert-dismissible fade show" role="alert">
                                 <span class="font-weight-medium">Mensaje:</span> Se actualizó sus datos correctamente.
@@ -45,6 +42,11 @@
                             </div>
                         </div>
                     </div>
+            <form [formGroup]="perfilForm" (ngSubmit)="actualizarPerfil()" autocomplete="off">
+
+                <div class="row">
+                   
+                   
                     <div class="col-sm-6">
                         <div class="form-group">
                             <label for="account-fn">Nombres completos</label>
@@ -60,7 +62,7 @@
                     <div class="col-sm-6">
                         <div class="form-group">
                             <label for="account-email">Correo Electrónico</label>
-                            <input class="form-control" formControlName="email" type="email" readonly value="{{identity.email}}">
+                            <input class="form-control"  type="email" readonly value="{{identity.email}}">
                         </div>
                     </div>
                     <div class="col-sm-6">
@@ -154,6 +156,7 @@
                     </div>
                 </div>
             </form>
+
         </section>
     </div>
 </div>

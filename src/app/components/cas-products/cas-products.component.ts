@@ -162,8 +162,9 @@ export class CasProductsComponent implements OnInit, OnDestroy {
 
   openModal(product: Producto) {
     this.selectedProduct = product;
-    // Use Bootstrap's modal method to show modal programmatically
-    const modalElement = document.getElementById('exampleModal');
+    // Use Bootstrap's modal method to show modal programmatically with dynamic ID
+    const modalId = `modalProduct-${product._id}`;
+    const modalElement = document.getElementById(modalId);
     if (modalElement) {
       const modal = new (window as any).bootstrap.Modal(modalElement);
       modal.show();

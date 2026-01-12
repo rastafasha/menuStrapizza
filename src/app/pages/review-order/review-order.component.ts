@@ -62,9 +62,6 @@ export class ReviewOrderComponent {
       this.isbandejaList = false;
       
     }
-    setTimeout(()=>{
-      this.router.navigate(['/home']);
-    }, 500)
     //si es falso enviar al home
     if(!this.isbandejaList){
      this.router.navigate(['/home']);

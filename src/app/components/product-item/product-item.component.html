@@ -19,8 +19,8 @@
         <div class="product-content">
             <div class="infpr">
                 <h4>{{product.titulo}}</h4>
-                <div class="product-price text-danger " style="text-decoration: line-through;" *ngIf="product.precio_antes > product.precio_ahora">{{product.precio_antes| currency:'EUR'}}</div>
-                <div class="product-price">{{product.precio_ahora| currency:'EUR'}}</div>
+                <div class="product-price text-danger " style="text-decoration: line-through;" *ngIf="product.precio_antes > product.precio_ahora">{{product.precio_antes|number:'1.2-2'| currency:tiendaSelected?.moneda}}</div>
+                <div class="product-price">{{product.precio_ahora|number:'1.2-2'| currency:tiendaSelected?.moneda}}</div>
             </div>
             <div class="botns">
                 <button class="btn-secondary btn" (click)="openPaymentsModal(product)"><i

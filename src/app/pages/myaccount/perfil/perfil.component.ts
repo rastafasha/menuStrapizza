@@ -84,7 +84,7 @@ export class PerfilComponent implements OnInit {
     if(USER){
       this.user = JSON.parse(USER);
       this.user_id = this.user.uid
-      console.log(this.user);
+      // console.log(this.user);
       this. getUser();
     }
    
@@ -93,7 +93,7 @@ export class PerfilComponent implements OnInit {
   getUser(){
     this.usuarioService.get_user(this.user_id).subscribe((resp:any)=>{
       this.identity = resp.usuario;
-      console.log(this.identity)
+      // console.log(this.identity)
       if(this.identity){
         this.getPaises();
         this.iniciarFormulario()

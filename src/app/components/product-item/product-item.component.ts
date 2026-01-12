@@ -38,6 +38,7 @@ export class ProductItemComponent {
   ngOnInit(): void {
      let USER = localStorage.getItem("user");
     this.user = USER ? JSON.parse(USER) : null;
+    this.getTiendas()
   }
 
   openPaymentsModal(product: any): void {
@@ -88,7 +89,7 @@ export class ProductItemComponent {
     const defaultTienda = this.tiendas.find(tienda => tienda.nombre === this.nombreSelected);
     this.tiendaSelected = defaultTienda;
 
-    console.log(defaultTienda)
+    // console.log(defaultTienda)
   }
   
 }

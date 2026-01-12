@@ -1,5 +1,5 @@
 <!-- Modal -->
-<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade" [id]="'modalProduct-' + (product?._id || '')" tabindex="-1" [attr.aria-labelledby]="'modalProductLabel-' + (product?._id || '')" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content" *ngIf="product">
             <div class="modal-header">
@@ -7,7 +7,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-              
+
                 <div class="ft-recipe">
                     <div class="ft-recipe__thumb">
                         <span id="close-modal">
@@ -22,21 +22,12 @@
                                 <div class="user-rating"></div>
                             </div>
                             <ul class="recipe-details">
-                                <li class="recipe-details-item time">
-                                    <i class="fa fa-clock icon-small"></i>
-                                    <span class="value">20</span>
-                                    <span class="title">Minutes</span>
-                                </li>
-                                <li class="recipe-details-item ingredients">
-                                    <i class="fa fa-book icon-small"></i>
-                                    <span class="value">5</span>
-                                    <span class="title">Ingredients</span>
-                                </li>
                                 <li class="recipe-details-item servings">
                                     <i class="fa fa-users icon-small"></i>
-                                    <span class="value" style="text-decoration: line-through;">{{product.precio_antes
-                                        |number:'1.2-2'|currency:'EUR'}}</span>
-                                    <span class="value">{{product.precio_ahora |number:'1.2-2'|currency:'EUR'}}</span>
+                                    <span class="value" style="text-decoration: line-through;"
+                                        *ngIf="+product.precio_antes > +product.precio_ahora">{{product.precio_antes
+                                        |number:'1.2-2'|currency:tiendaSelected?.moneda}}</span>
+                                    <span class="value">{{product.precio_ahora |number:'1.2-2'|currency:tiendaSelected?.moneda}}</span>
                                 </li>
                             </ul>
                         </header>
@@ -45,24 +36,12 @@
                             <p>Debes Iniciar Sesión ó Registrarte para solicitar un pedido</p>
                         </div>
 
-                         
-                        <!-- <div class="add-items justify-content-center" *ngIf="user">
-                            <i class="fa fa-minus icon-small" (click)="removeItem(product)"></i>
-                            <span>{{product.cantidad}}</span>
-                            <i class="fa fa-plus icon-small" (click)="addItem(product)"></i>
-                        </div> -->
                         <button class="btn-success btn" *ngIf="user" (click)="addItem(product)">
                             <i class="fa fa-shopping-bag"></i> Agregar al Pedido
                         </button>
-                        <div class="price" *ngIf="user">
-                            <p>{{product.precio_ahora * product.cantidad |number:'1.2-2'|currency}}</p>
-                            <!-- <p >{{item.precio_ahora | currency}}</p> -->
-                        </div>
-                        <!-- <button class="add-button btn-primary" (click)="addProduct(product)" >
-                            <i class="fa fa-plus icon-small"></i>
-                        </button> -->
+                        
 
-                         <!-- mensaje -->
+                        <!-- mensaje -->
                         <div class="aviso aviso-sucess" role="alert" *ngIf="msm_success">
                             <i class="fa fa-close" (click)="closeAviso()"></i>
                             <!-- al <a [routerLink]="['/review']"><b>Carrito!</b></a> -->
@@ -77,7 +56,7 @@
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 <button type="button" class="btn btn-primary">Save changes</button>
             </div> -->
-            
+
         </div>
     </div>
 </div>
