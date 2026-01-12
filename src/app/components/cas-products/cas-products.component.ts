@@ -23,6 +23,8 @@ import { InfiniteScrollDirective } from 'ngx-infinite-scroll';
 export class CasProductsComponent implements OnInit, OnDestroy {
   @Output() msm_success: EventEmitter<boolean> = new EventEmitter<boolean>();
   @Input() refreshCasProducts: EventEmitter<void> | null = null;
+  @Input() activeCategory: string = 'all';
+  @Input() title!: string ;
 
   option_selectedd: number = 1;
   solicitud_selectedd: any = null;
@@ -34,7 +36,7 @@ export class CasProductsComponent implements OnInit, OnDestroy {
 
   categories: Categoria[] = [];
   subcategories: any[] = [];
-  activeCategory: string = 'all';
+  
   catname!: string;
   isLoading: boolean = false;
   products: Producto[] = [];
@@ -85,7 +87,7 @@ export class CasProductsComponent implements OnInit, OnDestroy {
 
 
   getProductosCatName() {
-    this.catname = this.tiendaSelected?.subcategoria ?? 'Pizzería'
+    this.catname = this.tiendaSelected?.subcategoria ?? this.activeCategory
     this.isLoading = true
     this.categoryService.find_by_nombre(this.catname).subscribe(
       (resp: any) => {

@@ -9,11 +9,14 @@ import { MenuFooterComponent } from '../../shared/menu-footer/menu-footer.compon
 import { Usuario } from '../../models/usuario.model';
 import { NgIf } from '@angular/common';
 import { LoadingComponent } from "../../shared/loading/loading.component";
+import { ProducListSliderComponent } from '../../components/produc-list-slider/produc-list-slider.component';
 
 @Component({
   selector: 'app-home',
   imports: [HeaderComponent, SliderComponent, FreeDeliveryComponent, CasProductsComponent,
-    HeroComponent, FooterComponent, MenuFooterComponent, NgIf, LoadingComponent],
+    HeroComponent, FooterComponent, MenuFooterComponent, NgIf, LoadingComponent,
+    ProducListSliderComponent
+  ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })
@@ -24,6 +27,7 @@ export class HomeComponent {
   @Input() msm_success_value: boolean = false;
   user!:Usuario;
   isReloadig=false;
+  activeCategory!:string;
 
   // Event emitter for refreshing cas-products
   @Output() refreshCasProducts: EventEmitter<void> = new EventEmitter<void>();

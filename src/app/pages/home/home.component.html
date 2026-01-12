@@ -9,11 +9,16 @@
     <div class="clear"></div>
     <br>
     <!-- Categories Section -->
-    <app-cas-products (msm_success)="onMsmSuccess($event)" [refreshCasProducts]="refreshCasProducts"></app-cas-products>
+    <app-cas-products [activeCategory]="'Pizzería'" [title]="'Carta Pizza'" (msm_success)="onMsmSuccess($event)" [refreshCasProducts]="refreshCasProducts"></app-cas-products>
     <!-- Pastas Products -->
-    <!-- <app-produc-list-slider></app-produc-list-slider> -->
     <!-- Hero Section -->
     <app-hero></app-hero>
+    <app-cas-products [activeCategory]="'Entradas'" [title]="'Entradas'" (msm_success)="onMsmSuccess($event)" [refreshCasProducts]="refreshCasProducts"></app-cas-products>
+    <br>
+    <hr>
+    <br>
+    <app-cas-products [activeCategory]="'Bebidas'" [title]="'Bebidas'" (msm_success)="onMsmSuccess($event)" [refreshCasProducts]="refreshCasProducts"></app-cas-products>
+    <!-- <app-produc-list-slider (msm_success)="onMsmSuccess($event)" [refreshCasProducts]="refreshCasProducts"></app-produc-list-slider> -->
 
     <!-- Featured Products -->
 
