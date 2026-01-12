@@ -38,6 +38,7 @@ export class HeaderComponent implements OnDestroy {
   private carritoService = inject(CarritoService);
   private cartSubscription!: Subscription;
   nombreSelected = 'Strapizza';
+  titleapp = 'Strapizza';
 
   @HostListener('touchstart', ['$event'])
   onTouchStart(event: TouchEvent) {
@@ -137,9 +138,20 @@ openMenu() {
   }
 
   onPullRefresh() {
+    const headerReload = document.querySelector('.header-container');
+    const logotext = document.querySelector('.logo-text');
+    headerReload?.animate([{ background: '#ccc', color: '#f2f2f2' }], { duration: 300 });
+
+    // Update title and animate logo text opacity
+    this.titleapp = 'Cargando';
+    if (logotext instanceof HTMLElement) {
+      logotext.animate([{ opacity: '0.5' }, { opacity: '1' }], { duration: 300 });
+      logotext.textContent = this.titleapp;
+    }
+
     this.isReloadig = true;
     this.refreshApp.emit();
-    location.reload()
+    location.reload();
     this.isReloadig = false;
   }
 }

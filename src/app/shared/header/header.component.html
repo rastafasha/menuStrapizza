@@ -1,6 +1,6 @@
 <!-- Header -->
 <header class="header">
-    <div class="header-container">
+    <div class="header-container" (pulldown)="onPullRefresh()">
         <div class="logo">
 
             <!-- <span class="logo-icon">
@@ -15,7 +15,7 @@
 
                 </span>
             </span> -->
-            <span class="logo-text">Strapizza</span>
+            <span class="logo-text">{{titleapp}}</span>
             <a routerLink="/" >
                     <img src="assets/images/logo.png" alt="Strapizza Logo">
                 </a>
