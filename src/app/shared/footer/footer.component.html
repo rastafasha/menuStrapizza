@@ -5,8 +5,9 @@
             <div class="footer-section">
                 <h4>{{tiendaSelected?.nombre}}</h4>
                 <p>{{tiendaSelected?.ciudad}}, {{tiendaSelected?.pais}}</p>
-                <p>Compartiendo la tradición italiana desde 1990. Cada pizza es elaborada con amor y los mejores
-                    ingredientes.</p>
+                <div [innerHtml]="tiendaSelected?.direccion " class="directinonfo" ></div>
+                <!-- <p>Compartiendo la tradición italiana desde 1990. Cada pizza es elaborada con amor y los mejores
+                    ingredientes.</p> -->
             </div>
             <!-- <div class="footer-section">
                     <h4>Enlaces Rápidos</h4>
@@ -17,12 +18,13 @@
                         <li><a href="#promociones">Promociones</a></li>
                     </ul>
                 </div> -->
+                <br>
             <div class="footer-section">
                 <h4>Contáctanos</h4>
                 <ul class="footer-links">
                     <li><a href="#"><i class="fas fa-phone"></i> {{tiendaSelected?.telefono}}</a></li>
                     <!-- <li><a href="#"><i class="fas fa-map-marker-alt"></i> Calle Principal #123</a></li> -->
-                    <li><a href="#"><i class="fas fa-envelope"></i> info&#64;strapizza.com</a></li>
+                    <!-- <li><a href="#"><i class="fas fa-envelope"></i> info&#64;strapizza.com</a></li> -->
                 </ul>
             </div>
             <div class="footer-section">

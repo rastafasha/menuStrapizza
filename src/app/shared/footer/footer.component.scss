@@ -1,0 +1,14 @@
+.directinonfo{
+    column-count: 2;
+    & p::nth-child{
+        margin: 0 !important;
+        margin-bottom: 0 !important;
+        padding: 0 !important;
+
+    }
+}
+
+p{
+        margin-bottom: 0 !important;
+
+    }
