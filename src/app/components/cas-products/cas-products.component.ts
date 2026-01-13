@@ -51,9 +51,22 @@ export class CasProductsComponent implements OnInit, OnDestroy {
 
 
   ngOnInit() {
+    // Get tiendaSelected from TiendaService (set by HeaderComponent)
+    this.tiendaSelected = this.tiendasService.getSelectedTiendaSync();
+    
+    // Also subscribe to changes
+    this.tiendasService.selectedTiendaObservable$.subscribe(tienda => {
+      this.tiendaSelected = tienda;
+      // Refresh products when tienda changes
+      if (tienda) {
+        this.getProductosCatName();
+      }
+    });
+
     this.updateTodo();
     this.getProductosCatName();
     this.getCategories();
+
 
     // Listen for refresh trigger from parent (header pull)
     if (this.refreshCasProducts) {
@@ -87,7 +100,7 @@ export class CasProductsComponent implements OnInit, OnDestroy {
 
 
   getProductosCatName() {
-    this.catname = this.tiendaSelected?.subcategoria ?? this.activeCategory
+    this.catname = this.tiendaSelected?.categoria?.nombre ?? this.activeCategory
     this.isLoading = true
     this.categoryService.find_by_nombre(this.catname).subscribe(
       (resp: any) => {
@@ -103,7 +116,8 @@ export class CasProductsComponent implements OnInit, OnDestroy {
   }
 
   getProductosCatName1() {
-    this.catname = this.tiendaSelected?.subcategoria ?? 'Pizzería'
+    // this.catname = this.tiendaSelected?.subcategoria ?? 'Pizzería'
+    this.catname =  'Alimentos'
     this.isLoading = true
     this.categoryService.find_by_nombre(this.catname).subscribe(
       (resp: any) => {

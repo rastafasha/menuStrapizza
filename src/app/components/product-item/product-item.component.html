@@ -35,10 +35,10 @@
 </div>
 <div *ngIf="isUserLogged" class="aviso">
     <i class="fa fa-close" (click)="closeAviso()"></i>
-    <p>Debes Iniciar Sesión ó Registrarte para solicitar un pedido</p>
+    <p>Debes <a [routerLink]="['/login']"><b>Iniciar Sesión </b></a> ó <a [routerLink]="['/registro']"><b>Registrarte</b></a> para solicitar un pedido</p>
 </div>
 
 <div *ngIf="isProductAdded" class="aviso aviso-sucess">
     <i class="fa fa-close" (click)="closeAviso()"></i>
-    <p>Producto Agregado al <a [routerLink]="['/review']"><b>Carrito!</b></a></p>
+    <p>Articulo Agregado al <a [routerLink]="['/review']"><b>Carrito!</b></a></p>
 </div>

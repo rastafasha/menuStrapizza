@@ -32,8 +32,9 @@
                             </ul>
                         </header>
                         <p class="description" [innerHTML]="product.detalle"></p>
-                        <div *ngIf="!user" class="aviso">
-                            <p>Debes Iniciar Sesión ó Registrarte para solicitar un pedido</p>
+                        <div *ngIf="!user && msm_alert" class="aviso">
+                            <i class="fa fa-close" (click)="closeAviso()"></i>
+                            <p>Debes <a [routerLink]="['/login']"><b>Iniciar Sesión </b></a> ó <a [routerLink]="['/registro']"><b>Registrarte</b></a> para solicitar un pedido</p>
                         </div>
 
                         <button class="btn-success btn" *ngIf="user" (click)="addItem(product)">
@@ -44,8 +45,7 @@
                         <!-- mensaje -->
                         <div class="aviso aviso-sucess" role="alert" *ngIf="msm_success">
                             <i class="fa fa-close" (click)="closeAviso()"></i>
-                            <!-- al <a [routerLink]="['/review']"><b>Carrito!</b></a> -->
-                            <p>Artículo agregado! </p>
+                            <p>Artículo agregado<a [routerLink]="['/review']"><b>Carrito!</b></a>! </p>
                         </div>
                         <!-- mensaje -->
                     </div>

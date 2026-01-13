@@ -83,7 +83,7 @@ export class HeaderComponent implements OnDestroy {
   getTiendas() {
     this.tiendaService.cargarTiendas().subscribe((resp: Tienda[]) => {
       // Asignamos el array filtrado directamente
-      this.tiendas = resp.filter((tienda: Tienda) => tienda.categoria && tienda.categoria.nombre === 'Alimentos');
+      this.tiendas = resp.filter((tienda: Tienda) => tienda.subcategoria && tienda.subcategoria === 'Pizzería');
       // console.log(this.tiendas);
 
       this.setTiendaDefault();
@@ -107,7 +107,7 @@ export class HeaderComponent implements OnDestroy {
         localStorage.setItem('defaultTiendaSet', 'true');
       }
     }
-    // console.log(this.tiendaSelected)
+    console.log(this.tiendaSelected)
   }
 
 
@@ -150,6 +150,7 @@ openMenu() {
     }
 
     this.isReloadig = true;
+    this.getTiendas();
     this.refreshApp.emit();
     location.reload();
     this.isReloadig = false;

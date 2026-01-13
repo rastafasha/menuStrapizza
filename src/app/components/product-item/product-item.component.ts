@@ -27,20 +27,27 @@ export class ProductItemComponent {
   user!:Usuario;
   isUserLogged=false;
   isProductAdded=false;
-  tiendaSelected:any;
-
-  tiendas: Tienda[] = [];
-    nombreSelected = 'Strapizza';
+  tiendaSelected: Tienda | null = null;
+  tiendaNameSelected!:string;
 
   private carritoService = inject(CarritoService);
   private tiendaService = inject(TiendaService);
 
   ngOnInit(): void {
      let USER = localStorage.getItem("user");
-    this.user = USER ? JSON.parse(USER) : null;
-    setTimeout(()=>{
-      this.getTiendas()
-    }, 300)
+     this.user = USER ? JSON.parse(USER) : null;
+     
+     let TIENDA = localStorage.getItem("tiendaSelected");
+     this.tiendaNameSelected = TIENDA ? JSON.parse(TIENDA) : null;
+     
+     // Get tiendaSelected from TiendaService (set by HeaderComponent)
+     // this.tiendaSelected = this.tiendaService.getSelectedTiendaSync();
+     
+     // Also subscribe to changes
+     this.tiendaService.getTiendaByName(this.tiendaNameSelected).subscribe(tienda => {
+       this.tiendaSelected = tienda;
+      //  console.log(this.tiendaNameSelected)
+    });
   }
 
   openPaymentsModal(product: any): void {
@@ -64,7 +71,7 @@ export class ProductItemComponent {
         
         setTimeout(()=>{
           this.isProductAdded =true
-        }, 5000);
+        }, 300)
         this.isProductAdded =false
       }
   
@@ -75,23 +82,6 @@ export class ProductItemComponent {
     this.isProductAdded = false;
   }
 
-   getTiendas() {
-      this.tiendaService.cargarTiendas().subscribe((resp: Tienda[]) => {
-        // Asignamos el array filtrado directamente
-        this.tiendas = resp.filter((tienda: Tienda) => tienda.categoria && tienda.categoria.nombre === 'Alimentos');
-        // console.log(this.tiendas);
   
-        this.setTiendaDefault();
-  
-      })
-    }
-
-    setTiendaDefault() {
-    // Set default tiendaSelected to "Panaderia SlideDish" if not already set
-    const defaultTienda = this.tiendas.find(tienda => tienda.nombre === this.nombreSelected);
-    this.tiendaSelected = defaultTienda;
-
-    // console.log(defaultTienda)
-  }
   
 }

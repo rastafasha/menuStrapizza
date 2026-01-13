@@ -1,42 +1,38 @@
-# TODO - Pull-to-Refresh from Header Implementation
+# TODO - Implementar tiendaSelected desde TiendaService
 
-## Step 1: Add refresh EventEmitter to HeaderComponent
-- [x] Add `@Output() refreshApp: EventEmitter<void>` to header.component.ts
-- [x] Add `onPullRefresh()` method to emit the event
-- [x] Add touch event listeners for pull/jale detection (touchstart, touchend)
-- [x] Update header.component.html to trigger refresh on pull/jale action
+## Objetivo
+Hacer que `product-item` y `modalproduct` usen `TiendaService` para obtener `tiendaSelected` en lugar de duplicar lógica.
 
-## Step 2: Update HomeComponent to handle refresh
-- [x] Add `@Output() refreshCasProducts: EventEmitter<void>` to home.component.ts
-- [x] Add method to pass refresh to CasProductsComponent (onRefreshFromHeader)
-- [x] Update home.component.html to bind refresh events
+## Tareas
 
-## Step 3: Update CasProductsComponent to respond to refresh
-- [x] Add `@Input() refreshCasProducts: EventEmitter<void>` to cas-products.component.ts
-- [x] Subscribe to refreshCasProducts in ngOnInit to call refreshData()
+- [x] 1. Crear este archivo TODO.md
+- [x] 2. Agregar método `getSelectedTiendaSync()` en `tienda.service.ts`
+- [x] 3. Actualizar `product-item.component.ts` para usar `selectedTiendaObservable$`
+- [x] 4. Actualizar `modalproduct.component.ts` para usar `selectedTiendaObservable$`
+- [x] 5. Actualizar `cas-products.component.ts` para usar `TiendaService`
+- [x] 6. Actualizar `home.component.ts` para remover `tiendaSelected` heredado
+- [x] 7. Actualizar `cas-products.component.html` para remover binding `[tiendaSelected]`
 
-## Step 4: Test the implementation
-- [ ] Verify header pull/jale triggers refresh
-- [ ] Verify products are refreshed in home
+## Resumen de cambios
 
----
+### tienda.service.ts
+- Agregar `getSelectedTiendaSync()` para obtener valor sin suscripción
 
-## Summary of Changes:
+### product-item.component.ts
+- Remover `@Input() tiendaSelected`
+- Suscribirse a `selectedTiendaObservable$`
 
-### HeaderComponent (header.component.ts)
-- Added `@Output() refreshApp: EventEmitter<void>` 
-- Added touch event listeners (`touchstart`, `touchend`) to detect pull gestures
-- Added `onPullRefresh()` method that emits when pull is detected
+### modalproduct.component.ts
+- Remover `tiendaSelected` local y métodos duplicados (`getTiendas()`, `setTiendaDefault()`)
+- Suscribirse a `selectedTiendaObservable$`
 
-### HomeComponent (home.component.ts)
-- Added `@Output() refreshCasProducts: EventEmitter<void>`
-- Added `onRefreshFromHeader()` method to relay refresh events
+### cas-products.component.ts
+- Remover `@Input() tiendaSelected`
+- Suscribirse a `selectedTiendaObservable$` y obtener `tiendaSelected` del servicio
 
-### CasProductsComponent (cas-products.component.ts)
-- Added `@Input() refreshCasProducts: EventEmitter<void>`
-- Subscribed to the event in ngOnInit to call `refreshData()`
+### home.component.ts
+- Remover `@Output() tiendaSelected`, imports de `Tienda` y `TiendaService`, y propiedades no usadas
 
-### Templates (home.component.html)
-- Bound `(refreshApp)` output from header to home's `onRefreshFromHeader()`
-- Bound `[refreshCasProducts]` to cas-products component
+### cas-products.component.html
+- Remover `[tiendaSelected]="tiendaSelected"` del `<app-product-item>`
 

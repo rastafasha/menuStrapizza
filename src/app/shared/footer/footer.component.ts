@@ -16,35 +16,20 @@ export class FooterComponent  {
 tiendas: Tienda[] = [];
   tienda!: Tienda;
   nombreSelected = 'Strapizza';
+  tiendaNameSelected!:string;
 
 private tiendaService = inject(TiendaService);
 
   ngOnInit(){
 
-    this.getTiendas();
+    let TIENDA = localStorage.getItem("tiendaSelected");
+     this.tiendaNameSelected = TIENDA ? JSON.parse(TIENDA) : null;
+
+      this.tiendaService.getTiendaByName(this.tiendaNameSelected).subscribe(tienda => {
+       this.tiendaSelected = tienda;
+      //  console.log(this.tiendaNameSelected)
+    });
   }
 
-  getTiendas() {
-    this.tiendaService.cargarTiendas().subscribe((resp: Tienda[]) => {
-      // Asignamos el array filtrado directamente
-      this.tiendas = resp.filter((tienda: Tienda) => tienda.categoria && tienda.categoria.nombre === 'Alimentos');
-      // console.log(this.tiendas);
-
-      this.setTiendaDefault();
-
-    })
-  }
-
-
-
-  setTiendaDefault() {
-    // Check if default tienda has already been set
-    // if (localStorage.getItem('defaultTiendaSet')) return;
-
-    // Set default tiendaSelected to "Panaderia SlideDish" if not already set
-    const defaultTienda = this.tiendas.find(tienda => tienda.nombre === this.nombreSelected);
-    this.tiendaSelected = defaultTienda;
-    // console.log(defaultTienda)
-  }
 
 }

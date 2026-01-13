@@ -132,6 +132,13 @@ h5{
     color: #f3f0eb;
 }
 
+.aviso-sucess p a b{
+    color: #f3f0eb;
+    font-weight: bold;
+}
+
+
+
 .cart-count-badge {
   position: relative;
   top: auto;

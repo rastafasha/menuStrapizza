@@ -23,7 +23,6 @@ import { PwaNotifInstallerComponent } from '../../shared/pwa-notif-installer/pwa
 })
 export class HomeComponent {
 
-  @Output() tiendaSelected!: string ;
   @Output() msm_success: EventEmitter<boolean> = new EventEmitter<boolean>();
   @Input() msm_success_value: boolean = false;
   user!:Usuario;
@@ -47,7 +46,6 @@ export class HomeComponent {
   ngOnInit(){
     let USER = localStorage.getItem("user");
     this.user = USER ? JSON.parse(USER) : null;
-    // console.log(this.tiendaSelected)
   }
-
 }
+

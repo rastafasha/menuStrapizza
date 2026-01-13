@@ -1,4 +1,4 @@
-<app-header (refreshApp)="onRefreshFromHeader()"></app-header>
+<app-header (refreshApp)="onRefreshFromHeader()" ></app-header>
 <!-- <p>home works!</p> -->
 <!-- Carrousel Section -->
 <app-loading *ngIf="isReloadig"></app-loading>
@@ -9,19 +9,19 @@
     <div class="clear"></div>
     <br>
     <!-- Categories Section -->
-    <app-cas-products [activeCategory]="'Pizzería'" [isVisible]="true" [title]="'Carta Pizza'" (msm_success)="onMsmSuccess($event)" [refreshCasProducts]="refreshCasProducts"></app-cas-products>
+    <app-cas-products  [activeCategory]="'Pizzería'" [isVisible]="true" [title]="'Carta Pizza'"  (msm_success)="onMsmSuccess($event)" [refreshCasProducts]="refreshCasProducts"></app-cas-products>
     <!-- Pastas Products -->
     <!-- Hero Section -->
     <app-hero></app-hero>
-    <app-cas-products [activeCategory]="'Entradas'" [title]="'Entradas'" (msm_success)="onMsmSuccess($event)" [refreshCasProducts]="refreshCasProducts"></app-cas-products>
+    <app-cas-products  [activeCategory]="'Entradas'" [title]="'Entradas'"  (msm_success)="onMsmSuccess($event)" [refreshCasProducts]="refreshCasProducts"></app-cas-products>
     <br>
     <hr>
     <br>
-    <app-cas-products [activeCategory]="'Bebidas'" [title]="'Bebidas'" (msm_success)="onMsmSuccess($event)" [refreshCasProducts]="refreshCasProducts"></app-cas-products>
+    <app-cas-products  [activeCategory]="'Bebidas'" [title]="'Bebidas'"  (msm_success)="onMsmSuccess($event)" [refreshCasProducts]="refreshCasProducts"></app-cas-products>
     <br>
     <hr>
     <br>
-    <app-cas-products [activeCategory]="'Postres'" [title]="'Postres'" (msm_success)="onMsmSuccess($event)" [refreshCasProducts]="refreshCasProducts"></app-cas-products>
+    <app-cas-products  [activeCategory]="'Postres'" [title]="'Postres'"  (msm_success)="onMsmSuccess($event)" [refreshCasProducts]="refreshCasProducts"></app-cas-products>
     <!-- <app-produc-list-slider (msm_success)="onMsmSuccess($event)" [refreshCasProducts]="refreshCasProducts"></app-produc-list-slider> -->
 
     <!-- Featured Products -->
@@ -36,5 +36,5 @@
 <app-pwa-notif-installer></app-pwa-notif-installer>
     <!-- Footer -->
     <app-menu-footer *ngIf="user"></app-menu-footer>
-    <app-footer [tiendaSelected]="tiendaSelected"></app-footer>
+    <app-footer ></app-footer>
 </div>
