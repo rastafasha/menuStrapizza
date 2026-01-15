@@ -30,4 +30,4 @@
 </section>
 <div class="clear"></div>
 
-<app-modalproduct [product]="selectedProduct" [isModalOpen]="isModalOpen" [tienda_moneda]="tienda_moneda" (modalClosed)="closeModal()" *ngIf="!isLoading"></app-modalproduct>
+<app-modalproduct [product]="selectedProduct" [activeCategory]="activeCategory" [isModalOpen]="isModalOpen" [tienda_moneda]="tienda_moneda" (modalClosed)="closeModal()" *ngIf="!isLoading"></app-modalproduct>

@@ -5,6 +5,9 @@ import Swal from 'sweetalert2';
 import { Tienda } from '../../models/tienda.model';
 import { UsuarioService } from '../../services/usuario.service';
 import { NgIf } from '@angular/common';
+import { ImagenPipe } from '../../pipes/imagen-pipe.pipe';
+import { environment } from '../../environments/environment';
+import { TiendaService } from '../../services/tienda.service';
 
 @Component({
   selector: 'app-register',
@@ -12,7 +15,8 @@ import { NgIf } from '@angular/common';
     FormsModule,
     ReactiveFormsModule,
     RouterModule,
-    NgIf
+    NgIf,
+    ImagenPipe
   ],
   templateUrl: './register.component.html',
   styleUrls: [ './register.component.scss' ]
@@ -20,17 +24,18 @@ import { NgIf } from '@angular/common';
 export class RegisterComponent implements OnInit {
 
   public formSumitted = false;
-
+nombreSelected = environment.nombreSelected;
   registerForm:FormGroup;
   tiendas!: Tienda[];
   tienda!: Tienda;
+  tiendaSelected!: Tienda;
 
 
   constructor(
     private fb: FormBuilder,
     private router: Router,
     private usuarioService: UsuarioService,
-    // private tiendaService: TiendaService,
+    private tiendaService: TiendaService,
   ) {
     this.registerForm = this.fb.group({
       first_name: ['', Validators.required],
@@ -47,11 +52,15 @@ export class RegisterComponent implements OnInit {
     });
   }
 
-
-
-
   ngOnInit(): void {
-    // this.getTiendas();
+    this.getTienda();
+  }
+
+   getTienda(){
+    this.tiendaService.getTiendaByName(this.nombreSelected).subscribe((resp:any)=>{
+      this.tiendaSelected = resp;
+      console.log(this.tiendaSelected)
+    })
   }
 
   getTiendas(){

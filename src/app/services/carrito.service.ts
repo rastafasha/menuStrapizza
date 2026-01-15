@@ -69,21 +69,38 @@ export class CarritoService {
     return this.bandejaListSubject.getValue();
   }
 
+  // Generate a unique item key that includes nombre_selector for pasta products
+  private getItemKey(item: any): string {
+    // For pasta items with a selector, create a composite key
+    if ((item.subcategoria === 'Pastas' || item.subcategorias === 'Pastas') && item.nombre_selector) {
+      return `${item._id || item.id || item.name}_${item.nombre_selector}`;
+    }
+    // For regular items, use just the id or name
+    return item._id || item.id || item.name || JSON.stringify(item);
+  }
+
   // Add item to cart
   addItem(producto: any): void {
     const currentList = this.getBandejaList();
-    
-    const index = currentList.findIndex(item =>
-      item === producto ||
-      ((item as any)._id && (producto as any)._id && (item as any)._id === (producto as any)._id) ||
-      ((item as any).name && (producto as any).name && (item as any).name === (producto as any).name)
-    );
+
+    // Find index using the composite key that includes selector for pasta products
+    const index = currentList.findIndex(item => this.getItemKey(item) === this.getItemKey(producto));
 
     if (index !== -1) {
+      // Item exists - increment quantity
       if (currentList[index].cantidad) {
         currentList[index].cantidad += 1;
       } else {
         currentList[index].cantidad = 1;
+      }
+
+      // Update selector for pasta items when same product is added with different selector
+      if ((producto.subcategoria === 'Pastas' || producto.subcategorias === 'Pastas') && producto.nombre_selector) {
+        // Initialize selector property if not exists
+        if (!currentList[index].nombre_selector) {
+          currentList[index].nombre_selector = '';
+        }
+        currentList[index].nombre_selector = producto.nombre_selector;
       }
     } else {
       const newItem = { ...producto, cantidad: 1 };
@@ -97,11 +114,8 @@ export class CarritoService {
   removeItem(producto: any): void {
     const currentList = this.getBandejaList();
     
-    const index = currentList.findIndex(item =>
-      item === producto ||
-      ((item as any)._id && (producto as any)._id && (item as any)._id === (producto as any)._id) ||
-      ((item as any).name && (producto as any).name && (item as any).name === (producto as any).name)
-    );
+    // Find index using the composite key that includes selector for pasta products
+    const index = currentList.findIndex(item => this.getItemKey(item) === this.getItemKey(producto));
 
     if (index === -1) return;
 

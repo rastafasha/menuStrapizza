@@ -1,12 +1,14 @@
 <!-- ============================================================== -->
 <!-- Main wrapper - style you can find in pages.scss -->
 <!-- ============================================================== -->
-<section id="wrapper" class=" boxed-sm" style="background-image:url(../assets/images/background/login-register.jpg);">
+<section id="wrapper" class=" login-register" style="background-image:url(../assets/images/background/login-register.jpg);">
     <div class="login-box card">
         <div class="card-body">
             <form [formGroup]="registerForm" (ngSubmit)="crearUsuario()" autocapitalize="off" class="form-horizontal form-material" id="loginform">
-                <a href="javascript:void(0)" class="text-center db">
-                    <img src="../assets/images/logo.png" alt="Home" /><br/>
+                <a routerLink="/" class="ilogo">
+                     <img [src]="tiendaSelected.img | imagenPipe: 'tiendas'"  [alt]="tiendaSelected.nombre">
+                    <!-- <img src="../assets/images/logo.png" alt="Home" /> -->
+                    <br/>
                     <!-- <img src="../assets/images/logo-text.png" alt="Home" /> -->
                 </a>
                 <h3 class="box-title m-t-40 m-b-0">Register Now</h3><small>Create your account and enjoy</small>

@@ -4,6 +4,10 @@ import Swal from 'sweetalert2';
 import { Router, RouterModule } from '@angular/router';
 import { UsuarioService } from '../../services/usuario.service';
 import { CommonModule } from '@angular/common';
+import { environment } from '../../environments/environment';
+import { TiendaService } from '../../services/tienda.service';
+import { Tienda } from '../../models/tienda.model';
+import { ImagenPipe } from '../../pipes/imagen-pipe.pipe';
 
 // declare const gapi: any;
 
@@ -18,24 +22,26 @@ import { CommonModule } from '@angular/common';
     FormsModule,
     // HeaderComponent,
     // FooterComponent,
-    RouterModule
+    RouterModule,
+    ImagenPipe
 ],
   templateUrl: './login.component.html',
   styleUrls: [ './login.component.scss' ]
 })
 export class LoginComponent implements OnInit {
 
+  nombreSelected = environment.nombreSelected;
   public formSumitted = false;
   public auth2: any;
 
   loginForm: FormGroup;
-
-
+  tiendaSelected!: Tienda;
 
   constructor(
     private router: Router,
     private fb: FormBuilder,
     private usuarioService: UsuarioService,
+    private tiendaService: TiendaService,
     private ngZone: NgZone
   ) {
     this.loginForm = this.fb.group({
@@ -48,7 +54,15 @@ export class LoginComponent implements OnInit {
 ngOnInit(){
   // this.renderButton();
   this.usuarioService.getLocalStorage();
+  this.getTienda();
 }
+
+ getTienda(){
+    this.tiendaService.getTiendaByName(this.nombreSelected).subscribe((resp:any)=>{
+      this.tiendaSelected = resp;
+      console.log(this.tiendaSelected)
+    })
+  }
 
   login(){
 

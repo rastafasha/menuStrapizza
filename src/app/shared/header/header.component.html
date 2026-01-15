@@ -17,7 +17,8 @@
             </span> -->
             <span class="logo-text">{{titleapp}}</span>
             <a routerLink="/" >
-                    <img src="assets/images/logo.png" alt="Strapizza Logo">
+                    <img [src]="tiendaSelected.img | imagenPipe: 'tiendas'"  [alt]="tiendaSelected.nombre">
+                    <!-- <img src="assets/images/logo.png" alt="Strapizza Logo"> -->
                 </a>
             
         </div>

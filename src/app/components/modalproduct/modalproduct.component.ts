@@ -63,6 +63,7 @@ export class ModalproductComponent implements OnInit, OnDestroy {
     });
 
     this.product
+    this.activeCategory
 
     
   }
@@ -99,10 +100,10 @@ export class ModalproductComponent implements OnInit, OnDestroy {
             //si no viene usuario mostramo el alert por 5 segundos
             this.msm_alert = false;
             if(!this.user){
+              this.msm_alert = true;
               setTimeout(()=>{
-                this.msm_alert = true;
-              }, 500)
-              this.msm_alert = false;
+                this.msm_alert = false;
+              }, 2000)
             }
             this.getSelectorProducto();
 
@@ -139,8 +140,14 @@ export class ModalproductComponent implements OnInit, OnDestroy {
       // Validar que se haya seleccionado un selector
       if(!this.selector_to_cart || this.selector_to_cart === ' '){
         this.selector_error = true;
+         setTimeout(() => {
+          this.selector_error = false;
+        }, 3000)
         return;
       }
+
+      
+
       // Agregamos el selector al producto
       producto.nombre_selector = this.selector_to_cart;
     }
@@ -150,10 +157,10 @@ export class ModalproductComponent implements OnInit, OnDestroy {
     // Reset selector after adding
     this.selector_to_cart = ' ';
     
+    this.msm_success = true;
     setTimeout(() => {
-      this.msm_success = true;
-    }, 300)
-    this.msm_success = false;
+      this.msm_success = false;
+    }, 3000)
   }
 
   removeItem(producto: Producto) {
@@ -163,6 +170,7 @@ export class ModalproductComponent implements OnInit, OnDestroy {
   closeAviso() {
     this.msm_success = false;
     this.msm_alert = false;
+    this.selector_error = false;
     
   }
 

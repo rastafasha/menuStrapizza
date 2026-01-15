@@ -10,6 +10,7 @@ import { ProductItemComponent } from "../product-item/product-item.component";
 import { ModalproductComponent } from "../modalproduct/modalproduct.component";
 import { LoadingComponent } from '../../shared/loading/loading.component';
 import { InfiniteScrollDirective } from 'ngx-infinite-scroll';
+import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-cas-products',
@@ -29,6 +30,7 @@ export class CasProductsComponent implements OnInit, OnDestroy {
 
   option_selectedd: number = 1;
   solicitud_selectedd: any = null;
+  tiendaNameSelected = environment.nombreSelected;
 
   isRefreshing = false;
   isEdnOfList = false;
@@ -42,7 +44,7 @@ export class CasProductsComponent implements OnInit, OnDestroy {
   isLoading: boolean = false;
   products: Producto[] = [];
   tiendaSelected: Tienda | null = null;
-  tiendaNameSelected!: any;
+  
   todo: Producto[] = [];
 
   selectedProduct: Producto | null = null;
@@ -55,8 +57,7 @@ export class CasProductsComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     // Get tiendaSelected from TiendaService (set by HeaderComponent)
-    let TIENDA = localStorage.getItem("tiendaSelected");
-     this.tiendaNameSelected = TIENDA ? JSON.parse(TIENDA) : null;
+     this.tiendaNameSelected = this.tiendaNameSelected;
      
     // Also subscribe to changes
     if (this.tiendaNameSelected) {

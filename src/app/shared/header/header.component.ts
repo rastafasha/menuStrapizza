@@ -7,11 +7,14 @@ import { RouterModule } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Usuario } from '../../models/usuario.model';
 import { Subscription } from 'rxjs';
+import { environment } from '../../environments/environment';
+import { ImagenPipe } from '../../pipes/imagen-pipe.pipe';
 
 @Component({
   selector: 'app-header',
   imports: [RouterModule, CommonModule, ReactiveFormsModule,
-    FormsModule],
+    FormsModule, ImagenPipe
+  ],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss'
 })
@@ -23,9 +26,12 @@ export class HeaderComponent implements OnDestroy {
   tiendas: Tienda[] = [];
   tienda!: Tienda;
   bandejaList: any[] = [];
+  public user!: Usuario;
 
   year: number = new Date().getFullYear();
-  public user!: Usuario;
+  nombreSelected = environment.nombreSelected;
+  titleapp = environment.nombreSelected;
+  
 
   // Pull-to-refresh tracking
   private touchStartY: number = 0;
@@ -37,8 +43,7 @@ export class HeaderComponent implements OnDestroy {
   private tiendaService = inject(TiendaService);
   private carritoService = inject(CarritoService);
   private cartSubscription!: Subscription;
-  nombreSelected = 'Strapizza';
-  titleapp = 'Strapizza';
+  
 
   @HostListener('touchstart', ['$event'])
   onTouchStart(event: TouchEvent) {
@@ -63,21 +68,29 @@ export class HeaderComponent implements OnDestroy {
   ngOnInit(): void {
     let USER = localStorage.getItem("user");
     this.user = USER ? JSON.parse(USER) : null;
+    this.nombreSelected;
+    console.log(this.nombreSelected)
 
     // Subscribe to cart changes
     this.cartSubscription = this.carritoService.bandejaList$.subscribe(items => {
       this.bandejaList = items;
       this.totalList = items.length;
     });
-
-    this.getTiendas();
-    this.setTiendaDefault();
+    this.getTienda();
+    // this.getTiendas();
+    // this.setTiendaDefault();
   }
 
   ngOnDestroy(): void {
     if (this.cartSubscription) {
       this.cartSubscription.unsubscribe();
     }
+  }
+  getTienda(){
+    this.tiendaService.getTiendaByName(this.nombreSelected).subscribe((resp:any)=>{
+      this.tiendaSelected = resp;
+      // console.log(this.tiendaSelected)
+    })
   }
 
   getTiendas() {
@@ -104,41 +117,41 @@ export class HeaderComponent implements OnDestroy {
     }
 
     // Check if localStorage has a tiendaSelected
-    const storedTienda = localStorage.getItem('tiendaSelected');
-    if (storedTienda) {
-      const tiendaNombre = JSON.parse(storedTienda);
-      const storedTiendaObj = this.tiendas.find(t => t.nombre === tiendaNombre);
-      if (storedTiendaObj) {
-        this.tiendaSelected = storedTiendaObj;
-        this.tiendaService.setSelectedTienda(this.tiendaSelected);
-        console.log('Tienda from localStorage:', this.tiendaSelected);
-        return;
-      }
-    }
+    // const storedTienda = localStorage.getItem('tiendaSelected');
+    // if (storedTienda) {
+    //   const tiendaNombre = JSON.parse(storedTienda);
+    //   const storedTiendaObj = this.tiendas.find(t => t.nombre === tiendaNombre);
+    //   if (storedTiendaObj) {
+    //     this.tiendaSelected = storedTiendaObj;
+    //     this.tiendaService.setSelectedTienda(this.tiendaSelected);
+    //     console.log('Tienda from localStorage:', this.tiendaSelected);
+    //     return;
+    //   }
+    // }
 
     // Set default tiendaSelected to "Strapizza" if not already set
-    if (!this.tiendaSelected && this.tiendas.length > 0) {
-      const defaultTienda = this.tiendas.find(tienda => tienda.nombre === this.nombreSelected);
-      if (defaultTienda) {
-        this.tiendaSelected = defaultTienda;
-        this.tiendaService.setSelectedTienda(this.tiendaSelected);
-        localStorage.setItem('tiendaSelected', JSON.stringify(this.tiendaSelected.nombre));
-        localStorage.setItem('defaultTiendaSet', 'true');
-        console.log('Default tienda set:', this.tiendaSelected);
-      }
-    }
+    // if (!this.tiendaSelected && this.tiendas.length > 0) {
+    //   const defaultTienda = this.tiendas.find(tienda => tienda.nombre === this.nombreSelected);
+    //   if (defaultTienda) {
+    //     this.tiendaSelected = defaultTienda;
+    //     this.tiendaService.setSelectedTienda(this.tiendaSelected);
+    //     localStorage.setItem('tiendaSelected', JSON.stringify(this.tiendaSelected.nombre));
+    //     localStorage.setItem('defaultTiendaSet', 'true');
+    //     console.log('Default tienda set:', this.tiendaSelected);
+    //   }
+    // }
   }
 
 
-  onSelectStore(tienda: any) {
-    this.tiendaSelected = tienda;
-    this.tiendaService.setSelectedTienda(this.tiendaSelected);
-    this.tiendaService.getTiendaById(this.tiendaSelected._id).subscribe((resp: any) => {
-      // console.log(this.tiendaSelected.subcategoria);
-      localStorage.setItem('tiendaSelected', JSON.stringify(this.tiendaSelected.subcategoria));
+  // onSelectStore(tienda: any) {
+  //   this.tiendaSelected = tienda;
+  //   this.tiendaService.setSelectedTienda(this.tiendaSelected);
+  //   this.tiendaService.getTiendaById(this.tiendaSelected._id).subscribe((resp: any) => {
+  //     // console.log(this.tiendaSelected.subcategoria);
+  //     localStorage.setItem('tiendaSelected', JSON.stringify(this.tiendaSelected.subcategoria));
 
-    })
-  }
+  //   })
+  // }
 
 
   get iconBagColorClass(): string {
@@ -162,7 +175,6 @@ openMenu() {
     headerReload?.animate([{ background: '#ccc', color: '#f2f2f2' }], { duration: 300 });
 
     // Update title and animate logo text opacity
-    this.setTiendaDefault();
     this.titleapp = 'Cargando';
     if (logotext instanceof HTMLElement) {
       logotext.animate([{ opacity: '0.5' }, { opacity: '1' }], { duration: 300 });

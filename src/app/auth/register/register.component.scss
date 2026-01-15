@@ -26,6 +26,13 @@ Login register and recover password Page
   width: 100%;
   padding: 10% 0;
   position: fixed;
+  display: flex;
+  justify-content: center;
+  & .ilogo img{
+
+    display: flex;
+    margin: auto;
+  }
 }
 
 .login-box {

@@ -37,32 +37,40 @@
                         <p class="description" [innerHTML]="product.detalle"></p>
 
                         <!-- selectores -->
-                        <select class="custom-select form-control" id="product-size" name="selector_to_cart"
-                            [(ngModel)]="selector_to_cart" (change)="selector_error = false">
-                            <option value=" " selected disabled>Selecciona</option>
-                            <option value="{{selector.titulo}}" *ngFor="let selector of selectores">{{selector.titulo}}
-                            </option>
-
-                        </select>
-                        <div class="invalid-tooltip" style="display: block;" *ngIf="selector_error">Selecciona alguna
-                            opción por favor.
+                         <div  *ngIf=" activeCategory === 'Pastas'">
+                            <div style="display: block; text-align: center;" >
+                            <p>Selecciona alguna
+                            opción por favor.</p>
                         </div>
+                            <select class="custom-select form-control" id="product-size" name="selector_to_cart"
+                                [(ngModel)]="selector_to_cart" (change)="selector_error = false">
+                                <option value=" " selected disabled>Selecciona</option>
+                                <option value="{{selector.titulo}}" *ngFor="let selector of selectores">{{selector.titulo}}
+                                </option>
+
+                            </select>
+                         </div>
+                        
                         <!-- selectores -->
-                        <div *ngIf="!user && msm_alert" class="aviso">
-                            <i class="fa fa-close" (click)="closeAviso()"></i>
-                            <p>Debes <a [routerLink]="['/login']" (click)="onModalHidden()"><b>Iniciar Sesión </b></a> ó <a
-                                    [routerLink]="['/registro']" (click)="onModalHidden()"><b>Registrarte</b></a> para solicitar un pedido</p>
-                        </div>
-
+                        
                         <button class="btn-success btn" *ngIf="user" (click)="addItem(product)">
                             <i class="fa fa-shopping-bag"></i> Agregar al Pedido
                         </button>
 
-
                         <!-- mensaje -->
+                         <div *ngIf="selector_error" class="aviso">
+                            <i class="fa fa-close" (click)="closeAviso()"></i>
+                            <p>Selecciona alguna
+                            opción por favor</p>
+                        </div>
+                         <div *ngIf="!user && msm_alert" class="aviso">
+                            <i class="fa fa-close" (click)="closeAviso()"></i>
+                            <p>Debes <a [routerLink]="['/login']" (click)="onModalHidden()"><b>Iniciar Sesión </b></a> ó <a
+                                    [routerLink]="['/registro']" (click)="onModalHidden()"><b>Registrarte</b></a> para solicitar un pedido</p>
+                        </div>
                         <div class="aviso aviso-sucess" role="alert" *ngIf="msm_success">
                             <i class="fa fa-close" (click)="closeAviso()"></i>
-                            <p>Artículo agregado<a [routerLink]="['/review']"><b>Carrito!</b></a>! </p>
+                            <p>Artículo agregado al <a [routerLink]="['/review']"><b>Carrito!</b></a>! </p>
                         </div>
                         <!-- mensaje -->
                     </div>

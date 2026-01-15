@@ -6,6 +6,7 @@ import { Tienda } from '../../models/tienda.model';
 import { Usuario } from '../../models/usuario.model';
 import { CarritoService } from '../../services/carrito.service';
 import { TiendaService } from '../../services/tienda.service';
+import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-menu-footer',
@@ -22,6 +23,7 @@ export class MenuFooterComponent {
     bandejaList: any[] = [];
   
     year: number = new Date().getFullYear();
+    nombreSelected = environment.nombreSelected;
     public user!: Usuario;
   
     private tiendaService = inject(TiendaService);
@@ -38,8 +40,8 @@ export class MenuFooterComponent {
         this.totalList = items.length;
       });
   
-      this.getTiendas();
-      this.setTiendaDefault();
+      // this.getTiendas();
+      // this.setTiendaDefault();
     }
   
     ngOnDestroy(): void {
@@ -69,7 +71,7 @@ export class MenuFooterComponent {
   
       // Set default tiendaSelected to "Panaderia SlideDish" if not already set
       if (!this.tiendaSelected) {
-        const defaultTienda = this.tiendas.find(tienda => tienda.nombre === 'Strapizza');
+        const defaultTienda = this.tiendas.find(tienda => tienda.nombre === this.nombreSelected);
         
         if (defaultTienda) {
           this.tiendaSelected = defaultTienda;

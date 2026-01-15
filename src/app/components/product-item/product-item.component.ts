@@ -46,11 +46,11 @@ export class ProductItemComponent {
     addItem(producto:Producto){
         
       if(this.user == null){
+        this.isUserLogged = true;
         setTimeout(()=>{
-          this.isUserLogged = true;
+          this.isUserLogged = false;
           
-        }, 300);
-        this.isUserLogged = false;
+        }, 2000);
 
         return;
       }else{
@@ -58,10 +58,10 @@ export class ProductItemComponent {
         this.msm_success.emit(false);
         this.carritoService.addItem(producto);
         
+        this.isProductAdded =true
         setTimeout(()=>{
-          this.isProductAdded =true
-        }, 300)
-        this.isProductAdded =false
+          this.isProductAdded =false
+        }, 2000)
       }
   
     }

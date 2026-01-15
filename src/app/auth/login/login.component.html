@@ -6,7 +6,9 @@
             <div class="login-wrapper">
                 <a routerLink="/">
 
-                    <img src="../assets/images/logo.png" alt="Home" /><br/>
+                    <!-- <img src="../assets/images/logo.png" alt="Home" /> -->
+                     <img [src]="tiendaSelected.img | imagenPipe: 'tiendas'"  [alt]="tiendaSelected.nombre">
+                    <br/>
                 </a>
                 <div class="login">
                     <h3>Log In</h3><br>
