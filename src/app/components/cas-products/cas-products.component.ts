@@ -25,6 +25,7 @@ export class CasProductsComponent implements OnInit, OnDestroy {
   @Input() activeCategory: string = 'all';
   @Input() title!: string ;
   @Input() isVisible = false;
+  @Input() tienda_moneda!: any;
 
   option_selectedd: number = 1;
   solicitud_selectedd: any = null;
@@ -41,9 +42,11 @@ export class CasProductsComponent implements OnInit, OnDestroy {
   isLoading: boolean = false;
   products: Producto[] = [];
   tiendaSelected: Tienda | null = null;
+  tiendaNameSelected!: any;
   todo: Producto[] = [];
 
   selectedProduct: Producto | null = null;
+  isModalOpen: boolean = false;
 
   private categoryService = inject(CategoryService);
   private productoService = inject(ProductoService);
@@ -52,16 +55,20 @@ export class CasProductsComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     // Get tiendaSelected from TiendaService (set by HeaderComponent)
-    this.tiendaSelected = this.tiendasService.getSelectedTiendaSync();
-    
+    let TIENDA = localStorage.getItem("tiendaSelected");
+     this.tiendaNameSelected = TIENDA ? JSON.parse(TIENDA) : null;
+     
     // Also subscribe to changes
-    this.tiendasService.selectedTiendaObservable$.subscribe(tienda => {
-      this.tiendaSelected = tienda;
+    if (this.tiendaNameSelected) {
+     this.tiendasService.getTiendaByName(this.tiendaNameSelected).subscribe(tienda => {
+       this.tiendaSelected = tienda;
+       this.tienda_moneda = this.tiendaSelected?.moneda;
       // Refresh products when tienda changes
       if (tienda) {
         this.getProductosCatName();
       }
     });
+    }
 
     this.updateTodo();
     this.getProductosCatName();
@@ -176,13 +183,12 @@ export class CasProductsComponent implements OnInit, OnDestroy {
 
   openModal(product: Producto) {
     this.selectedProduct = product;
-    // Use Bootstrap's modal method to show modal programmatically with dynamic ID
-    const modalId = `modalProduct-${product._id}`;
-    const modalElement = document.getElementById(modalId);
-    if (modalElement) {
-      const modal = new (window as any).bootstrap.Modal(modalElement);
-      modal.show();
-    }
+    this.isModalOpen = true;
+  }
+
+  closeModal(): void {
+    this.isModalOpen = false;
+    this.selectedProduct = null;
   }
 
   public PageSize(): void {

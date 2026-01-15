@@ -94,20 +94,39 @@ export class HeaderComponent implements OnDestroy {
 
 
   setTiendaDefault() {
-    // Check if default tienda has already been set
-    // if (localStorage.getItem('defaultTiendaSet')) return;
+    // Check if TiendaService already has a selected tienda
+    const serviceTienda = this.tiendaService.getSelectedTiendaSync();
+    if (serviceTienda) {
+      this.tiendaSelected = serviceTienda;
+      localStorage.setItem('tiendaSelected', JSON.stringify(this.tiendaSelected.nombre));
+      console.log('Tienda from service:', this.tiendaSelected);
+      return;
+    }
 
-    // Set default tiendaSelected to "Panaderia SlideDish" if not already set
-    if (!this.tiendaSelected) {
+    // Check if localStorage has a tiendaSelected
+    const storedTienda = localStorage.getItem('tiendaSelected');
+    if (storedTienda) {
+      const tiendaNombre = JSON.parse(storedTienda);
+      const storedTiendaObj = this.tiendas.find(t => t.nombre === tiendaNombre);
+      if (storedTiendaObj) {
+        this.tiendaSelected = storedTiendaObj;
+        this.tiendaService.setSelectedTienda(this.tiendaSelected);
+        console.log('Tienda from localStorage:', this.tiendaSelected);
+        return;
+      }
+    }
+
+    // Set default tiendaSelected to "Strapizza" if not already set
+    if (!this.tiendaSelected && this.tiendas.length > 0) {
       const defaultTienda = this.tiendas.find(tienda => tienda.nombre === this.nombreSelected);
       if (defaultTienda) {
         this.tiendaSelected = defaultTienda;
         this.tiendaService.setSelectedTienda(this.tiendaSelected);
         localStorage.setItem('tiendaSelected', JSON.stringify(this.tiendaSelected.nombre));
         localStorage.setItem('defaultTiendaSet', 'true');
+        console.log('Default tienda set:', this.tiendaSelected);
       }
     }
-    console.log(this.tiendaSelected)
   }
 
 
@@ -143,6 +162,7 @@ openMenu() {
     headerReload?.animate([{ background: '#ccc', color: '#f2f2f2' }], { duration: 300 });
 
     // Update title and animate logo text opacity
+    this.setTiendaDefault();
     this.titleapp = 'Cargando';
     if (logotext instanceof HTMLElement) {
       logotext.animate([{ opacity: '0.5' }, { opacity: '1' }], { duration: 300 });
@@ -150,7 +170,6 @@ openMenu() {
     }
 
     this.isReloadig = true;
-    this.getTiendas();
     this.refreshApp.emit();
     location.reload();
     this.isReloadig = false;

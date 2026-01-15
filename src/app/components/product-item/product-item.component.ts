@@ -21,6 +21,8 @@ import { ImagenPipe } from '../../pipes/imagen-pipe.pipe';
 export class ProductItemComponent {
 
   @Input() product: any;
+  @Input() tienda_moneda: any;
+  @Input() activeCategory!: string;
   @Output() productSelected: EventEmitter<any> = new EventEmitter<any>();
   @Output() msm_success: EventEmitter<boolean> = new EventEmitter<boolean>();
   
@@ -31,23 +33,10 @@ export class ProductItemComponent {
   tiendaNameSelected!:string;
 
   private carritoService = inject(CarritoService);
-  private tiendaService = inject(TiendaService);
 
   ngOnInit(): void {
      let USER = localStorage.getItem("user");
      this.user = USER ? JSON.parse(USER) : null;
-     
-     let TIENDA = localStorage.getItem("tiendaSelected");
-     this.tiendaNameSelected = TIENDA ? JSON.parse(TIENDA) : null;
-     
-     // Get tiendaSelected from TiendaService (set by HeaderComponent)
-     // this.tiendaSelected = this.tiendaService.getSelectedTiendaSync();
-     
-     // Also subscribe to changes
-     this.tiendaService.getTiendaByName(this.tiendaNameSelected).subscribe(tienda => {
-       this.tiendaSelected = tienda;
-      //  console.log(this.tiendaNameSelected)
-    });
   }
 
   openPaymentsModal(product: any): void {

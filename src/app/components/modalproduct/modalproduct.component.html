@@ -1,5 +1,7 @@
 <!-- Modal -->
-<div class="modal fade" [id]="'modalProduct-' + (product?._id || '')" tabindex="-1" [attr.aria-labelledby]="'modalProductLabel-' + (product?._id || '')" aria-hidden="true">
+<div class="modal fade" [id]="'modalProduct-' + (product?._id || '')" tabindex="-1"
+    [attr.aria-labelledby]="'modalProductLabel-' + (product?._id || '')" aria-hidden="true"
+    (hidden.bs.modal)="onModalHidden()">
     <div class="modal-dialog">
         <div class="modal-content" *ngIf="product">
             <div class="modal-header">
@@ -26,21 +28,36 @@
                                     <i class="fa fa-users icon-small"></i>
                                     <span class="value" style="text-decoration: line-through;"
                                         *ngIf="+product.precio_antes > +product.precio_ahora">{{product.precio_antes
-                                        |number:'1.2-2'|currency:tiendaSelected?.moneda}}</span>
-                                    <span class="value">{{product.precio_ahora |number:'1.2-2'|currency:tiendaSelected?.moneda}}</span>
+                                        |number:'1.2-2'|currency:tienda_moneda}}</span>
+                                    <span class="value">{{product.precio_ahora
+                                        |number:'1.2-2'|currency:tienda_moneda}}</span>
                                 </li>
                             </ul>
                         </header>
                         <p class="description" [innerHTML]="product.detalle"></p>
+
+                        <!-- selectores -->
+                        <select class="custom-select form-control" id="product-size" name="selector_to_cart"
+                            [(ngModel)]="selector_to_cart" (change)="selector_error = false">
+                            <option value=" " selected disabled>Selecciona</option>
+                            <option value="{{selector.titulo}}" *ngFor="let selector of selectores">{{selector.titulo}}
+                            </option>
+
+                        </select>
+                        <div class="invalid-tooltip" style="display: block;" *ngIf="selector_error">Selecciona alguna
+                            opción por favor.
+                        </div>
+                        <!-- selectores -->
                         <div *ngIf="!user && msm_alert" class="aviso">
                             <i class="fa fa-close" (click)="closeAviso()"></i>
-                            <p>Debes <a [routerLink]="['/login']"><b>Iniciar Sesión </b></a> ó <a [routerLink]="['/registro']"><b>Registrarte</b></a> para solicitar un pedido</p>
+                            <p>Debes <a [routerLink]="['/login']" (click)="onModalHidden()"><b>Iniciar Sesión </b></a> ó <a
+                                    [routerLink]="['/registro']" (click)="onModalHidden()"><b>Registrarte</b></a> para solicitar un pedido</p>
                         </div>
 
                         <button class="btn-success btn" *ngIf="user" (click)="addItem(product)">
                             <i class="fa fa-shopping-bag"></i> Agregar al Pedido
                         </button>
-                        
+
 
                         <!-- mensaje -->
                         <div class="aviso aviso-sucess" role="alert" *ngIf="msm_success">

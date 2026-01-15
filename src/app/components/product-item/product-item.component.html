@@ -21,13 +21,13 @@
                 <h4>{{product.titulo}}</h4>
                 <div class="product-price text-danger " 
                 style="text-decoration: line-through;" *ngIf="product.precio_antes > product.precio_ahora">
-                    {{product.precio_antes|number:'1.2-2'| currency:tiendaSelected?.moneda}}</div>
-                <div class="product-price">{{product.precio_ahora|number:'1.2-2'| currency:tiendaSelected?.moneda}}</div>
+                    {{product.precio_antes|number:'1.2-2'| currency:tienda_moneda}}</div>
+                <div class="product-price">{{product.precio_ahora|number:'1.2-2'| currency:tienda_moneda}}</div>
             </div>
             <div class="botns">
                 <button class="btn-secondary btn" (click)="openPaymentsModal(product)"><i
                         class="fa fa-eye"></i></button>
-                <button class="btn-success btn" (click)="addItem(product)"><i class="fa fa-shopping-bag"></i></button>
+                <button class="btn-success btn" *ngIf="activeCategory !== 'Pastas'" (click)="addItem(product)"><i class="fa fa-shopping-bag"></i></button>
             </div>
         </div>
     </div>

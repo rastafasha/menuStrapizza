@@ -655,6 +655,9 @@ export class CheckoutComponent {
     this.bandejaList.forEach((item: any) => {
       const itemTotal = (item.precio_ahora * item.cantidad).toFixed(2);
       message += `• ${item.titulo || item.titulo}\n`;
+      if(item.subcategoria === 'Pastas'){
+        message += `• ${item.nombre_selector}\n`;
+      }
       message += `  Cant: ${item.cantidad} x ${item.precio_ahora.toFixed(2)} = ${itemTotal}\n\n`;
     });
 

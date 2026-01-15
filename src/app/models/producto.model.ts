@@ -16,6 +16,7 @@ export class Producto {
   cantidad!:number;
   categoria!: Categoria;
   subcategoria!: string;
+  nombre_selector!: string;
   isFeatured!: boolean;
   status!: boolean;
   marca!: Marca;

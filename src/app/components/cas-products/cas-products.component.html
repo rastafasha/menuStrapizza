@@ -19,7 +19,7 @@
                 </ul>
             </div>
             <div class="product-card" *ngFor="let product of todo; let i = index" cdkDrag>
-                <app-product-item [product]="product" (productSelected)="openModal($event)"
+                <app-product-item [activeCategory]="activeCategory" [tienda_moneda]="tienda_moneda"  [product]="product" (productSelected)="openModal($event)"
                     (msm_success)="onMsmSuccess($event)">
                 </app-product-item>
             </div>
@@ -30,4 +30,4 @@
 </section>
 <div class="clear"></div>
 
-<app-modalproduct [product]="selectedProduct" *ngIf="!isLoading"></app-modalproduct>
+<app-modalproduct [product]="selectedProduct" [isModalOpen]="isModalOpen" [tienda_moneda]="tienda_moneda" (modalClosed)="closeModal()" *ngIf="!isLoading"></app-modalproduct>
