@@ -7,13 +7,14 @@
                 </a>
             </li>
            
-            <li>
+            <li *ngIf="totalList > 0 ">
                 <a [routerLink]="['/review']" routerLinkActive="active">
                     <!-- <i class="fa fa-shopping-bag"></i> -->
                     <span class="cart-count-badge" *ngIf="bandejaList.length > 0 && bandejaList.length <= 10">
                         {{totalList}}</span>
-                    <i class="fa fa-shopping-cart animated tada cursor" *ngIf="bandejaList.length > 0 && bandejaList.length <= 10"
-                        routerLink="/review"></i>
+                    <span class="cart-count-badge" *ngIf="bandejaList.length > 10">
+                        +10</span>
+                    <i class="fa fa-shopping-cart animated tada "></i>
                 </a>
             </li>
             

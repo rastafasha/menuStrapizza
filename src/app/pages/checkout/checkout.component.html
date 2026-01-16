@@ -8,46 +8,45 @@
   <div class="order-list">
     <div class="order-list-bar"></div>
     <div class="list-box">
-      <h3>Mi Pedido</h3>
+
+
+      <div class="breadcrumb-item">
+        <h3>Mi Pedido</h3>
+        <button class="check-button" routerLink="/review">
+          <i class="fa fa-chevron-left icon-small"></i>
+        </button>
+      </div>
       <div class="clear"></div>
-
-      <div class=" d-flex justify-content-center  mb-3 col-12 ">
-        <div class="row g-3 w-100">
-          <div class="col-12">
-            <!-- <span>Resumen</span> -->
-
-            <div class="card ">
-              <p>Hola, Soy <b>{{identity.first_name}} {{identity.last_name}}</b>,
-                y quiero hacer un pedido con la lista, solicito informacion para realizar el pago y cofirmar la compra.
-              </p>
-              <div class="list-item" *ngFor="let item of bandejaList; let i = index">
-                    <div class="clear"></div>
-                    <div class="info-item">
-                        <img [src]="item.img | imagenPipe:'productos' " alt="">
-                        <h2>{{item.titulo}}</h2>
-                        <div class="add-items justify-content-center">
-                            <span>{{item.cantidad}}</span>
-                        </div>
-                        <div class="price">
-                            <p>{{item.precio_ahora * item.cantidad |number:'1.2-2'| currency:tiendaSelected?.moneda}}</p>
-                            <!-- <p >{{item.precio_ahora | currency}}</p> -->
-                        </div>
-                    </div>
-                </div>
-
-              <hr class="mt-0 line">
-              <div class="p-1 pt-0 pb-0 d-flex justify-content-between ">
-                
-                <div class="d-flex flex-column">
-                  
-                  <span>Total a Pagar</span>
-
-                </div>
-                <span>{{total() |number:'1.2-2'| currency:tiendaSelected?.moneda}}</span>
-              </div>
+      <div class="top-item-flex">
+        <p>Hola <b>{{identity.first_name}}</b>!,
+          <br>
+          Sí ya confirmaste tu Pedido, al solicitar enviaremos tu numero de Whatsapp, para recibir el pedido y
+          comunicarnos contigo.
+        </p>
+      </div>
+      <div class=" overf">
+        <div class="list-item" *ngFor="let item of bandejaList; let i = index">
+          <div class="clear"></div>
+          <div class="info-item">
+            <img [src]="item.img | imagenPipe:'productos' " alt="">
+            <h2>{{item.titulo}}</h2>
+            <div class="add-items justify-content-center">
+              <span>{{item.cantidad}}</span>
+            </div>
+            <div class="price">
+              <p>{{item.precio_ahora * item.cantidad |number:'1.2-2'| currency:tienda_moneda}}</p>
+              <!-- <p >{{item.precio_ahora | currency}}</p> -->
             </div>
           </div>
         </div>
+
+      </div>
+      <hr class="mt-0 line">
+      <div class="info_pago total">
+        <!-- <div class="info_pago_titulo1"><span> Artículos</span> </div> -->
+        <div class="info_pago_titulo1"><span>Total a Pagar</span> </div>
+        <!-- <div class="info_pagod_data3"><span>({{bandejaList.length}})</span> </div> -->
+        <div class="info_pagod_data3"><span>{{total() |number:'1.2-2'| currency:tienda_moneda}}</span> </div>
       </div>
 
       <!-- !!identity -->
@@ -62,7 +61,7 @@
 
       <!-- !!enviar whatsapp -->
 
-      <div class="col-12" *ngIf="identity">
+      <div class="col-12" style="margin-top: 20px;" *ngIf="identity">
         <div class="order-button-container">
           <button class="check-button" (click)="sendWhatsAppOrder()">
             <i class="fa fa-whatsapp"></i>
@@ -70,7 +69,7 @@
           </button>
         </div>
       </div>
-    <!-- !!enviar whatsapp -->
+      <!-- !!enviar whatsapp -->
 
       <div class="col-12" *ngIf="identitys">
 

@@ -8,10 +8,10 @@ export const environment = {
   // mediaUrl: 'http://localhost:3000/api/uploads/',
   // soketServer : 'http://localhost:3000',
   //remoto vercel
-  nombreSelected: 'Strapizza',
   baseUrl: 'https://back-ecomm-mall.vercel.app/api',
   mediaUrl: 'https://back-ecomm-mall.vercel.app/api/uploads/',
   soketServer : 'https://back-ecomm-mall.vercel.app',
+  nombreSelected: 'Strapizza',
   
   mediaUrlRemoto: 'https://res.cloudinary.com/dmv6aukai/image/upload/v1741218430/mallConnect',
   

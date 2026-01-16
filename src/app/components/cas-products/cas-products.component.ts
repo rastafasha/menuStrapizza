@@ -24,6 +24,7 @@ export class CasProductsComponent implements OnInit, OnDestroy {
   @Output() msm_success: EventEmitter<boolean> = new EventEmitter<boolean>();
   @Input() refreshCasProducts: EventEmitter<void> | null = null;
   @Input() activeCategory: string = 'all';
+  @Input() activeSubCategory: string = 'all';
   @Input() title!: string ;
   @Input() isVisible = false;
   @Input() tienda_moneda!: any;
@@ -57,8 +58,6 @@ export class CasProductsComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     // Get tiendaSelected from TiendaService (set by HeaderComponent)
-     this.tiendaNameSelected = this.tiendaNameSelected;
-     
     // Also subscribe to changes
     if (this.tiendaNameSelected) {
      this.tiendasService.getTiendaByName(this.tiendaNameSelected).subscribe(tienda => {
@@ -87,23 +86,7 @@ export class CasProductsComponent implements OnInit, OnDestroy {
   }
 
 
-  optionSelected(value: number) {
-    this.option_selectedd = value;
-    if (this.option_selectedd === 1) {
-
-      // this.ngOnInit();
-    }
-    if (this.option_selectedd === 2) {
-      this.solicitud_selectedd = null;
-    }
-    if (this.option_selectedd === 3) {
-      this.solicitud_selectedd = null;
-    }
-    if (this.option_selectedd === 4) {
-      this.solicitud_selectedd = null;
-    }
-  }
-
+  
 
 
 
@@ -124,7 +107,7 @@ export class CasProductsComponent implements OnInit, OnDestroy {
   }
 
   getProductosCatName1() {
-    // this.catname = this.tiendaSelected?.subcategoria ?? 'Pizzería'
+    // this.catname = this.tiendaSelected?.subcategoria ?? this.activeSubCategory
     this.catname =  'Alimentos'
     this.isLoading = true
     this.categoryService.find_by_nombre(this.catname).subscribe(
@@ -155,13 +138,13 @@ export class CasProductsComponent implements OnInit, OnDestroy {
         products: productos.filter((product: any) => product.subcategoria === subcategoria),
       }));
       this.subcategories = categorias || [];
-      // console.log(this.selectCategory)
+      // console.log(this.subcategories)
     })
     this.isLoading = false
   }
 
   selectCategory(category: string) {
-    // console.log('selectCategory called with:', category);
+    console.log('selectCategory called with:', category);
     this.activeCategory = category;
     this.isLoading = true
     this.updateTodo();

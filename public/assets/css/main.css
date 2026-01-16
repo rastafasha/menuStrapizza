@@ -60,6 +60,10 @@ h5{
     color: #333;
 }
 
+a{
+  text-decoration: none !important;
+}
+
 
 .free-delivery-section{
     width: 100vw;
@@ -198,3 +202,27 @@ h5{
 .tada {
   animation-name: tada;
 }
+
+
+.breadcrumb-item{
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.info_pago{
+   display: grid;
+grid-template-columns: repeat(1, 1fr);
+grid-template-rows: repeat(2, 1fr);
+grid-column-gap: 0px;
+grid-row-gap: 0px;
+width: 100%;
+
+ 
+}
+
+ .info_pago_titulo1 { grid-area: 1 / 1 / 2 / 2; }
+  .info_pago_titulo2 { grid-area: 2 / 1 / 3 / 2; }
+  .info_pagod_data3 { grid-area: 1 / 2 / 2 / 3; display: flex;justify-content: end; }
+  .info_pagod_data4 { grid-area: 2 / 2 / 3 / 3; display: flex;justify-content: end; }

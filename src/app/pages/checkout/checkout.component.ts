@@ -79,7 +79,7 @@ export class CheckoutComponent {
 
   tienda!: Tienda;
   tiendas: Tienda[] = [];
-  nombreSelected = 'Strapizza';
+  nombreSelected = environment.nombreSelected;
   tiendaSelected: any;
   selectedMethod: string = 'Selecciona un método de pago';
   public clienteSeleccionado: any;
@@ -116,7 +116,7 @@ export class CheckoutComponent {
     // private _pagoCheque: PagochequeService,
     private _tipoPagosService: TiposdepagoService,
     private _carritoService: CarritoService,
-    private _tiendaService: TiendaService,
+    private tiendaService: TiendaService,
     private _ventaService: VentaService,
     private _productoService: ProductoService,
     private _router: Router,
@@ -144,44 +144,20 @@ export class CheckoutComponent {
       this.identity = JSON.parse(USER);
       // console.log(this.identity);
     }
-  
+    this.nombreSelected;
+    this.getTienda();
     this.loadBandejaListFromLocalStorage();
-     setTimeout(()=>{
-      this.getTiendas()
-    }, 300)
 
     // this.listar_carrito();
   }
 
-  getTiendas() {
-    this._tiendaService.cargarTiendas().subscribe((resp: Tienda[]) => {
+  getTienda() {
+    this.tiendaService.getTiendaByName(this.nombreSelected).subscribe((resp: Tienda) => {
       // Asignamos el array filtrado directamente
-      this.tiendas = resp.filter((tienda: Tienda) => tienda.categoria && tienda.categoria.nombre === 'Alimentos');
-      // console.log(this.tiendas);
-
-      this.setTiendaDefault();
-
+      this.tiendaSelected = resp;
+      this.tienda_moneda = this.tiendaSelected.moneda
+      
     })
-  }
-
-
-
-  setTiendaDefault() {
-    // Set default tiendaSelected to "Panaderia SlideDish" if not already set
-    const defaultTienda = this.tiendas.find(tienda => tienda.nombre === this.nombreSelected);
-    this.tiendaSelected = defaultTienda;
-
-    if (this.tiendaSelected) {
-      this.data_direccionLocal = this.tiendaSelected;
-      this.tienda_moneda = this.tiendaSelected.moneda?.toString() ?? '';
-      this.localId = this.tiendaSelected._id;
-      // console.log(this.tienda_moneda);
-    } else {
-      this.data_direccionLocal = {};
-      this.tienda_moneda = '';
-      this.localId = '';
-      console.log('No tiendaSelected found');
-    }
   }
 
   private listAndIdentify() {
