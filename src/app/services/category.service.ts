@@ -4,8 +4,7 @@ import { map } from 'rxjs/operators';
 
 import { Observable } from "rxjs";
 import { Categoria } from '../models/categoria.model';
-import { environment } from '../environments/environment';
-
+import { environment } from '../../environments/environment';
 const base_url = environment.baseUrl;
 
 @Injectable({

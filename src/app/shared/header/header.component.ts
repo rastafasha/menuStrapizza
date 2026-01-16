@@ -7,8 +7,8 @@ import { RouterModule } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Usuario } from '../../models/usuario.model';
 import { Subscription } from 'rxjs';
-import { environment } from '../../environments/environment';
 import { ImagenPipe } from '../../pipes/imagen-pipe.pipe';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-header',

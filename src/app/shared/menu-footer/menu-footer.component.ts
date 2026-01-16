@@ -5,8 +5,7 @@ import { Subscription } from 'rxjs';
 import { Tienda } from '../../models/tienda.model';
 import { Usuario } from '../../models/usuario.model';
 import { CarritoService } from '../../services/carrito.service';
-import { TiendaService } from '../../services/tienda.service';
-import { environment } from '../../environments/environment';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-menu-footer',

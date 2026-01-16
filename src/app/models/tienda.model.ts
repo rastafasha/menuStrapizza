@@ -1,4 +1,5 @@
-import { environment } from "../environments/environment";
+
+import { environment } from "../../environments/environment";
 import { Categoria } from "./categoria.model";
 
 const base_url = environment.mediaUrlRemoto;

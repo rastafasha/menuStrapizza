@@ -8,7 +8,7 @@ import { Tienda } from '../../models/tienda.model';
 import { TiendaService } from '../../services/tienda.service';
 import { CarritoService } from '../../services/carrito.service';
 import { Subscription } from 'rxjs';
-import { environment } from '../../environments/environment';
+import { environment } from '../../../environments/environment';
 
 
 @Component({

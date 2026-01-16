@@ -5,8 +5,7 @@ import { HttpBackend, HttpClient } from '@angular/common/http';
 import { Usuario } from '../../models/usuario.model';
 import { UsuarioService } from '../../services/usuario.service';
 import { HeaderComponent } from "../../shared/header/header.component";
-import { AsideCuentaComponent } from './aside-cuenta/aside-cuenta.component';
-import { environment } from '../../environments/environment';
+import { environment } from '../../../environments/environment';
 import { NgIf } from '@angular/common';
 import { MenuFooterComponent } from "../../shared/menu-footer/menu-footer.component";
 

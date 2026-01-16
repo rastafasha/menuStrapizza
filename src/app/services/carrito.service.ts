@@ -3,7 +3,7 @@ import { Observable, BehaviorSubject } from "rxjs";
 import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { Carrito } from "../models/carrito.model";
 import { map } from 'rxjs/operators';
-import { environment } from '../environments/environment';
+import { environment } from '../../environments/environment';
 
 const base_url = environment.baseUrl;
 

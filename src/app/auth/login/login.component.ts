@@ -4,10 +4,10 @@ import Swal from 'sweetalert2';
 import { Router, RouterModule } from '@angular/router';
 import { UsuarioService } from '../../services/usuario.service';
 import { CommonModule } from '@angular/common';
-import { environment } from '../../environments/environment';
 import { TiendaService } from '../../services/tienda.service';
 import { Tienda } from '../../models/tienda.model';
 import { ImagenPipe } from '../../pipes/imagen-pipe.pipe';
+import { environment } from '../../../environments/environment';
 
 // declare const gapi: any;
 

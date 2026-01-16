@@ -10,9 +10,9 @@ import { UsuarioService } from '../../../services/usuario.service';
 import { HeaderComponent } from '../../../shared/header/header.component';
 import { AsideCuentaComponent } from '../aside-cuenta/aside-cuenta.component';
 import { ImagenPipe } from '../../../pipes/imagen-pipe.pipe';
-import { environment } from '../../../environments/environment';
 import { PaisService } from '../../../services/pais.service';
 import { Pais } from '../../../models/pais.model';
+import { environment } from '../../../../environments/environment';
 
 declare var jQuery:any;
 declare var $:any;

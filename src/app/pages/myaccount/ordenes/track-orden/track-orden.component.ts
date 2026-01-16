@@ -3,7 +3,8 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { UsuarioService } from '../../../../services/usuario.service';
 import { VentaService } from '../../../../services/venta.service';
-import { environment } from '../../../../environments/environment';
+import { environment } from '../../../../../environments/environment';
+
 
 declare var jQuery:any;
 declare var $:any;

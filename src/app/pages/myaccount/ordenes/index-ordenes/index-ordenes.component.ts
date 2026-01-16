@@ -8,7 +8,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { HeaderComponent } from '../../../../shared/header/header.component';
 import { AsideCuentaComponent } from '../../aside-cuenta/aside-cuenta.component';
-import { environment } from '../../../../environments/environment';
+import { environment } from '../../../../../environments/environment';
 
 declare var jQuery:any;
 declare var $:any;

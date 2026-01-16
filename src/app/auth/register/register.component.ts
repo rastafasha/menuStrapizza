@@ -6,8 +6,8 @@ import { Tienda } from '../../models/tienda.model';
 import { UsuarioService } from '../../services/usuario.service';
 import { NgIf } from '@angular/common';
 import { ImagenPipe } from '../../pipes/imagen-pipe.pipe';
-import { environment } from '../../environments/environment';
 import { TiendaService } from '../../services/tienda.service';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-register',

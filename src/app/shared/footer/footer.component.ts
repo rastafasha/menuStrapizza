@@ -3,7 +3,7 @@ import { Component, inject, Input } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { Tienda } from '../../models/tienda.model';
 import { TiendaService } from '../../services/tienda.service';
-import { environment } from '../../environments/environment';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-footer',

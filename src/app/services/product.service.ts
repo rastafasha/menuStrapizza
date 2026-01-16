@@ -5,8 +5,7 @@ import { catchError, map, tap } from 'rxjs/operators';
 import { Producto } from '../models/producto.model';
 import { Observable } from "rxjs";
 import { Categoria, CatProducModel } from '../models/categoria.model';
-import { environment } from '../environments/environment';
-
+import { environment } from '../../environments/environment';
 
 const base_url = environment.baseUrl;
 

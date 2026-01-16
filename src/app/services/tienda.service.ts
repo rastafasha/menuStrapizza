@@ -2,8 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { map, Observable, BehaviorSubject } from 'rxjs';
 import { Tienda } from '../models/tienda.model';
-import { environment } from '../environments/environment';
-
+import { environment } from '../../environments/environment';
 const base_url = environment.baseUrl;
 
 @Injectable({

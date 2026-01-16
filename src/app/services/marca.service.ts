@@ -2,8 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, } from '@angular/common/http';
 import { map } from 'rxjs/operators';
 import { Marca } from '../models/marca.model';
-import { environment } from '../environments/environment';
-
+import { environment } from '../../environments/environment';
 const base_url = environment.baseUrl;
 
 @Injectable({

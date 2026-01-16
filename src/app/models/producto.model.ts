@@ -1,5 +1,4 @@
-
-import { environment } from '../environments/environment';
+import { environment } from '../../environments/environment';
 import { Categoria } from './categoria.model';
 import { Marca } from './marca.model';
 

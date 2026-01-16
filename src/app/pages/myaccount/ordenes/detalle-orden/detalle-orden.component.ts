@@ -9,7 +9,7 @@ import { CommonModule } from '@angular/common';
 import { AsideCuentaComponent } from '../../aside-cuenta/aside-cuenta.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ImagenPipe } from '../../../../pipes/imagen-pipe.pipe';
-import { environment } from '../../../../environments/environment';
+import { environment } from '../../../../../environments/environment';
 declare var jQuery:any;
 declare var $:any;
 

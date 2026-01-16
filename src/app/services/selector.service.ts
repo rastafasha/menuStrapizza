@@ -3,8 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { map } from 'rxjs/operators';
 import { Selector } from "../models/selector.model";
 import { Observable } from 'rxjs';
-import { environment } from '../environments/environment';
-
+import { environment } from '../../environments/environment';
 const base_url = environment.baseUrl;
 
 @Injectable({

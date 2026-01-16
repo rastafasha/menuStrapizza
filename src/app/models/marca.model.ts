@@ -1,5 +1,4 @@
-import { environment } from "../environments/environment";
-
+import { environment } from "../../environments/environment";
 
 const base_url = environment.baseUrl;
 export class Marca {

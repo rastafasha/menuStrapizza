@@ -14,7 +14,7 @@ import { VentaService } from '../../services/venta.service';
 import { ProductoService } from '../../services/product.service';
 import { Tienda } from '../../models/tienda.model';
 import { CartItemModel } from '../../models/cart-item-model';
-import { environment } from '../../environments/environment';
+import { environment } from '../../../environments/environment';
 import { Producto } from '../../models/producto.model';
 import { Usuario } from '../../models/usuario.model';
 import { ImagenPipe } from '../../pipes/imagen-pipe.pipe';
