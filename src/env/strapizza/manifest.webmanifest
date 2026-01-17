@@ -1,4 +1,5 @@
-{
+  {
+  "dir": "ltr",
   "name": "Menu Strapizza",
   "short_name": "Menu Strapizza",
   "categories": ["Alimentos", "compras", "delivery"],
@@ -59,3 +60,5 @@
     }
   ]
 }
+
+  

@@ -9,8 +9,7 @@ import { ProductoService } from '../../services/product.service';
 import { ProductItemComponent } from "../product-item/product-item.component";
 import { ModalproductComponent } from "../modalproduct/modalproduct.component";
 import { LoadingComponent } from '../../shared/loading/loading.component';
-import { InfiniteScrollDirective } from 'ngx-infinite-scroll';
-import { environment } from '../../environments/environment';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-cas-products',

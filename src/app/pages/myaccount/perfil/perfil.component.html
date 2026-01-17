@@ -19,34 +19,33 @@
                 <h6 class="font-size-base text-light mb-0">Actualiza los datos de tu perfíl:</h6>
             </div>
             <!-- Profile form-->
-              <div class="col-sm-12" *ngIf="msm_error">
-                        <div class="form-group">
-                            <div class="alert alert-danger alert-dismissible fade show" role="alert"
-                                (click)="close_alert()">
-                                <span class="font-weight-medium">Error:</span> Por favor complete el formulario
-                                correctamente.
-                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                        </div>
+            <div class="col-sm-12" *ngIf="msm_error">
+                <div class="form-group">
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert" (click)="close_alert()">
+                        <span class="font-weight-medium">Error:</span> Por favor complete el formulario
+                        correctamente.
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
                     </div>
-                     <div class="col-sm-12" *ngIf="msm_success">
-                        <div class="form-group">
-                            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                                <span class="font-weight-medium">Mensaje:</span> Se actualizó sus datos correctamente.
-                                <button type="button" class="close" data-dismiss="alert" aria-label="Close"
-                                    (click)="close_alert()">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                        </div>
+                </div>
+            </div>
+            <div class="col-sm-12" *ngIf="msm_success">
+                <div class="form-group">
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <span class="font-weight-medium">Mensaje:</span> Se actualizó sus datos correctamente.
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close"
+                            (click)="close_alert()">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
                     </div>
+                </div>
+            </div>
             <form [formGroup]="perfilForm" (ngSubmit)="actualizarPerfil()" autocomplete="off">
 
                 <div class="row">
-                   
-                   
+
+
                     <div class="col-sm-6">
                         <div class="form-group">
                             <label for="account-fn">Nombres completos</label>
@@ -62,7 +61,7 @@
                     <div class="col-sm-6">
                         <div class="form-group">
                             <label for="account-email">Correo Electrónico</label>
-                            <input class="form-control"  type="email" readonly value="{{identity.email}}">
+                            <input class="form-control" type="email" readonly value="{{identity.email}}">
                         </div>
                     </div>
                     <div class="col-sm-6">
@@ -93,7 +92,7 @@
                             <label for="account-pass">Nueva contraseña</label>
                             <div class="password-toggle">
                                 <input class="form-control" type="password" id="password" name="new_password"
-                                formControlName="password" placeholder="Nueva contraseña">
+                                    formControlName="password" placeholder="Nueva contraseña">
                                 <label class="password-toggle-btn">
                                     <input class="custom-control-input" type="button" (click)="view_password();"
                                         autocomplete="nope">
@@ -109,7 +108,7 @@
                             <label for="account-confirm-pass">Confirmar contraseña</label>
                             <div class="password-toggle">
                                 <input class="form-control" type="password" id="password_dos" name="comfirm_password"
-                                     formControlName="password" placeholder="Repita la contraseña">
+                                    formControlName="password" placeholder="Repita la contraseña">
                                 <label class="password-toggle-btn">
                                     <input class="custom-control-input" (click)="view_password2();" type="checkbox"><i
                                         class="czi-eye password-toggle-indicator"></i><span class="sr-only">Show

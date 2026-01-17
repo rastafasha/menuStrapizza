@@ -1,0 +1,88 @@
+/* Estilos principales para Strapizza Landing Page */
+
+
+
+/* Carrousel Section */
+.carousel-section {
+    padding: 60px 0;
+    background-color: var(--white);
+}
+
+.carousel-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.section-title {
+    text-align: center;
+    font-size: 2.5rem;
+    color: var(--secondary-color);
+    margin-bottom: 40px;
+    position: relative;
+}
+
+.section-title::after {
+    content: '';
+    display: block;
+    width: 80px;
+    height: 4px;
+    background-color: var(--primary-color);
+    margin: 15px auto 0;
+    border-radius: 2px;
+}
+
+.carousel-wrapper {
+    position: relative;
+    overflow: hidden;
+    border-radius: 20px;
+    /* box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); */
+}
+
+.carousel-track {
+    display: flex;
+    transition: transform 0.5s ease-in-out;
+}
+
+.carousel-slide {
+    min-width: 100%;
+    flex-shrink: 0;
+}
+
+.carousel-slide img {
+    width: 100%;
+    height: 190px;
+    object-fit: cover;
+}
+
+.carousel-dots{
+    display: flex;
+    justify-self: end;
+    gap: 5px;
+}
+
+.carousel-dot{
+    display: flex;
+    width: 35px;
+    height: 5px;
+    border-radius: 100px;
+    background-color: green;
+}
+.carousel-dots .active{
+    display: flex;
+    background-color: red;
+}
+
+
+.pizza-grande{
+    display: block;
+    z-index: 15;
+    top: 0;
+    left: 0;
+    position: absolute;
+}
+
+.pizza-grande img{
+    height: calc(60vh);
+    width: 100vw;
+}
