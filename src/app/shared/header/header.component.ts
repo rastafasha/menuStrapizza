@@ -68,14 +68,17 @@ export class HeaderComponent implements OnDestroy {
   ngOnInit(): void {
     let USER = localStorage.getItem("user");
     this.user = USER ? JSON.parse(USER) : null;
-    this.nombreSelected;
-    this.getTienda();
+    
     // Subscribe to cart changes
     this.cartSubscription = this.carritoService.bandejaList$.subscribe(items => {
       this.bandejaList = items;
       this.totalList = items.length;
-      console.log('llamando')
     });
+
+    setTimeout(() => {
+      this.nombreSelected;
+      this.getTienda();
+    }, 1000);
   }
 
   ngOnDestroy(): void {
