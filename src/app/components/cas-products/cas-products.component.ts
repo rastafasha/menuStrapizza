@@ -59,21 +59,11 @@ export class CasProductsComponent implements OnInit, OnDestroy {
     // Get tiendaSelected from TiendaService (set by HeaderComponent)
     // Also subscribe to changes
     if (this.tiendaNameSelected) {
-     this.tiendasService.getTiendaByName(this.tiendaNameSelected).subscribe(tienda => {
-       this.tiendaSelected = tienda;
-       this.tienda_moneda = this.tiendaSelected?.moneda;
-      // Refresh products when tienda changes
-      if (tienda) {
-        this.getProductosCatName();
-      }
-    });
+      setTimeout(()=>{
+        this.getTiendaName()
+      }, 1000)
+     
     }
-
-    this.updateTodo();
-    this.getProductosCatName();
-    this.getCategories();
-
-
     // Listen for refresh trigger from parent (header pull)
     if (this.refreshCasProducts) {
       this.refreshCasProducts.subscribe(() => this.refreshData());
@@ -84,9 +74,19 @@ export class CasProductsComponent implements OnInit, OnDestroy {
     // No need to unsubscribe from EventEmitter as it's managed by Angular
   }
 
-
-  
-
+  getTiendaName(){
+    this.tiendasService.getTiendaByName(this.tiendaNameSelected).subscribe(tienda => {
+       this.tiendaSelected = tienda;
+       this.tienda_moneda = this.tiendaSelected?.moneda;
+      // Refresh products when tienda changes
+      if (this.tiendaSelected) {
+        this.getProductosCatName();
+        this.updateTodo();
+        this.getProductosCatName();
+        this.getCategories();
+      }
+    });
+  }
 
 
   getProductosCatName() {
