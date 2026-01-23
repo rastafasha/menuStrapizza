@@ -78,7 +78,7 @@ export class HeaderComponent implements OnDestroy {
     setTimeout(() => {
       this.nombreSelected;
       this.getTienda();
-    }, 1000);
+    }, 500);
   }
 
   ngOnDestroy(): void {

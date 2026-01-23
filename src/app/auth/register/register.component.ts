@@ -59,7 +59,7 @@ nombreSelected = environment.nombreSelected;
    getTienda(){
     this.tiendaService.getTiendaByName(this.nombreSelected).subscribe((resp:any)=>{
       this.tiendaSelected = resp;
-      console.log(this.tiendaSelected)
+      // console.log(this.tiendaSelected)
     })
   }
 
@@ -78,7 +78,7 @@ nombreSelected = environment.nombreSelected;
     this.formSumitted = true;
     //agregamos el id de la tienda a la respuesta
 
-    this.registerForm.value.local = this.tienda._id;
+    this.registerForm.value.local = this.tiendaSelected._id;
     console.log(this.registerForm.value);
 
     if(this.registerForm.invalid){
