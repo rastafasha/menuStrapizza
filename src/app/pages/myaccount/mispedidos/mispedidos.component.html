@@ -1,0 +1,52 @@
+<app-header></app-header>
+<section class="sub-header d-flex justify-content-center mt-5" style="padding-top: 30px;">
+    <img class="rellax bg-overlay" src="images/sub-header/05.jpg" alt="">
+    <div class="overlay-call-to-action"></div>
+    <h3 class="heading-style-3">Mis Ordenes</h3>
+</section>
+<!-- Page Content-->
+<div class="container pb-5 mb-2 mb-md-3">
+    <div class="row">
+        <!-- Sidebar-->
+        <aside class="col-lg-4 pt-4 pt-lg-0">
+            <app-aside-cuenta></app-aside-cuenta>
+        </aside>
+        <!-- Content  -->
+        <section class="col-lg-8">
+            <!-- Addresses list-->
+
+            <hr class="pb-4">
+            <!-- <div *ngFor="let item_pedido of ventas |  paginate: { itemsPerPage: count, currentPage: p }"> -->
+            <div *ngFor="let item_pedido of pedidos ">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h3 class="product-title font-size-base" style="margin-bottom: 0px;"><a>Pedido: N°-{{item_pedido._id.toUpperCase()}}</a></h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-lg-5">
+                                <div class="font-size-sm"><span class="text-muted mr-2">Fecha:</span>{{ item_pedido.createdAt | date:'MMM d, y, h:mm:ss a' }}</div>
+                                <!-- <div class="font-size-sm"><span class="text-muted mr-2">Tienda:</span>{{ tienda.nombre }}</div> -->
+                                <ul *ngFor="let item_pedido of item_pedido.pedido">
+                                    <li>{{ item_pedido.titulo }} | {{ item_pedido.cantidad }} |{{ item_pedido.precio_ahora|currency}}</li>
+                                </ul>
+                               
+                                
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+
+            </div>
+            <!-- paginador -->
+            <div class="row">
+                <div class="col-md-12 text-right">
+                    <!-- <pagination-controls (pageChange)="p = $event"></pagination-controls> -->
+
+                </div>
+            </div>
+        </section>
+    </div>
+</div>

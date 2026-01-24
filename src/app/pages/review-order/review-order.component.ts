@@ -9,6 +9,7 @@ import { TiendaService } from '../../services/tienda.service';
 import { CarritoService } from '../../services/carrito.service';
 import { Subscription } from 'rxjs';
 import { environment } from '../../../environments/environment';
+import { PedidomenuService } from '../../services/pedidomenu.service';
 
 
 @Component({
@@ -34,9 +35,13 @@ export class ReviewOrderComponent implements OnInit, OnDestroy {
 
   tiendas: Tienda[] = [];
   nombreSelected = environment.nombreSelected;
+  identity: any;
+  userId : any;
+  pedido: any;
 
   private tiendaService = inject(TiendaService);
   private carritoService = inject(CarritoService);
+  private pedidoService = inject(PedidomenuService);
   private cartSubscription!: Subscription;
 
   constructor(
@@ -45,6 +50,11 @@ export class ReviewOrderComponent implements OnInit, OnDestroy {
     window.scrollTo(0, 0);
   }
   ngOnInit() {
+    let USER = localStorage.getItem('user');
+    if (USER) {
+      this.identity = JSON.parse(USER);
+    }
+    this.userId = this.identity.uid;
     // Subscribe to cart changes from CarritoService
     this.cartSubscription = this.carritoService.bandejaList$.subscribe(items => {
       this.bandejaList = items;
@@ -84,6 +94,9 @@ export class ReviewOrderComponent implements OnInit, OnDestroy {
     // Use CarritoService to remove item - this will trigger the BehaviorSubject update
     // and notify all subscribers including MenuFooterComponent
     this.carritoService.removeItem(item);
+    if (this.bandejaList.length === 0) {
+     this.chekpedidoguardado();
+    }
   }
 
   geneardorOrdeneNumero() {
@@ -101,6 +114,20 @@ export class ReviewOrderComponent implements OnInit, OnDestroy {
       this.tienda_moneda = this.tiendaSelected.moneda
       
     })
+  }
+
+   chekpedidoguardado(){
+    this.pedidoService.getByUserId(this.userId).subscribe((resp:any)=>{
+      console.log(resp)
+      this.pedido = resp[0]
+      this.borrarPedido()
+    })
+  }
+
+  borrarPedido(){
+    this.pedidoService.borrarPedido(this.pedido._id).subscribe((resp:any)=>{
+      console.log(resp)
+    })  
   }
 
   

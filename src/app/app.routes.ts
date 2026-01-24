@@ -10,6 +10,7 @@ import { DetalleOrdenComponent } from './pages/myaccount/ordenes/detalle-orden/d
 import { IndexOrdenesComponent } from './pages/myaccount/ordenes/index-ordenes/index-ordenes.component';
 import { PerfilComponent } from './pages/myaccount/perfil/perfil.component';
 import { ReviewOrderComponent } from './pages/review-order/review-order.component';
+import { MispedidosComponent } from './pages/myaccount/mispedidos/mispedidos.component';
 // import { ReviewOrderComponent } from './pages/review-order/review-order.component';
 
 export const routes: Routes = [
@@ -37,6 +38,7 @@ export const routes: Routes = [
     {path: 'my-account', component: MyaccountComponent },
     {path: 'my-account/perfil/:id', component: PerfilComponent },
     { path: 'my-account/ordenes', component: IndexOrdenesComponent},
+    { path: 'my-account/pedidos', component: MispedidosComponent},
     { path: 'my-account/ordenes/detalles/:id', component: DetalleOrdenComponent},
     {path: 'my-account/cart', component: CartCheckoutComponent },
 ];

@@ -61,7 +61,7 @@
 
       <!-- !!enviar whatsapp -->
 
-      <div class="col-12" style="margin-top: 20px;" *ngIf="identity">
+      <div class="col-12" style="margin-top: 20px;" *ngIf="identity && !pedidoGuardado">
         <div class="order-button-container">
           <button class="check-button" (click)="sendWhatsAppOrder()">
             <i class="fa fa-whatsapp"></i>
@@ -71,7 +71,7 @@
       </div>
       <!-- !!enviar whatsapp -->
 
-      <div class="col-12" *ngIf="identitys">
+      <div class="col-12" *ngIf="identity && pedidoGuardado">
 
 
         <!-- <span>Metodos de Pago</span> -->

@@ -18,6 +18,8 @@ import { environment } from '../../../environments/environment';
 import { Producto } from '../../models/producto.model';
 import { Usuario } from '../../models/usuario.model';
 import { ImagenPipe } from '../../pipes/imagen-pipe.pipe';
+import { PedidomenuService } from '../../services/pedidomenu.service';
+import { Pedido } from '../../models/pedido.model';
 
 declare var $: any;
 // declare var paypal;
@@ -43,6 +45,7 @@ export class CheckoutComponent {
   iva: number = 12;
   public identity!: Usuario;
   public localId!: string;
+  public userId!: any;
   paypal: boolean = false;
   //DATA
   public radio_postal: any;
@@ -74,9 +77,12 @@ export class CheckoutComponent {
   // public payPalConfig ? : IPayPalConfig;
   cartItems: any[] = [];
 
+  pedidoGuardado = false;
+
   public url!: string;
   public postales: any;
 
+  pedido!: Pedido;
   tienda!: Tienda;
   tiendas: Tienda[] = [];
   nombreSelected = environment.nombreSelected;
@@ -117,6 +123,7 @@ export class CheckoutComponent {
     private _tipoPagosService: TiposdepagoService,
     private _carritoService: CarritoService,
     private tiendaService: TiendaService,
+    private pedidosService: PedidomenuService,
     private _ventaService: VentaService,
     private _productoService: ProductoService,
     private _router: Router,
@@ -145,9 +152,11 @@ export class CheckoutComponent {
       // console.log(this.identity);
     }
     this.nombreSelected;
+    this.userId = this.identity.uid;
     this.getTienda();
     this.loadBandejaListFromLocalStorage();
-
+    this.pedidoGuardado = false;
+    this.chekpedidoguardado();
     // this.listar_carrito();
   }
 
@@ -654,6 +663,7 @@ export class CheckoutComponent {
       window.open(url, '_blank');
     }
     // console.log(message)
+    this.guardarPedido();
   }
 
 
@@ -746,6 +756,71 @@ export class CheckoutComponent {
       items.push(item);
     });
     return items;
+  }
+  //guardamos el pedido de bandejalist para una vez confirmado, poder procesar el pago si el cliente lo quiere
+  guardarPedido() {
+    this.pedidoGuardado = false;
+    const data = {
+      user: this.identity.uid,
+      tienda: this.tiendaSelected._id,
+      pedido: this.bandejaList
+    }
+    this.pedidosService.create(data).subscribe((resp:any)=>{
+      console.log(resp)
+      this.pedidoGuardado = true;
+
+    
+    })
+    
+    
+  }
+
+  chekpedidoguardado(){
+    const storedItems = localStorage.getItem('bandejaItems');
+    // Si no hay items en localStorage, no hay pedido guardado
+    if (!storedItems) {
+      this.pedidoGuardado = false;
+      return;
+    }
+
+    // Si no hay userId, no hay pedido guardado
+    if (!this.userId) {
+      this.pedidoGuardado = false;
+      return;
+    }
+
+    this.pedidosService.getByUserId(this.userId).subscribe((resp: any) => {
+      console.log('Pedidos del usuario:', resp);
+      
+      // resp es un array de pedidos
+      // Si el array está vacío, no hay pedido guardado
+      if (!resp || resp.length === 0) {
+        this.pedidoGuardado = false;
+        return;
+      }
+
+      // Convertir storedItems a objeto para comparar
+      const bandejaItems = JSON.parse(storedItems);
+      
+      // Verificar si existe algún pedido que coincida con los items actuales
+      // Comparamos el contenido de los arrays, no por referencia
+      const pedidoCoincide = resp.some((pedido: any) => {
+        // Comparamos que la tienda sea la misma
+        const mismaTienda = pedido.tienda === this.tiendaSelected?._id;
+        
+        // Comparamos que los pedidos tengan los mismos items (misma longitud y mismos IDs)
+        const mismaBandeja = pedido.pedido && pedido.pedido.length === bandejaItems.length;
+        
+        return mismaTienda && mismaBandeja;
+      });
+
+      // pedidoGuardado es true solo si:
+      // 1. Hay items en localStorage Y
+      // 2. Hay un pedido en la BD que coincida con esos items
+      this.pedidoGuardado = pedidoCoincide;
+      
+      console.log('pedidoGuardado:', this.pedidoGuardado);
+    });
   }
 
 }
