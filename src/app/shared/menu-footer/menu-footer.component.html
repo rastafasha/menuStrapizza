@@ -7,7 +7,7 @@
                 </a>
             </li>
            
-            <li *ngIf="totalList > 0 ">
+            <li *ngIf="totalList > 0 || bandejaList">
                 <a [routerLink]="['/review']" routerLinkActive="active">
                     <!-- <i class="fa fa-shopping-bag"></i> -->
                     <span class="cart-count-badge" *ngIf="bandejaList.length > 0 && bandejaList.length <= 10">

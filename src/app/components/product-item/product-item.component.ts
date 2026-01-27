@@ -31,12 +31,16 @@ export class ProductItemComponent {
   isProductAdded=false;
   tiendaSelected: Tienda | null = null;
   tiendaNameSelected!:string;
+  img:string | null = '../assets/images/no-image.jpg';
 
   private carritoService = inject(CarritoService);
 
   ngOnInit(): void {
      let USER = localStorage.getItem("user");
      this.user = USER ? JSON.parse(USER) : null;
+     if(!this.product.img){
+      this.img = '../assets/images/no-image.jpg';
+    }
   }
 
   openPaymentsModal(product: any): void {

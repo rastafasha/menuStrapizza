@@ -83,6 +83,8 @@ export class UsuarioService {
   logout() {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    localStorage.removeItem('bandejaItems');
+    localStorage.removeItem('avisoShown');
     // localStorage.removeItem('menu');
     this.router.navigateByUrl('/');
 

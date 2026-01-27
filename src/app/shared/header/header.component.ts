@@ -9,24 +9,26 @@ import { Usuario } from '../../models/usuario.model';
 import { Subscription } from 'rxjs';
 import { ImagenPipe } from '../../pipes/imagen-pipe.pipe';
 import { environment } from '../../../environments/environment';
+import { AvisoComponent } from '../aviso/aviso.component';
 
 @Component({
   selector: 'app-header',
   imports: [RouterModule, CommonModule, ReactiveFormsModule,
-    FormsModule, ImagenPipe
+    FormsModule, ImagenPipe, AvisoComponent
   ],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss'
 })
 export class HeaderComponent implements OnDestroy {
 
-  @Output()tiendaSelected!: Tienda;
+  tiendaSelected: Tienda | undefined;
   @Output() refreshApp: EventEmitter<void> = new EventEmitter<void>();
   totalList: number = 0;
   tiendas: Tienda[] = [];
   tienda!: Tienda;
   bandejaList: any[] = [];
   public user!: Usuario;
+  img:string | null = '../assets/images/no-image.jpg';
 
   year: number = new Date().getFullYear();
   nombreSelected = environment.nombreSelected;
@@ -39,6 +41,9 @@ export class HeaderComponent implements OnDestroy {
   private readonly PULL_THRESHOLD = 100; // pixels needed to trigger refresh
 
   isReloadig=false;
+
+   isAviso:boolean = false;
+   aviso: string = 'Hala desde el header, para refrescar la pagina';
 
   private tiendaService = inject(TiendaService);
   private carritoService = inject(CarritoService);
@@ -66,19 +71,34 @@ export class HeaderComponent implements OnDestroy {
   }
 
   ngOnInit(): void {
+    // Show aviso only once on initial app start
+    const avisoShown = localStorage.getItem('avisoShown');
+    if (!avisoShown) {
+      this.isAviso = true;
+      setTimeout(() => {
+        this.isAviso = false;
+        localStorage.setItem('avisoShown', 'true');
+      }, 3000);
+    } else {
+      this.isAviso = false;
+    }
+    
     let USER = localStorage.getItem("user");
     this.user = USER ? JSON.parse(USER) : null;
-    
+
     // Subscribe to cart changes
     this.cartSubscription = this.carritoService.bandejaList$.subscribe(items => {
       this.bandejaList = items;
       this.totalList = items.length;
     });
 
+    this.nombreSelected;
     setTimeout(() => {
-      this.nombreSelected;
-      this.getTienda();
     }, 500);
+    this.getTienda();
+    
+    
+    
   }
 
   ngOnDestroy(): void {

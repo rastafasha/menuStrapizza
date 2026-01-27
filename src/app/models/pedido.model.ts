@@ -6,6 +6,7 @@ export class Pedido{
         public user: string,
         public pedido: Array<any>,
         public tienda: Tienda,
+        public status: string,
         public createdAt: Date,
     ){
     }

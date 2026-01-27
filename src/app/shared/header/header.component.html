@@ -3,42 +3,14 @@
     <div class="header-container" (pulldown)="onPullRefresh()">
         <div class="logo">
 
-            <!-- <span class="logo-icon">
-                <a routerLink="/my-account"  *ngIf="user" style="color: var(--black);">
-                    <i class="fa fa-user  animated tada"></i>
-                </a>
-                <span *ngIf="user">
-                    <span class="cart-count-badge" *ngIf="bandejaList.length > 0 && bandejaList.length <= 10">
-                        {{totalList}}</span>
-                    <i class="fa fa-shopping-cart animated tada  cursor" *ngIf="bandejaList.length > 0 && bandejaList.length <= 10"
-                        routerLink="/review"></i>
-
-                </span>
-            </span> -->
             <span class="logo-text">{{titleapp}}</span>
-            <a routerLink="/" >
+            <a routerLink="/" *ngIf="tiendaSelected">
                     <img [src]="tiendaSelected.img | imagenPipe: 'tiendas'"  [alt]="tiendaSelected.nombre">
                     <!-- <img src="assets/images/logo.png" alt="Strapizza Logo"> -->
                 </a>
             
         </div>
-        <!-- <nav>
-                <ul class="nav-menu">
-                    <li><a href="#inicio">Inicio</a></li>
-                    <li><a href="#menu">Menú</a></li>
-                    <li><a href="#categorias">Categorías</a></li>
-                    <li><a href="#promociones">Promociones</a></li>
-                    <li><a href="#contacto">Contacto</a></li>
-                </ul>
-            </nav> -->
-        <!-- <a href="#perfil" class="btn-primary" style="width: 50px; display: flex;"><i class="fa fa-user"></i></a> -->
-        <!-- <a href="#pedir" class="btn-primary"><i class="fa fa-bars"></i></a> -->
     </div>
-    <!-- <div class="menulateral">
-        <ul>
-            <li>home</li>
-            <li>perfil</li>
-            <li>contacto</li>
-        </ul>
-    </div> -->
 </header>
+
+<app-aviso class="aviso-pull" [aviso]="aviso" *ngIf="isAviso"></app-aviso>

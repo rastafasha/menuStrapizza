@@ -72,7 +72,7 @@
             <i class="fa fa-chevron-left icon-small"></i>
             Volver
         </button>
-        <button class="check-button" routerLink="/checkout" *ngIf="total() > 0">
+        <button class="check-button" (click)="makeRequest()"  *ngIf="total() > 0">
             Hacer pedido
             <i class="fa fa-chevron-right icon-small"></i>
         </button>

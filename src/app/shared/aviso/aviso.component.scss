@@ -1,0 +1,20 @@
+
+.avisos {
+    border: 1px solid #ccc;
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    border-radius: 8px;
+    margin-top: 15px;
+    background-color: aliceblue;
+    & h2 {
+        font-size: 16px;
+        font-weight: bold;
+        color: var(--azul);
+    }
+    & .fa {
+        border-radius: 100px;
+        color: var(--azul);
+        font-size: 20px;
+    }
+}

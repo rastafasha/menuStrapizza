@@ -15,7 +15,7 @@
                     Registrate para solicitar tu pedido.
                 </p>
                 <div class="botns">
-                    <a routerLink="registro" class="btn-primary">
+                    <a routerLink="registro" class="btn-primary" *ngIf="!isLogued">
                     <i class="fas fa-pizza-slice"></i> Registrarme
                 </a>
                 <a routerLink="my-account" class="btn-primary">

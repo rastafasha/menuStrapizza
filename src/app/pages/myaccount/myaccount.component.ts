@@ -58,7 +58,7 @@ export class MyaccountComponent implements OnInit {
    getUser(){
     this.usuarioService.get_user(this.user_id).subscribe((resp:any)=>{
       this.identity = resp.usuario;
-      console.log(this.identity)
+      // console.log(this.identity)
      
     })
   }

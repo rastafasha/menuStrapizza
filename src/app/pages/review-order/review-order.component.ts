@@ -39,9 +39,12 @@ export class ReviewOrderComponent implements OnInit, OnDestroy {
   userId : any;
   pedido: any;
 
+  pedidoGuardado = false;
+
   private tiendaService = inject(TiendaService);
   private carritoService = inject(CarritoService);
   private pedidoService = inject(PedidomenuService);
+  
   private cartSubscription!: Subscription;
 
   constructor(
@@ -68,7 +71,8 @@ export class ReviewOrderComponent implements OnInit, OnDestroy {
 
     this.geneardorOrdeneNumero();
     this.nombreSelected;
-    this.getTienda()
+    this.getTienda();
+    this.chekpedidoguardado();
 
   }
 
@@ -117,18 +121,91 @@ export class ReviewOrderComponent implements OnInit, OnDestroy {
   }
 
    chekpedidoguardado(){
+
+     const storedItems = localStorage.getItem('bandejaItems');
+    // Si no hay items en localStorage, no hay pedido guardado
+    if (!storedItems) {
+      this.pedidoGuardado = false;
+      return;
+    }
+
+    // Si no hay userId, no hay pedido guardado
+    if (!this.userId) {
+      this.pedidoGuardado = false;
+      return;
+    }
     this.pedidoService.getByUserId(this.userId).subscribe((resp:any)=>{
-      console.log(resp)
+      // console.log(resp)
+      
+
+      console.log('Pedidos del usuario:', resp);
+      
+      // resp es un array de pedidos
+      // Si el array está vacío, no hay pedido guardado
+      if (!resp || resp.length === 0) {
+        this.pedidoGuardado = false;
+        return;
+      }
+
+      // Convertir storedItems a objeto para comparar
+      const bandejaItems = JSON.parse(storedItems);
+      
+      // Verificar si existe algún pedido que coincida con los items actuales
+      // Comparamos el contenido de los arrays, no por referencia
+      const pedidoCoincide = resp.some((pedido: any) => {
+        // Comparamos que la tienda sea la misma
+        const mismaTienda = pedido.tienda === this.tiendaSelected?._id;
+        
+        // Comparamos que los pedidos tengan los mismos items (misma longitud y mismos IDs)
+        const mismaBandeja = pedido.pedido && pedido.pedido.length === bandejaItems.length;
+        
+        return mismaTienda && mismaBandeja;
+      });
+
+      // pedidoGuardado es true solo si:
+      // 1. Hay items en localStorage Y
+      // 2. Hay un pedido en la BD que coincida con esos items
+      this.pedidoGuardado = pedidoCoincide;
+
       this.pedido = resp[0]
       this.borrarPedido()
     })
   }
 
+   //guardamos el pedido de bandejalist para una vez confirmado, poder procesar el pago si el cliente lo quiere
+  guardarPedido() {
+    this.pedidoGuardado = false;
+    const data = {
+      user: this.identity.uid,
+      tienda: this.tiendaSelected._id,
+      pedido: this.bandejaList
+    }
+    this.pedidoService.create(data).subscribe((resp:any)=>{
+      console.log(resp)
+      this.pedidoGuardado = true;
+
+    
+    })
+    
+    
+  }
+
   borrarPedido(){
     this.pedidoService.borrarPedido(this.pedido._id).subscribe((resp:any)=>{
-      console.log(resp)
+      // console.log(resp)
     })  
   }
+
+
+  makeRequest(){
+
+    if(!this.pedidoGuardado){
+      this.guardarPedido(); 
+    }
+    this.router.navigateByUrl('/checkout');
+
+  }
+  
 
   
 }

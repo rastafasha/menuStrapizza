@@ -42,6 +42,7 @@ export class ModalproductComponent implements OnInit, OnDestroy {
   bandejaList: any[] = [];
   tiendaSelected: Tienda | null = null;
   tiendaNameSelected!:string;
+ img:string | null = './assets/images/no-image.jpg';
 
   public selector_to_cart = ' ';
   public selector_error = false;
@@ -54,17 +55,16 @@ export class ModalproductComponent implements OnInit, OnDestroy {
     this.msm_alert = false;
     let USER = localStorage.getItem("user");
     this.user = USER ? JSON.parse(USER) : null;
-
-    
-
     // Subscribe to cart changes to keep local copy updated
     this.cartSubscription = this.carritoService.bandejaList$.subscribe(items => {
       this.bandejaList = items;
     });
 
-    this.product
-    this.activeCategory
-
+    this.product;
+    this.activeCategory;
+    if(!this.product?.img){
+      this.img = '../assets/images/no-image.jpg';
+    }
     
   }
 
@@ -82,7 +82,6 @@ export class ModalproductComponent implements OnInit, OnDestroy {
     if (changes['isModalOpen'] && this.product) {
       const modalId = `modalProduct-${this.product._id}`;
 
-      
       
       // Use setTimeout to ensure DOM element is available
       setTimeout(() => {
@@ -134,7 +133,6 @@ export class ModalproductComponent implements OnInit, OnDestroy {
   addItem(producto: Producto) {
     this.msm_success = false;
     this.selector_error = false;
-    console.log(producto)
 
     if(producto.subcategoria === 'Pastas'){
       // Validar que se haya seleccionado un selector
@@ -145,8 +143,6 @@ export class ModalproductComponent implements OnInit, OnDestroy {
         }, 3000)
         return;
       }
-
-      
 
       // Agregamos el selector al producto
       producto.nombre_selector = this.selector_to_cart;
