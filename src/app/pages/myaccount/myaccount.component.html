@@ -5,6 +5,7 @@
 <div class="about" id="page" *ngIf="identity">
 
    
+   
     <section  style="height: calc(100vh - 100px); padding-top: 120px;">
         <div class="container">
             <div class="row blog-v reverse" style="margin-bottom: 20px;">
@@ -17,6 +18,10 @@
                 </div>
 
             </div>
+
+             <div *ngIf="!identity.telefono">
+        <h5>Por favor, llena tus datos para continuar con la experiencia</h5>
+    </div>
             <div class="row ">
                 <div class="opciones">
                     <div class="iconop ">
@@ -29,7 +34,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="iconop ">
+                    <div class="iconop " *ngIf="identity.telefono">
                         <div class="card">
                             <div class="card-body">
                                 <a [routerLink]="['/my-account/ordenes']">
@@ -40,7 +45,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="iconop ">
+                    <div class="iconop " *ngIf="identity.telefono">
                         <div class="card">
                             <div class="card-body">
                                 <a [routerLink]="['/my-account/pedidos']">
@@ -51,7 +56,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="iconop ">
+                    <div class="iconop " *ngIf="identity.telefono">
                         <div class="card">
                             <div class="card-body">
                                 <a [routerLink]="['/review']">

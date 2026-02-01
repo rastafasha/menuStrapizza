@@ -88,11 +88,11 @@ export class UsuarioService {
     // localStorage.removeItem('menu');
     this.router.navigateByUrl('/');
 
-    this.auth2.signOut().then(() => {
-      this.ngZone.run(() => {
-        this.router.navigateByUrl('/login');
-      });
-    });
+    // this.auth2.signOut().then(() => {
+    //   this.ngZone.run(() => {
+    //     this.router.navigateByUrl('/login');
+    //   });
+    // });
   }
 
   validarToken(): Observable<boolean> {

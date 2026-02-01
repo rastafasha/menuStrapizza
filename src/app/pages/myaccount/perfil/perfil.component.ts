@@ -50,12 +50,14 @@ export class PerfilComponent implements OnInit {
   public user!: Usuario;
   public identity!: Usuario;
   public user_id: any;
+  
 
   public pais!: Pais;
 
   public perfilForm!: FormGroup;
   public imagenSubir!: File;
   public imgTemp: any = null;
+
 
 
   //DATA
@@ -75,6 +77,20 @@ export class PerfilComponent implements OnInit {
     
     this.url = environment.baseUrl;
 
+    // Initialize empty FormGroup to prevent template binding errors
+    this.perfilForm = this.fb.group({
+      uid: [''],
+      email: [''],
+      first_name: [''],
+      last_name: [''],
+      numdoc: [''],
+      telefono: [''],
+      pais: [''],
+      google: [''],
+      role: [''],
+      password: [''],
+      img: [''],
+    });
   }
 
   ngOnInit(): void {
@@ -94,27 +110,47 @@ export class PerfilComponent implements OnInit {
     this.usuarioService.get_user(this.user_id).subscribe((resp:any)=>{
       this.identity = resp.usuario;
       // console.log(this.identity)
-      if(this.identity){
+      if(!this.identity){
+        this._router.navigate(['/']);
+      }
+       // First initialize the form
+        this.iniciarFormulario();
+        
+        // Then set the values
+        this.perfilForm.setValue({
+          uid: this.identity.uid,
+          email: this.identity.email,
+          first_name: this.identity.first_name,
+          last_name: this.identity.last_name,
+          numdoc: this.identity.numdoc || null,
+          telefono: this.identity.telefono || null,
+          pais: this.identity.pais || null,
+          google: this.identity.google || null,
+          role: this.identity.role,
+          password: '',
+          img: this.identity.img || null,
+        });
+        
         this.getPaises();
-        this.iniciarFormulario()
-      }else{
-      this._router.navigate(['/']);
-    }
+     
+
+     
     })
   }
 
-  iniciarFormulario(){
+   iniciarFormulario(){
     this.perfilForm = this.fb.group({
       uid: [ this.identity.uid,  Validators.required ],
       email: [ this.identity.email],
-      first_name: [ this.identity.first_name, Validators.required ],
-      last_name: [ this.identity.last_name, Validators.required ],
-      numdoc: [ this.identity.numdoc ],
-      telefono: [ this.identity.telefono ],
-      pais: [ this.identity.pais],
-      google: [ this.identity.google],
-      role: [ this.identity.role],
+      first_name: [ '', Validators.required ],
+      last_name: [ '', Validators.required ],
+      numdoc: ['' ],
+      telefono: [ ''],
+      pais: [ ''],
+      google: [ ''],
+      role: [ ''],
       password: [ ''],
+      img: [ ''],
     });
     
   }
