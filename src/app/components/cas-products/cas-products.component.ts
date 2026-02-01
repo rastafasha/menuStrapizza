@@ -60,8 +60,8 @@ export class CasProductsComponent implements OnInit, OnDestroy {
     // Also subscribe to changes
     if (this.tiendaNameSelected) {
       setTimeout(()=>{
-        this.getTiendaName()
       }, 500)
+      this.getTiendaName()
      
     }
     // Listen for refresh trigger from parent (header pull)
