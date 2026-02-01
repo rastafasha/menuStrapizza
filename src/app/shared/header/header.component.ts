@@ -94,10 +94,8 @@ export class HeaderComponent implements OnDestroy {
 
     this.nombreSelected;
     setTimeout(() => {
-    }, 500);
-    this.getTienda();
-    
-    
+      this.getTienda();
+    }, 300);
     
   }
 
