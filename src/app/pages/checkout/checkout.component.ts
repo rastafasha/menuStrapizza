@@ -66,7 +66,8 @@ export class CheckoutComponent {
   public msm_success_cupon = false;
   public precio_envio: any;
   public msm_error = '';
-  public whatsapp = '+584241874370';
+  // public whatsapp = '+584241874370';
+  public whatsapp!: string;
 
   // public socket = io(environment.soketServer);
   public data_direccionLocal: any = {};
@@ -613,8 +614,6 @@ export class CheckoutComponent {
     },)
   }
 
-
-
   geneardorOrdeneNumero() {
     //creamos una suma de 1 a 1000 para ordenes nuevas
     const max = 1000;
@@ -631,7 +630,7 @@ export class CheckoutComponent {
       return '';
     }
 
-    let message = `*Nuevo Pedido desde app Menu #${this.randomNum}*\n\n`;
+    let message = `*Nuevo Pedido desde app Menu Strapizza #${this.randomNum}*\n\n`;
     message += `*Cliente:* ${this.identity.first_name} ${this.identity.last_name}\n`;
     message += `*Teléfono:* ${this.identity.telefono || 'No registrado'}\n\n`;
     message += `*Detalles del Pedido:*\n`;
@@ -655,6 +654,8 @@ export class CheckoutComponent {
 
   // Open WhatsApp with pre-filled message
   sendWhatsAppOrder(): void {
+
+    this.whatsapp = this.tiendaSelected.telefono;
     const phone = this.whatsapp.replace(/\D/g, '');
     const message = this.getWhatsAppMessage();
 
