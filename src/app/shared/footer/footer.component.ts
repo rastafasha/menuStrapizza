@@ -1,9 +1,10 @@
 
-import { Component, inject, Input } from '@angular/core';
+import { Component, inject, Input, OnInit, OnDestroy } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { Tienda } from '../../models/tienda.model';
 import { TiendaService } from '../../services/tienda.service';
 import { environment } from '../../../environments/environment';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-footer',
@@ -11,7 +12,7 @@ import { environment } from '../../../environments/environment';
   templateUrl: './footer.component.html',
   styleUrl: './footer.component.scss'
 })
-export class FooterComponent  {
+export class FooterComponent implements OnInit, OnDestroy {
 
 @Input()tiendaSelected:any;
 tiendas: Tienda[] = [];
@@ -20,14 +21,19 @@ tiendas: Tienda[] = [];
   tiendaNameSelected!:string;
 
 private tiendaService = inject(TiendaService);
+private tiendaSubscription!: Subscription;
 
   ngOnInit(){
     this.nombreSelected;
-      this.tiendaService.getTiendaByName(this.nombreSelected).subscribe(tienda => {
-       this.tiendaSelected = tienda;
-      //  console.log(this.tiendaNameSelected)
+    // Use cached observable to avoid redundant API calls
+    this.tiendaSubscription = this.tiendaService.getTiendaByNameCached(this.nombreSelected).subscribe(tienda => {
+      this.tiendaSelected = tienda;
     });
   }
 
-
+  ngOnDestroy() {
+    if (this.tiendaSubscription) {
+      this.tiendaSubscription.unsubscribe();
+    }
+  }
 }

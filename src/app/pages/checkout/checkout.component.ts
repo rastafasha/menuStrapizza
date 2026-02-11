@@ -20,6 +20,8 @@ import { Usuario } from '../../models/usuario.model';
 import { ImagenPipe } from '../../pipes/imagen-pipe.pipe';
 import { PedidomenuService } from '../../services/pedidomenu.service';
 import { Pedido } from '../../models/pedido.model';
+import { DireccionService } from '../../services/direccion.service';
+import { Direccion } from '../../models/direccion.model';
 
 declare var $: any;
 // declare var paypal;
@@ -84,6 +86,9 @@ export class CheckoutComponent {
   public postales: any;
 
   pedido!: Pedido;
+  pedidos!: Pedido;
+  delivery!: string;
+  deliveryAddres!: string;
   tienda!: Tienda;
   tiendas: Tienda[] = [];
   nombreSelected = environment.nombreSelected;
@@ -93,6 +98,9 @@ export class CheckoutComponent {
 
   habilitacionFormTransferencia: boolean = false;
   habilitacionFormCheque: boolean = false;
+  habilitacionFormEfectivo: boolean = false;
+
+  
 
   paymentMethods: PaymentMethod[] = []; //array metodos de pago para transferencia (dolares, bolivares, movil)
   paymentSelected!: PaymentMethod; //metodo de pago seleccionado por el usuario para transferencia
@@ -116,6 +124,9 @@ export class CheckoutComponent {
     phone: new FormControl('', Validators.required),
     paymentday: new FormControl('', Validators.required)
   });
+  formEfectivo = new FormGroup({
+    amount: new FormControl('', Validators.required),
+  });
 
 
   constructor(
@@ -125,6 +136,7 @@ export class CheckoutComponent {
     private _carritoService: CarritoService,
     private tiendaService: TiendaService,
     private pedidosService: PedidomenuService,
+    private _direccionService: DireccionService,
     private _ventaService: VentaService,
     private _productoService: ProductoService,
     private _router: Router,
@@ -157,7 +169,10 @@ export class CheckoutComponent {
     this.getTienda();
     this.loadBandejaListFromLocalStorage();
     this.pedidoGuardado = false;
-    this.chekpedidoguardado();
+
+    setTimeout(()=>{
+      this.chekpedidoguardado();
+      }, 300)
     // this.listar_carrito();
   }
 
@@ -327,40 +342,14 @@ export class CheckoutComponent {
   }
 
 
-  // Método que se llama cuando cambia el select
-  // onPaymentMethodChange(event: any) {
-  //   this.selectedMethod = event.target.value;
-  //   console.log('metodo de pago seleccionado: ',this.selectedMethod)
-  //   this.getPaymentMbyName(this.selectedMethod);
-
-  //   if(this.selectedMethod==='paypal' || this.selectedMethod==='card'){
-  //     // transferencia bancaria => abrir formulario (en un futuro un modal con formulario)
-  //     // this.renderPayPalButton(); // Renderiza el botón de nuevo según la opción seleccionada
-  //     this.habilitacionFormTransferencia = false;
-  //     this.habilitacionFormCheque = false;
-  //   }
-  //   if(this.selectedMethod==='Transferencia Dólares' || this.selectedMethod==='Transferencia Bolivares'
-  //     || this.selectedMethod==='pagomovil' || this.selectedMethod==='zelle'
-  //   ){
-  //     // transferencia bancaria => abrir formulario (en un futuro un modal con formulario)
-  //     this.habilitacionFormTransferencia = true;
-  //     this.habilitacionFormCheque = false;
-  //   }
-  //   else if(this.selectedMethod==='cheque'){
-  //     // cheque
-  //     this.habilitacionFormCheque = true;
-
-  //     this.habilitacionFormTransferencia = false;
-
-
-  //   }
-  // }
 
   // Método que se llama cuando cambia el select
   onPaymentMethodChange(event: any) {
     this.selectedMethod = event.target.value;
     this.renderPayPalButton(); // Renderiza el botón de nuevo según la opción seleccionada
   }
+
+ 
 
   getPaymentMbyName(selectedMethod: string) {
     this.selectedMethod = selectedMethod
@@ -645,11 +634,15 @@ export class CheckoutComponent {
       message += `  Cant: ${item.cantidad} x ${item.precio_ahora.toFixed(2)} = ${itemTotal}\n\n`;
     });
 
+    // message += `─────────────────────\n`;
+    // message += `*Delivery:* ${this.pedido.delivery}\n`;
     message += `─────────────────────\n`;
     message += `*TOTAL:* ${this.tienda_moneda} ${this.total().toFixed(2)}\n\n`;
     message += `Por favor confirmar disponibilidad y método de pago.`;
 
     return encodeURIComponent(message);
+
+    
   }
 
   // Open WhatsApp with pre-filled message
@@ -665,6 +658,8 @@ export class CheckoutComponent {
     }
     // console.log(message)
     this.guardarPedido();
+    this._carritoService.clearCart();
+    
   }
 
 
@@ -675,6 +670,7 @@ export class CheckoutComponent {
     if (this.selectedMethod === 'card' || this.selectedMethod === 'paypal') {
       // deshabilitar el formulario de pago con transferencia
       this.habilitacionFormTransferencia = false;
+      this.habilitacionFormEfectivo = false;
       this.paypal = true;
       // Cargar el botón de PayPal con las opciones seleccionadas
       this.initPayPalConfig();
@@ -682,13 +678,23 @@ export class CheckoutComponent {
     else if (this.selectedMethod === 'transferencia') {
       // transferencia bancaria => abrir formulario (en un futuro un modal con formulario)
       this.habilitacionFormTransferencia = true;
+       this.habilitacionFormEfectivo = false;
+      this.paypal = false;
+    }
+    else if (this.selectedMethod === 'efectivo') {
+      // transferencia bancaria => abrir formulario (en un futuro un modal con formulario)
+      this.habilitacionFormEfectivo = true;
+      this.habilitacionFormTransferencia = false;
       this.paypal = false;
     }
     else {
       this.paypal = false;
       this.habilitacionFormTransferencia = false;
+      this.habilitacionFormEfectivo = false;
     }
   }
+
+ 
 
   private initPayPalConfig(): void {
     // this.payPalConfig = {
@@ -764,14 +770,18 @@ export class CheckoutComponent {
     const data = {
       user: this.identity.uid,
       tienda: this.tiendaSelected._id,
-      pedido: this.bandejaList
+      pedido: this.bandejaList,
+      delivery: this.pedido.delivery,
+      deliveryAddres: this.pedido.deliveryAddres,
+      status: 'PENDING'
     }
     this.pedidosService.create(data).subscribe((resp:any)=>{
-      console.log(resp)
+      // console.log(resp)
       this.pedidoGuardado = true;
-
-    
+      this._router.navigate(['/my-account/pedidos']);
+      localStorage.removeItem('bandejaItems');
     })
+
     
     
   }
@@ -791,8 +801,17 @@ export class CheckoutComponent {
     }
 
     this.pedidosService.getByUserId(this.userId).subscribe((resp: any) => {
-      console.log('Pedidos del usuario:', resp);
-      
+      // console.log('Pedidos del usuario:', resp);
+      this.pedido = resp;
+
+      this.delivery = resp[0].delivery;
+      this.deliveryAddres = resp[0].deliveryAddres;
+      // console.log(this.delivery)
+      // console.log(this.deliveryAddres)
+      // setTimeout(() => {
+      //   this.getDireccionId();
+      // }, 200);
+
       // resp es un array de pedidos
       // Si el array está vacío, no hay pedido guardado
       if (!resp || resp.length === 0) {
@@ -821,7 +840,18 @@ export class CheckoutComponent {
       this.pedidoGuardado = pedidoCoincide;
       
       console.log('pedidoGuardado:', this.pedidoGuardado);
+
+      
+      
+      
     });
+  }
+
+  getDireccionId(){
+    this._direccionService.get_direccion(this.deliveryAddres).subscribe((resp:any)=>{
+      this.direccion = resp;
+      // console.log(this.direccion)
+    })
   }
 
 }

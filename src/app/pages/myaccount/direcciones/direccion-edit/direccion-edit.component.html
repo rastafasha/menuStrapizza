@@ -1,0 +1,113 @@
+<app-loading *ngIf="isLoading"></app-loading>
+
+<!-- Page Content-->
+<div class="container" *ngIf="!isLoading">
+    <div class="back-title">
+
+        <a [routerLink]="['/my-account/direcciones']">
+            <button class="boton_azul_borde">Volver</button>
+        </a>
+    </div>
+
+    <div class="num_tracking">
+        <!-- Content  -->
+        <section class="col-lg-12">
+
+            <!-- Sección del Mapa -->
+            <div class="map-section">
+                <h4><i class="fa fa-map-marker"></i> Seleccionar Ubicación</h4>
+                <p class="text-muted">Haz clic en el mapa para seleccionar la ubicación de tu dirección</p>
+                
+                <!-- Contenedor del mapa -->
+                <div #mapContainer class="map-container"></div>
+                
+                <!-- Loading del mapa -->
+                <div class="map-loading" *ngIf="mapLoading">
+                    <div class="spinner"></div>
+                    <p>Obteniendo ubicación...</p>
+                </div>
+                
+                <!-- Error del mapa -->
+                <div class="map-error" *ngIf="mapError">
+                    <p>⚠️ {{ mapError }}</p>
+                </div>
+                
+                <!-- Botón ubicación actual -->
+                <button class="btn btn-primary btn-block location-btn" (click)="useCurrentLocation()">
+                    <i class="fa fa-crosshairs"></i> Usar mi ubicación actual
+                </button>
+                
+                <!-- Coordenadas seleccionadas -->
+                <div class="coords-display" *ngIf="selectedCoords">
+                    <span class="label">📍 Ubicación seleccionada:</span>
+                    <span class="value">{{ selectedCoords.lat.toFixed(6) }}, {{ selectedCoords.lng.toFixed(6) }}</span>
+                </div>
+            </div>
+
+            <!-- Profile form-->
+            <form class=" p-t-20 col-xs-12" [formGroup]="direccionForm" (ngSubmit)="onSubmit()">
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label>Nombre y apellidos</label>
+                        <input class="form-control" type="text" required placeholder="Nombres y apellidos"
+                            formControlName="nombres_completos">
+
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label>País</label>
+                        <div class="input-group form-label labelgoogle">
+                            <select class="form-control" formControlName="pais">
+                                <option [value]=" ">Seleccione País</option>
+                                <option *ngFor="let data of paises" [value]="data.pais">
+                                    {{data.pais}}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-12">
+                    <div class="form-group">
+                        <label>Dirección</label>
+                        <textarea class="form-control" placeholder="Ingrese la dirección" required
+                            formControlName="direccion"></textarea>
+                    </div>
+                </div>
+                <div class="col-sm-12">
+                    <div class="form-group">
+                        <label>Referencia (Coordenadas)</label>
+                        <textarea class="form-control" placeholder="Seleccione la ubicación en el mapa" required
+                            formControlName="referencia"></textarea>
+                        <small class="text-muted">
+                            <i class="fa fa-info-circle"></i> 
+                            Seleccione la ubicación haciendo clic en el mapa. Las coordenadas se guardarán automáticamente.
+                        </small>
+                    </div>
+                </div>
+
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label>Ciudad</label>
+                        <input class="form-control" type="text" id="address-fn" required placeholder="Ciudad"
+                            formControlName="ciudad">
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label>ZIP</label>
+                        <input class="form-control" type="text" id="address-fn" required placeholder="Código Postal"
+                            formControlName="zip">
+                    </div>
+                </div>
+
+                <button type="submit" [disabled]="direccionForm.invalid"
+                    class="btn btn-success waves-effect waves-light m-r-10 btn-block">
+                    <i class="fa fa-save"></i> Guardar cambios
+                </button>
+            </form>
+
+        </section>
+    </div>
+</div>
+

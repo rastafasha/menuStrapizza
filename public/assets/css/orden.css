@@ -4,6 +4,7 @@
   display: flex;
   justify-content: center;
   margin-bottom: 2.5rem;
+  gap:15px;
 }
 
 .check-button,
@@ -81,9 +82,10 @@
   min-height: 100px;
   width: 95%;
   margin: 0 auto;
+  padding: 20px;
   margin-top: 15px;
   background: white;
-  background: linear-gradient(180deg, rgba(176, 176, 176, 1) 0%, rgba(255, 255, 255, 0.99) 52%, rgba(255, 255, 255, 1) 100%);
+  background: linear-gradient(180deg, rgb(238, 237, 237) 0%, rgba(255, 255, 255, 0.99) 52%, rgba(255, 255, 255, 1) 100%);
   /* box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3); */
   
   border-top: 1px solid #676767;
@@ -94,7 +96,6 @@ box-shadow: rgba(50, 50, 93, 0.25) 0px 30px 60px -12px, rgba(0, 0, 0, 0.3) 0px 1
   flex-direction: column;
   justify-content: space-between;
   align-items: baseline;
-  padding:10px;
   margin-bottom: 5px;
 
   /* animation: customAni .5s ease-in 2s  normal none; */

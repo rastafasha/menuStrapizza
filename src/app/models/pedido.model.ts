@@ -7,6 +7,8 @@ export class Pedido{
         public pedido: Array<any>,
         public tienda: Tienda,
         public status: string,
+        public delivery: string,
+        public deliveryAddres: string,
         public createdAt: Date,
     ){
     }

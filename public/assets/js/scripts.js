@@ -9,8 +9,16 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentSlide = 0;
     const totalSlides = slides.length;
     
+    // Exit if carousel elements don't exist
+    if (!track || slides.length === 0) {
+        console.log('Carousel elements not found, skipping initialization');
+        return;
+    }
+    
     function updateCarousel() {
-        track.style.transform = `translateX(-${currentSlide * 100}%)`;
+        if (track) {
+            track.style.transform = `translateX(-${currentSlide * 100}%)`;
+        }
         
         // Update dots
         dots.forEach((dot, index) => {

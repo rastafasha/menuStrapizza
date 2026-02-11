@@ -10,6 +10,9 @@ import { CarritoService } from '../../services/carrito.service';
 import { Subscription } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { PedidomenuService } from '../../services/pedidomenu.service';
+import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { DireccionService } from '../../services/direccion.service';
+import { Direccion } from '../../models/direccion.model';
 
 
 @Component({
@@ -18,8 +21,9 @@ import { PedidomenuService } from '../../services/pedidomenu.service';
     HeaderComponent,
     CommonModule,
     RouterModule,
-    ImagenPipe
-
+    ImagenPipe,
+    ReactiveFormsModule,
+    FormsModule
   ],
   templateUrl: './review-order.component.html',
   styleUrl: './review-order.component.scss'
@@ -41,11 +45,24 @@ export class ReviewOrderComponent implements OnInit, OnDestroy {
 
   pedidoGuardado = false;
 
+  selectedDelivery: string = 'Deseas Delivery?';
+  habilitacionAddresLocal: boolean = false;
+  habilitacionFormDelivery: boolean = false;
+
+  direcciones:Direccion[] = [];
+  direccionSelected!:Direccion;
+
   private tiendaService = inject(TiendaService);
   private carritoService = inject(CarritoService);
   private pedidoService = inject(PedidomenuService);
+  private direccionService = inject(DireccionService);
   
   private cartSubscription!: Subscription;
+
+  formDelivery = new FormGroup({
+      delivery: new FormControl('', Validators.required),
+      deliveryAddres: new FormControl('', Validators.required),
+    });
 
   constructor(
     private router: Router
@@ -73,6 +90,7 @@ export class ReviewOrderComponent implements OnInit, OnDestroy {
     this.nombreSelected;
     this.getTienda();
     this.chekpedidoguardado();
+    this.getDireccionbyUser();
 
   }
 
@@ -121,7 +139,6 @@ export class ReviewOrderComponent implements OnInit, OnDestroy {
   }
 
    chekpedidoguardado(){
-
      const storedItems = localStorage.getItem('bandejaItems');
     // Si no hay items en localStorage, no hay pedido guardado
     if (!storedItems) {
@@ -135,11 +152,6 @@ export class ReviewOrderComponent implements OnInit, OnDestroy {
       return;
     }
     this.pedidoService.getByUserId(this.userId).subscribe((resp:any)=>{
-      // console.log(resp)
-      
-
-      console.log('Pedidos del usuario:', resp);
-      
       // resp es un array de pedidos
       // Si el array está vacío, no hay pedido guardado
       if (!resp || resp.length === 0) {
@@ -158,7 +170,6 @@ export class ReviewOrderComponent implements OnInit, OnDestroy {
         
         // Comparamos que los pedidos tengan los mismos items (misma longitud y mismos IDs)
         const mismaBandeja = pedido.pedido && pedido.pedido.length === bandejaItems.length;
-        
         return mismaTienda && mismaBandeja;
       });
 
@@ -168,7 +179,7 @@ export class ReviewOrderComponent implements OnInit, OnDestroy {
       this.pedidoGuardado = pedidoCoincide;
 
       this.pedido = resp[0]
-      this.borrarPedido()
+      // this.borrarPedido()
     })
   }
 
@@ -178,13 +189,14 @@ export class ReviewOrderComponent implements OnInit, OnDestroy {
     const data = {
       user: this.identity.uid,
       tienda: this.tiendaSelected._id,
-      pedido: this.bandejaList
+      pedido: this.bandejaList,
+      delivery: this.formDelivery.value.delivery,
+      deliveryAddres: this.formDelivery.value.deliveryAddres,
+      status: 'ONDEVICE'
     }
     this.pedidoService.create(data).subscribe((resp:any)=>{
       console.log(resp)
       this.pedidoGuardado = true;
-
-    
     })
     
     
@@ -192,20 +204,62 @@ export class ReviewOrderComponent implements OnInit, OnDestroy {
 
   borrarPedido(){
     this.pedidoService.borrarPedido(this.pedido._id).subscribe((resp:any)=>{
-      // console.log(resp)
     })  
   }
 
 
   makeRequest(){
-
     if(!this.pedidoGuardado){
       this.guardarPedido(); 
     }
     this.router.navigateByUrl('/checkout');
+  }
 
+   // Método que se llama cuando cambia el select
+  onDeliveryMethodChange(event: any) {
+    this.selectedDelivery = event.target.value;
+     this.renderDelivery(); // Renderiza el botón de nuevo según la opción seleccionada
   }
   
+
+   private renderDelivery() {
+    // Primero, limpiar el contenedor anterior
+    // this.paypalElement.nativeElement.innerHTML = '';
+
+    if (this.selectedDelivery === 'Delivery' ) {
+      // deshabilitar el formulario de pago con transferencia
+      this.habilitacionAddresLocal = false;
+      this.habilitacionFormDelivery = true;
+      // Cargar el botón de PayPal con las opciones seleccionadas
+      // this.initPayPalConfig();
+    }
+    else if (this.selectedDelivery === 'Pickup') {
+      // transferencia bancaria => abrir formulario (en un futuro un modal con formulario)
+      this.habilitacionAddresLocal = true;
+       this.habilitacionFormDelivery = false;
+    }
+    else {
+      this.habilitacionAddresLocal = false;
+      this.habilitacionFormDelivery = false;
+    }
+    
+  }
+
+  getDireccionbyUser(){
+    this.direccionService.listarUsuario(this.userId).subscribe((resp:any)=>{
+      this.direcciones = resp.direcciones;
+    })
+  }
+
+  // metodo para el cambio del select 'tipo de transferencia'
+  onChangeDireccion(event: Event) {
+    const target = event.target as HTMLSelectElement; //obtengo el valor
+    // console.log(target.value)
+
+    // guardo el metodo seleccionado en la variable de clase direccionSelected
+    this.direccionSelected = this.direcciones.filter(method => method._id === target.value)[0]
+    // console.log(this.direccionSelected)
+  }
 
   
 }

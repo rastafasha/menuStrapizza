@@ -10,6 +10,7 @@ import { ProductItemComponent } from "../product-item/product-item.component";
 import { ModalproductComponent } from "../modalproduct/modalproduct.component";
 import { LoadingComponent } from '../../shared/loading/loading.component';
 import { environment } from '../../../environments/environment';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-cas-products',
@@ -53,31 +54,42 @@ export class CasProductsComponent implements OnInit, OnDestroy {
   private categoryService = inject(CategoryService);
   private productoService = inject(ProductoService);
   private tiendasService = inject(TiendaService);
-
+  private tiendaSubscription!: Subscription;
 
   ngOnInit() {
     // Get tiendaSelected from TiendaService (set by HeaderComponent)
-    // Also subscribe to changes
+    // Use cached observable to avoid redundant API calls
     if (this.tiendaNameSelected) {
-      setTimeout(()=>{
-      }, 500)
-      this.getTiendaName()
-     
+      this.tiendaSubscription = this.tiendasService.getTiendaByNameCached(this.tiendaNameSelected).subscribe(tienda => {
+        this.tiendaSelected = tienda;
+        this.tienda_moneda = this.tiendaSelected?.moneda;
+        // Refresh products when tienda changes
+        if (this.tiendaSelected) {
+          this.getProductosCatName();
+          this.updateTodo();
+          this.getProductosCatName();
+          this.getCategories();
+        }
+      });
     }
     // Listen for refresh trigger from parent (header pull)
     if (this.refreshCasProducts) {
       this.refreshCasProducts.subscribe(() => this.refreshData());
     }
+
   }
 
   ngOnDestroy() {
-    // No need to unsubscribe from EventEmitter as it's managed by Angular
+    if (this.tiendaSubscription) {
+      this.tiendaSubscription.unsubscribe();
+    }
   }
 
   getTiendaName(){
-    this.tiendasService.getTiendaByName(this.tiendaNameSelected).subscribe(tienda => {
-       this.tiendaSelected = tienda;
-       this.tienda_moneda = this.tiendaSelected?.moneda;
+    // Now using cached observable instead of direct API call
+    this.tiendasService.getTiendaByNameCached(this.tiendaNameSelected).subscribe(tienda => {
+      this.tiendaSelected = tienda;
+      this.tienda_moneda = this.tiendaSelected?.moneda;
       // Refresh products when tienda changes
       if (this.tiendaSelected) {
         this.getProductosCatName();
@@ -106,8 +118,8 @@ export class CasProductsComponent implements OnInit, OnDestroy {
   }
 
   getProductosCatName1() {
-    // this.catname = this.tiendaSelected?.subcategoria ?? this.activeSubCategory
-    this.catname =  'Alimentos'
+    this.catname = this.tiendaSelected?.subcategoria ?? this.activeSubCategory
+    // this.catname =  'Alimentos'
     this.isLoading = true
     this.categoryService.find_by_nombre(this.catname).subscribe(
       (resp: any) => {

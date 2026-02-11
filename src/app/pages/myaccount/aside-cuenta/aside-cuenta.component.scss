@@ -13,6 +13,7 @@
 
 .list-unstyled{
     display: flex;
+    flex-wrap: wrap;
     justify-content: space-between;
     font-family: var( --font-Title);
     & a{

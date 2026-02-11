@@ -43,9 +43,8 @@
             </div>
             <form *ngIf="perfilForm" [formGroup]="perfilForm" (ngSubmit)="actualizarPerfil()" autocomplete="off">
 
-                <div class="row">
-
-
+               <div class="container">
+                 <div class="row">
                     <div class="col-sm-6">
                         <div class="form-group">
                             <label for="account-fn">Nombres completos</label>
@@ -129,8 +128,10 @@
                         </div>
                     </div>
                 </div>
+               </div>
 
-                <div class="row" *ngIf="identity">
+                <div class="container">
+                    <div class="row" *ngIf="identity">
                     <div class="col-xs-12 col-sm-3 media">
                         <img [src]="(identity.img ?? '') | imagenPipe: 'usuarios'" alt="user.first_name">
 
@@ -153,6 +154,7 @@
                             </div>
                         </div>
                     </div>
+                </div>
                 </div>
             </form>
 

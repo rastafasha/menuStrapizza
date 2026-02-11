@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { Usuario } from '../../../models/usuario.model';
 import { UsuarioService } from '../../../services/usuario.service';
 import { ImagenPipe } from '../../../pipes/imagen-pipe.pipe';
@@ -17,6 +17,7 @@ import { CommonModule } from '@angular/common';
 })
 export class AsideCuentaComponent implements OnInit {
 
+  @Input() isNotvisible:boolean =false;
   public url!:string;
   public identity!: Usuario;
 

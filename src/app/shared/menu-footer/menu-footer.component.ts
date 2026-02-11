@@ -51,7 +51,7 @@ export class MenuFooterComponent {
       this.cartSubscription = this.carritoService.bandejaList$.subscribe(items => {
         this.bandejaList = items;
         this.totalList = items.length;
-        console.log(this.bandejaList)
+        // console.log(this.bandejaList)
       });
     }
   
@@ -87,7 +87,7 @@ export class MenuFooterComponent {
     }
     this.pedidoService.getByUserId(this.userId).subscribe((resp:any)=>{
       this.pedidos = resp;
-      console.log('Pedidos del usuario:', resp);
+      // console.log('Pedidos del usuario:', resp);
       
       // resp es un array de pedidos
       // Si el array está vacío, no hay pedido guardado

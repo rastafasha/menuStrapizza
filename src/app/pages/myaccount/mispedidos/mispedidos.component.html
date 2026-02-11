@@ -8,8 +8,8 @@
 <div class="container pb-5 mb-2 mb-md-3">
     <div class="row">
         <!-- Sidebar-->
-        <aside class="col-lg-4 pt-4 pt-lg-0">
-            <app-aside-cuenta></app-aside-cuenta>
+        <aside class="col-lg-4 pt-4 pt-lg-0 " style="margin-top: 0px;">
+            <app-aside-cuenta [isNotvisible]="true"></app-aside-cuenta>
         </aside>
         <!-- Content  -->
         <section class="col-lg-8">
@@ -20,26 +20,60 @@
             <div *ngFor="let item_pedido of pedidos ">
                 <div class="card mb-4">
                     <div class="card-header">
-                        <h3 class="product-title font-size-base" style="margin-bottom: 0px;"><a>Pedido: N°-{{item_pedido._id.toUpperCase()}}</a></h3>
-                        <h3 class="product-title font-size-base" style="margin-bottom: 0px;"><a>Status:{{item_pedido.status}}</a></h3>
+                        <h3 class="product-title font-size-base" style="margin-bottom: 0px;"><a>Pedido:
+                                N°-{{item_pedido._id.toUpperCase()}}</a></h3>
+                        <h3 class="product-title font-size-base" style="margin-bottom: 0px;">
+                            <a>Status:{{item_pedido.status}}</a></h3>
+                        <a *ngIf="item_pedido.status ==='ONDEVICE'"  class="nav-link-style text-danger btn-sm"
+                            (click)="abrirModal(item_pedido._id)" style="cursor:pointer">
+                            <div class="fa fa-trash"></div>
+                        </a>
+                        <!-- Modal backdrop -->
+                        <div *ngIf="modalAbierto === item_pedido._id" 
+                            class="modal-backdrop fade show" 
+                            style="z-index: 1040;"
+                            (click)="cerrarModal()"></div>
+                        <!-- modal eliminar -->
+                        <div class="modal fade" [class.show]="modalAbierto === item_pedido._id" 
+                            [style.display]="modalAbierto === item_pedido._id ? 'block' : 'none'" 
+                            tabindex="-1" role="dialog"
+                            aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h4 class="modal-title">Confirmación</h4>
+                                        <button class="close" type="button" (click)="cerrarModal()"
+                                            aria-label="Close"><span aria-hidden="true">×</span></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p class="font-size-sm">¿Desea eliminar
+                                            definitivamente el regsitro?</p>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button class="btn btn-secondary btn-sm" type="button"
+                                            (click)="cerrarModal()">Cancelar</button>
+                                        <button class="btn btn-primary btn-shadow btn-sm" type="button"
+                                            (click)="eliminar(item_pedido._id)">Suprimir</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- modal eliminar -->
                     </div>
                     <div class="card-body">
                         <div class="row">
                             <div class="col-lg-5">
-                                <div class="font-size-sm"><span class="text-muted mr-2">Fecha:</span>{{ item_pedido.createdAt | date:'MMM d, y, h:mm:ss a' }}</div>
+                                <div class="font-size-sm"><span class="text-muted mr-2">Fecha:</span>{{
+                                    item_pedido.createdAt | date:'MMM d, y, h:mm:ss a' }}</div>
                                 <!-- <div class="font-size-sm"><span class="text-muted mr-2">Tienda:</span>{{ tienda.nombre }}</div> -->
                                 <ul *ngFor="let item_pedido of item_pedido.pedido">
-                                    <li>{{ item_pedido.titulo }} | {{ item_pedido.cantidad }} |{{ item_pedido.precio_ahora|currency}}</li>
+                                    <li>{{ item_pedido.titulo }} | {{ item_pedido.cantidad }} |{{
+                                        item_pedido.precio_ahora|currency}}</li>
                                 </ul>
-                               
-                                
                             </div>
                         </div>
-
                     </div>
                 </div>
-
-
             </div>
             <!-- paginador -->
             <div class="row">
@@ -51,3 +85,4 @@
         </section>
     </div>
 </div>
+<app-menu-footer></app-menu-footer>

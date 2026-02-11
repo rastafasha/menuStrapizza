@@ -6,8 +6,6 @@
     <div class="title-top" *ngIf="!isbandejaList">
         <h1>Cesta vacia</h1>
     </div>
-
-
     <div class="order-list" *ngIf="isbandejaList">
         <div class="order-list-bar"></div>
         <div class="list-box">
@@ -20,16 +18,12 @@
             <div class="clear"></div>
             <div class="top-item">
                 <div class="list-item-left">
-
                     <span class="burbleinfo">
-                        <!-- <i class="fa fa-shopping-bag icon-small" ></i> -->
                         Orden No.{{randomNum}}
                     </span>
-
                 </div>
                 <div class="list-item-right">
                     <span class="burbleinfo"> {{fechaHoy | date:'dd/MM/YYYY'}}</span>
-
                 </div>
             </div>
             <div class="overf">
@@ -53,16 +47,54 @@
                     </div>
                 </div>
                 <!-- itemlist -->
-
-                <div class="info_pago total">
-        <!-- <div class="info_pago_titulo1"><span> Artículos</span> </div> -->
-        <div class="info_pago_titulo1"><span>Total a Pagar</span> </div>
-        <!-- <div class="info_pagod_data3"><span>({{bandejaList.length}})</span> </div> -->
-        <div class="info_pagod_data3"><span>{{total() |number:'1.2-2'| currency:tienda_moneda}}</span> </div>
-      </div>
+               
+                <!-- Delivery -->
+                <!-- <div class="col-12" *ngIf="identity ">
+                    <form [formGroup]="formDelivery">
+                        <div class="card p-3" id="card-pay">
+                        <label class="form-label">Desea delivery?</label>
+                        <select id="paymentMethod" class="form-control" (change)="onDeliveryMethodChange($event)"
+                            [(ngModel)]="selectedDelivery" formControlName="delivery" >
+                            <option value=" ">Seleccione</option>
+                            <option value="Delivery">Si</option>
+                            <option value="Pickup">Voy por la tienda</option>
+                        </select>
+                        <div *ngIf="habilitacionAddresLocal" class="mt-1 mb-1 ">
+                            <div class="card mb-3">
+                                <div class="card-body alert-warning ">
+                                    <p>Claro! Aqui tienes nuestra ubicacion y telefonos:</p>
+                                    <div *ngIf="tiendaSelected.direccion" [innerHtml]="tiendaSelected?.direccion " class="directinonfo" ></div>
+                                    <p *ngIf="tiendaSelected.telefono">telefono:&nbsp;{{tiendaSelected.telefono}}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div *ngIf="habilitacionFormDelivery" class="mt-1 mb-1 ">
+                           <form [formGroup]="formDelivery">
+                            <div class="mb-3 mt-2 col-12">
+                                <label class="form-label">Dirección de Entrega</label>
+                                <select formControlName="deliveryAddres" class="form-control" (change)="onChangeDireccion($event)"
+                                name="deliveryAddres" id="deliveryAddres">
+                                <option value=" ">Seleccione Dirección</option>
+                                <option [value]="direccion._id" *ngFor="let direccion of direcciones">
+                                    {{direccion.direccion }}
+                                </option>
+                                </select>
+                            </div>
+                           </form>
+                        </div>
+                    </div>
+                    </form>
+                </div> -->
                 
-
-
+                 <!-- Total a Pagar -->
+                <div class="info_pago total">
+                    <!-- <div class="info_pago_titulo1"><span> Artículos</span> </div> -->
+                    <div class="info_pago_titulo1"><span>Total a Pagar</span> </div>
+                    <!-- <div class="info_pagod_data3"><span>({{bandejaList.length}})</span> </div> -->
+                    <div class="info_pagod_data3"><span>{{total() |number:'1.2-2'| currency:tienda_moneda}}</span>
+                    </div>
+                </div>
+                <!-- Total a Pagar -->
 
             </div>
         </div>
@@ -72,7 +104,7 @@
             <i class="fa fa-chevron-left icon-small"></i>
             Volver
         </button>
-        <button class="check-button" (click)="makeRequest()"  *ngIf="total() > 0">
+        <button class="check-button" (click)="makeRequest()" *ngIf="total() > 0">
             Hacer pedido
             <i class="fa fa-chevron-right icon-small"></i>
         </button>

@@ -12,18 +12,19 @@ import { VentaService } from '../../../services/venta.service';
 import { PedidomenuService } from '../../../services/pedidomenu.service';
 import { Pedido } from '../../../models/pedido.model';
 import { Tienda } from '../../../models/tienda.model';
+import { MenuFooterComponent } from "../../../shared/menu-footer/menu-footer.component";
 
 @Component({
   selector: 'app-mispedidos',
-  imports:[
-      HeaderComponent,
-      CommonModule,
-      AsideCuentaComponent,
-      RouterModule,
-      ReactiveFormsModule,
-      FormsModule,
-      
-    ],
+  imports: [
+    HeaderComponent,
+    CommonModule,
+    AsideCuentaComponent,
+    RouterModule,
+    ReactiveFormsModule,
+    FormsModule,
+    MenuFooterComponent
+],
   templateUrl: './mispedidos.component.html',
   styleUrl: './mispedidos.component.scss'
 })
@@ -43,6 +44,9 @@ export class MispedidosComponent {
   count: number = 8;
 
   public id!:string;
+  
+  // Modal control - Angular way (no jQuery needed)
+  public modalAbierto: string | null = null;
 
   constructor(
     private usuarioService: UsuarioService,
@@ -75,6 +79,27 @@ export class MispedidosComponent {
       },
       error=>{
 
+      }
+    );
+  }
+
+  // Modal control methods - Angular way (no jQuery needed)
+  abrirModal(id: string): void {
+    this.modalAbierto = id;
+  }
+
+  cerrarModal(): void {
+    this.modalAbierto = null;
+  }
+
+  eliminar(id:any){
+    this.pedidoService.borrarPedido(id).subscribe(
+      response=>{
+        this.cerrarModal();
+        this.listar_pedidos();
+      },
+      error=>{
+        this.cerrarModal();
       }
     );
   }

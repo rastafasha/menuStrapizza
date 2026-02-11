@@ -21,7 +21,7 @@ import { AvisoComponent } from '../aviso/aviso.component';
 })
 export class HeaderComponent implements OnDestroy {
 
-  tiendaSelected: Tienda | undefined;
+  tiendaSelected: Tienda | undefined | null;
   @Output() refreshApp: EventEmitter<void> = new EventEmitter<void>();
   totalList: number = 0;
   tiendas: Tienda[] = [];
@@ -48,6 +48,7 @@ export class HeaderComponent implements OnDestroy {
   private tiendaService = inject(TiendaService);
   private carritoService = inject(CarritoService);
   private cartSubscription!: Subscription;
+  private tiendaSubscription!: Subscription;
   
 
   @HostListener('touchstart', ['$event'])
@@ -93,24 +94,22 @@ export class HeaderComponent implements OnDestroy {
     });
 
     this.nombreSelected;
-    setTimeout(() => {
-      this.getTienda();
-    }, 300);
     
+    // Use cached observable to avoid redundant API calls
+    this.tiendaSubscription = this.tiendaService.getTiendaByNameCached(this.nombreSelected).subscribe(tienda => {
+      this.tiendaSelected = tienda;
+    });
   }
 
   ngOnDestroy(): void {
     if (this.cartSubscription) {
       this.cartSubscription.unsubscribe();
     }
+    if (this.tiendaSubscription) {
+      this.tiendaSubscription.unsubscribe();
+    }
   }
-  getTienda(){
-    this.tiendaService.getTiendaByName(this.nombreSelected).subscribe((resp:any)=>{
-      this.tiendaSelected = resp;
-      // console.log(this.tiendaSelected)
-    })
-  }
-
+  
   getTiendas() {
     this.tiendaService.cargarTiendas().subscribe((resp: Tienda[]) => {
       // Asignamos el array filtrado directamente
@@ -133,43 +132,8 @@ export class HeaderComponent implements OnDestroy {
       console.log('Tienda from service:', this.tiendaSelected);
       return;
     }
-
-    // Check if localStorage has a tiendaSelected
-    // const storedTienda = localStorage.getItem('tiendaSelected');
-    // if (storedTienda) {
-    //   const tiendaNombre = JSON.parse(storedTienda);
-    //   const storedTiendaObj = this.tiendas.find(t => t.nombre === tiendaNombre);
-    //   if (storedTiendaObj) {
-    //     this.tiendaSelected = storedTiendaObj;
-    //     this.tiendaService.setSelectedTienda(this.tiendaSelected);
-    //     console.log('Tienda from localStorage:', this.tiendaSelected);
-    //     return;
-    //   }
-    // }
-
-    // Set default tiendaSelected to "Strapizza" if not already set
-    // if (!this.tiendaSelected && this.tiendas.length > 0) {
-    //   const defaultTienda = this.tiendas.find(tienda => tienda.nombre === this.nombreSelected);
-    //   if (defaultTienda) {
-    //     this.tiendaSelected = defaultTienda;
-    //     this.tiendaService.setSelectedTienda(this.tiendaSelected);
-    //     localStorage.setItem('tiendaSelected', JSON.stringify(this.tiendaSelected.nombre));
-    //     localStorage.setItem('defaultTiendaSet', 'true');
-    //     console.log('Default tienda set:', this.tiendaSelected);
-    //   }
-    // }
   }
 
-
-  // onSelectStore(tienda: any) {
-  //   this.tiendaSelected = tienda;
-  //   this.tiendaService.setSelectedTienda(this.tiendaSelected);
-  //   this.tiendaService.getTiendaById(this.tiendaSelected._id).subscribe((resp: any) => {
-  //     // console.log(this.tiendaSelected.subcategoria);
-  //     localStorage.setItem('tiendaSelected', JSON.stringify(this.tiendaSelected.subcategoria));
-
-  //   })
-  // }
 
 
   get iconBagColorClass(): string {
