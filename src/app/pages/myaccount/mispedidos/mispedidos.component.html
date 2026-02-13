@@ -24,10 +24,15 @@
                                 N°-{{item_pedido._id.toUpperCase()}}</a></h3>
                         <h3 class="product-title font-size-base" style="margin-bottom: 0px;">
                             <a>Status:{{item_pedido.status}}</a></h3>
-                        <a *ngIf="item_pedido.status ==='ONDEVICE'"  class="nav-link-style text-danger btn-sm"
+
+                        <a *ngIf="item_pedido.status ==='ONDEVICE'"  class="nav-link-style text-danger btn-sm btn"
                             (click)="abrirModal(item_pedido._id)" style="cursor:pointer">
                             <div class="fa fa-trash"></div>
                         </a>
+                        <button type="button" *ngIf="item_pedido.status ==='INPROCESS'"  class="nav-link-style text-success btn-sm btn"
+                            [routerLink]="['/pay', item_pedido._id ]" style="cursor:pointer">
+                            <div class="fa fa-dollar-sign"></div>
+                        </button>
                         <!-- Modal backdrop -->
                         <div *ngIf="modalAbierto === item_pedido._id" 
                             class="modal-backdrop fade show" 
@@ -66,7 +71,7 @@
                                 <div class="font-size-sm"><span class="text-muted mr-2">Fecha:</span>{{
                                     item_pedido.createdAt | date:'MMM d, y, h:mm:ss a' }}</div>
                                 <!-- <div class="font-size-sm"><span class="text-muted mr-2">Tienda:</span>{{ tienda.nombre }}</div> -->
-                                <ul *ngFor="let item_pedido of item_pedido.pedido">
+                                <ul *ngFor="let item_pedido of item_pedido.pedidoList">
                                     <li>{{ item_pedido.titulo }} | {{ item_pedido.cantidad }} |{{
                                         item_pedido.precio_ahora|currency}}</li>
                                 </ul>

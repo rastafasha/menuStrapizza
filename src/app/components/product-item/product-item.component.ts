@@ -3,10 +3,11 @@ import { CommonModule } from '@angular/common';
 import { Producto } from '../../models/producto.model';
 import { Usuario } from '../../models/usuario.model';
 import { Tienda } from '../../models/tienda.model';
-import { RouterModule } from '@angular/router';
+import { ActivatedRoute, RouterModule } from '@angular/router';
 import { CarritoService } from '../../services/carrito.service';
 import { TiendaService } from '../../services/tienda.service';
 import { ImagenPipe } from '../../pipes/imagen-pipe.pipe';
+import { ColorService } from '../../services/color.service';
 
 @Component({
   selector: 'app-product-item',
@@ -25,20 +26,25 @@ export class ProductItemComponent {
   @Input() activeCategory!: string;
   @Output() productSelected: EventEmitter<any> = new EventEmitter<any>();
   @Output() msm_success: EventEmitter<boolean> = new EventEmitter<boolean>();
-  
-  user!:Usuario;
-  isUserLogged=false;
-  isProductAdded=false;
+
+  user!: Usuario;
+  isUserLogged = false;
+  isProductAdded = false;
   tiendaSelected: Tienda | null = null;
-  tiendaNameSelected!:string;
-  img:string | null = '../assets/images/no-image.jpg';
+  tiendaNameSelected!: string;
+  img: string | null = '../assets/images/no-image.jpg';
+
+  public colores: any = [];
+  public color_to_cart!:string;
+  public productoId!:any;
 
   private carritoService = inject(CarritoService);
+  private _colorService = inject(ColorService);
 
   ngOnInit(): void {
-     let USER = localStorage.getItem("user");
-     this.user = USER ? JSON.parse(USER) : null;
-     if(!this.product.img){
+    let USER = localStorage.getItem("user");
+    this.user = USER ? JSON.parse(USER) : null;
+    if (!this.product.img) {
       this.img = '../assets/images/no-image.jpg';
     }
   }
@@ -47,34 +53,50 @@ export class ProductItemComponent {
     this.productSelected.emit(product);
   }
 
-    addItem(producto:Producto){
-        
-      if(this.user == null){
-        this.isUserLogged = true;
-        setTimeout(()=>{
-          this.isUserLogged = false;
-          
-        }, 2000);
+  addItem(producto: Producto) {
 
-        return;
-      }else{
+    if (this.user == null) {
+      this.isUserLogged = true;
+      setTimeout(() => {
+        this.isUserLogged = false;
 
-        this.msm_success.emit(false);
-        this.carritoService.addItem(producto);
-        
-        this.isProductAdded =true
-        setTimeout(()=>{
-          this.isProductAdded =false
-        }, 2000)
-      }
-  
+      }, 2000);
+
+      return;
+    } else {
+
+      this.msm_success.emit(false);
+      this.productoId = producto._id;
+
+      this._colorService.colorByProduct(this.productoId).subscribe(
+        response => {
+          this.colores = response;
+          this.color_to_cart = this.colores[0]?.color || '#333333';
+          console.log('color_to_cart: ', this.color_to_cart);
+
+          let data = {
+            ...producto,
+            color: this.color_to_cart,
+          }
+          this.carritoService.addItem(data);
+
+          this.isProductAdded = true
+          setTimeout(() => {
+            this.isProductAdded = false
+          }, 2000)
+        },
+      );
     }
 
-  closeAviso(){
+  }
+
+
+
+  closeAviso() {
     this.isUserLogged = false;
     this.isProductAdded = false;
   }
 
-  
-  
+
+
 }

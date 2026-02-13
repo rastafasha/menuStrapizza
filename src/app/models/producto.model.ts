@@ -1,5 +1,6 @@
 import { environment } from '../../environments/environment';
 import { Categoria } from './categoria.model';
+import { Color } from './color.model';
 import { Marca } from './marca.model';
 
 const base_url = environment.mediaUrlRemoto;
@@ -15,10 +16,11 @@ export class Producto {
   cantidad!:number;
   categoria!: Categoria;
   subcategoria!: string;
+  marca!: Marca;
+  color!: Color;
   nombre_selector!: string;
   isFeatured!: boolean;
   status!: boolean;
-  marca!: Marca;
   createdAt!: Date;
   updatedAt!: Date;
   img!: string;

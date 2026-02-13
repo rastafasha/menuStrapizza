@@ -13,6 +13,7 @@ import { ReviewOrderComponent } from './pages/review-order/review-order.componen
 import { MispedidosComponent } from './pages/myaccount/mispedidos/mispedidos.component';
 import { DireccionEditComponent } from './pages/myaccount/direcciones/direccion-edit/direccion-edit.component';
 import { DireccionesComponent } from './pages/myaccount/direcciones/direcciones.component';
+import { PayComponent } from './pages/pay/pay.component';
 // import { ReviewOrderComponent } from './pages/review-order/review-order.component';
 
 export const routes: Routes = [
@@ -27,6 +28,10 @@ export const routes: Routes = [
     {
         path:'checkout',
         component: CheckoutComponent
+    },
+    {
+        path:'pay/:id',
+        component: PayComponent
     },
     {
         path:'login',

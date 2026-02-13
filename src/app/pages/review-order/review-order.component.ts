@@ -45,12 +45,7 @@ export class ReviewOrderComponent implements OnInit, OnDestroy {
 
   pedidoGuardado = false;
 
-  selectedDelivery: string = 'Deseas Delivery?';
-  habilitacionAddresLocal: boolean = false;
-  habilitacionFormDelivery: boolean = false;
-
-  direcciones:Direccion[] = [];
-  direccionSelected!:Direccion;
+  
 
   private tiendaService = inject(TiendaService);
   private carritoService = inject(CarritoService);
@@ -59,10 +54,7 @@ export class ReviewOrderComponent implements OnInit, OnDestroy {
   
   private cartSubscription!: Subscription;
 
-  formDelivery = new FormGroup({
-      delivery: new FormControl('', Validators.required),
-      deliveryAddres: new FormControl('', Validators.required),
-    });
+  
 
   constructor(
     private router: Router
@@ -82,7 +74,7 @@ export class ReviewOrderComponent implements OnInit, OnDestroy {
 
       // If cart becomes empty, navigate to home
       if (items.length === 0 && this.router.url.includes('/review')) {
-        this.router.navigate(['/home']);
+        this.router.navigate(['/']);
       }
     });
 
@@ -90,7 +82,7 @@ export class ReviewOrderComponent implements OnInit, OnDestroy {
     this.nombreSelected;
     this.getTienda();
     this.chekpedidoguardado();
-    this.getDireccionbyUser();
+    
 
   }
 
@@ -189,15 +181,13 @@ export class ReviewOrderComponent implements OnInit, OnDestroy {
     const data = {
       user: this.identity.uid,
       tienda: this.tiendaSelected._id,
-      pedido: this.bandejaList,
-      delivery: this.formDelivery.value.delivery,
-      deliveryAddres: this.formDelivery.value.deliveryAddres,
+      pedidoList: this.bandejaList,
       status: 'ONDEVICE'
     }
-    this.pedidoService.create(data).subscribe((resp:any)=>{
-      console.log(resp)
-      this.pedidoGuardado = true;
+      this.pedidoService.create(data).subscribe((resp:any)=>{
+        this.pedidoGuardado = true;
     })
+    
     
     
   }
@@ -215,51 +205,6 @@ export class ReviewOrderComponent implements OnInit, OnDestroy {
     this.router.navigateByUrl('/checkout');
   }
 
-   // Método que se llama cuando cambia el select
-  onDeliveryMethodChange(event: any) {
-    this.selectedDelivery = event.target.value;
-     this.renderDelivery(); // Renderiza el botón de nuevo según la opción seleccionada
-  }
-  
-
-   private renderDelivery() {
-    // Primero, limpiar el contenedor anterior
-    // this.paypalElement.nativeElement.innerHTML = '';
-
-    if (this.selectedDelivery === 'Delivery' ) {
-      // deshabilitar el formulario de pago con transferencia
-      this.habilitacionAddresLocal = false;
-      this.habilitacionFormDelivery = true;
-      // Cargar el botón de PayPal con las opciones seleccionadas
-      // this.initPayPalConfig();
-    }
-    else if (this.selectedDelivery === 'Pickup') {
-      // transferencia bancaria => abrir formulario (en un futuro un modal con formulario)
-      this.habilitacionAddresLocal = true;
-       this.habilitacionFormDelivery = false;
-    }
-    else {
-      this.habilitacionAddresLocal = false;
-      this.habilitacionFormDelivery = false;
-    }
-    
-  }
-
-  getDireccionbyUser(){
-    this.direccionService.listarUsuario(this.userId).subscribe((resp:any)=>{
-      this.direcciones = resp.direcciones;
-    })
-  }
-
-  // metodo para el cambio del select 'tipo de transferencia'
-  onChangeDireccion(event: Event) {
-    const target = event.target as HTMLSelectElement; //obtengo el valor
-    // console.log(target.value)
-
-    // guardo el metodo seleccionado en la variable de clase direccionSelected
-    this.direccionSelected = this.direcciones.filter(method => method._id === target.value)[0]
-    // console.log(this.direccionSelected)
-  }
 
   
 }

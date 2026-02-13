@@ -61,7 +61,7 @@ export class PedidomenuService {
       return this.http.post(url, pedido, this.headers);
     }
 
-    actualizar(pedido: Pedido){
+    actualizar(pedido: any){
       const url = `${base_url}/pedidomenu/update/${pedido._id}`;
       return this.http.put(url, pedido, this.headers);
     }
