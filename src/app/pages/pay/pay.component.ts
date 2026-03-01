@@ -23,7 +23,7 @@ import { Pedido } from '../../models/pedido.model';
 import { DireccionService } from '../../services/direccion.service';
 import { Direccion } from '../../models/direccion.model';
 import { PagoEfectivoService } from '../../services/pago-efectivo.service';
-
+import { ICreateOrderRequest, IPayPalConfig, NgxPayPalModule } from 'ngx-paypal';
 declare var $: any;
 // declare var paypal;
 
@@ -32,8 +32,8 @@ declare var $: any;
   imports: [
     HeaderComponent, CommonModule, RouterModule,
     ReactiveFormsModule, FormsModule,
-    ImagenPipe
-    //  NgxPayPalModule
+    ImagenPipe,
+    NgxPayPalModule
   ],
   templateUrl: './pay.component.html',
   styleUrl: './pay.component.scss'
@@ -78,8 +78,8 @@ export class PayComponent {
 
 
   public no_direccion = 'no necesita direccion';
-
-  // public payPalConfig ? : IPayPalConfig;
+  
+  public payPalConfig ? : IPayPalConfig;
   cartItems: any[] = [];
 
   pedidoGuardado = false;
@@ -104,18 +104,18 @@ export class PayComponent {
   habilitacionFormEfectivo: boolean = false;
 
   selectedDelivery: string = 'Deseas Delivery?';
-    habilitacionAddresLocal: boolean = false;
-    habilitacionFormDelivery: boolean = false;
-  
-    direcciones:Direccion[] = [];
-    direccionSelected!:Direccion;
-    efectivo:string = 'efectivo'
-  
+  habilitacionAddresLocal: boolean = false;
+  habilitacionFormDelivery: boolean = false;
+
+  direcciones: Direccion[] = [];
+  direccionSelected!: Direccion;
+  efectivo: string = 'efectivo'
+
 
   paymentMethods: PaymentMethod[] = []; //array metodos de pago para transferencia (dolares, bolivares, movil)
   paymentSelected!: PaymentMethod; //metodo de pago seleccionado por el usuario para transferencia
   paymentMethodinfo!: PaymentMethod; //metodo de pago seleccionado por el usuario para transferencia
-  
+
 
   formTransferencia = new FormGroup({
     metodo_pago: new FormControl(this.paymentMethodinfo, Validators.required),
@@ -128,9 +128,9 @@ export class PayComponent {
   });
 
   formDelivery = new FormGroup({
-      delivery: new FormControl('', Validators.required),
-      deliveryAddres: new FormControl('', Validators.required),
-    });
+    delivery: new FormControl('', Validators.required),
+    deliveryAddres: new FormControl('', Validators.required),
+  });
 
   // formCheque = new FormGroup({
   //   amount: new FormControl('', Validators.required),
@@ -173,7 +173,7 @@ export class PayComponent {
 
   }
   ngOnInit() {
-     
+
     this.obtenerMetodosdePago();
     let USER = localStorage.getItem('user');
     if (USER) {
@@ -184,8 +184,8 @@ export class PayComponent {
     this.nombreSelected;
     this.getTienda();
     this.getDireccionbyUser();
-    this._activatedRoute.params.subscribe( ({id}) => this.loadPedido(id));
-
+    this._activatedRoute.params.subscribe(({ id }) => this.loadPedido(id));
+    this.initPayPalConfig();
   }
 
   getTienda() {
@@ -193,30 +193,27 @@ export class PayComponent {
       // Asignamos el array filtrado directamente
       this.tiendaSelected = resp;
       this.tienda_moneda = this.tiendaSelected.moneda
-      
+
     })
   }
 
-  loadPedido(id:string){
-    this.pedidosService.getById(id).subscribe((resp:any)=>{
+  loadPedido(id: string) {
+    this.pedidosService.getById(id).subscribe((resp: any) => {
       this.pedido = resp;
       this.pedidos = resp.pedidoList;
-      this.totalAmount = this.pedidos.reduce((sum, item) => 
+      this.totalAmount = this.pedidos.reduce((sum, item) =>
         sum + item.precio_ahora * item.cantidad, 0
       );
 
-      
-      console.log(this.pedidos);
-
       this.pedidos.forEach(element => {
-          this.subtotal = Math.round(this.subtotal + (element.precio_ahora * element.cantidad));
-          this.data_detalle.push({
-            producto: element,
-            cantidad: element.cantidad,
-            precio: Math.round(element.precio_ahora),
-            color: element.color,
-            selector: element.nombre_selector
-          });
+        this.subtotal = Math.round(this.subtotal + (element.precio_ahora * element.cantidad));
+        this.data_detalle.push({
+          producto: element,
+          cantidad: element.cantidad,
+          precio: Math.round(element.precio_ahora),
+          color: element.color,
+          selector: element.nombre_selector
+        });
       })
     })
   }
@@ -242,23 +239,19 @@ export class PayComponent {
   // metodo para el cambio del select 'tipo de transferencia'
   onChangePayment(event: Event) {
     const target = event.target as HTMLSelectElement; //obtengo el valor
-    console.log(target.value)
+    // console.log(target.value)
 
     // guardo el metodo seleccionado en la variable de clase paymentSelected
     this.paymentSelected = this.paymentMethods.filter(method => method._id === target.value)[0]
-    console.log(this.paymentSelected)
+    // console.log(this.paymentSelected)
   }
-
-
 
   // Método que se llama cuando cambia el select
   onPaymentMethodChange(event: any) {
     this.selectedMethod = event.target.value;
-    console.log(this.selectedMethod)
+    // console.log(this.selectedMethod)
     this.renderPayPalButton(); // Renderiza el botón de nuevo según la opción seleccionada
   }
-
- 
 
   getPaymentMbyName(selectedMethod: string) {
     this.selectedMethod = selectedMethod
@@ -321,12 +314,12 @@ export class PayComponent {
     }
   }
 
-   sendFormEfectivo() {
+  sendFormEfectivo() {
 
     if (this.formEfectivo.valid) {
 
       const data = {
-       localId: this.tiendaSelected._id,
+        localId: this.tiendaSelected._id,
         user: this.identity.uid,
         name_person: this.identity.first_name + this.identity.last_name,
         phone: this.identity.telefono,
@@ -453,21 +446,21 @@ export class PayComponent {
     // }.bind(this));
   }
 
-   
 
 
-   // Método que se llama cuando cambia el select
+
+  // Método que se llama cuando cambia el select
   onDeliveryMethodChange(event: any) {
     this.selectedDelivery = event.target.value;
-     this.renderDelivery(); // Renderiza el botón de nuevo según la opción seleccionada
+    this.renderDelivery(); // Renderiza el botón de nuevo según la opción seleccionada
   }
-  
 
-   private renderDelivery() {
+
+  private renderDelivery() {
     // Primero, limpiar el contenedor anterior
     // this.paypalElement.nativeElement.innerHTML = '';
 
-    if (this.selectedDelivery === 'Delivery' ) {
+    if (this.selectedDelivery === 'Delivery') {
       // deshabilitar el formulario de pago con transferencia
       this.habilitacionAddresLocal = false;
       this.habilitacionFormDelivery = true;
@@ -477,17 +470,17 @@ export class PayComponent {
     else if (this.selectedDelivery === 'Pickup') {
       // transferencia bancaria => abrir formulario (en un futuro un modal con formulario)
       this.habilitacionAddresLocal = true;
-       this.habilitacionFormDelivery = false;
+      this.habilitacionFormDelivery = false;
     }
     else {
       this.habilitacionAddresLocal = false;
       this.habilitacionFormDelivery = false;
     }
-    
+
   }
 
-  getDireccionbyUser(){
-    this._direccionService.listarUsuario(this.userId).subscribe((resp:any)=>{
+  getDireccionbyUser() {
+    this._direccionService.listarUsuario(this.userId).subscribe((resp: any) => {
       this.direcciones = resp.direcciones;
     })
   }
@@ -500,10 +493,10 @@ export class PayComponent {
     this.get_direccion(this.direccionSelected)
   }
 
-  get_direccion(direccionSelected:any){
+  get_direccion(direccionSelected: any) {
     this.data_direccion = direccionSelected._id;
     this._direccionService.get_direccion(this.data_direccion).subscribe(
-      response =>{
+      response => {
         this.data_direccion = response;
         console.log(this.data_direccion)
       }
@@ -540,13 +533,13 @@ export class PayComponent {
         metodo_pago: this.selectedMethod,
         // metodo_pago : 'Paypal',
 
-        tipo_envio:this.selectedDelivery,
+        tipo_envio: this.selectedDelivery,
         precio_envio: "0",
         tiempo_estimado: this.fechaHoy,
 
         direccion: this.data_direccion.direccion,
         destinatario: this.data_direccion.nombres_completos,
-        detalles:this.data_detalle,
+        detalles: this.data_detalle,
         referencia: this.data_direccion.referencia,
         pais: this.data_direccion.pais,
         ciudad: this.data_direccion.ciudad,
@@ -582,7 +575,7 @@ export class PayComponent {
             // this.socket.emit('save-carrito', {new:true});
             // this.socket.emit('save-stock', {new:true});
             // this._router.navigate(['/dashboard/ventas/modulo']);
-            
+
           },
           error => {
             console.log(error);
@@ -605,16 +598,16 @@ export class PayComponent {
     },)
   }
 
-  actualizarPedido(){
-    const data ={
-      _id:this.pedido._id,
+  actualizarPedido() {
+    const data = {
+      _id: this.pedido._id,
       status: 'PAYED'
     }
-    this.pedidosService.actualizar(data).subscribe((resp:any)=>{
-    })  
+    this.pedidosService.actualizar(data).subscribe((resp: any) => {
+    })
   }
 
- 
+
 
   private renderPayPalButton() {
     // Primero, limpiar el contenedor anterior
@@ -631,7 +624,7 @@ export class PayComponent {
     else if (this.selectedMethod === 'transferencia') {
       // transferencia bancaria => abrir formulario (en un futuro un modal con formulario)
       this.habilitacionFormTransferencia = true;
-       this.habilitacionFormEfectivo = false;
+      this.habilitacionFormEfectivo = false;
       this.paypal = false;
     }
     else if (this.selectedMethod === 'efectivo') {
@@ -647,58 +640,76 @@ export class PayComponent {
     }
   }
 
- 
+
 
   private initPayPalConfig(): void {
-    // this.payPalConfig = {
-    //   currency: 'USD',
-    //   clientId: environment.clientIdPaypal,
-    //   createOrderOnClient: (data) => <ICreateOrderRequest>{
-    //     intent: 'CAPTURE',
-    //     purchase_units: [{
-    //       amount: {
-    //         currency_code: 'USD',
-    //         value: Math.round(this.subtotal).toString(),
-    //         breakdown: {
-    //           item_total: {
-    //             currency_code: 'USD',
-    //             value: Math.round(this.subtotal).toString(),
-    //           }
-    //         }
-    //       },
-    //       items: this.getItemsList()
-    //     }]
-    //   },
-    //   advanced: {
-    //     commit: 'true'
-    //   },
-    //   style: {
-    //     label: 'paypal',
-    //     layout: 'vertical'
-    //   },
-    //   onApprove: (data, actions) => {
-    //     console.log('onApprove - transaction was approved, but not authorized', data, actions);
-    //     actions.order.get().then((details: any) => {
-    //       console.log('onApprove - you can get full order details inside onApprove: ', details);
-    //     });
-    //   },
-    //   onClientAuthorization: (data) => {
-    //     console.log('onClientAuthorization - you should probably inform your server about completed transaction at this point', data);
-    //     this.data_venta.idtransaccion = data.id;
-    //     this.saveVenta();
-    //   },
-    //   onCancel: (data, actions) => {
-    //     console.log('OnCancel', data, actions);
-    //   },
-    //   onError: err => {
-    //     console.log('OnError', err);
-    //   },
-    //   onClick: (data, actions) => {
-    //     console.log('onClick', data, actions);
-    //   },
-    // };
+    this.payPalConfig = {
+      currency: this.tienda_moneda,
+      clientId: environment.clientIdPaypal,
+      createOrderOnClient: (data) => <ICreateOrderRequest>{
+        intent: 'CAPTURE',
+        purchase_units: [{
+          amount: {
+            currency_code: this.tienda_moneda,
+            value: Math.round(this.subtotal).toString(),
+            breakdown: {
+              item_total: {
+                currency_code: this.tienda_moneda,
+                value: Math.round(this.subtotal).toString(),
+              }
+            }
+          },
+          items: this.getItemsList()
+        }]
+      },
+      advanced: {
+        commit: 'true'
+      },
+      style: {
+        label: 'paypal',
+        layout: 'vertical'
+      },
+      onApprove: (data, actions) => {
+        console.log('onApprove - transaction was approved, but not authorized', data, actions);
+        actions.order.get().then((details: any) => {
+          console.log('onApprove - you can get full order details inside onApprove: ', details);
+        });
+      },
+      onClientAuthorization: (data) => {
+        console.log('onClientAuthorization - you should probably inform your server about completed transaction at this point', data);
+        this.data_venta.idtransaccion = data.id;
+        this.saveVenta();
+      },
+      onCancel: (data, actions) => {
+        console.log('OnCancel', data, actions);
+      },
+      onError: err => {
+        console.log('OnError', err);
+      },
+      onClick: (data, actions) => {
+        console.log('onClick', data, actions);
+      },
+    };
   }
 
+  getItemsList(): any[]{
+
+    const items: any[] = [];
+    let item = {};
+    this.cartItems.forEach((it: CartItemModel)=>{
+      item = {
+        name: it.productName,
+        unit_amount: {
+          currency_code: 'USD',
+          value: it.productPrice,
+        },
+        quantity: it.quantity,
+        category: it.category,
+      };
+      items.push(item);
+    });
+    return items;
+  }
 
 
 
