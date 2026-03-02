@@ -10,6 +10,7 @@ import { CarritoService } from '../../services/carrito.service';
 import { Subscription } from 'rxjs';
 import { SelectorService } from '../../services/selector.service';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { ImagenPipe } from '../../pipes/imagen-pipe.pipe';
 
 @Component({
   selector: 'app-modalproduct',
@@ -17,7 +18,8 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
     CommonModule,
     RouterModule,
     ReactiveFormsModule,
-    FormsModule
+    FormsModule,
+    ImagenPipe
   ],
   templateUrl: './modalproduct.component.html',
   styleUrl: './modalproduct.component.scss'

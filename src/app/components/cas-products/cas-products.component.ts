@@ -155,7 +155,7 @@ export class CasProductsComponent implements OnInit, OnDestroy {
   }
 
   selectCategory(category: string) {
-    console.log('selectCategory called with:', category);
+    // console.log('selectCategory called with:', category);
     this.activeCategory = category;
     this.isLoading = true
     this.updateTodo();

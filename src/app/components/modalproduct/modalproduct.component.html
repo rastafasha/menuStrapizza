@@ -15,7 +15,7 @@
                         <span id="close-modal">
                             <i class="ion ion-md-close"></i>
                         </span>
-                        <img [src]="product.img" [alt]="product.titulo" />
+                        <img [src]="product.img | imagenPipe: 'productos'" [alt]="product.titulo" />
                     </div>
                     <div class="ft-recipe__content">
                         <header class="content__header">
