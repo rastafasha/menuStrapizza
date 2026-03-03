@@ -71,18 +71,21 @@
                 }
               ],
               "assets": [
-                "src/.htaccess",
                 "src/assets",
-                "src/manifest.webmanifest",
                 {
                   "glob": "_redirects",
                   "input": "src",
                   "output": "/"
                 },
                 {
-                  "glob": "manifest.webmanifest",
-                  "input": "src/env/strapizza/",
-                  "output": "public/"
+                  "glob": "**/*",
+                  "input": "src/env/strapizza/assets",
+                  "output": "/assets"
+                },
+                {
+                  "glob": "manifest.webmanifest", 
+                  "input": "src/env/strapizza/", 
+                  "output": "/"
                 }
               ],
               "budgets": [
@@ -97,7 +100,8 @@
                   "maximumError": "90kb"
                 }
               ],
-              "outputHashing": "all"
+              "outputHashing": "all",
+              "serviceWorker": "ngsw-config.json"
             },
             "slidedish": {
               "outputPath": "dist/slidedish",
@@ -111,19 +115,22 @@
                   "with": "src/environments/environment.slidedish.ts"
                 }
               ],
-              "assets": [
-                "src/.htaccess",
+             "assets": [
                 "src/assets",
-                "src/manifest.webmanifest",
                 {
                   "glob": "_redirects",
                   "input": "src",
                   "output": "/"
                 },
                 {
-                  "glob": "manifest.webmanifest",
-                  "input": "src/env/slidedish/",
-                  "output": "public/"
+                  "glob": "**/*",
+                  "input": "src/env/slidedish/assets",
+                  "output": "/assets"
+                },
+                {
+                  "glob": "manifest.webmanifest", 
+                  "input": "src/env/slidedish/", 
+                  "output": "/"
                 }
               ],
               "budgets": [
@@ -138,7 +145,8 @@
                   "maximumError": "90kb"
                 }
               ],
-              "outputHashing": "all"
+              "outputHashing": "all",
+              "serviceWorker": "ngsw-config.json"
             }
           },
           "defaultConfiguration": "production"

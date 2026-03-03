@@ -1,0 +1,228 @@
+/* imports CSS */
+@import url('./carrousel.css');
+@import url('./header.css');
+@import url('./hero.css');
+@import url('./products-list.css');
+@import url('./fonts.css');
+@import url('./footer.css');
+@import url('./pastasypastichos.css');
+@import url('./orden.css');
+@import url('./checkout.css');
+@import url('./menufooter.css');
+/* Variables CSS */
+:root {
+    --primary-color: #e63946;
+    --secondary-color: #1d3557;
+    --accent-color: #f4a261;
+    --light-bg: #fefae0;
+    --dark-text: #2b2d42;
+    --white: #ffffff;
+    --light-brown: #0e5b04;
+    --font-primary: 'Poppins', sans-serif;
+    --font-Title: 'Retro Team';
+}
+
+.clear {
+    clear: both;
+    visibility: hidden;
+    margin: 0px;
+    padding: 0px;
+    height: 0;
+}
+
+/* Reset y base */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-primary);
+    background-color: var(--light-bg);
+    color: var(--dark-text);
+    line-height: 1.6;
+}
+.delivery-icon img,
+.product-image img, 
+.category-image img{
+width: 100%;
+height: auto;
+display: block;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5{
+    font-family: var( --font-Title);
+    color: #333;
+}
+
+a{
+  text-decoration: none !important;
+}
+
+
+.free-delivery-section{
+    width: 100vw;
+    float: right;
+}
+
+.delivery-icon{
+    width: 70vw;
+    float: right;
+}
+
+.delivery-text{
+    width: 95vw;
+    float: left;
+    padding-top: 15px;
+    padding-bottom: 20px;
+}
+.title-top{
+    padding-top: 40px;
+}
+
+
+.tab-content-set .nav{
+        display: flex;
+        justify-content:space-between;
+        align-items: center;
+        padding: 10px;
+        gap: 5px;
+}
+
+.tab-content-set .nav li{
+            padding: 5px;
+            font-size: 16px;
+            
+        }
+
+.tab-content-set .nav li  a{
+                color: var(--azulclaro);
+                font-family: 'Retro Team';
+            }
+
+.container{
+    margin: 0 auto;
+    width: 98%;
+
+}
+
+.aviso{
+    display: flex;
+    flex-direction: row-reverse;
+    padding: 15px;
+    border-right: 1px solid #dcb50b;
+    background-color: #edaa73f6;
+    color: #f3f0eb;
+    margin-bottom: 5px;
+    border-radius: 12px;
+    width: 98vw;
+    position: fixed;
+    z-index: 1500;
+    bottom: 35px;
+    left: 0;
+    top: auto;
+    gap: 10px;
+    justify-content: space-between;
+}
+
+.aviso-sucess{
+    border-right: 1px solid #167f05;
+    background-color: #19a264f2;
+    color: #f3f0eb;
+}
+
+.aviso-sucess p a b{
+    color: #f3f0eb;
+    font-weight: bold;
+}
+
+
+
+.cart-count-badge {
+  position: relative;
+  top: auto;
+  right: 0;
+  bottom: 30px;
+  background-color: #ff0000;
+  color: white;
+  font-size: 0.75rem;
+  font-weight: bold;
+  border-radius: 50%;
+  padding: 2px 6px;
+  line-height: 1;
+  pointer-events: none;
+  transform: translate(50%, -50%);
+  z-index: 3;
+}
+/* .fa-shopping-cart{
+  position: relative;
+  z-index: 1;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #047e0c;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+} */
+
+/* animaciones */
+
+
+.animated {
+  animation-duration: 1s;
+  animation-iteration-count: 1;
+}
+
+@keyframes tada {
+  0% {
+    transform: scale3d(1, 1, 1);
+  }
+
+  10%, 20% {
+    transform: scale3d(.9, .9, .9) rotate3d(0, 0, 1, -3deg);
+  }
+
+  30%, 50%, 70%, 90% {
+    transform: scale3d(1.1, 1.1, 1.1) rotate3d(0, 0, 1, 3deg);
+  }
+
+  40%, 60%, 80% {
+    transform: scale3d(1.1, 1.1, 1.1) rotate3d(0, 0, 1, -3deg);
+  }
+
+  100% {
+    transform: scale3d(1, 1, 1);
+  }
+}
+
+.tada {
+  animation-name: tada;
+}
+
+
+.breadcrumb-item{
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.info_pago{
+   display: grid;
+grid-template-columns: repeat(1, 1fr);
+grid-template-rows: repeat(2, 1fr);
+grid-column-gap: 0px;
+grid-row-gap: 0px;
+width: 100%;
+
+ 
+}
+
+ .info_pago_titulo1 { grid-area: 1 / 1 / 2 / 2; }
+  .info_pago_titulo2 { grid-area: 2 / 1 / 3 / 2; }
+  .info_pagod_data3 { grid-area: 1 / 2 / 2 / 3; display: flex;justify-content: end; }
+  .info_pagod_data4 { grid-area: 2 / 2 / 3 / 3; display: flex;justify-content: end; }
