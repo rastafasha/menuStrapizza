@@ -1,15 +1,28 @@
 <section class="hero" id="inicio">
         <div class="hero-container">
             <div class="hero-content">
-                <h1 class="hero-title">
-                    Las Mejores <span>Pizzas</span><br>de la Ciudad
-                </h1>
-                <div class="hero-image">
-                    <img src="assets/images/pizza-queso.png" alt="Pizza Strapizza">
+                <div *ngIf="nombreSelected ==='Strapizza'">
+                    <h1 class="hero-title">
+                        Las Mejores <span>Pizzas</span><br>de la Ciudad
+                    </h1>
+                    <div class="hero-image" >
+                        <img src="assets/images/pizza-queso.png" alt="Pizza Strapizza">
+                    </div>
+
                 </div>
+                <div *ngIf="nombreSelected ==='Slidedish'">
+                    <h1 class="hero-title">
+                        Delicias <span>Frescas</span><br>cada Día
+                    </h1>
+                    <div class="hero-image" >
+                        <img src="assets/images/croisant.png" alt="Croissant Slidedish">
+                    </div>
+
+                </div>
+               
                 <p class="hero-subtitle">
                     
-                    Descubre el verdadero sabor de Italia con nuestros ingredientes frescos
+                    Descubre el verdadero sabor con nuestros ingredientes frescos
                     y recetas tradicionales transmitidas por generaciones.
                     <br><br>
                     Registrate para solicitar tu pedido.

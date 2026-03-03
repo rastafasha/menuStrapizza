@@ -11,10 +11,13 @@ import { NgIf } from '@angular/common';
 import { LoadingComponent } from "../../shared/loading/loading.component";
 import { ProducListSliderComponent } from '../../components/produc-list-slider/produc-list-slider.component';
 import { PwaNotifInstallerComponent } from '../../shared/pwa-notif-installer/pwa-notif-installer.component';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-home',
-  imports: [HeaderComponent, SliderComponent, FreeDeliveryComponent, CasProductsComponent,
+  imports: [HeaderComponent,
+    //  SliderComponent, 
+     FreeDeliveryComponent, CasProductsComponent,
     HeroComponent, FooterComponent, MenuFooterComponent, NgIf, LoadingComponent,
     PwaNotifInstallerComponent
   ],
@@ -29,6 +32,7 @@ export class HomeComponent {
   isReloadig=false;
   isVisible=false;
   activeCategory!:string;
+  nombreSelected = environment.nombreSelected;
 
   // Event emitter for refreshing cas-products
   @Output() refreshCasProducts: EventEmitter<void> = new EventEmitter<void>();

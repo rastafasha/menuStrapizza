@@ -7,6 +7,7 @@
     "start:dev": "ng serve --port 4206",
     "build": "ng build",
     "build:strapizza": "ng build --configuration strapizza",
+    "build:slidedish": "ng build --configuration slidedish",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },

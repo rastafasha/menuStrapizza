@@ -68,6 +68,8 @@ export class ProductoService {
       );
 
   }
+
+  
   
   listar_newest():Observable<any>{
     const url = `${base_url}/productos/productos_nuevos/show_producto`;
@@ -78,7 +80,7 @@ export class ProductoService {
   }
 
   findProducto_by_Categorynombre(nombre: any):Observable<any>{
-    const url = `${base_url}/productos/producto_by_categorynombre/nombre/${nombre}`;
+    const url = `${base_url}/productos/producto_by_categorynombre/${nombre}`;
     return this.http.get<any>(url)
   }
 

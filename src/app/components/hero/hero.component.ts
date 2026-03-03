@@ -1,6 +1,7 @@
 import { NgIf } from '@angular/common';
 import { Component } from '@angular/core';
 import { RouterModule } from '@angular/router';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-hero',
@@ -11,6 +12,7 @@ import { RouterModule } from '@angular/router';
 export class HeroComponent {
 
   isLogued: boolean = false;
+  nombreSelected = environment.nombreSelected;
 
   ngOnInit(): void {
     const USER = localStorage.getItem("user");

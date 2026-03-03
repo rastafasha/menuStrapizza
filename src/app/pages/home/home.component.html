@@ -3,20 +3,21 @@
 <!-- Carrousel Section -->
 <app-loading *ngIf="isReloadig"></app-loading>
 <div *ngIf="!isReloadig">
-    <app-slider></app-slider>
+    <!-- <app-slider></app-slider> -->
     <!-- Free Delivery Section -->
     <app-free-delivery></app-free-delivery>
     <div class="clear"></div>
     <br>
     <!-- Categories Section - Loads immediately (most important) -->
-    <app-cas-products *ngIf="!isReloadig" [activeCategory]="'Pizzería'" [activeSubCategory]="'Pizza'" [isVisible]="true" [title]="'Carta Pizza'"  (msm_success)="onMsmSuccess($event)" [refreshCasProducts]="refreshCasProducts"></app-cas-products>
+    <app-cas-products *ngIf="!isReloadig && nombreSelected ==='Strapizza'" [activeCategory]="'Pizzería'" [activeSubCategory]="'Pizza'" [isVisible]="true" [title]="'Carta'"  (msm_success)="onMsmSuccess($event)" [refreshCasProducts]="refreshCasProducts"></app-cas-products>
+    <app-cas-products *ngIf="!isReloadig && nombreSelected ==='Slidedish'" [activeCategory]="'Panadería'" [activeSubCategory]="'Delicateses'" [isVisible]="true" [title]="'Carta'"  (msm_success)="onMsmSuccess($event)" [refreshCasProducts]="refreshCasProducts"></app-cas-products>
     
     <!-- Hero Section - Loads immediately -->
-    <app-hero></app-hero>
+    <app-hero ></app-hero>
     
     <!-- Lazy loaded secondary sections - Only load when user scrolls to them -->
     @defer (on viewport) {
-        <app-cas-products *ngIf="!isReloadig" [activeCategory]="'Entradas'" [title]="'Entradas'"  (msm_success)="onMsmSuccess($event)" [refreshCasProducts]="refreshCasProducts"></app-cas-products>
+        <app-cas-products *ngIf="!isReloadig && nombreSelected ==='Strapizza'" [activeCategory]="'Entradas'" [title]="'Entradas'"  (msm_success)="onMsmSuccess($event)" [refreshCasProducts]="refreshCasProducts"></app-cas-products>
     } @placeholder {
         <div class="loading-placeholder" style="text-align: center; padding: 20px;">
             Cargando Entradas...
@@ -24,11 +25,11 @@
     } @loading {
         <app-loading></app-loading>
     }
-    <br>
+    <!-- <br>
     <hr>
-    <br>
+    <br> -->
     @defer (on viewport) {
-        <app-cas-products *ngIf="!isReloadig" [activeCategory]="'Bebidas'" [title]="'Bebidas'"  (msm_success)="onMsmSuccess($event)" [refreshCasProducts]="refreshCasProducts"></app-cas-products>
+        <app-cas-products *ngIf="!isReloadig && nombreSelected ==='Strapizza'" [activeCategory]="'Bebidas'" [title]="'Bebidas'"  (msm_success)="onMsmSuccess($event)" [refreshCasProducts]="refreshCasProducts"></app-cas-products>
     } @placeholder {
         <div class="loading-placeholder" style="text-align: center; padding: 20px;">
             Cargando Bebidas...
@@ -36,11 +37,11 @@
     } @loading {
         <app-loading></app-loading>
     }
-    <br>
+    <!-- <br>
     <hr>
-    <br>
+    <br> -->
     @defer (on viewport) {
-        <app-cas-products *ngIf="!isReloadig" [activeCategory]="'Postres'" [title]="'Postres'"  (msm_success)="onMsmSuccess($event)" [refreshCasProducts]="refreshCasProducts"></app-cas-products>
+        <app-cas-products *ngIf="!isReloadig && nombreSelected ==='Strapizza'" [activeCategory]="'Postres'" [title]="'Postres'"  (msm_success)="onMsmSuccess($event)" [refreshCasProducts]="refreshCasProducts"></app-cas-products>
     } @placeholder {
         <div class="loading-placeholder" style="text-align: center; padding: 20px;">
             Cargando Postres...

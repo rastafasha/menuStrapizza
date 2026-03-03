@@ -117,22 +117,38 @@ export class CasProductsComponent implements OnInit, OnDestroy {
     );
   }
 
-  getProductosCatName1() {
-    this.catname = this.tiendaSelected?.subcategoria ?? this.activeSubCategory
-    // this.catname =  'Alimentos'
-    this.isLoading = true
-    this.categoryService.find_by_nombre(this.catname).subscribe(
-      (resp: any) => {
-        this.products = resp.productos || [];
-        // console.log(this.products)
-        this.updateTodo();
-        this.isLoading = false
-      },
-      (error) => {
-        console.error('Error al obtener los productos', error);
-      }
-    );
-  }
+  //  getProductosCatName() {
+  //   this.catname = this.tiendaSelected?.subcategoria ?? this.activeCategory;
+  //   this.isLoading = true
+  //   this.productoService.findProducto_by_Categorynombre(this.catname).subscribe(
+  //     (resp: any) => {
+  //       this.products = resp.productos || [];
+  //       //obtenemos las subcategorias de los productos
+  //       //filtramos los productos donde sea igual a la categoria Panaderia
+  //       const productos = (resp.productos || []).filter((producto: any) => producto.categoria?.nombre === this.catname);
+  //       //extraemos el campo subcategoria
+  //       const subcategorias = productos.map((producto: any) => producto.subcategoria);
+  //       //eliminamos los duplicados
+  //       const subcategoriasUnicas = [...new Set(subcategorias)];
+  //       //creamos un arreglo de objetos con el nombre de la subcategoria y el arreglo de productos
+  //       const categorias = subcategoriasUnicas.map((subcategoria: any) => ({
+  //         nombre: subcategoria,
+  //         products: productos.filter((product: any) => product.subcategoria === subcategoria),
+  //       }));
+  //       this.subcategories = categorias || [];
+
+        
+  //       this.updateTodo();
+  //       // console.log(this.products)
+  //       this.isLoading = false;
+  //     },
+  //     (error) => {
+  //       console.error('Error al obtener los productos', error);
+  //     }
+  //   );
+  // }
+
+
   //obtenemos las subcategorias de los productos
   getCategories() {
     this.isLoading = true
@@ -154,8 +170,10 @@ export class CasProductsComponent implements OnInit, OnDestroy {
     this.isLoading = false
   }
 
+  
+
   selectCategory(category: string) {
-    // console.log('selectCategory called with:', category);
+    console.log('selectCategory called with:', category);
     this.activeCategory = category;
     this.isLoading = true
     this.updateTodo();
@@ -184,10 +202,6 @@ export class CasProductsComponent implements OnInit, OnDestroy {
   closeModal(): void {
     this.isModalOpen = false;
     this.selectedProduct = null;
-  }
-
-  public PageSize(): void {
-    this.getProductosCatName1();
   }
 
   onMsmSuccess(value: boolean): void {
