@@ -4,7 +4,8 @@
         <div class="logo">
 
             <span class="logo-text">{{titleapp}}</span>
-            <a routerLink="/" *ngIf="tiendaSelected">
+            <app-loading *ngIf="isLoading"></app-loading>
+            <a routerLink="/" *ngIf="tiendaSelected && !isLoading">
                     <img [src]="tiendaSelected.img | imagenPipe: 'tiendas'"  [alt]="tiendaSelected.nombre">
                     <!-- <img src="assets/images/logo.png" alt="Strapizza Logo"> -->
                 </a>

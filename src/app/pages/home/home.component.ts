@@ -17,7 +17,8 @@ import { environment } from '../../../environments/environment';
   selector: 'app-home',
   imports: [HeaderComponent,
     //  SliderComponent, 
-     FreeDeliveryComponent, CasProductsComponent,
+    //  FreeDeliveryComponent, 
+     CasProductsComponent,
     HeroComponent, FooterComponent, MenuFooterComponent, NgIf, LoadingComponent,
     PwaNotifInstallerComponent
   ],
@@ -29,7 +30,7 @@ export class HomeComponent {
   @Output() msm_success: EventEmitter<boolean> = new EventEmitter<boolean>();
   @Input() msm_success_value: boolean = false;
   user!:Usuario;
-  isReloadig=false;
+  isLoading=false;
   isVisible=false;
   activeCategory!:string;
   nombreSelected = environment.nombreSelected;
@@ -42,9 +43,9 @@ export class HomeComponent {
   }
 
   onRefreshFromHeader() {
-    this.isReloadig = true;
+    this.isLoading = true;
     this.refreshCasProducts.emit();
-    this.isReloadig = false;
+    this.isLoading = false;
   }
 
   ngOnInit(){

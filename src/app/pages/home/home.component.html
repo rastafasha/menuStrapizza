@@ -1,65 +1,49 @@
 <app-header (refreshApp)="onRefreshFromHeader()" ></app-header>
 <!-- <p>home works!</p> -->
 <!-- Carrousel Section -->
-<app-loading *ngIf="isReloadig"></app-loading>
-<div *ngIf="!isReloadig">
+<app-loading *ngIf="isLoading"></app-loading>
+<div *ngIf="!isLoading">
     <!-- <app-slider></app-slider> -->
     <!-- Free Delivery Section -->
-    <app-free-delivery></app-free-delivery>
+    <!-- <app-free-delivery></app-free-delivery> -->
     <div class="clear"></div>
     <br>
     <!-- Categories Section - Loads immediately (most important) -->
-    <app-cas-products *ngIf="!isReloadig && nombreSelected ==='Strapizza'" [activeCategory]="'Pizzería'" [activeSubCategory]="'Pizza'" [isVisible]="true" [title]="'Carta'"  (msm_success)="onMsmSuccess($event)" [refreshCasProducts]="refreshCasProducts"></app-cas-products>
-    <app-cas-products *ngIf="!isReloadig && nombreSelected ==='Slidedish'" [activeCategory]="'Panadería'" [activeSubCategory]="'Delicateses'" [isVisible]="true" [title]="'Carta'"  (msm_success)="onMsmSuccess($event)" [refreshCasProducts]="refreshCasProducts"></app-cas-products>
+    <app-cas-products *ngIf="!isLoading && nombreSelected ==='Strapizza'" [activeCategory]="'Pizzería'" [activeSubCategory]="'Pizza'" [isVisible]="true" [title]="'Carta'"  (msm_success)="onMsmSuccess($event)" [refreshCasProducts]="refreshCasProducts"></app-cas-products>
+    <app-cas-products *ngIf="!isLoading && nombreSelected ==='Slidedish'" [activeCategory]="'Panadería'" [activeSubCategory]="'Delicateses'" [isVisible]="true" [title]="'Carta'"  (msm_success)="onMsmSuccess($event)" [refreshCasProducts]="refreshCasProducts"></app-cas-products>
     
     <!-- Hero Section - Loads immediately -->
     <app-hero ></app-hero>
     
     <!-- Lazy loaded secondary sections - Only load when user scrolls to them -->
     @defer (on viewport) {
-        <app-cas-products *ngIf="!isReloadig && nombreSelected ==='Strapizza'" [activeCategory]="'Entradas'" [title]="'Entradas'"  (msm_success)="onMsmSuccess($event)" [refreshCasProducts]="refreshCasProducts"></app-cas-products>
+        <app-cas-products *ngIf="!isLoading && nombreSelected ==='Strapizza'" [activeCategory]="'Entradas'" [title]="'Entradas'"  (msm_success)="onMsmSuccess($event)" [refreshCasProducts]="refreshCasProducts"></app-cas-products>
     } @placeholder {
         <div class="loading-placeholder" style="text-align: center; padding: 20px;">
             Cargando Entradas...
         </div>
     } @loading {
-        <app-loading></app-loading>
+        <app-loading *ngIf="isLoading"></app-loading>
     }
-    <!-- <br>
-    <hr>
-    <br> -->
     @defer (on viewport) {
-        <app-cas-products *ngIf="!isReloadig && nombreSelected ==='Strapizza'" [activeCategory]="'Bebidas'" [title]="'Bebidas'"  (msm_success)="onMsmSuccess($event)" [refreshCasProducts]="refreshCasProducts"></app-cas-products>
+        <app-cas-products *ngIf="!isLoading && nombreSelected ==='Strapizza'" [activeCategory]="'Bebidas'" [title]="'Bebidas'"  (msm_success)="onMsmSuccess($event)" [refreshCasProducts]="refreshCasProducts"></app-cas-products>
     } @placeholder {
         <div class="loading-placeholder" style="text-align: center; padding: 20px;">
             Cargando Bebidas...
         </div>
     } @loading {
-        <app-loading></app-loading>
+        <app-loading *ngIf="isLoading"></app-loading>
     }
-    <!-- <br>
-    <hr>
-    <br> -->
     @defer (on viewport) {
-        <app-cas-products *ngIf="!isReloadig && nombreSelected ==='Strapizza'" [activeCategory]="'Postres'" [title]="'Postres'"  (msm_success)="onMsmSuccess($event)" [refreshCasProducts]="refreshCasProducts"></app-cas-products>
+        <app-cas-products *ngIf="!isLoading && nombreSelected ==='Strapizza'" [activeCategory]="'Postres'" [title]="'Postres'"  (msm_success)="onMsmSuccess($event)" [refreshCasProducts]="refreshCasProducts"></app-cas-products>
     } @placeholder {
         <div class="loading-placeholder" style="text-align: center; padding: 20px;">
             Cargando Postres...
         </div>
     } @loading {
-        <app-loading></app-loading>
+        <app-loading *ngIf="isLoading"></app-loading>
     }
-    <!-- <app-produc-list-slider (msm_success)="onMsmSuccess($event)" [refreshCasProducts]="refreshCasProducts"></app-produc-list-slider> -->
-
-    <!-- Featured Products -->
-
-    <!-- <section class="featured-section" id="menu">
-    <div class="featured-container">
-        <h2 class="section-title">Los Más Populares</h2>
-
-        <app-produc-list></app-produc-list>
-    </div>
-</section> -->
+   
 <app-pwa-notif-installer></app-pwa-notif-installer>
     <!-- Footer -->
     <app-menu-footer *ngIf="user"></app-menu-footer>

@@ -10,11 +10,12 @@ import { Subscription } from 'rxjs';
 import { ImagenPipe } from '../../pipes/imagen-pipe.pipe';
 import { environment } from '../../../environments/environment';
 import { AvisoComponent } from '../aviso/aviso.component';
+import { LoadingComponent } from '../loading/loading.component';
 
 @Component({
   selector: 'app-header',
   imports: [RouterModule, CommonModule, ReactiveFormsModule,
-    FormsModule, ImagenPipe, AvisoComponent
+    FormsModule, ImagenPipe, AvisoComponent, LoadingComponent
   ],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss'
@@ -29,6 +30,7 @@ export class HeaderComponent implements OnDestroy {
   bandejaList: any[] = [];
   public user!: Usuario;
   img:string | null = '../assets/images/no-image.jpg';
+  isLoading=false;
 
   year: number = new Date().getFullYear();
   nombreSelected = environment.nombreSelected;

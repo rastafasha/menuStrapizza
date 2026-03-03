@@ -28,6 +28,7 @@ export class CasProductsComponent implements OnInit, OnDestroy {
   @Input() title!: string ;
   @Input() isVisible = false;
   @Input() tienda_moneda!: any;
+  @Input() isLoading: boolean = false;
 
   option_selectedd: number = 1;
   solicitud_selectedd: any = null;
@@ -42,7 +43,6 @@ export class CasProductsComponent implements OnInit, OnDestroy {
   subcategories: any[] = [];
   
   catname!: string;
-  isLoading: boolean = false;
   products: Producto[] = [];
   tiendaSelected: Tienda | null = null;
   
