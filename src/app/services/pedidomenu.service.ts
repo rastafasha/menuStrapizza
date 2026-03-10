@@ -54,6 +54,23 @@ export class PedidomenuService {
           );
   
     }
+
+    getByTiendaId(_id: string){
+      const url = `${base_url}/pedidomenu/by_tiendaId/${_id}`;
+      return this.http.get<any>(url, this.headers)
+        .pipe(
+          map((resp:{ok: boolean, pedidos: Pedido[]}) => resp.pedidos)
+          );
+  
+    }
+    getByTiendaUserId(_id: string, userId:string){
+      const url = `${base_url}/pedidomenu/by_tiendaIduser/${_id}/${userId}`;
+      return this.http.get<any>(url, this.headers)
+        .pipe(
+          map((resp:{ok: boolean, pedidos: Pedido[]}) => resp.pedidos)
+          );
+  
+    }
   
   
     create(pedido: any){

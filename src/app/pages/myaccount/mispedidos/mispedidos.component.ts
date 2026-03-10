@@ -13,6 +13,7 @@ import { PedidomenuService } from '../../../services/pedidomenu.service';
 import { Pedido } from '../../../models/pedido.model';
 import { Tienda } from '../../../models/tienda.model';
 import { MenuFooterComponent } from "../../../shared/menu-footer/menu-footer.component";
+import { TiendaService } from '../../../services/tienda.service';
 
 @Component({
   selector: 'app-mispedidos',
@@ -47,14 +48,12 @@ export class MispedidosComponent {
   
   // Modal control - Angular way (no jQuery needed)
   public modalAbierto: string | null = null;
+  nombreSelected = environment.nombreSelected;
+  tiendaSelected: any;
 
   constructor(
-    private usuarioService: UsuarioService,
-    private _router : Router,
-    private activatedRoute: ActivatedRoute,
-    private http: HttpClient,
-    private ventaService: VentaService,
-    private pedidoService: PedidomenuService
+    private pedidoService: PedidomenuService,
+     private tiendaService: TiendaService,
   ) {
     // this.usuario = usuarioService.usuario;
      let USER = localStorage.getItem('user');
@@ -65,20 +64,21 @@ export class MispedidosComponent {
   }
 
   ngOnInit(): void {
+    this.getTienda();
+  }
 
-    this.listar_pedidos();
+   getTienda() {
+    this.tiendaService.getTiendaByName(this.nombreSelected).subscribe((resp: Tienda) => {
+      this.tiendaSelected = resp;
+      this.listar_pedidos();
 
+    })
   }
 
   listar_pedidos(){
-   this.pedidoService.getByUserId(this.identity.uid!).subscribe(
+   this.pedidoService.getByTiendaUserId(this.tiendaSelected._id, this.identity.uid!).subscribe(
       (resp:any)=>{
         this.pedidos = resp;
-        console.log(this.pedidos);
-
-      },
-      error=>{
-
       }
     );
   }

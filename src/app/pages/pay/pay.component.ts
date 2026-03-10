@@ -174,7 +174,7 @@ export class PayComponent {
   }
   ngOnInit() {
 
-    this.obtenerMetodosdePago();
+    
     let USER = localStorage.getItem('user');
     if (USER) {
       this.identity = JSON.parse(USER);
@@ -193,6 +193,7 @@ export class PayComponent {
       // Asignamos el array filtrado directamente
       this.tiendaSelected = resp;
       this.tienda_moneda = this.tiendaSelected.moneda
+      this.getTiposdePagoByLocal();
 
     })
   }
@@ -235,6 +236,16 @@ export class PayComponent {
       // console.log('metodos de pago: ',this.paymentMethods)
     });
   }
+
+   getTiposdePagoByLocal() {
+    this._tipoPagosService.getPaymentMethodByTiendaId(this.tiendaSelected._id).subscribe(paymentMethods => {
+     
+      this.paymentMethods = paymentMethods;
+      // console.log(this.tiposdepagos);
+    })
+  }
+
+  
 
   // metodo para el cambio del select 'tipo de transferencia'
   onChangePayment(event: Event) {

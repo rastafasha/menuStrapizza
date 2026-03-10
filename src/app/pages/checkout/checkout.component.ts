@@ -227,7 +227,7 @@ export class CheckoutComponent {
       return '';
     }
 
-    let message = `*Nuevo Pedido desde app Menu Strapizza #${this.randomNum}*\n\n`;
+    let message = `*Nuevo Pedido desde App Menu #${this.randomNum}*\n\n`;
     message += `*Cliente:* ${this.identity.first_name} ${this.identity.last_name}\n`;
     message += `*Teléfono:* ${this.identity.telefono || 'No registrado'}\n\n`;
     message += `*Detalles del Pedido:*\n`;
