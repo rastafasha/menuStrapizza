@@ -24,6 +24,8 @@ import { DireccionService } from '../../services/direccion.service';
 import { Direccion } from '../../models/direccion.model';
 import { PagoEfectivoService } from '../../services/pago-efectivo.service';
 import { ICreateOrderRequest, IPayPalConfig, NgxPayPalModule } from 'ngx-paypal';
+import { Paypal } from '../../models/paypal.model';
+import { PaypalService } from '../../services/paypal.service';
 declare var $: any;
 // declare var paypal;
 
@@ -78,8 +80,8 @@ export class PayComponent {
 
 
   public no_direccion = 'no necesita direccion';
-  
-  public payPalConfig ? : IPayPalConfig;
+
+  public payPalConfig?: IPayPalConfig;
   cartItems: any[] = [];
 
   pedidoGuardado = false;
@@ -109,7 +111,8 @@ export class PayComponent {
 
   direcciones: Direccion[] = [];
   direccionSelected!: Direccion;
-  efectivo: string = 'efectivo'
+  efectivo: string = 'efectivo';
+  paypalinfo?: Paypal;
 
 
   paymentMethods: PaymentMethod[] = []; //array metodos de pago para transferencia (dolares, bolivares, movil)
@@ -158,6 +161,7 @@ export class PayComponent {
     private _productoService: ProductoService,
     private _router: Router,
     private _activatedRoute: ActivatedRoute,
+    private _paypalService: PaypalService,
     //  private _postalService :PostalService,
   ) {
     window.scrollTo(0, 0);
@@ -174,18 +178,17 @@ export class PayComponent {
   }
   ngOnInit() {
 
-    
+
     let USER = localStorage.getItem('user');
     if (USER) {
       this.identity = JSON.parse(USER);
-      // console.log(this.identity);
     }
     this.userId = this.identity.uid;
     this.nombreSelected;
     this.getTienda();
     this.getDireccionbyUser();
     this._activatedRoute.params.subscribe(({ id }) => this.loadPedido(id));
-    this.initPayPalConfig();
+    // initPayPalConfig moved to after getPaypalByTienda()
   }
 
   getTienda() {
@@ -194,8 +197,39 @@ export class PayComponent {
       this.tiendaSelected = resp;
       this.tienda_moneda = this.tiendaSelected.moneda
       this.getTiposdePagoByLocal();
+      this.getPaypalByTienda();
 
     })
+  }
+
+  getPaypalByTienda() {
+    this._paypalService.getPaypalByTiendaId(this.tiendaSelected._id).subscribe((paypals: any[]) => {
+      if (paypals.length > 0) {
+        this.paypalinfo = paypals[0];
+        if (!this.paypalinfo?.clientIdPaypal || this.paypalinfo.clientIdPaypal.trim() === '') {
+          console.error('Invalid/empty PayPal clientIdPaypal from backend');
+          Swal.fire({
+            icon: 'error',
+            title: 'Configuración de PayPal inválida',
+            text: 'Contacte al administrador de la tienda.',
+            timer: 3000
+          });
+          return;
+        }
+        console.log('PayPal config loaded:', this.paypalinfo!.clientIdPaypal);
+        // Init PayPal with service data only
+        this.initPayPalConfig();
+      } else {
+        console.warn('No PayPal config for tienda');
+        Swal.fire({
+          icon: 'warning',
+          title: 'PayPal no configurado',
+          text: 'Este método de pago no está disponible para esta tienda.',
+          timer: 3000
+        });
+        this.paypalinfo = undefined;
+      }
+    });
   }
 
   loadPedido(id: string) {
@@ -229,23 +263,15 @@ export class PayComponent {
   }
 
 
-
-  private obtenerMetodosdePago() {
-    this._trasferencias.getPaymentsActives().subscribe(data => {
-      this.paymentMethods = data.paymentMethods;
-      // console.log('metodos de pago: ',this.paymentMethods)
-    });
-  }
-
-   getTiposdePagoByLocal() {
+  getTiposdePagoByLocal() {
     this._tipoPagosService.getPaymentMethodByTiendaId(this.tiendaSelected._id).subscribe(paymentMethods => {
-     
+
       this.paymentMethods = paymentMethods;
       // console.log(this.tiposdepagos);
     })
   }
 
-  
+
 
   // metodo para el cambio del select 'tipo de transferencia'
   onChangePayment(event: Event) {
@@ -621,15 +647,11 @@ export class PayComponent {
 
 
   private renderPayPalButton() {
-    // Primero, limpiar el contenedor anterior
-    // this.paypalElement.nativeElement.innerHTML = '';
-
     if (this.selectedMethod === 'card' || this.selectedMethod === 'paypal') {
-      // deshabilitar el formulario de pago con transferencia
       this.habilitacionFormTransferencia = false;
       this.habilitacionFormEfectivo = false;
       this.paypal = true;
-      // Cargar el botón de PayPal con las opciones seleccionadas
+      // Config already loaded via getPaypalByTienda()
       this.initPayPalConfig();
     }
     else if (this.selectedMethod === 'transferencia') {
@@ -652,21 +674,31 @@ export class PayComponent {
   }
 
 
-
   private initPayPalConfig(): void {
+    if (!this.paypalinfo!.clientIdPaypal || this.paypalinfo!.clientIdPaypal.trim() === '') {
+      console.error('No valid PayPal client ID from service');
+      Swal.fire({
+        icon: 'error',
+        title: 'Error de PayPal',
+        text: 'Client ID inválido. Contacte al administrador.',
+        timer: 3000
+      });
+      return;
+    }
+
     this.payPalConfig = {
       currency: this.tienda_moneda,
-      clientId: environment.clientIdPaypal,
+      clientId: this.paypalinfo!.clientIdPaypal, // Use service data only
       createOrderOnClient: (data) => <ICreateOrderRequest>{
         intent: 'CAPTURE',
         purchase_units: [{
           amount: {
             currency_code: this.tienda_moneda,
-            value: Math.round(this.subtotal).toString(),
+            value: (this.totalAmount || this.subtotal).toString(),
             breakdown: {
               item_total: {
                 currency_code: this.tienda_moneda,
-                value: Math.round(this.subtotal).toString(),
+                value: (this.totalAmount || this.subtotal).toString(),
               }
             }
           },
@@ -681,44 +713,58 @@ export class PayComponent {
         layout: 'vertical'
       },
       onApprove: (data, actions) => {
-        console.log('onApprove - transaction was approved, but not authorized', data, actions);
+        console.log('onApprove - transaction approved', data, actions);
         actions.order.get().then((details: any) => {
-          console.log('onApprove - you can get full order details inside onApprove: ', details);
+          console.log('Order details:', details);
         });
       },
       onClientAuthorization: (data) => {
-        console.log('onClientAuthorization - you should probably inform your server about completed transaction at this point', data);
+        console.log('Payment authorized:', data);
         this.data_venta.idtransaccion = data.id;
         this.saveVenta();
       },
       onCancel: (data, actions) => {
-        console.log('OnCancel', data, actions);
+        console.log('Payment cancelled', data, actions);
       },
       onError: err => {
-        console.log('OnError', err);
+        console.error('PayPal Error:', err);
+        Swal.fire({
+          icon: 'error',
+          title: 'Error en PayPal',
+          text: 'Transacción fallida. Intente nuevamente.',
+          timer: 3000
+        });
       },
       onClick: (data, actions) => {
-        console.log('onClick', data, actions);
+        console.log('PayPal clicked', data, actions);
       },
     };
   }
 
-  getItemsList(): any[]{
+  getItemsList(): any[] {
 
     const items: any[] = [];
-    let item = {};
-    this.cartItems.forEach((it: CartItemModel)=>{
-      item = {
-        name: it.productName,
+    // Populate from current pedidos if cartItems empty
+    const orderItems = this.cartItems.length > 0 ? this.cartItems : this.pedidos.map(p => ({
+      productName: p.titulo,
+      productPrice: p.precio_ahora.toString(),
+      quantity: p.cantidad,
+      category: 'Pedido'
+    })) || [];
+
+    orderItems.forEach((it: any) => {
+      const item = {
+        name: it.productName || 'Producto',
         unit_amount: {
-          currency_code: 'USD',
-          value: it.productPrice,
+          currency_code: this.tienda_moneda || 'USD',
+          value: it.productPrice || '0.00',
         },
-        quantity: it.quantity,
-        category: it.category,
+        quantity: it.quantity || 1,
+        category: it.category || 'general',
       };
       items.push(item);
     });
+    console.log('PayPal items:', items);
     return items;
   }
 

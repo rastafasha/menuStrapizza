@@ -1,10 +1,11 @@
 import { Injectable, NgZone } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable } from "rxjs";
+import { Observable, switchMap, map } from "rxjs";
 import { Router } from '@angular/router';
 import{Usuario} from '../models/usuario.model';
 import { environment } from '../../environments/environment';
 import { Producto } from '../models/producto.model';
+import { PaypalService } from './paypal.service';
 
 
 const base_url = environment.baseUrl;
@@ -17,8 +18,6 @@ export class VentaService {
   public url;
   rapidapiK = environment.rapidapiKey;
   rapidapiH = environment.rapidapiHost;
-  clientIdPaypal = environment.clientIdPaypal;
-  sandboxPaypal = environment.sandboxPaypal;
 
   user!:Usuario;
   producto!:Producto;
@@ -26,6 +25,7 @@ export class VentaService {
   constructor(
     private _http: HttpClient,
     private router: Router,
+    private paypalService: PaypalService
     ) {
       this.url = environment.baseUrl;
   }
@@ -110,14 +110,24 @@ export class VentaService {
     return this._http.get(this.url+'/ventas/cancelacion/'+id,{headers:headers});
   }
 
-  get_token():Observable<any>{
-    let headers = new HttpHeaders({
-      'Accept': 'application/json',
-      'Content-Type':'application/x-www-form-urlencoded',
-      'Authorization': 'Basic ' + btoa(`${this.clientIdPaypal}:${this.sandboxPaypal}`),
-      // 'Authorization': 'Basic ' + btoa('AVTHn-IitbqsInQ7Y_Ald2kPSvEjTd3RRm_OevRxyzv_tXo7XskvFK6w2IxFuZLeKSXWUqoDg_JdWu5V:AXlazeNsZ0CmjfJIronSzcqzw4hLHkcoVEM5fO5BY7AbD-_GhKoKezRcavq6-T4kQuRqaTXFB_VXmheG'),
-    });
-    return this._http.post('https://api.sandbox.paypal.com/v1/oauth2/token','grant_type=client_credentials',{headers:headers});
+  get_token(tiendaId: string):Observable<any>{
+    return this.paypalService.getPaypalByTiendaId(tiendaId).pipe(
+      switchMap(paypals => {
+        if (!paypals || paypals.length === 0) {
+          throw new Error('No PayPal configuration found for this tienda');
+        }
+        const paypal = paypals[0];
+        const auth = btoa(`${paypal.clientIdPaypal}:${paypal.clientSecret}`);
+        const headers = new HttpHeaders({
+          'Accept': 'application/json',
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Authorization': `Basic ${auth}`,
+        });
+        return this._http.post('https://api.sandbox.paypal.com/v1/oauth2/token', 'grant_type=client_credentials', { headers }).pipe(
+          map((resp: any) => resp.access_token)
+        );
+      })
+    );
   }
 
   set_reembolso(token:any,id:string):Observable<any>{
