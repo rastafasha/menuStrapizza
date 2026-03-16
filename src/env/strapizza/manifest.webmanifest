@@ -1,8 +1,8 @@
 {
-  "name": "Menu Strapizza",
-  "short_name": "Menu Strapizza",
+  "name": "Menu Pizzería",
+  "short_name": "Menu Pizzería",
   "categories": ["Alimentos", "compras", "delivery"],
-  "description": "Menú Digital de Strapizza",
+  "description": "Menú Digital de Pizzería",
   "display": "standalone",
   "theme_color": "#333",
   "background_color": "#fafafa",

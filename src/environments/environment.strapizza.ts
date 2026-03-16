@@ -6,7 +6,7 @@ export const environment = {
   soketServer: 'https://back-ecomm-mall.onrender.com/',
   mediaUrlRemoto:
     'https://res.cloudinary.com/dmv6aukai/image/upload/v1741218430/mallConnect',
-  nombreSelected: 'Strapizza',
+  nombreSelected: 'Pizzeria',
   //pluggins
   rapidapiKey: 'a7036a3222mshc2920e679cd1cafp141e56jsn81cbe707ac15',
   rapidapiHost: 'apidojo-17track-v1.p.rapidapi.com',

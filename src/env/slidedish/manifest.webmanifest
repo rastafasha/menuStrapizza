@@ -1,8 +1,8 @@
 {
-  "name": "Menu Slidedish",
+  "name": "Menu Panaderia",
   "short_name": "Menu Slidedish",
   "categories": ["Alimentos", "compras", "delivery"],
-  "description": "Menú Digital de Slidedish",
+  "description": "Menú Digital de Panaderia",
   "display": "standalone",
   "theme_color": "#333",
   "background_color": "#fafafa",
