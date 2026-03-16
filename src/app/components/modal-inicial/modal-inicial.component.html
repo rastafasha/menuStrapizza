@@ -1,0 +1,36 @@
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <!-- <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div> -->
+      <div class="modal-body">
+        <h2>¡Bienvenido al menú de {{nombreSelected}}! </h2>
+
+        <p>Arma tu pedido en pocos pasos:</p>
+
+        <ul>
+          <li><b>Regístrate:</b> Crea tu cuenta para gestionar tus pedidos y recibir promociones exclusivas.</li>
+          <li><b>Ordena:</b> Navega, añade al carrito y confirma tu dirección para el delivery.</li>
+          <li><b>Finaliza:</b> Tu pedido se enviará por WhatsApp. El local te contactará para confirmar el pago y la
+            entrega.</li>
+        </ul>
+
+        <p><i>¡Fácil, rápido y directo a tu mesa!</i></p>
+        <div class="botns">
+          <button type="button" class="btn btn-outline-success btn-md" *ngIf="!isLogued" (click)="onRegister()" >
+            <i class="fas fa-pizza-slice"></i> Registrarme
+          </button>
+
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-success" data-bs-dismiss="modal">Ok, Quiero Ver el Meńu!</button>
+        <button type="button" class="btn btn-outline-danger" (click)="onNoShowMore()">No quiero ver más este
+          mensaje</button>
+      </div>
+    </div>
+  </div>
+</div>

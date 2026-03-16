@@ -44,11 +44,24 @@
                 </div>
             </div>
 
+            
+
             <!-- Profile form-->
             <form class=" p-t-20 col-xs-12" [formGroup]="direccionForm" (ngSubmit)="onSubmit()">
+                 <div class="col-sm-12">
+                    <div class="form-group">
+                        <label>Referencia (Coordenadas)</label>
+                        <textarea class="form-control" placeholder="Seleccione la ubicación en el mapa" required
+                            formControlName="referencia"></textarea>
+                        <small class="text-muted">
+                            <i class="fa fa-info-circle"></i> 
+                            Seleccione la ubicación haciendo clic en el mapa. Las coordenadas se guardarán automáticamente.
+                        </small>
+                    </div>
+                </div>
                 <div class="col-sm-6">
                     <div class="form-group">
-                        <label>Nombre y apellidos</label>
+                        <label>Nombre direccíón (casa, oficina):</label>
                         <input class="form-control" type="text" required placeholder="Nombres y apellidos"
                             formControlName="nombres_completos">
 
@@ -74,17 +87,7 @@
                             formControlName="direccion"></textarea>
                     </div>
                 </div>
-                <div class="col-sm-12">
-                    <div class="form-group">
-                        <label>Referencia (Coordenadas)</label>
-                        <textarea class="form-control" placeholder="Seleccione la ubicación en el mapa" required
-                            formControlName="referencia"></textarea>
-                        <small class="text-muted">
-                            <i class="fa fa-info-circle"></i> 
-                            Seleccione la ubicación haciendo clic en el mapa. Las coordenadas se guardarán automáticamente.
-                        </small>
-                    </div>
-                </div>
+               
 
                 <div class="col-sm-6">
                     <div class="form-group">

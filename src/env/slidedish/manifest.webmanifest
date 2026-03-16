@@ -1,6 +1,6 @@
 {
   "name": "Menu Panaderia",
-  "short_name": "Menu Slidedish",
+  "short_name": "Menu Panaderia",
   "categories": ["Alimentos", "compras", "delivery"],
   "description": "Menú Digital de Panaderia",
   "display": "standalone",

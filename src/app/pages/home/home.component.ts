@@ -12,6 +12,7 @@ import { LoadingComponent } from "../../shared/loading/loading.component";
 import { ProducListSliderComponent } from '../../components/produc-list-slider/produc-list-slider.component';
 import { PwaNotifInstallerComponent } from '../../shared/pwa-notif-installer/pwa-notif-installer.component';
 import { environment } from '../../../environments/environment';
+import { ModalInicialComponent } from '../../components/modal-inicial/modal-inicial.component';
 
 @Component({
   selector: 'app-home',
@@ -20,7 +21,8 @@ import { environment } from '../../../environments/environment';
     //  FreeDeliveryComponent, 
      CasProductsComponent,
     HeroComponent, FooterComponent, MenuFooterComponent, NgIf, LoadingComponent,
-    PwaNotifInstallerComponent
+    PwaNotifInstallerComponent,
+    ModalInicialComponent
   ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'

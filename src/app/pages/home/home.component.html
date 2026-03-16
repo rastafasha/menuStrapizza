@@ -14,7 +14,7 @@
     
     <!-- Hero Section - Loads immediately -->
     <app-hero ></app-hero>
-    
+   
     <!-- Lazy loaded secondary sections - Only load when user scrolls to them -->
     @defer (on viewport) {
         <app-cas-products *ngIf="!isLoading && nombreSelected ==='Pizzeria'" [activeCategory]="'Entradas'" [title]="'Entradas'"  (msm_success)="onMsmSuccess($event)" [refreshCasProducts]="refreshCasProducts"></app-cas-products>
@@ -54,6 +54,7 @@
     }
    
 <app-pwa-notif-installer></app-pwa-notif-installer>
+<app-modal-inicial [nombreSelected]="nombreSelected"></app-modal-inicial>
     <!-- Footer -->
     <app-menu-footer *ngIf="user"></app-menu-footer>
     <app-footer ></app-footer>

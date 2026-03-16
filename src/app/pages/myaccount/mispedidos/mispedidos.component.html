@@ -31,7 +31,7 @@
                         </a>
                         <button type="button" *ngIf="item_pedido.status ==='INPROCESS'"  class="nav-link-style text-success btn-sm btn"
                             [routerLink]="['/pay', item_pedido._id ]" style="cursor:pointer">
-                            <div class="fa fa-dollar-sign"></div>
+                            Completar mi compra
                         </button>
                         <!-- Modal backdrop -->
                         <div *ngIf="modalAbierto === item_pedido._id" 
@@ -90,4 +90,5 @@
         </section>
     </div>
 </div>
+<app-modalinfo-pedidos></app-modalinfo-pedidos>
 <app-menu-footer></app-menu-footer>

@@ -64,7 +64,7 @@ export class PedidomenuService {
   
     }
     getByTiendaUserId(_id: string, userId:string){
-      const url = `${base_url}/pedidomenu/by_tiendaIduser/${_id}/${userId}`;
+      const url = `${base_url}/pedidomenu/by_tiendaiduser/${_id}/${userId}`;
       return this.http.get<any>(url, this.headers)
         .pipe(
           map((resp:{ok: boolean, pedidos: Pedido[]}) => resp.pedidos)

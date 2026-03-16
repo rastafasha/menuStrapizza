@@ -62,3 +62,68 @@ Login register and recover password Page
     height: 100%;
   }
 }
+
+
+
+/* Step Indicator Styles */
+.step-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  
+  .step-number {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background-color: #e0e0e0;
+    color: #666;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 14px;
+    transition: all 0.3s ease;
+  }
+  
+  .step-label {
+    font-size: 12px;
+    color: #999;
+    transition: all 0.3s ease;
+  }
+  
+  &.active {
+    .step-number {
+      background-color: #1e88e5;
+      color: #fff;
+    }
+    .step-label {
+      color: #1e88e5;
+      font-weight: 600;
+    }
+  }
+  
+  &.completed {
+    .step-number {
+      background-color: #4caf50;
+      color: #fff;
+    }
+    .step-label {
+      color: #4caf50;
+    }
+  }
+}
+
+.step-line {
+  width: 40px;
+  height: 2px;
+  background-color: #e0e0e0;
+  margin-bottom: 20px;
+}

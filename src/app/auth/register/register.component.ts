@@ -4,31 +4,34 @@ import { Router, RouterModule } from '@angular/router';
 import Swal from 'sweetalert2';
 import { Tienda } from '../../models/tienda.model';
 import { UsuarioService } from '../../services/usuario.service';
-import { NgIf } from '@angular/common';
+import { NgClass, NgIf } from '@angular/common';
 import { ImagenPipe } from '../../pipes/imagen-pipe.pipe';
 import { TiendaService } from '../../services/tienda.service';
 import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-register',
-  imports:[
+  imports: [
     FormsModule,
     ReactiveFormsModule,
     RouterModule,
     NgIf,
+    NgClass,
     ImagenPipe
   ],
   templateUrl: './register.component.html',
-  styleUrls: [ './register.component.scss' ]
+  styleUrls: ['./register.component.scss']
 })
 export class RegisterComponent implements OnInit {
 
   public formSumitted = false;
-nombreSelected = environment.nombreSelected;
-  registerForm:FormGroup;
+  nombreSelected = environment.nombreSelected;
+  registerForm: FormGroup;
   tiendas!: Tienda[];
   tienda!: Tienda;
   tiendaSelected!: Tienda;
+
+  public currentStep: number = 1;
 
 
   constructor(
@@ -40,11 +43,11 @@ nombreSelected = environment.nombreSelected;
     this.registerForm = this.fb.group({
       first_name: ['', Validators.required],
       last_name: ['', Validators.required],
-      email: [ '', [Validators.required, Validators.email] ],
+      email: ['', [Validators.required, Validators.email]],
       password: ['', Validators.required],
       password2: ['', Validators.required],
       local: [''],
-      terminos: [false, Validators.required],
+      terminos: [false],
 
     }, {
       validators: this.passwordsIguales('password', 'password2')
@@ -56,14 +59,14 @@ nombreSelected = environment.nombreSelected;
     this.getTienda();
   }
 
-   getTienda(){
-    this.tiendaService.getTiendaByName(this.nombreSelected).subscribe((resp:any)=>{
+  getTienda() {
+    this.tiendaService.getTiendaByName(this.nombreSelected).subscribe((resp: any) => {
       this.tiendaSelected = resp;
       // console.log(this.tiendaSelected)
     })
   }
 
-  getTiendas(){
+  getTiendas() {
     // this.tiendaService.cargarTiendas().subscribe((resp:any)=>{
     //   this.tiendas = resp;
     //   //filtramos las tiendas y buscamos la que se llama web
@@ -74,29 +77,46 @@ nombreSelected = environment.nombreSelected;
     // })
   }
 
-  crearUsuario(){
+
+  nextStep() {
+    // Validate step 1 fields (first_name, last_name)
+    const firstName = this.registerForm.get('first_name');
+    const lastName = this.registerForm.get('last_name');
+
+    if (firstName?.invalid || lastName?.invalid) {
+      firstName?.markAsTouched();
+      lastName?.markAsTouched();
+      return;
+    }
+
+    this.currentStep = 2;
+  }
+
+  prevStep() {
+    this.currentStep = 1;
+  }
+
+  crearUsuario() {
     this.formSumitted = true;
     //agregamos el id de la tienda a la respuesta
 
     this.registerForm.value.local = this.tiendaSelected._id;
     console.log(this.registerForm.value);
 
-    if(this.registerForm.invalid){
+    if (this.registerForm.invalid) {
       return;
     }
 
     //realizar el posteo del usuario
     this.usuarioService.crearUsuario(this.registerForm.value).subscribe(
-      resp =>{
+      resp => {
         console.log(resp);
-        // this.router.navigateByUrl('/login');
         this.usuarioService.getLocalStorage();
-         if(localStorage.getItem('user')){
-          setTimeout(()=>{
-            this.router.navigateByUrl('/my-account');
-          },500);
+        Swal.fire('Gracias por Registrate!, En breve te enviaremos a tu perfil para completar los datos requeridos')
+        if (localStorage.getItem('user')) {
+          this.router.navigateByUrl('/my-account');
         }
-      },(err) => {
+      }, (err) => {
         Swal.fire('Error', err.error.msg, 'error');
       }
     );
@@ -104,39 +124,39 @@ nombreSelected = environment.nombreSelected;
   }
 
   campoNoValido(campo: string): boolean {
-    if(this.registerForm.get(campo)?.invalid && this.formSumitted){
+    if (this.registerForm.get(campo)?.invalid && this.formSumitted) {
       return true;
-    }else{
+    } else {
       return false;
     }
 
 
   }
 
-  aceptaTerminos(){
+  aceptaTerminos() {
     return !this.registerForm.get('terminos')?.value && this.formSumitted;
   }
 
-  passwordNoValido(){
+  passwordNoValido() {
     const pass1 = this.registerForm.get('password')?.value;
     const pass2 = this.registerForm.get('password2')?.value;
 
-    if((pass1 !== pass2) && this.formSumitted){
+    if ((pass1 !== pass2) && this.formSumitted) {
       return true;
-    }else{
+    } else {
       return false;
     }
   }
 
-  passwordsIguales(pass1Name: string, pass2Name: string){
-    return (formGroup: FormGroup) =>{
+  passwordsIguales(pass1Name: string, pass2Name: string) {
+    return (formGroup: FormGroup) => {
       const pass1Control = formGroup.get(pass1Name);
       const pass2Control = formGroup.get(pass2Name);
 
-      if(pass1Control?.value === pass2Control?.value){
+      if (pass1Control?.value === pass2Control?.value) {
         pass2Control?.setErrors(null)
-      }else{
-        pass2Control?.setErrors({noEsIgual: true});
+      } else {
+        pass2Control?.setErrors({ noEsIgual: true });
       }
     }
   }

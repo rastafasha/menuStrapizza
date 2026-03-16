@@ -14,6 +14,7 @@ import { Pedido } from '../../../models/pedido.model';
 import { Tienda } from '../../../models/tienda.model';
 import { MenuFooterComponent } from "../../../shared/menu-footer/menu-footer.component";
 import { TiendaService } from '../../../services/tienda.service';
+import { ModalinfoPedidosComponent } from "../../../components/modalinfo-pedidos/modalinfo-pedidos.component";
 
 @Component({
   selector: 'app-mispedidos',
@@ -24,13 +25,13 @@ import { TiendaService } from '../../../services/tienda.service';
     RouterModule,
     ReactiveFormsModule,
     FormsModule,
-    MenuFooterComponent
+    MenuFooterComponent,
+    ModalinfoPedidosComponent
 ],
   templateUrl: './mispedidos.component.html',
   styleUrl: './mispedidos.component.scss'
 })
 export class MispedidosComponent {
-  public identity;
   public url:any;
   public msm_error = false;
   public msm_success = false;
@@ -45,6 +46,7 @@ export class MispedidosComponent {
   count: number = 8;
 
   public id!:string;
+  user:any;
   
   // Modal control - Angular way (no jQuery needed)
   public modalAbierto: string | null = null;
@@ -54,17 +56,18 @@ export class MispedidosComponent {
   constructor(
     private pedidoService: PedidomenuService,
      private tiendaService: TiendaService,
+     private usuarioService: UsuarioService,
   ) {
     // this.usuario = usuarioService.usuario;
-     let USER = localStorage.getItem('user');
-    if(USER){
-      this.identity = JSON.parse(USER);
-      // console.log(this.identity);
-    }
+    
+   
+
   }
 
   ngOnInit(): void {
-    this.getTienda();
+     let USER = localStorage.getItem("user");
+    this.user = JSON.parse(USER ? USER : '');
+    this. getTienda();
   }
 
    getTienda() {
@@ -75,8 +78,10 @@ export class MispedidosComponent {
     })
   }
 
+ 
+
   listar_pedidos(){
-   this.pedidoService.getByTiendaUserId(this.tiendaSelected._id, this.identity.uid!).subscribe(
+   this.pedidoService.getByTiendaUserId(this.tiendaSelected._id, this.user.uid).subscribe(
       (resp:any)=>{
         this.pedidos = resp;
       }

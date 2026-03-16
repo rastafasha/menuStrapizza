@@ -14,7 +14,7 @@ import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-login',
-  standalone:true,
+  standalone: true,
 
   imports: [
     CommonModule,
@@ -24,9 +24,9 @@ import { environment } from '../../../environments/environment';
     // FooterComponent,
     RouterModule,
     ImagenPipe
-],
+  ],
   templateUrl: './login.component.html',
-  styleUrls: [ './login.component.scss' ]
+  styleUrls: ['./login.component.scss']
 })
 export class LoginComponent implements OnInit {
 
@@ -51,41 +51,41 @@ export class LoginComponent implements OnInit {
     });
   }
 
-ngOnInit(){
-  // this.renderButton();
-  this.usuarioService.getLocalStorage();
-  this.getTienda();
-}
+  ngOnInit() {
+    // this.renderButton();
+    this.usuarioService.getLocalStorage();
+    this.getTienda();
+  }
 
- getTienda(){
-    this.tiendaService.getTiendaByName(this.nombreSelected).subscribe((resp:any)=>{
+  getTienda() {
+    this.tiendaService.getTiendaByName(this.nombreSelected).subscribe((resp: any) => {
       this.tiendaSelected = resp;
       // console.log(this.tiendaSelected)
     })
   }
 
-  login(){
+  login() {
 
-this.usuarioService.login(this.loginForm.value).subscribe(
-      resp =>{
+    this.usuarioService.login(this.loginForm.value).subscribe(
+      resp => {
         // console.log('Login response:', resp);
-        if(this.loginForm.get('remember')?.value){
+        if (this.loginForm.get('remember')?.value) {
           localStorage.setItem('email', this.loginForm.get('email')?.value);
-        }else{
+        } else {
           localStorage.removeItem('email');
         }
         this.usuarioService.getLocalStorage();
-         if(localStorage.getItem('user') !== 'undefined'){
-          setTimeout(()=>{
+        if (localStorage.getItem('user') !== 'undefined') {
+          setTimeout(() => {
             this.router.navigateByUrl('/my-account');
-          },500);
-        }else{
+          }, 500);
+        } else {
           this.router.navigateByUrl('/login');
         }
-        
-      
+
+
         // this.router.navigateByUrl('/my-account');
-      },(err) => {
+      }, (err) => {
         Swal.fire('Error', err.error.msg, 'error');
       }
     )
@@ -105,7 +105,7 @@ this.usuarioService.login(this.loginForm.value).subscribe(
   //   this.startApp();
   // }
 
-  async startApp(){
+  async startApp() {
     this.usuarioService.googleInit();
     this.auth2 = this.usuarioService.auth2;
 
