@@ -10,6 +10,7 @@ import { AsideCuentaComponent } from '../../aside-cuenta/aside-cuenta.component'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ImagenPipe } from '../../../../pipes/imagen-pipe.pipe';
 import { environment } from '../../../../../environments/environment';
+import { TiendaService } from '../../../../services/tienda.service';
 declare var jQuery:any;
 declare var $:any;
 
@@ -53,17 +54,20 @@ export class DetalleOrdenComponent implements OnInit {
   public msm_error_cancelar = '';
   public data_cancelacion : any = {};
 
+   public local!: string;
+  public tienda_moneda!: any;
+
   constructor(
     private _userService: UsuarioService,
     private _router : Router,
     private _route :ActivatedRoute,
     private http: HttpClient,
     private _ventaService: VentaService,
+    private tiendaService: TiendaService,
   ) {
      let USER = localStorage.getItem('user');
     if(USER){
       this.identity = JSON.parse(USER);
-      console.log(this.identity);
     }
   }
 
@@ -109,12 +113,21 @@ export class DetalleOrdenComponent implements OnInit {
       response =>{
         this.detalle = response.detalle;
         this.venta = response.venta;
+        this.local = this.venta.local
         // this.data_reviews();
         this.evaluar_cancelacion();
+        this.getTienda();
       },
       error=>{
       }
     );
+  }
+
+  getTienda(){
+    this.tiendaService.getTiendaById(this.local).subscribe((resp:any)=>{
+      this.tienda_moneda = resp.moneda;
+      
+    })
   }
 
   get_cancelacion(){
@@ -122,8 +135,6 @@ export class DetalleOrdenComponent implements OnInit {
     this._ventaService.listarCancelacionporUser(this.id).subscribe(
       response =>{
         this.data_cancelacion = response.cancelacion;
-
-
       },
       error =>{
         this.data_cancelacion = null;

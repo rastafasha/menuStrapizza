@@ -39,7 +39,7 @@
                                     <span *ngIf="item_venta.tracking_number">{{item_venta.tracking_number}}</span>
                                     <span *ngIf="!item_venta.tracking_number" class="badge badge-dark">No disponible</span>
                                 </div>
-                                <div class="font-size-lg text-accent pt-2"><span class="text-muted mr-2">Total pagado:</span>${{item_venta.total_pagado}}</div>
+                                <div class="font-size-lg text-accent pt-2"><span class="text-muted mr-2">Total pagado:</span>{{item_venta.total_pagado | currency:tienda_moneda}}</div>
                                 
                                 <div *ngIf="item_venta.estado !== 'Cancelado' && item_venta.estado !== 'Reembolsado'">
                                     <div class="btn-group btn-group mt-4" role="group" aria-label="Small group">

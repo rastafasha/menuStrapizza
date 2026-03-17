@@ -9,6 +9,7 @@ import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { HeaderComponent } from '../../../../shared/header/header.component';
 import { AsideCuentaComponent } from '../../aside-cuenta/aside-cuenta.component';
 import { environment } from '../../../../../environments/environment';
+import { TiendaService } from '../../../../services/tienda.service';
 
 declare var jQuery:any;
 declare var $:any;
@@ -37,6 +38,8 @@ export class IndexOrdenesComponent implements OnInit {
   public cancelacion!: Cancelacion;
   public ventas!: Venta[]|null;
   public venta!: Venta;
+  public local!: string;
+  public tienda_moneda!: any;
   public detalle : any = {};
 
   p: number = 1;
@@ -49,7 +52,8 @@ export class IndexOrdenesComponent implements OnInit {
     private _router : Router,
     private activatedRoute: ActivatedRoute,
     private http: HttpClient,
-    private ventaService: VentaService
+    private ventaService: VentaService,
+    private tiendaService: TiendaService,
   ) {
     // this.usuario = usuarioService.usuario;
      let USER = localStorage.getItem('user');
@@ -75,13 +79,21 @@ export class IndexOrdenesComponent implements OnInit {
    this.ventaService.listarporUser(this.identity.uid!).subscribe(
       response=>{
         this.ventas = response.ventas;
-        console.log(this.ventas);
-
+        this.local = this.venta.local;
+        this.getTienda();
       },
       error=>{
 
       }
     );
+  }
+
+  getTienda(){
+    this.tiendaService.getTiendaById(this.local).subscribe((resp:any)=>{
+      this.tienda_moneda = resp.moneda;
+      console.log(this.tienda_moneda)
+      
+    })
   }
 
 
@@ -91,7 +103,6 @@ export class IndexOrdenesComponent implements OnInit {
     this.ventaService.listarCancelacionporUser(this.identity.uid!).subscribe(
       response=>{
         this.cancelacion = response.cancelacion;
-        console.log(this.cancelacion);
       },
       error=>{
 
