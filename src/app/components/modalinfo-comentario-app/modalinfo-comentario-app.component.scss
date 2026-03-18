@@ -1,0 +1,21 @@
+.stars {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    padding-right: 13px;
+    & .fa {
+        font-size: 2ch;
+    }
+    & ul {
+        display: inline-flex;
+        & li {
+            list-style: none;
+            color: #ccc
+        }
+        & li .active {
+            color: gold;
+        }
+    
+    }
+
+}

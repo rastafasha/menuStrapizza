@@ -1,0 +1,66 @@
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+
+                <div class="row pb-3">
+                    
+                    <div class="col-md-12 mt-2 pt-4 mt-md-0 pt-md-0">
+                        <div class="bg-secondary py-grid-gutter px-grid-gutter rounded-lg"
+                            style="background: white !important;">
+                            <p >Gracias por usar nuestra aplicación, para finalizar, cómo ha sido tu experiencia con esta aplicacion?, solo lo haremos una vez.</p>
+                            <!-- <p class="h4 pb-2">¿Qué te ha parecido la integración de esta aplicación al negocio?</p> -->
+                            <form #reviewForm="ngForm" (ngSubmit)="saveComent(reviewForm)">
+                                <div class="form-group" *ngIf="msm_error_review">
+                                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                        {{msm_error_review}}
+                                       
+                                        <button type="button" class="btn-close" (click)="close_alert()" data-dismiss="alert" aria-label="Close"></button>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="review-rating">Rating<span class="text-danger">*</span></label>
+                                    <select class="custom-select form-control" required="" name="review_estrellas"
+                                        [(ngModel)]="review_estrellas">
+                                        <option value="" selected disabled>Selecciona
+                                        </option>
+                                        <option value="5">5 estrellas</option>
+                                        <option value="4">4 estrellas</option>
+                                        <option value="3">3 estrellas</option>
+                                        <option value="2">2 estrellas</option>
+                                        <option value="1">1 estrella</option>
+                                    </select>
+
+                                </div>
+                                <div class="form-group">
+                                    <label for="review-text">Reseña<span class="text-danger">*</span></label>
+                                    <textarea class="form-control" rows="5" required="" name="review_comentario"
+                                        [(ngModel)]="review_comentario"
+                                        placeholder="¿Qué te ha parecido la integración de esta aplicación al negocio?"></textarea>
+
+                                </div>
+                                <div class="form-group">
+                                    <label for="review-pros">Pros</label>
+                                    <textarea class="form-control" rows="2" placeholder="Lo bueno" name="review_pros"
+                                        [(ngModel)]="review_pros"></textarea>
+                                </div>
+                                <div class="form-group mb-4">
+                                    <label for="review-cons">Cons</label>
+                                    <textarea class="form-control" rows="2" placeholder="Lo malo" name="review_cons"
+                                        [(ngModel)]="review_cons"></textarea>
+                                </div>
+                                <ng-container *ngIf="identity">
+                                    <button type="button" class="btn btn-outline-primary btn-shadow" data-bs-dismiss="modal">Opinaré luego</button>
+                                    &nbsp;
+                                    <button class="btn btn-outline-success btn-shadow btn-block" type="submit">Enviar
+                                        reseña</button>
+                                </ng-container>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

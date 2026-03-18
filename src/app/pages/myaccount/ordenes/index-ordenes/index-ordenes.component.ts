@@ -10,21 +10,22 @@ import { HeaderComponent } from '../../../../shared/header/header.component';
 import { AsideCuentaComponent } from '../../aside-cuenta/aside-cuenta.component';
 import { environment } from '../../../../../environments/environment';
 import { TiendaService } from '../../../../services/tienda.service';
+import { ModalinfoComentarioAppComponent } from "../../../../components/modalinfo-comentario-app/modalinfo-comentario-app.component";
 
 declare var jQuery:any;
 declare var $:any;
 
 @Component({
   selector: 'app-index-ordenes',
-  imports:[
-      HeaderComponent,
-      CommonModule,
-      AsideCuentaComponent,
-      RouterModule,
-      ReactiveFormsModule,
-      FormsModule,
-      
-    ],
+  imports: [
+    HeaderComponent,
+    CommonModule,
+    AsideCuentaComponent,
+    RouterModule,
+    ReactiveFormsModule,
+    FormsModule,
+    ModalinfoComentarioAppComponent
+],
   templateUrl: './index-ordenes.component.html',
   styleUrls: ['./index-ordenes.component.css']
 })
