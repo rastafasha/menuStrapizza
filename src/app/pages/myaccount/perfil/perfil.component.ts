@@ -13,6 +13,7 @@ import { ImagenPipe } from '../../../pipes/imagen-pipe.pipe';
 import { PaisService } from '../../../services/pais.service';
 import { Pais } from '../../../models/pais.model';
 import { environment } from '../../../../environments/environment';
+import { LoadingComponent } from '../../../shared/loading/loading.component';
 
 declare var jQuery:any;
 declare var $:any;
@@ -30,7 +31,8 @@ interface HtmlInputEvent extends Event{
     RouterModule,
     ReactiveFormsModule,
     FormsModule,
-    ImagenPipe
+    ImagenPipe,
+    LoadingComponent
 
   ],
   templateUrl: './perfil.component.html',
@@ -50,6 +52,8 @@ export class PerfilComponent implements OnInit {
   public user!: Usuario;
   public identity!: Usuario;
   public user_id: any;
+
+  public isLoading = false;
   
 
   public pais!: Pais;
@@ -110,6 +114,7 @@ export class PerfilComponent implements OnInit {
   }
 
   getUser(){
+    this.isLoading = true;
     this.usuarioService.get_user(this.user_id).subscribe((resp:any)=>{
       this.usuarioSeleccionado = resp.usuario;
       // console.log(this.identity)
@@ -133,6 +138,7 @@ export class PerfilComponent implements OnInit {
           password: '',
           img: this.usuarioSeleccionado.img || null,
         });
+         this.isLoading = false;
         
     })
   }
@@ -192,13 +198,14 @@ export class PerfilComponent implements OnInit {
   }
 
   actualizarPerfil(){
-
+    this.isLoading = true;
     const {first_name, last_name, telefono, pais,  numdoc, email, role, uid} = this.perfilForm.value;
     this.usuarioService.actualizarP(this.perfilForm.value)
     .subscribe((resp:any) => {
-      
+      this.isLoading = false;
       Swal.fire('Guardado', 'Los cambios fueron actualizados', 'success');
     }, (err)=>{
+      this.isLoading = false;
       Swal.fire('Error', err.error.msg, 'error');
 
     })
@@ -223,6 +230,7 @@ cambiarImagen(event: Event) {
 
 
   subirImagen(){
+    this.isLoading = true;
     if (!this.imagenSubir) {
       Swal.fire('Error', 'No hay imagen seleccionada', 'warning');
       return;
@@ -235,9 +243,11 @@ cambiarImagen(event: Event) {
       // Update localStorage
       localStorage.setItem('user', JSON.stringify(this.usuarioSeleccionado));
       // Reset preview
+      this.isLoading = false;
       this.IMAGE_PREVISUALIZA = img ? `${environment.baseUrl}/uploads/usuarios/${img}` : 'assets/images/no-image.png';
       Swal.fire('Guardado', 'La imagen fue actualizada', 'success');
     }).catch(err =>{
+      this.isLoading = false;
       console.error(err);
       Swal.fire('Error', 'No se pudo subir la imagen', 'error');
     })
