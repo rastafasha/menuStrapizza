@@ -9,7 +9,6 @@ import { CommonModule } from '@angular/common';
   selector: 'app-aside-cuenta',
   imports:[
     CommonModule,
-    ImagenPipe,
     RouterModule
   ],
   templateUrl: './aside-cuenta.component.html',

@@ -3,7 +3,7 @@
     <h3>Inicia sesión para acceder</h3>
 </div>
 <div class="about" id="page" *ngIf="identity">
-    <section  style="height: calc(100vh - 100px); padding-top: 120px;">
+    <section style="height: calc(100vh - 100px); padding-top: 120px;">
         <div class="container">
             <div class="row blog-v reverse" style="margin-bottom: 20px;">
                 <div class="col-sm-4">
@@ -17,9 +17,9 @@
 
             </div>
 
-             <div *ngIf="!identity.telefono">
-        <h5>Por favor, llena tus datos para continuar con la experiencia</h5>
-    </div>
+            <div *ngIf="!identity.telefono">
+                <h5>Por favor, llena tus datos para continuar con la experiencia</h5>
+            </div>
             <div class="row ">
                 <div class="opciones">
                     <div class="iconop ">
@@ -93,4 +93,4 @@
         </div>
     </section>
 </div>
-<app-menu-footer ></app-menu-footer>
+<app-menu-footer></app-menu-footer>

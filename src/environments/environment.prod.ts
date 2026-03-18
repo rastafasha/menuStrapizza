@@ -7,7 +7,7 @@ export const environment = {
   nombreSelected: 'Strapizza',
   baseUrl: 'https://back-ecomm-mall.vercel.app/api',
   soketServer : 'https://back-ecomm-mall.vercel.app/',
-  mediaUrl: 'https://back-ecomm-mall.vercel.app/api/uploads/',
+  mediaUrl: 'https://back-ecomm-mall.vercel.app/api/uploads',
   mediaUrlRemoto: 'https://res.cloudinary.com/dmv6aukai/image/upload/v1741218430/mallConnect',
   //pluggins
   rapidapiKey: 'a7036a3222mshc2920e679cd1cafp141e56jsn81cbe707ac15',

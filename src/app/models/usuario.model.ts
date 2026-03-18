@@ -9,8 +9,8 @@ export class Usuario {
     public telefono: string,
     public numdoc: string,
     public email: string,
+    public img: string,
     public password?: string,
-    public img?: string,
     public google?: boolean,
     public role?: 'ADMIN' | 'USER' | 'VENTAS',
     public uid?: string

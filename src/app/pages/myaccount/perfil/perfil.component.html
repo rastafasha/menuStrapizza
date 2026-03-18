@@ -8,12 +8,12 @@
 <div class="container pb-5 mb-2 mb-md-3">
     <div class="row">
         <!-- Sidebar-->
-        <aside class="col-lg-4 pt-4 pt-lg-0">
+        <aside class="col-xs-12 col-lg-4 pt-4 pt-lg-0">
             <app-aside-cuenta></app-aside-cuenta>
         </aside>
 
         <!-- Content  -->
-        <section class="col-lg-8">
+        <section class="col-xs-12 col-lg-8">
             <!-- Toolbar-->
             <div class="d-none d-lg-flex justify-content-between align-items-center pt-lg-3 pb-4 pb-lg-5 mb-lg-3">
                 <h6 class="font-size-base text-light mb-0">Actualiza los datos de tu perfíl:</h6>
@@ -41,35 +41,137 @@
                     </div>
                 </div>
             </div>
-            <form *ngIf="perfilForm" [formGroup]="perfilForm" (ngSubmit)="actualizarPerfil()" autocomplete="off">
+            <div class="product_list">
+                <div class="div1">
+                    <img [src]="usuarioSeleccionado.img | imagenPipe: 'usuarios'"
+                        [alt]="usuarioSeleccionado.first_name">
+                </div>
+                <div class="div2">
+                    <h3>{{usuarioSeleccionado.first_name}} {{usuarioSeleccionado.last_name}} </h3>
+                    <p>{{usuarioSeleccionado.numdoc}}</p>
+                </div>
+            </div>
 
-               <div class="container">
-                 <div class="row">
-                    <div class="col-sm-6">
+            <form *ngIf="perfilForm" [formGroup]="perfilForm" (ngSubmit)="actualizarPerfil()" autocomplete="off">
+                <!-- Foto -->
+                <div style="height: auto; margin-bottom: 20px;">
+                    <div class="col-xs-12 col-sm-">
                         <div class="form-group">
-                            <label for="account-fn">Nombres completos</label>
-                            <input class="form-control" type="text" formControlName="first_name" required>
+                            <div *ngIf="FILE_AVATAR">
+                                <img [src]="IMAGE_PREVISUALIZA" style="width: 250px;" alt="Preview">
+                            </div>
+                            <div class="cz-file-drop-area">
+                                <label for="file" class="upload labelgoogle">
+                                    <input type="file" accept="image/*" name="image" id="file"
+                                        (change)="cambiarImagen($event)" class="hide-input input">
+                                    <span class="label__name">
+                                        {{'Select a Photo'}}
+                                    </span>
+                                </label>
+                                <button type="button" (click)="subirImagen()"
+                                    class="btn btn-success waves-effect waves-light m-r-10 ">
+                                    <i class="fa fa-save"></i> Cambiar imagen
+                                </button>
+
+
+                            </div>
                         </div>
                     </div>
-                    <div class="col-sm-6">
-                        <div class="form-group">
-                            <label for="account-ln">Apellidos Completos</label>
-                            <input class="form-control" type="text" formControlName="last_name" required>
+                </div>
+                <hr>
+                <br>
+                <div class="container">
+                    <div class="row">
+                        <!-- Nombre -->
+                        <div class="col-xs-12 col-sm-6 ">
+                            <label for="validationCustom02" class="form-label labelgoogle">
+                                <input type="text" formControlName="first_name" class="form-control input"
+                                    id="validationCustom02" placeholder=" " required>
+                                <span class="label__name">
+                                    {{'Nombre'}} <span class="login-danger">*</span>
+                                </span>
+                            </label>
+                            @if(perfilForm.controls['first_name'].touched){
+
+                            <div class="text-danger">
+                                @if(perfilForm.controls['first_name'].errors?.['required']){
+                                <span>{{'Field Required'}}</span>
+                                }
+                                @if(perfilForm.controls['first_name'].errors?.['minlength']){
+                                <span>{{'3 Charecters Minimal'}}</span>
+                                }
+                            </div>
+                            }
+                        </div>
+                        <!-- Apellido -->
+                        <div class="col-xs-12 col-md-6 ">
+                            <label for="validationCustom02" class="form-label labelgoogle">
+                                <input type="text" formControlName="last_name" class="form-control input"
+                                    id="validationCustom02" placeholder=" " required>
+                                <span class="label__name">
+                                    {{'Apellido'}} <span class="login-danger">*</span>
+
+                                </span>
+                            </label>
+                            @if(perfilForm.controls['last_name'].touched){
+
+                            <div class="text-danger">
+                                @if(perfilForm.controls['last_name'].errors?.['required']){
+                                <span>{{'Field Required'}}</span>
+                                }
+                                @if(perfilForm.controls['last_name'].errors?.['minlength']){
+                                <span>{{'3 Charecters Minimal'}}</span>
+                                }
+                            </div>
+                            }
                         </div>
                     </div>
-                    <!-- <div class="col-sm-6">
-                        <div class="form-group">
-                            <label for="account-email">Correo Electrónico</label>
-                            <input class="form-control" formControlName="email" type="email" readonly value="{{identity.email}}">
+                    <div class="row">
+                        <!-- Identificación -->
+                        <div class="col-xs-12 col-md-6 ">
+                            <label for="validationCustom02" class="form-label labelgoogle">
+                                <input type="text" formControlName="numdoc" class="form-control input"
+                                    id="validationCustom02" placeholder=" " required>
+                                <span class="label__name">
+                                    {{'Id Number'}}<span class="login-danger">*</span>
+                                </span>
+                            </label>
+                            @if(perfilForm.controls['numdoc'].touched){
+
+                            <div class="text-danger">
+                                @if(perfilForm.controls['numdoc'].errors?.['required']){
+                                <span>{{'Field Required'}}</span>
+                                }
+                                @if(perfilForm.controls['numdoc'].errors?.['minlength']){
+                                <span>{{'3 Charecters Minimal'}}</span>
+                                }
+                            </div>
+                            }
                         </div>
-                    </div> -->
-                    <div class="col-sm-6">
-                        <div class="form-group">
-                            <label for="account-phone">Telefono</label>
-                            <input class="form-control" type="text" formControlName="telefono" required>
+                        <!-- Teléfono Móvil -->
+                        <div class="col-xs-12 col-md-6 ">
+                            <label for="validationCustom02" class="form-label labelgoogle">
+                                <input type="text" formControlName="telefono" class="form-control input"
+                                    id="validationCustom02" placeholder=" " required>
+                                <span class="label__name">
+                                    {{'Teléfono Móvil'}}<span class="login-danger">*</span>
+                                </span>
+                            </label>
+                            @if(perfilForm.controls['telefono'].touched){
+
+                            <div class="text-danger">
+                                @if(perfilForm.controls['telefono'].errors?.['required']){
+                                <span>{{'Field Required'}}</span>
+                                }
+                                @if(perfilForm.controls['telefono'].errors?.['minlength']){
+                                <span>{{'3 Charecters Minimal'}}</span>
+                                }
+                            </div>
+                            }
                         </div>
                     </div>
-                    <div class="col-sm-6">
+
+                    <div class="col-xs-12 ">
                         <div class="form-group">
                             <label for="account-phone">País</label>
                             <select class="form-control" formControlName="pais" required>
@@ -78,45 +180,47 @@
                             </select>
                         </div>
                     </div>
-                    <div class="col-sm-6">
-                        <div class="form-group">
-                            <label for="account-phone">Número de documento</label>
-                            <input class="form-control" type="text" formControlName="numdoc" required>
-                            <!-- <input autocomplete="off" class="form-control" type="number" formControlName="numdoc"  name="numdoc"
-                                [(ngModel)]="user.numdoc"> -->
+                    <div class="col-12 mt-2 mb-3">
+                        <div class="d-flex flex-wrap justify-content-between align-items-center">
+                            <div class="custom-control custom-checkbox d-block"></div>
+                            <button class="btn btn-outline-primary mt-3 mt-sm-0" type="submit">Actualizar
+                                perfíl</button>
                         </div>
                     </div>
-                    <div class="col-sm-6">
-                        <div class="form-group">
-                            <label for="account-pass">Nueva contraseña</label>
-                            <div class="password-toggle">
-                                <input class="form-control" type="password" id="password" name="new_password"
-                                    formControlName="password" placeholder="Nueva contraseña">
-                                <label class="password-toggle-btn">
-                                    <input class="custom-control-input" type="button" (click)="view_password()"
-                                        autocomplete="nope">
-                                    <i class="czi-eye password-toggle-indicator"></i><span class="sr-only">Show
-                                        password</span>
-                                </label>
-                                <div class="invalid-feedback" *ngIf="pass_error">Las contraseñas no coinciden.</div>
+                    <br>
+                    <hr>
+                    <div class="row">
+                        <p>En caso que quieras cambiar tu contraseña</p>
+                        <div class="col-xs-12 col-sm-6">
+                            <div class="form-group">
+                                <label for="account-pass">Nueva contraseña</label>
+                                <div class="password-toggle">
+                                    <input class="form-control" type="password" id="password" name="new_password"
+                                        formControlName="password" placeholder="Nueva contraseña">
+                                    <div class="invalid-feedback" *ngIf="pass_error">Las contraseñas no coinciden.</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-12 col-sm-6">
+                            <div class="form-group">
+                                <label for="account-confirm-pass">Confirmar contraseña</label>
+                                <div class="password-toggle">
+                                    <input class="form-control" type="password" id="password_dos"
+                                        name="comfirm_password" formControlName="password"
+                                        placeholder="Repita la contraseña">
+                                    <label class="password-toggle-btn">
+                                        <input class="custom-control-input" (click)="view_password2()"
+                                            type="checkbox"><i class="czi-eye password-toggle-indicator"></i><span
+                                            class="sr-only">Show
+                                            password</span>
+                                    </label>
+                                    <div class="invalid-feedback" *ngIf="pass_error">Las contraseñas no coinciden.</div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-sm-6">
-                        <div class="form-group">
-                            <label for="account-confirm-pass">Confirmar contraseña</label>
-                            <div class="password-toggle">
-                                <input class="form-control" type="password" id="password_dos" name="comfirm_password"
-                                    formControlName="password" placeholder="Repita la contraseña">
-                                <label class="password-toggle-btn">
-                                    <input class="custom-control-input" (click)="view_password2()" type="checkbox"><i
-                                        class="czi-eye password-toggle-indicator"></i><span class="sr-only">Show
-                                        password</span>
-                                </label>
-                                <div class="invalid-feedback" *ngIf="pass_error">Las contraseñas no coinciden.</div>
-                            </div>
-                        </div>
-                    </div>
+
+
 
                     <div class="col-12">
                         <hr class="mt-2 mb-3">
@@ -124,38 +228,12 @@
                             <div class="custom-control custom-checkbox d-block">
 
                             </div>
-                            <button class="btn btn-primary mt-3 mt-sm-0" type="submit">Actualizar perfíl</button>
+                            <button class="btn btn-outline-primary mt-3 mt-sm-0" type="submit">Actualizar
+                                Contraseña</button>
                         </div>
                     </div>
                 </div>
-               </div>
 
-                <div class="container">
-                    <div class="row" *ngIf="identity">
-                    <div class="col-xs-12 col-sm-3 media">
-                        <img [src]="(identity.img ?? '') | imagenPipe: 'usuarios'" style="width: 150px; display: block; margin: auto;" alt="user.first_name">
-
-                    </div>
-                    <div class="col-xs-12 col-sm-">
-                        <div class="form-group">
-                            <div class="cz-file-drop-area">
-                                <!-- <div class="cz-file-drop-preview img-thumbnail rounded">
-                                    <img *ngIf="!imgTemp" [src]="identity.imagenUrl" style="width: 100px;">
-                                    <img *ngIf="imgTemp" [src]="imgTemp" style="width: 100px;">
-                                </div> -->
-                                <span class="cz-file-drop-message">Suelta la imagen aquí</span>
-                                <input type="file" class="cz-file-drop-input" (change)="cambiarImagen($event)">
-                                <br>
-                                <br>
-                                <button type="button" [disabled]="!imagenSubir" (click)="subirImagen()"
-                                    class="btn btn-success waves-effect waves-light m-r-10 ">
-                                    <i class="fa fa-save"></i> Cambiar imagen
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                </div>
             </form>
 
         </section>

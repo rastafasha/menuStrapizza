@@ -40,8 +40,8 @@ export class PerfilComponent implements OnInit {
 
   public url;
   public paises:any;
-  public file !:File;
-  public imgSelect !: String | ArrayBuffer;
+  // public file !:File; // unused
+  // public imgSelect !: String | ArrayBuffer; // unused
   public data_paises : any = [];
   public msm_error = false;
   public msm_success = false;
@@ -56,8 +56,11 @@ export class PerfilComponent implements OnInit {
 
   public perfilForm!: FormGroup;
   public imagenSubir!: File;
-  public imgTemp: any = null;
-
+  public imgTemp: string | ArrayBuffer | null = null;
+  public usuarioSeleccionado!: Usuario;
+  public FILE_AVATAR!: HTMLInputElement;
+  public IMAGE_PREVISUALIZA: string | null = null;
+  text_validation: any = null;
 
 
   //DATA
@@ -108,40 +111,36 @@ export class PerfilComponent implements OnInit {
 
   getUser(){
     this.usuarioService.get_user(this.user_id).subscribe((resp:any)=>{
-      this.identity = resp.usuario;
+      this.usuarioSeleccionado = resp.usuario;
       // console.log(this.identity)
-      if(!this.identity){
+      if(!this.usuarioSeleccionado){
         this._router.navigate(['/']);
       }
        // First initialize the form
         this.iniciarFormulario();
-        
+         this.getPaises();
         // Then set the values
         this.perfilForm.setValue({
-          uid: this.identity.uid,
-          email: this.identity.email,
-          first_name: this.identity.first_name,
-          last_name: this.identity.last_name,
-          numdoc: this.identity.numdoc || null,
-          telefono: this.identity.telefono || null,
-          pais: this.identity.pais || null,
-          google: this.identity.google || null,
-          role: this.identity.role,
+          uid: this.usuarioSeleccionado.uid,
+          email: this.usuarioSeleccionado.email,
+          first_name: this.usuarioSeleccionado.first_name,
+          last_name: this.usuarioSeleccionado.last_name,
+          numdoc: this.usuarioSeleccionado.numdoc || null,
+          telefono: this.usuarioSeleccionado.telefono || null,
+          pais: this.usuarioSeleccionado.pais || null,
+          google: this.usuarioSeleccionado.google || null,
+          role: this.usuarioSeleccionado.role,
           password: '',
-          img: this.identity.img || null,
+          img: this.usuarioSeleccionado.img || null,
         });
         
-        this.getPaises();
-     
-
-     
     })
   }
 
    iniciarFormulario(){
     this.perfilForm = this.fb.group({
-      uid: [ this.identity.uid,  Validators.required ],
-      email: [ this.identity.email],
+      uid: [ '',  Validators.required ],
+      email: [''],
       first_name: [ '', Validators.required ],
       last_name: [ '', Validators.required ],
       numdoc: ['' ],
@@ -206,27 +205,40 @@ export class PerfilComponent implements OnInit {
   }
 cambiarImagen(event: Event) {
   const input = event.target as HTMLInputElement;
-  if (input.files && input.files[0]) {
-    const file = input.files[0];
-    // your code here, using 'file'
+  if (!input.files || input.files.length === 0) {
+    return;
   }
   
-
-    const reader = new FileReader();
-    // reader.readAsDataURL(file);
-
-    reader.onloadend = () =>{
-      this.imgTemp = reader.result;
-    }
+  const file = input.files[0];
+  this.imagenSubir = file;
+  this.FILE_AVATAR = input;
+  
+  const reader = new FileReader();
+  reader.readAsDataURL(file);
+  reader.onloadend = () => {
+    this.IMAGE_PREVISUALIZA = reader.result as string;
+    this.imgTemp = reader.result;
+  };
 }
 
 
   subirImagen(){
+    if (!this.imagenSubir) {
+      Swal.fire('Error', 'No hay imagen seleccionada', 'warning');
+      return;
+    }
+    
     this.fileUploadService
-    .actualizarFoto(this.imagenSubir, 'usuarios', this.identity.uid || '')
-    .then(img => { this.identity.img = img;
+    .actualizarFoto(this.imagenSubir, 'usuarios', this.usuarioSeleccionado.uid || '')
+    .then(img => { 
+      this.usuarioSeleccionado.img = img;
+      // Update localStorage
+      localStorage.setItem('user', JSON.stringify(this.usuarioSeleccionado));
+      // Reset preview
+      this.IMAGE_PREVISUALIZA = img ? `${environment.baseUrl}/uploads/usuarios/${img}` : 'assets/images/no-image.png';
       Swal.fire('Guardado', 'La imagen fue actualizada', 'success');
     }).catch(err =>{
+      console.error(err);
       Swal.fire('Error', 'No se pudo subir la imagen', 'error');
     })
   }
