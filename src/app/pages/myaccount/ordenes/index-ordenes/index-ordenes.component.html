@@ -17,7 +17,7 @@
 
             <hr class="pb-4">
             <!-- <div *ngFor="let item_venta of ventas |  paginate: { itemsPerPage: count, currentPage: p }"> -->
-            <div *ngFor="let item_venta of ventas ">
+            <div *ngFor="let item_venta of ventas  ">
                 <div class="card mb-4">
                     <div class="card-header">
                         <h3 class="product-title font-size-base" style="margin-bottom: 0px;"><a>Compra: N°-{{item_venta._id.toUpperCase()}}</a></h3>
@@ -80,4 +80,4 @@
     </div>
 </div>
 
-<app-modalinfo-comentario-app></app-modalinfo-comentario-app>
+<app-modalinfo-comentario-app [localId]="localId"></app-modalinfo-comentario-app>

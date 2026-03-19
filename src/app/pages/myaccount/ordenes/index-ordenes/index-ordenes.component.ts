@@ -31,7 +31,7 @@ declare var $:any;
 })
 export class IndexOrdenesComponent implements OnInit {
 
-  public identity;
+  public identity:any;
   public url:any;
   public msm_error = false;
   public msm_success = false;
@@ -40,8 +40,11 @@ export class IndexOrdenesComponent implements OnInit {
   public ventas!: Venta[]|null;
   public venta!: Venta;
   public local!: string;
+  public localId!: string;
   public tienda_moneda!: any;
   public detalle : any = {};
+
+   nombreSelected = environment.nombreSelected;
 
   p: number = 1;
   count: number = 8;
@@ -57,31 +60,27 @@ export class IndexOrdenesComponent implements OnInit {
     private tiendaService: TiendaService,
   ) {
     // this.usuario = usuarioService.usuario;
-     let USER = localStorage.getItem('user');
-    if(USER){
-      this.identity = JSON.parse(USER);
-      console.log(this.identity);
-    }
+     
   }
 
   ngOnInit(): void {
-
-    if(this.identity){
-      this.listar_ventas();
+    let USER = localStorage.getItem('user');
+    if(USER){
+      this.identity = JSON.parse(USER);
+       this.listar_ventas();
       this.listar_cancelacion();
       this.url = environment.baseUrl;
     }else{
       this._router.navigate(['/']);
     }
+    this.getTienda();
 
   }
 
   listar_ventas(){
-   this.ventaService.listarporUser(this.identity.uid!).subscribe(
+   this.ventaService.listarporUser(this.identity.uid).subscribe(
       response=>{
         this.ventas = response.ventas;
-        this.local = this.venta.local;
-        this.getTienda();
       },
       error=>{
 
@@ -90,9 +89,10 @@ export class IndexOrdenesComponent implements OnInit {
   }
 
   getTienda(){
-    this.tiendaService.getTiendaById(this.local).subscribe((resp:any)=>{
+    this.tiendaService.getTiendaByName(this.nombreSelected).subscribe((resp:any)=>{
+      this.local = resp;
+      this.localId = resp._id;
       this.tienda_moneda = resp.moneda;
-      console.log(this.tienda_moneda)
       
     })
   }

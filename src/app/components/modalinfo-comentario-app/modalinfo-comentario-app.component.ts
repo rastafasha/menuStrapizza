@@ -13,6 +13,7 @@ import { Usuario } from '../../models/usuario.model';
 })
 export class ModalinfoComentarioAppComponent implements AfterViewInit{
   @Input() nombreSelected!:string;
+  @Input() localId!:string;
   isLogued: boolean = false;
 
   public comentarios :any=[];
@@ -95,6 +96,7 @@ saveComent(reviewForm: { valid: any; value: { review_comentario: any; review_pro
       cons: reviewForm.value.review_cons,
       estrellas: reviewForm.value.review_estrellas,
       user: this.identity.uid,
+      tienda: this.localId,
     }
     this._comentarioService.create(data).subscribe(
       (response:any) =>{
