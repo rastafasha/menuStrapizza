@@ -222,11 +222,11 @@ export class DireccionEditComponent implements OnInit, AfterViewInit, OnDestroy 
       .then(res => res.json())
       .then(data => {
         const address = data.display_name || `Lat ${lat.toFixed(4)}, Lng ${lng.toFixed(4)}`;
-        this.direccionForm.patchValue({ referencia: `📍 ${address}` });
+        this.direccionForm.patchValue({ direccion: `📍 ${address}` });
         console.log('Address:', address);
       })
       .catch(() => {
-        this.direccionForm.patchValue({ referencia: `📍 GPS: ${lat.toFixed(6)}, ${lng.toFixed(6)}` });
+        this.direccionForm.patchValue({ direccion: `📍 GPS: ${lat.toFixed(6)}, ${lng.toFixed(6)}` });
       });
   }
 
