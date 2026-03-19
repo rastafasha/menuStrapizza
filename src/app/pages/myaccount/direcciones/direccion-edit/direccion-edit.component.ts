@@ -80,12 +80,14 @@ export class DireccionEditComponent implements OnInit, AfterViewInit, OnDestroy 
     // Suscripción a geolocalización para centrar mapa inicialmente
     this.locationSubscription = this.geolocation$.subscribe({
       next: (position) => {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+        console.log('Initial geolocation success - Lat:', lat, 'Lng:', lng);
         // Solo usar GPS si no hay coordenadas ya seleccionadas
         if (!this.selectedCoords && this.map) {
-          const lat = position.coords.latitude;
-          const lng = position.coords.longitude;
           this.map.setView([lat, lng], 15);
         }
+        
         this.mapLoading = false;
         this.mapError = '';
       },
@@ -114,10 +116,11 @@ export class DireccionEditComponent implements OnInit, AfterViewInit, OnDestroy 
   }
 
   ngAfterViewInit() {
-    // Pequeño delay para asegurar que el DOM está listo
+    // Delay aumentado para asegurar DOM listo y logging
     setTimeout(() => {
+      console.log('Attempting to init map. Container ready?', !!this.mapContainer?.nativeElement);
       this.initMap();
-    }, 100);
+    }, 300);
   }
 
   ngOnDestroy() {
@@ -134,9 +137,12 @@ export class DireccionEditComponent implements OnInit, AfterViewInit, OnDestroy 
    * Inicializa el mapa de Leaflet
    */
   private initMap(): void {
+    console.log('Map container element:', this.mapContainer?.nativeElement);
     // Verificar que el contenedor del mapa existe
     if (!this.mapContainer?.nativeElement) {
       console.error('Contenedor del mapa no encontrado');
+      this.mapError = 'Contenedor del mapa no disponible. Recarga la página.';
+      this.mapLoading = false;
       return;
     }
 
@@ -173,10 +179,13 @@ export class DireccionEditComponent implements OnInit, AfterViewInit, OnDestroy 
   /**
    * Coloca o mueve el marcador en las coordenadas especificadas
    */
-  private placeMarker(lat: number, lng: number): void {
+  private async placeMarker(lat: number, lng: number): Promise<void> {
     if (!this.map) return;
 
     this.selectedCoords = { lat, lng };
+
+    // Patch form fields explicitly
+    this.direccionForm.patchValue({ latitud: lat, longitud: lng });
 
     if (this.marker) {
       // Mover marcador existente
@@ -189,10 +198,48 @@ export class DireccionEditComponent implements OnInit, AfterViewInit, OnDestroy 
         .openPopup();
     }
 
-    // Actualizar el campo referencia con las coordenadas
+    // Obtener dirección legible desde coordenadas
+    await this.fetchAddress(lat, lng);
+
+    // Actualizar referencia con dirección o coordenadas
+    const refText = this.direccionForm.value.referencia || `📍 ${lat.toFixed(6)}, ${lng.toFixed(6)}`;
     this.direccionForm.patchValue({
-      referencia: `📍 Coordenadas: ${lat.toFixed(6)}, ${lng.toFixed(6)}`
+      referencia: refText
     });
+  }
+
+  /**
+   * Obtiene dirección legible de coordenadas usando Nominatim (OpenStreetMap)
+   */
+  private async fetchAddress(lat: number, lng: number): Promise<void> {
+    try {
+      console.log('Fetching reverse geocode for:', lat, lng);
+      const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`);
+      const data = await response.json();
+      
+      let address = data.display_name || 'Dirección aproximada no disponible';
+      if (data.address) {
+        const parts = [];
+        if (data.address.road) parts.push(data.address.road);
+        if (data.address.house_number) parts.push(data.address.house_number);
+        if (data.address.city || data.address.town || data.address.village) parts.push(data.address.city || data.address.town || data.address.village);
+        if (data.address.country) parts.push(data.address.country);
+        address = parts.filter(Boolean).join(', ');
+      }
+      
+      console.log('Reverse geocoded address:', address);
+      // Update referencia with full address + coords
+      const currentRef = this.direccionForm.get('referencia')?.value || '';
+      this.direccionForm.patchValue({
+        referencia: `${currentRef ? currentRef + ' | ' : ''}📍 ${address} [${lat.toFixed(6)}, ${lng.toFixed(6)}]`
+      });
+    } catch (error) {
+      console.warn('Reverse geocoding failed:', error);
+      // Fallback: just coords
+      this.direccionForm.patchValue({
+        referencia: `📍 Coords: ${lat.toFixed(6)}, ${lng.toFixed(6)} (geocode failed)`
+      });
+    }
   }
 
   /**
@@ -204,14 +251,25 @@ export class DireccionEditComponent implements OnInit, AfterViewInit, OnDestroy 
       next: (position) => {
         const lat = position.coords.latitude;
         const lng = position.coords.longitude;
+        console.log('GPS Success - Lat:', lat, 'Lng:', lng);
         this.placeMarker(lat, lng);
-        this.map?.setView([lat, lng], 15);
+        if (this.map) {
+          this.map.setView([lat, lng], 15);
+        }
         this.mapLoading = false;
       },
       error: (error) => {
         console.error('Error de geolocalización:', error);
         this.mapLoading = false;
-        Swal.fire('Error', 'No se pudo obtener tu ubicación actual', 'error');
+        let msg = 'No se pudo obtener tu ubicación actual. ';
+        if (error.code === error.PERMISSION_DENIED) {
+          msg += 'Habilita permisos de ubicación (candado en barra de direcciones). Usa HTTPS.';
+        } else if (error.code === error.POSITION_UNAVAILABLE) {
+          msg += 'Ubicación no disponible en este dispositivo.';
+        } else if (error.code === error.TIMEOUT) {
+          msg += 'Timeout - intenta de nuevo.';
+        }
+        Swal.fire('Error GPS', msg, 'warning');
       }
     });
   }
@@ -286,14 +344,14 @@ export class DireccionEditComponent implements OnInit, AfterViewInit, OnDestroy 
     }
   }
 
-  onSubmit(){
+  onSubmit(){debugger
     const {nombres_completos, direccion, referencia, pais,
       ciudad, zip, user } = this.direccionForm.value;
 
     // Incluir coordenadas si están disponibles
     const data: any = {
       ...this.direccionForm.value,
-      latitud: this.selectedCoords?.lat || this.direccion?.latitud,
+      latitud: this.selectedCoords?.lat || this.direccion?.latitud, 
       longitud: this.selectedCoords?.lng || this.direccion?.longitud
     };
 
