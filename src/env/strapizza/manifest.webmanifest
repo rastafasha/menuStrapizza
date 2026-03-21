@@ -1,8 +1,8 @@
 {
-  "name": "Menu Pizzería",
-  "short_name": "Menu Pizzería",
+  "name": "Zlipmenu Pizzería",
+  "short_name": "Zlipmenu Pizzería",
   "categories": ["Alimentos", "compras", "delivery"],
-  "description": "Menú Digital de Pizzería",
+  "description": "Menú Digital para Pizzería",
   "display": "standalone",
   "theme_color": "#333",
   "background_color": "#fafafa",
