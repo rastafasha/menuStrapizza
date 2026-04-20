@@ -3,12 +3,34 @@
     width: 12px;
   }
 
-  .pwanotif{
-    display: block;
-      position: absolute;
-      z-index: 9;
-      height: 200px;
-      width: 100vw;
-      background: #1d1c1aab;
+  // .pwanotif{
+  //   display: block;
+  //     position: absolute;
+  //     z-index: 9;
+  //     height: 200px;
+  //     width: 100vw;
+  //     background: #1d1c1aab;
 
-  }
+  // }
+
+  .pwanotif {
+    display: flex;
+    align-items: center; /* Centra el contenido verticalmente */
+    position: fixed;     /* Fixed en lugar de absolute para que flote sobre todo */
+    top: 0;
+    left: 0;
+    z-index: 9999;       /* Un valor alto para que esté por encima de modales y botones */
+    height: auto;        /* Quitamos los 200px; que sea dinámico según el texto */
+    min-height: 60px;
+    width: 100vw;
+    background: rgba(29, 28, 26, 0.95); /* Un fondo oscuro con ligera transparencia */
+    backdrop-filter: blur(4px);         /* Efecto de desenfoque moderno */
+    border-bottom: 2px solid #ffc107;   /* Una línea dorada/amarilla para llamar la atención */
+    padding: 10px 20px;
+    animation: fadeInDown 0.5s ease;    /* Animación de entrada */
+}
+
+/* Ajuste para el botón de cerrar en la barra */
+.pwanotif .btn-close {
+    filter: invert(1); /* Lo hace blanco para que resalte en el fondo oscuro */
+}

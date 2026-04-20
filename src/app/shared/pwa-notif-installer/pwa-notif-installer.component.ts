@@ -50,24 +50,24 @@ export class PwaNotifInstallerComponent implements OnInit {
 
 
 
-initPwa(){
+initPwa() {
   this.updateOnlineStatus();
 
-    window.addEventListener('online',  this.updateOnlineStatus.bind(this));
-    window.addEventListener('offline', this.updateOnlineStatus.bind(this));
+  if (this.swUpdate.isEnabled) {
+    // IMPORTANTE: Se añade el .subscribe() para que Angular "escuche" cambios
+    this.swUpdate.versionUpdates.pipe(
+      filter((evt): evt is VersionReadyEvent => evt.type === 'VERSION_READY')
+    ).subscribe(() => {
+      this.modalVersion = true; // Activa tu modal HTML
+    });
 
-    if (this.swUpdate.isEnabled) {
-      this.swUpdate.versionUpdates.pipe(
-        filter((evt: any): evt is VersionReadyEvent => evt.type === 'VERSION_READY'),
-        map((evt: any) => {
-          // console.info(`currentVersion=[${evt.currentVersion} | latestVersion=[${evt.latestVersion}]`);
-          this.modalVersion = true;
-        }),
-      );
-    }
+    // Fuerza a la PWA a buscar cambios en Vercel de inmediato
+    this.swUpdate.checkForUpdate();
+  }
 
-    this.loadModalPwa();
+  this.loadModalPwa();
 }
+
 
 private updateOnlineStatus(): void {
   this.isOnline = window.navigator.onLine;
