@@ -67,7 +67,7 @@ export class ModalproductComponent implements OnInit, OnDestroy {
     if(!this.product?.img){
       this.img = '../assets/images/no-image.jpg';
     }
-    
+    this.getSelectorProducto();
   }
 
   ngOnDestroy(): void {
@@ -111,6 +111,7 @@ export class ModalproductComponent implements OnInit, OnDestroy {
 
       // Agregamos el selector al producto
       producto.nombre_selector = this.selector_to_cart;
+      
     }
 
     this.carritoService.addItem(producto);
@@ -139,6 +140,7 @@ export class ModalproductComponent implements OnInit, OnDestroy {
     this.selectorService.selectorByProduct(this.product._id).subscribe(
       response =>{
         this.selectores = response;
+        console.log(this.selectores)
       },
       error=>{
 

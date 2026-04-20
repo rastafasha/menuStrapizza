@@ -93,7 +93,7 @@ export class CasProductsComponent implements OnInit, OnDestroy {
         this.getProductosCatName();
         this.updateTodo();
         this.getProductosCatName();
-        this.getCategories();
+        // this.getCategories();
       }
     });
   }
@@ -121,7 +121,7 @@ export class CasProductsComponent implements OnInit, OnDestroy {
   getCategories() {
     this.isLoading = true
     this.productoService.getProductosActivos().subscribe((resp: any) => {
-      //filtramos los productos donde sea igual a la categoria Panaderia
+      //filtramos los productos donde sea igual a la categoria
       const productos = resp.filter((producto: any) => producto.categoria.nombre === this.catname);
       //extraemos el campo subcategoria
       const subcategorias = productos.map((producto: any) => producto.subcategoria);
