@@ -8,7 +8,7 @@
     <div class="offcanvas-header p-3" *ngIf="product">
         <h5 class="offcanvas-title" [id]="'modalProductLabel-' + product._id">{{product.titulo}}</h5>
         <!-- El atributo data-bs-dismiss ahora debe ser "offcanvas" -->
-        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" (click)="onModalHidden()" aria-label="Close"></button>
     </div>
 
     <div class="offcanvas-body" *ngIf="product">
@@ -59,19 +59,19 @@
 
                 <!-- mensajes de alerta -->
                 <div *ngIf="selector_error" class="alert alert-warning mt-3">
-                    <i class="fa fa-close float-end" data-bs-dismiss="offcanvas" style="cursor:pointer"></i>
+                    <i class="fa fa-close float-end" (click)="closeAviso()"  style="cursor:pointer"></i>
                     <p class="mb-0">Selecciona alguna opción por favor</p>
                 </div>
 
                 <div *ngIf="!user && msm_alert" class="alert alert-info mt-3">
-                    <i class="fa fa-close float-end" data-bs-dismiss="offcanvas" style="cursor:pointer"></i>
+                    <i class="fa fa-close float-end" data-bs-dismiss="offcanvas" style="cursor:pointer" (click)="onModalHidden()"></i>
                     <p class="mb-0">Debes <a [routerLink]="['/login']" data-bs-dismiss="offcanvas"><b>Iniciar Sesión</b></a> ó 
                     <a [routerLink]="['/registro']" data-bs-dismiss="offcanvas"><b>Registrarte</b></a></p>
                 </div>
 
                 <div class="alert alert-success mt-3" *ngIf="msm_success">
-                    <i class="fa fa-close float-end" data-bs-dismiss="offcanvas" style="cursor:pointer"></i>
-                    <p class="mb-0">¡Artículo agregado al <a [routerLink]="['/review']" data-bs-dismiss="offcanvas"><b>Carrito!</b></a>!</p>
+                    <i class="fa fa-close float-end" data-bs-dismiss="offcanvas" style="cursor:pointer" (click)="closeAviso()"></i>
+                    <p class="mb-0">¡Artículo agregado al <a [routerLink]="['/review']" data-bs-dismiss="offcanvas" (click)="onModalHidden()"><b>Carrito!</b></a>!</p>
                 </div>
             </div>
         </div>

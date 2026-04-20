@@ -83,9 +83,14 @@ export class ModalproductComponent implements OnInit, OnDestroy {
 
 
   onModalHidden(): void {
-    this.modalClosed.emit();
-    this.selector_to_cart = ' ';
-  }
+  this.modalClosed.emit();
+  this.selector_to_cart = ' ';
+  
+  // Force removal if Bootstrap's JS fails to clean up
+  document.querySelectorAll('.offcanvas-backdrop').forEach(el => el.remove());
+  document.body.style.overflow = 'auto'; 
+  document.body.style.paddingRight = '0';
+}
 
 
   total() {
