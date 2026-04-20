@@ -51,7 +51,7 @@ export class ModalproductComponent implements OnInit, OnDestroy {
   public selectores : any = [];
   
   private cartSubscription!: Subscription;
-  private modalInstance: any = null;
+  // private modalInstance: any = null; - removed
 
   ngOnInit(): void {
     this.msm_alert = false;
@@ -74,50 +74,13 @@ export class ModalproductComponent implements OnInit, OnDestroy {
     if (this.cartSubscription) {
       this.cartSubscription.unsubscribe();
     }
-    if (this.modalInstance) {
-      this.modalInstance.dispose();
-    }
+    // Cleanup orphan Bootstrap backdrops (fixes stuck backdrop issue)
+    const backdrops = document.querySelectorAll('.offcanvas-backdrop');
+    backdrops.forEach((backdrop: Element) => backdrop.remove());
   }
 
-  ngOnChanges(changes: any): void {
-    
-    if (changes['isModalOpen'] && this.product) {
-      const modalId = `modalProduct-${this.product._id}`;
+  // ngOnChanges removed - no longer needed with Bootstrap data attributes
 
-      
-      // Use setTimeout to ensure DOM element is available
-      setTimeout(() => {
-        const modalElement = document.getElementById(modalId);
-        
-        if (modalElement) {
-          if (this.isModalOpen) {
-            // Clean up any existing modal instance
-            if (this.modalInstance) {
-              this.modalInstance.dispose();
-            }
-            this.modalInstance = new (window as any).bootstrap.Modal(modalElement);
-            this.modalInstance.show();
-
-            //si no viene usuario mostramo el alert por 5 segundos
-            this.msm_alert = false;
-            if(!this.user){
-              this.msm_alert = true;
-              setTimeout(()=>{
-                this.msm_alert = false;
-              }, 2000)
-            }
-            this.getSelectorProducto();
-
-          } else {
-            if (this.modalInstance) {
-              this.modalInstance.hide();
-              this.modalInstance = null;
-            }
-          }
-        }
-      }, 100);
-    }
-  }
 
   onModalHidden(): void {
     this.modalClosed.emit();
@@ -169,7 +132,6 @@ export class ModalproductComponent implements OnInit, OnDestroy {
     this.msm_success = false;
     this.msm_alert = false;
     this.selector_error = false;
-    
   }
 
   getSelectorProducto(){

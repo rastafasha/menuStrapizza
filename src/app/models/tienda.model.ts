@@ -46,3 +46,12 @@ export class Tienda{
   }
 }
 
+export class RedesSociales{
+  constructor(
+    public index?: string,
+    public name_red?: string,
+    public icono?: string,
+    public usuario_red?: string,
+  ){}
+}
+

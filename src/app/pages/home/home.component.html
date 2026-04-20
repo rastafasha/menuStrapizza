@@ -11,6 +11,7 @@
     <!-- Categories Section - Loads immediately (most important) -->
     <app-cas-products *ngIf="!isLoading && nombreSelected ==='Pizzeria'" [activeCategory]="'Pizzería'" [activeSubCategory]="'Pizza'" [isVisible]="true" [title]="'Carta'"  (msm_success)="onMsmSuccess($event)" [refreshCasProducts]="refreshCasProducts"></app-cas-products>
     <app-cas-products *ngIf="!isLoading && nombreSelected ==='Slidedish'" [activeCategory]="'Panadería'" [activeSubCategory]="'Delicateses'" [isVisible]="true" [title]="'Carta'"  (msm_success)="onMsmSuccess($event)" [refreshCasProducts]="refreshCasProducts"></app-cas-products>
+    <app-cas-products *ngIf="!isLoading && nombreSelected ==='Hamburguesa'" [activeCategory]="'Hamburguesa'" [activeSubCategory]="'Hamburguesa'" [isVisible]="true" [title]="'Carta'"  (msm_success)="onMsmSuccess($event)" [refreshCasProducts]="refreshCasProducts"></app-cas-products>
     
     <!-- Hero Section - Loads immediately -->
     <app-hero ></app-hero>
@@ -34,6 +35,7 @@
     } @loading {
         <app-loading *ngIf="isLoading"></app-loading>
     }
+   
     @defer (on viewport) {
         <app-cas-products *ngIf="!isLoading && nombreSelected ==='Pizzeria'" [activeCategory]="'Bebidas'" [title]="'Bebidas'"  (msm_success)="onMsmSuccess($event)" [refreshCasProducts]="refreshCasProducts"></app-cas-products>
     } @placeholder {
@@ -43,6 +45,7 @@
     } @loading {
         <app-loading *ngIf="isLoading"></app-loading>
     }
+   
     @defer (on viewport) {
         <app-cas-products *ngIf="!isLoading && nombreSelected ==='Pizzeria'" [activeCategory]="'Postres'" [title]="'Postres'"  (msm_success)="onMsmSuccess($event)" [refreshCasProducts]="refreshCasProducts"></app-cas-products>
     } @placeholder {

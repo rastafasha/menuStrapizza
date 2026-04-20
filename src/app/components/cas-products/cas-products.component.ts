@@ -11,7 +11,7 @@ import { ModalproductComponent } from "../modalproduct/modalproduct.component";
 import { LoadingComponent } from '../../shared/loading/loading.component';
 import { environment } from '../../../environments/environment';
 import { Subscription } from 'rxjs';
-
+declare var bootstrap: any;
 @Component({
   selector: 'app-cas-products',
   imports: [CommonModule, LoadingComponent,
@@ -47,9 +47,7 @@ export class CasProductsComponent implements OnInit, OnDestroy {
   tiendaSelected: Tienda | null = null;
   
   todo: Producto[] = [];
-
   selectedProduct: Producto | null = null;
-  isModalOpen: boolean = false;
 
   private categoryService = inject(CategoryService);
   private productoService = inject(ProductoService);
@@ -117,36 +115,6 @@ export class CasProductsComponent implements OnInit, OnDestroy {
     );
   }
 
-  //  getProductosCatName() {
-  //   this.catname = this.tiendaSelected?.subcategoria ?? this.activeCategory;
-  //   this.isLoading = true
-  //   this.productoService.findProducto_by_Categorynombre(this.catname).subscribe(
-  //     (resp: any) => {
-  //       this.products = resp.productos || [];
-  //       //obtenemos las subcategorias de los productos
-  //       //filtramos los productos donde sea igual a la categoria Panaderia
-  //       const productos = (resp.productos || []).filter((producto: any) => producto.categoria?.nombre === this.catname);
-  //       //extraemos el campo subcategoria
-  //       const subcategorias = productos.map((producto: any) => producto.subcategoria);
-  //       //eliminamos los duplicados
-  //       const subcategoriasUnicas = [...new Set(subcategorias)];
-  //       //creamos un arreglo de objetos con el nombre de la subcategoria y el arreglo de productos
-  //       const categorias = subcategoriasUnicas.map((subcategoria: any) => ({
-  //         nombre: subcategoria,
-  //         products: productos.filter((product: any) => product.subcategoria === subcategoria),
-  //       }));
-  //       this.subcategories = categorias || [];
-
-        
-  //       this.updateTodo();
-  //       // console.log(this.products)
-  //       this.isLoading = false;
-  //     },
-  //     (error) => {
-  //       console.error('Error al obtener los productos', error);
-  //     }
-  //   );
-  // }
 
 
   //obtenemos las subcategorias de los productos
@@ -194,15 +162,28 @@ export class CasProductsComponent implements OnInit, OnDestroy {
   }
 
 
-  openModal(product: Producto) {
+  openModal(product: any) {
     this.selectedProduct = product;
-    this.isModalOpen = true;
-  }
+    
+    // Un pequeño timeout asegura que Angular renderizó el ID dinámico antes de buscarlo
+    setTimeout(() => {
+        const element = document.getElementById('modalProduct-' + product._id);
+        if (element) {
+            // Inicialización explícita con opciones para evitar el error de 'backdrop'
+            const myOffcanvas = new bootstrap.Offcanvas(element, {
+                backdrop: true, // o false según prefieras
+                keyboard: true,
+                scroll: true
+            });
+            myOffcanvas.show();
+        }
+    }, 0);
+}
 
-  closeModal(): void {
-    this.isModalOpen = false;
-    this.selectedProduct = null;
-  }
+  // onProductSelected(product: any): void {
+  //   this.selectedProduct = product;
+  //   console.log(this.selectedProduct)
+  // }
 
   onMsmSuccess(value: boolean): void {
     this.msm_success.emit(value);

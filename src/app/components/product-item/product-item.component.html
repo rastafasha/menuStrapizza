@@ -1,19 +1,6 @@
-<!-- <div class="example-box" cdkDrag>
-    <div class="product-image" (click)="openPaymentsModal(product)">
-        <img [src]="product.img" [alt]="product.titulo" />
-    </div>
-    <h3 class="product-name">{{ product.titulo }}</h3>
-    <p class="product-price">{{ product.precio_ahora.toFixed(2) | currency }}</p>
-    <button class="add-button" >
-        <i class="fa fa-plus icon-small"></i>
-    </button>
-
-</div> -->
-
-
 <div class="products-grid">
     <div class="product-card">
-        <div class="product-image" (click)="openPaymentsModal(product)">
+<div class="product-image" data-bs-toggle="offcanvas" [attr.data-bs-target]="'#modalProduct-' + product._id">
             <img [src]="product.img | imagenPipe: 'productos'" [alt]="product.titulo  ">
         </div>
         <div class="product-content">
@@ -25,7 +12,7 @@
                 <div class="product-price">{{product.precio_ahora|number:'1.2-2'| currency:tienda_moneda}}</div>
             </div>
             <div class="botns">
-                <button class="btn-secondary btn" (click)="openPaymentsModal(product)"><i
+                <button class="btn-secondary btn" data-bs-toggle="offcanvas" [attr.data-bs-target]="'#modalProduct-' + product._id"><i
                         class="fa fa-eye"></i></button>
                 <button class="btn-success btn" *ngIf="activeCategory !== 'Pastas'" (click)="addItem(product)"><i class="fa fa-shopping-bag"></i></button>
             </div>
@@ -34,11 +21,11 @@
 
 </div>
 <div *ngIf="isUserLogged" class="aviso">
-    <i class="fa fa-close" (click)="closeAviso()"></i>
+    <i class="fa fa-close" data-bs-dismiss="offcanvas"></i>
     <p>Debes <a [routerLink]="['/login']"><b>Iniciar Sesión </b></a> ó <a [routerLink]="['/registro']"><b>Registrarte</b></a> para solicitar un pedido</p>
 </div>
 
 <div *ngIf="isProductAdded" class="aviso aviso-sucess">
-    <i class="fa fa-close" (click)="closeAviso()"></i>
+    <i class="fa fa-close" data-bs-dismiss="offcanvas"></i>
     <p>Articulo Agregado al <a [routerLink]="['/review']"><b>Carrito!</b></a></p>
 </div>

@@ -10,6 +10,7 @@
 @import url('./checkout.css');
 @import url('./menufooter.css');
 @import url('./formulario-tipogoogle.css');
+@import url('./iconos.css');
 /* Variables CSS */
 :root {
     --primary-color: #e63946;

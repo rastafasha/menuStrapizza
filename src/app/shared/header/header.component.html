@@ -3,7 +3,7 @@
     <div class="header-container" (pulldown)="onPullRefresh()">
         <div class="logo">
 
-            <span class="logo-text">{{titleapp}}</span>
+            <span class="logo-text">Zlipmenu | {{titleapp}}</span>
             <app-loading *ngIf="isLoading"></app-loading>
             <a routerLink="/" *ngIf="tiendaSelected && !isLoading">
                     <img [src]="tiendaSelected.img | imagenPipe: 'tiendas'"  [alt]="tiendaSelected.nombre">

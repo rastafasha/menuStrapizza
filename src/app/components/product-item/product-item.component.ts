@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, inject } from '@angular/core';
+import { Component, Input, Output, EventEmitter, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Producto } from '../../models/producto.model';
 import { Usuario } from '../../models/usuario.model';
@@ -8,7 +8,7 @@ import { CarritoService } from '../../services/carrito.service';
 import { TiendaService } from '../../services/tienda.service';
 import { ImagenPipe } from '../../pipes/imagen-pipe.pipe';
 import { ColorService } from '../../services/color.service';
-
+declare var bootstrap: any;
 @Component({
   selector: 'app-product-item',
   imports: [
@@ -37,6 +37,7 @@ export class ProductItemComponent {
   public colores: any = [];
   public color_to_cart!:string;
   public productoId!:any;
+  // productSelected = signal<any>(null);
 
   private carritoService = inject(CarritoService);
   private _colorService = inject(ColorService);
@@ -49,9 +50,6 @@ export class ProductItemComponent {
     }
   }
 
-  openPaymentsModal(product: any): void {
-    this.productSelected.emit(product);
-  }
 
   addItem(producto: Producto) {
 
@@ -90,7 +88,9 @@ export class ProductItemComponent {
 
   }
 
-
+  openPaymentsModal(product: any): void {
+    this.productSelected.emit(product);
+  }
 
   closeAviso() {
     this.isUserLogged = false;

@@ -8,6 +8,7 @@
     "build": "ng build",
     "build:strapizza": "ng build --configuration strapizza",
     "build:slidedish": "ng build --configuration slidedish",
+    "build:hamburguesa": "ng build --configuration hamburguesa",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },
