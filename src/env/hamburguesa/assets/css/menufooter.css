@@ -3,16 +3,63 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center; /* Centra el contenido durante la expansión */
     height: 52px;
-    width: 100%;
-    border-radius: 26px 26px 0px 0px;
     position: fixed;
     bottom: 0;
-    z-index: 99;
-    bottom: 0;
-    /* background: linear-gradient(180deg,rgba(176, 176, 176, 0) 0%, rgba(255, 255, 255, 0.99) 52%, rgba(255, 255, 255, 1) 100%); */
-    /* background: linear-gradient(180deg,rgba(176, 176, 176, 0) 0%, rgba(40, 40, 40, 0.99) 52%, rgba(40, 40, 40, 1) 100%); */
+    z-index: 999;
+    left: 50%; /* Cambiado a 50% para centrarlo dinámicamente desde el eje */
+    transform: translate(-50%, 100px); /* Comienza oculto abajo */
+    
+    /* Dispara la animación principal */
+    animation: entradaMenu 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
 }
+
+/* Animación del contenedor principal */
+@keyframes entradaMenu {
+    0% {
+        width: 52px; /* Ancho igual al alto para que sea un círculo perfecto */
+        border-radius: 50%;
+        transform: translate(-50%, 60px); /* Viene desde abajo */
+    }
+    40% {
+        width: 52px;
+        border-radius: 50%;
+        transform: translate(-50%, -15px); /* Sube a su altura final como círculo */
+    }
+    100% {
+        width: 70%; /* Se abre horizontalmente */
+        border-radius: 26px; /* Adopta su forma de píldora final */
+        transform: translate(-50%, -15px); /* Mantiene la posición final */
+    }
+}
+
+/* Ocultar los íconos al inicio y aparecerlos al final */
+.menu-footer ul {
+    display: flex;
+    width: 100%;
+    justify-content: space-around;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    
+    /* Animación de retraso para los íconos */
+    opacity: 0;
+    animation: aparecerIconos 0.4s ease-out 0.7s forwards;
+}
+
+@keyframes aparecerIconos {
+    0% {
+        opacity: 0;
+        transform: scale(0.7);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
 
 .menu-footer ul {
     display: flex;
@@ -32,7 +79,7 @@ text-decoration: none !important;
     font-size: 20px;
     color: var(--light-brown);
     margin: auto;
-    margin-top: 5px;
+    margin-top: 0px;
     text-decoration: none !important;
     
 }
@@ -64,7 +111,16 @@ text-decoration: none !important;
     margin-top: -40px;
     text-decoration: none;
     text-decoration: none !important;
+    animation: ease 2s ;
 }
+
+.menu-footer ul li a:has(.cart-count-badge) {
+  margin-top: -25px;
+}
+
+/* .menu-footer ul li a.cart:not(:has(.cart-count-badge)) i.fa-shopping-cart {
+  display: none !important;
+} */
 
 .menu-footer ul li.active.iconstore a i {
     color: var(--green-gray);
