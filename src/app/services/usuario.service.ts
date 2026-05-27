@@ -5,7 +5,7 @@ import { LoginForm } from '../auth/interfaces/login-form.interface';
 import { CargarUsuario } from '../auth/interfaces/cargar-usuarios.interface';
 
 import { tap, map, catchError } from 'rxjs/operators';
-import { Observable, of } from 'rxjs';
+import { BehaviorSubject, Observable, of } from 'rxjs';
 import { Router } from '@angular/router';
 import { Usuario } from '../models/usuario.model';
 import { environment } from '../../environments/environment';
@@ -19,7 +19,10 @@ const base_url = environment.baseUrl;
 })
 export class UsuarioService {
   public auth2: any;
-  public usuario!: Usuario;
+  public usuario: Usuario | null = null;
+  public estaAutenticado = false;
+  private currentUserSubject = new BehaviorSubject<Usuario | null>(null);
+  public currentUser$ = this.currentUserSubject.asObservable();
 
   constructor(
     private http: HttpClient,
@@ -51,16 +54,30 @@ export class UsuarioService {
   }
   
   getLocalStorage() {
-    if (localStorage.getItem('token') && localStorage.getItem('user')) {
-      let USER = localStorage.getItem('user');
-      if (USER && USER !== 'undefined') {
-        this.usuario = JSON.parse(USER);
-      } else {
+    const authStr = localStorage.getItem('estaAutenticado');
+    this.estaAutenticado = authStr === 'true';
+
+
+    const token = localStorage.getItem('token');
+    const userStr = localStorage.getItem('user');
+    
+    if (token && userStr) {
+      try {
+        const userData = JSON.parse(userStr);
+        // Create User instance from parsed data (match JSON shape)
         this.usuario = new Usuario('', '', '', '', '', '', '', '', false, 'USER', '');
+        this.currentUserSubject.next(this.usuario);
+      } catch (e) {
+        console.error('Error parsing user from localStorage:', e);
+        this.usuario = null;
+        this.currentUserSubject.next(null);
       }
     } else {
-      this.usuario = new Usuario('', '', '', '', '', '', '', '', false, 'USER', '');
+      this.usuario = null;
+      this.currentUserSubject.next(null);
     }
+
+    return this.usuario;
   }
   guardarLocalStorage(token: string, user: any) {
     localStorage.setItem('token', token);
@@ -140,6 +157,13 @@ export class UsuarioService {
 
   crearUsuario(formData: RegisterForm) {
     return this.http.post(`${base_url}/usuarios/registro`, formData).pipe(
+      tap((resp: any) => {
+        this.guardarLocalStorage(resp.token, resp.usuario);
+      })
+    );
+  }
+  crearClienteExpress(formData: any) {
+    return this.http.post(`${base_url}/usuarios/express`, formData).pipe(
       tap((resp: any) => {
         this.guardarLocalStorage(resp.token, resp.usuario);
       })

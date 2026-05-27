@@ -8,6 +8,7 @@ import { CarritoService } from '../../services/carrito.service';
 import { TiendaService } from '../../services/tienda.service';
 import { ImagenPipe } from '../../pipes/imagen-pipe.pipe';
 import { ColorService } from '../../services/color.service';
+import { ToastrService } from 'ngx-toastr';
 declare var bootstrap: any;
 @Component({
   selector: 'app-product-item',
@@ -41,6 +42,7 @@ export class ProductItemComponent {
 
   private carritoService = inject(CarritoService);
   private _colorService = inject(ColorService);
+  private toastr = inject(ToastrService);
 
   ngOnInit(): void {
     let USER = localStorage.getItem("user");
@@ -53,39 +55,21 @@ export class ProductItemComponent {
 
   addItem(producto: Producto) {
 
-    if (this.user == null) {
-      this.isUserLogged = true;
-      setTimeout(() => {
-        this.isUserLogged = false;
-
-      }, 2000);
-
-      return;
-    } else {
-
-      this.msm_success.emit(false);
+    this.msm_success.emit(false);
       this.productoId = producto._id;
 
       this._colorService.colorByProduct(this.productoId).subscribe(
         response => {
           this.colores = response;
           this.color_to_cart = this.colores[0]?.color || '#333333';
-          console.log('color_to_cart: ', this.color_to_cart);
-
           let data = {
             ...producto,
             color: this.color_to_cart,
           }
           this.carritoService.addItem(data);
-
-          this.isProductAdded = true
-          setTimeout(() => {
-            this.isProductAdded = false
-          }, 2000)
+          this.toastr.success('Artículo agregado al carrito');
         },
       );
-    }
-
   }
 
   openPaymentsModal(product: any): void {

@@ -1,31 +1,25 @@
 <div class="products-grid">
     <div class="product-card">
-<div class="product-image" data-bs-toggle="offcanvas" [attr.data-bs-target]="'#modalProduct-' + product._id">
+        <div class="product-image" data-bs-toggle="offcanvas" [attr.data-bs-target]="'#modalProduct-' + product._id">
             <img [src]="product.img | imagenPipe: 'productos'" [alt]="product.titulo  ">
         </div>
         <div class="product-content">
             <div class="infpr">
                 <h4>{{product.titulo}}</h4>
-                <div class="product-price text-danger " 
-                style="text-decoration: line-through;" *ngIf="product.precio_antes > product.precio_ahora">
+                <div class="product-price text-danger " style="text-decoration: line-through;"
+                    *ngIf="product.precio_antes > product.precio_ahora">
                     {{product.precio_antes|number:'1.2-2'| currency:tienda_moneda}}</div>
                 <div class="product-price">{{product.precio_ahora|number:'1.2-2'| currency:tienda_moneda}}</div>
             </div>
             <div class="botns">
-                <button class="btn-secondary btn" data-bs-toggle="offcanvas" [attr.data-bs-target]="'#modalProduct-' + product._id"><i
-                        class="fa fa-eye"></i></button>
-                <button class="btn-success btn" *ngIf="activeCategory !== 'Pastas'" (click)="addItem(product)"><i class="fa fa-shopping-bag"></i></button>
+                <button class="btn-secondary btn" data-bs-toggle="offcanvas"
+                    [attr.data-bs-target]="'#modalProduct-' + product._id">
+                    <i class="fa fa-eye"></i></button>
+                <button class="btn-success btn" *ngIf="activeCategory !== 'Pastas'" (click)="addItem(product)">
+                    <i class="fa fa-shopping-bag"></i>
+                </button>
             </div>
         </div>
     </div>
 
-</div>
-<div *ngIf="isUserLogged" class="aviso">
-    <i class="fa fa-close" (click)="closeAviso()"></i>
-    <p>Debes <a [routerLink]="['/login']"><b>Iniciar Sesión </b></a> ó <a [routerLink]="['/registro']"><b>Registrarte</b></a> para solicitar un pedido</p>
-</div>
-
-<div *ngIf="isProductAdded" class="aviso aviso-sucess">
-    <i class="fa fa-close" (click)="closeAviso()"></i>
-    <p>Articulo Agregado al <a [routerLink]="['/review']"><b>Carrito!</b></a></p>
 </div>

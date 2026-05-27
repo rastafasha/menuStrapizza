@@ -3,74 +3,183 @@
     <div class="title-top">
         <h1>Confirmar Pedido</h1>
     </div>
-    <div class="title-top" *ngIf="!isbandejaList">
-        <h1>Cesta vacia</h1>
-    </div>
-    <div class="order-list" *ngIf="isbandejaList">
-        <div class="order-list-bar"></div>
-        <div class="list-box">
-            <div class="breadcrumb-item">
-                <h3>Confirmar</h3>
+
+
+    <div class="container m-t-20">
+
+        <!-- PASO 1: RESUMEN DEL CARRITO (Tu vista actual con la bandejaList) -->
+        <div class="step-container" *ngIf="pasoActual === 1">
+            <!-- ... Aquí va tu lista actual de platos, totales, etc. ... -->
+            <div class="title-top" *ngIf="!isbandejaList">
+                <h1>Cesta vacia</h1>
+            </div>
+            <div class="order-list" *ngIf="isbandejaList">
+                <div class="order-list-bar"></div>
+                <div class="list-box">
+                    <div class="breadcrumb-item">
+                        <h3>Confirmar</h3>
+                        <button class="check-button" routerLink="/">
+                            <i class="fa fa-chevron-left icon-small"></i>
+                        </button>
+                    </div>
+                    <div class="clear"></div>
+                    <div class="top-item">
+                        <div class="list-item-left">
+                            <span class="burbleinfo">
+                                Orden No.{{randomNum}}
+                            </span>
+                        </div>
+                        <div class="list-item-right">
+                            <span class="burbleinfo"> {{fechaHoy | date:'dd/MM/YYYY'}}</span>
+                        </div>
+                    </div>
+                    <div class="overf">
+                        <!-- itemlist -->
+                        <div class="list-item" *ngFor="let item of bandejaList; let i = index">
+                            <div class="clear"></div>
+                            <div class="info-item">
+                                <img [src]="item.img | imagenPipe:'productos' " alt="">
+                                <h2>{{item.titulo | slice:0:8}}...</h2>
+                                <p *ngIf="item.subcategoria === 'Pastas'">{{item.nombre_selector | slice:0:6}}...</p>
+                                <div class="add-items justify-content-center">
+                                    <i class="fa fa-minus icon-small" (click)="removeItem(item,i )"></i>
+                                    <span>{{item.cantidad}}</span>
+                                    <i class="fa fa-plus icon-small" (click)="addItem(item, i)"></i>
+                                </div>
+                                <div class="price">
+                                    <p>{{item.precio_ahora * item.cantidad |number:'1.2-2'| currency:tienda_moneda}}
+                                    </p>
+                                    <!-- <p >{{item.precio_ahora | currency}}</p> -->
+                                </div>
+                            </div>
+                        </div>
+                        <!-- itemlist -->
+
+
+
+                        <!-- Total a Pagar -->
+                        <div class="info_pago total">
+                            <!-- <div class="info_pago_titulo1"><span> Artículos</span> </div> -->
+                            <div class="info_pago_titulo1"><span>Total a Pagar</span> </div>
+                            <!-- <div class="info_pagod_data3"><span>({{bandejaList.length}})</span> </div> -->
+                            <div class="info_pagod_data3"><span>{{total() |number:'1.2-2'|
+                                    currency:tienda_moneda}}</span>
+                            </div>
+                        </div>
+                        <!-- Total a Pagar -->
+
+                    </div>
+                </div>
+            </div>
+            <!-- Botón para avanzar si está vacía la sesión -->
+
+            <div class="order-button-container">
                 <button class="check-button" routerLink="/">
                     <i class="fa fa-chevron-left icon-small"></i>
+                    Volver
+                </button>
+                <button class="check-button" (click)="avanzarAlRegistroExpress()">
+                    Continuar con el Pedido <i class="fa fa-chevron-right icon-small"></i>
                 </button>
             </div>
-            <div class="clear"></div>
-            <div class="top-item">
-                <div class="list-item-left">
-                    <span class="burbleinfo">
-                        Orden No.{{randomNum}}
-                    </span>
-                </div>
-                <div class="list-item-right">
-                    <span class="burbleinfo"> {{fechaHoy | date:'dd/MM/YYYY'}}</span>
-                </div>
-            </div>
-            <div class="overf">
-                <!-- itemlist -->
-                <div class="list-item" *ngFor="let item of bandejaList; let i = index">
-                    <div class="clear"></div>
-                    <div class="info-item">
-                        <img [src]="item.img | imagenPipe:'productos' " alt="">
-                        <h2>{{item.titulo | slice:0:8}}...</h2>
-                        <p *ngIf="item.subcategoria === 'Pastas'">{{item.nombre_selector | slice:0:6}}...</p>
-                        <div class="add-items justify-content-center">
-                            <i class="fa fa-minus icon-small" (click)="removeItem(item,i )"></i>
-                            <span>{{item.cantidad}}</span>
-                            <i class="fa fa-plus icon-small" (click)="addItem(item, i)"></i>
-                        </div>
-                        <div class="price">
-                            <p>{{item.precio_ahora * item.cantidad |number:'1.2-2'| currency:tienda_moneda}}
-                            </p>
-                            <!-- <p >{{item.precio_ahora | currency}}</p> -->
-                        </div>
-                    </div>
-                </div>
-                <!-- itemlist -->
-               
-               
-                
-                 <!-- Total a Pagar -->
-                <div class="info_pago total">
-                    <!-- <div class="info_pago_titulo1"><span> Artículos</span> </div> -->
-                    <div class="info_pago_titulo1"><span>Total a Pagar</span> </div>
-                    <!-- <div class="info_pagod_data3"><span>({{bandejaList.length}})</span> </div> -->
-                    <div class="info_pagod_data3"><span>{{total() |number:'1.2-2'| currency:tienda_moneda}}</span>
-                    </div>
-                </div>
-                <!-- Total a Pagar -->
-
-            </div>
         </div>
+
+        <!-- PASO 2: FORMULARIO EXPRESS (Nombre, Teléfono y Tipo de Entrega) -->
+        <div class="checkout-container animated fadeInUp title-top" *ngIf="pasoActual === 2">
+            <h3>👤 Datos del Cliente</h3>
+            <form [formGroup]="expressForm" >
+                <div class="form-group">
+                    <label>¿A nombre de quién dejamos el pedido?</label>
+                    <input type="text" formControlName="first_name" placeholder="Ej. Juan Pérez" class="form-control">
+                </div>
+
+                <div class="form-group">
+                    <label>Teléfono de contacto</label>
+                    <input type="tel" formControlName="telefono" placeholder="Ej. 04121234567" class="form-control">
+                </div>
+
+                <div class="form-group">
+                    <label>¿Cómo deseas tu pedido?</label>
+                    <select formControlName="tipoEntrega" class="form-control">
+                        <option value="">Seleccione</option>
+                        <option value="delivery">🛵 Delivery (A domicilio)</option>
+                        <option value="pickup">🛍️ Pick up (Retiro en tienda)</option>
+                    </select>
+                </div>
+
+                <div class="mt-3 order-button-container">
+                    <button type="button" class="check-button" (click)="pasoActual = 1">
+                        <i class="fa fa-chevron-left icon-small"></i> 
+                        Atrás
+                    </button>
+                    <button type="button" class="check-button"
+                        [disabled]="expressForm.invalid" (click)="procesarClienteExpress()">Siguiente <i class="fa fa-chevron-right icon-small"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- PASO 3: GEOLOCALIZACIÓN Y DIRECCIÓN COMPLETA (Tu código potente del mapa) -->
+        <!-- Si es Pickup se salta este paso, si es Delivery le incrustamos TU sección de mapa directamente aquí -->
+        <div class="num_tracking animated fadeInUp" *ngIf="pasoActual === 3">
+
+            <!-- Tu Sección del Mapa Tal Cual la tienes -->
+            <div class="map-section">
+                <h4><i class="fa fa-map-marker"></i> Seleccionar Ubicación de Entrega</h4>
+                <p class="text-muted">Haz clic en el mapa para que el motorizado sepa exactamente dónde estás.</p>
+                <!-- Contenedor del mapa -->
+                <div #mapContainer class="map-container"></div>
+
+                <div class="map-loading" *ngIf="mapLoading">
+                    <div class="spinner"></div>
+                    <p>Obteniendo ubicación...</p>
+                </div>
+                <!-- Error del mapa -->
+                <div class="map-error" *ngIf="mapError">
+                    <p>⚠️ {{ mapError }}</p>
+                </div>
+
+                <button type="button" class="btn btn-primary btn-block location-btn" (click)="useCurrentLocation()">
+                    <i class="fa fa-crosshairs"></i> Usar mi ubicación actual
+                </button>
+                <!-- Coordenadas seleccionadas -->
+                <div class="coords-display" *ngIf="selectedCoords">
+                    <span class="label">📍 Ubicación seleccionada:</span>
+                    <span class="value">{{ selectedCoords.lat.toFixed(6) }}, {{ selectedCoords.lng.toFixed(6) }}</span>
+                </div>
+            </div>
+
+            <!-- Tu Formulario de Dirección Adaptado -->
+            <form class="p-t-20 col-xs-12" [formGroup]="direccionForm" >
+                <div class="col-sm-12">
+                    <div class="form-group">
+                        <label>Dirección Exacta</label>
+                        <textarea class="form-control" placeholder="Edificio, Casa, Nro de Apto..." required
+                            formControlName="direccion"></textarea>
+                    </div>
+                </div>
+                <div class="col-sm-12">
+                    <div class="form-group">
+                        <label>Punto de Referencia</label>
+                        <textarea class="form-control" placeholder="Ej: Frente al centro comercial, portón blanco..."
+                            required formControlName="referencia"></textarea>
+                    </div>
+                </div>
+
+                <!-- Ocultamos País, Ciudad y ZIP rellenándolos por código internamente para que no den error de validación -->
+                <div class="mt-3 order-button-container">
+                    <button type="button" class="check-button" (click)="pasoActual = 2">
+                        <i class="fa fa-chevron-left icon-small"></i> 
+                        Atrás</button>
+                    <button type="button"  class="check-button" (click)="onSubmitDireccionFinal()">
+                        <i class="fab fa-whatsapp"></i> Finalizar y Enviar Pedido
+                    </button>
+                </div>
+
+            </form>
+        </div>
+
     </div>
-    <div class="order-button-container">
-        <button class="check-button" routerLink="/">
-            <i class="fa fa-chevron-left icon-small"></i>
-            Volver
-        </button>
-        <button class="check-button" (click)="makeRequest()" *ngIf="total() > 0">
-            Hacer pedido
-            <i class="fa fa-chevron-right icon-small"></i>
-        </button>
-    </div>
+
+
 </main>

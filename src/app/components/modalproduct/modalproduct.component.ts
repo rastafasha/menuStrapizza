@@ -11,6 +11,7 @@ import { Subscription } from 'rxjs';
 import { SelectorService } from '../../services/selector.service';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ImagenPipe } from '../../pipes/imagen-pipe.pipe';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-modalproduct',
@@ -25,8 +26,8 @@ import { ImagenPipe } from '../../pipes/imagen-pipe.pipe';
   styleUrl: './modalproduct.component.scss'
 })
 export class ModalproductComponent implements OnInit, OnDestroy {
-  @Input() product: any ;
-  @Input() selectedProduct: any ;
+  @Input() product: any;
+  @Input() selectedProduct: any;
   @Input() tienda_moneda!: any;
   @Input() activeCategory!: string;
   @Input() isModalOpen: boolean = false;
@@ -39,17 +40,18 @@ export class ModalproductComponent implements OnInit, OnDestroy {
   private tiendaService = inject(TiendaService);
   private carritoService = inject(CarritoService);
   private selectorService = inject(SelectorService);
+  private toastr = inject(ToastrService);
 
   user!: Usuario;
   bandejaList: any[] = [];
   tiendaSelected: Tienda | null = null;
-  tiendaNameSelected!:string;
- img:string | null = './assets/images/no-image.jpg';
+  tiendaNameSelected!: string;
+  img: string | null = './assets/images/no-image.jpg';
 
   public selector_to_cart = ' ';
   public selector_error = false;
-  public selectores : any = [];
-  
+  public selectores: any = [];
+
   private cartSubscription!: Subscription;
   // private modalInstance: any = null; - removed
 
@@ -64,7 +66,7 @@ export class ModalproductComponent implements OnInit, OnDestroy {
 
     this.product;
     this.activeCategory;
-    if(!this.product?.img){
+    if (!this.product?.img) {
       this.img = '../assets/images/no-image.jpg';
     }
     this.getSelectorProducto();
@@ -83,14 +85,14 @@ export class ModalproductComponent implements OnInit, OnDestroy {
 
 
   onModalHidden(): void {
-  this.modalClosed.emit();
-  this.selector_to_cart = ' ';
-  
-  // Force removal if Bootstrap's JS fails to clean up
-  document.querySelectorAll('.offcanvas-backdrop').forEach(el => el.remove());
-  document.body.style.overflow = 'auto'; 
-  document.body.style.paddingRight = '0';
-}
+    this.modalClosed.emit();
+    this.selector_to_cart = ' ';
+
+    // Force removal if Bootstrap's JS fails to clean up
+    document.querySelectorAll('.offcanvas-backdrop').forEach(el => el.remove());
+    document.body.style.overflow = 'auto';
+    document.body.style.paddingRight = '0';
+  }
 
 
   total() {
@@ -104,11 +106,11 @@ export class ModalproductComponent implements OnInit, OnDestroy {
     this.msm_success = false;
     this.selector_error = false;
 
-    if(producto.subcategoria === 'Pastas'){
+    if (producto.subcategoria === 'Pastas') {
       // Validar que se haya seleccionado un selector
-      if(!this.selector_to_cart || this.selector_to_cart === ' '){
+      if (!this.selector_to_cart || this.selector_to_cart === ' ') {
         this.selector_error = true;
-         setTimeout(() => {
+        setTimeout(() => {
           this.selector_error = false;
         }, 3000)
         return;
@@ -116,22 +118,18 @@ export class ModalproductComponent implements OnInit, OnDestroy {
 
       // Agregamos el selector al producto
       producto.nombre_selector = this.selector_to_cart;
-      
+
     }
 
     this.carritoService.addItem(producto);
-    
     // Reset selector after adding
     this.selector_to_cart = ' ';
-    
-    this.msm_success = true;
-    setTimeout(() => {
-      this.msm_success = false;
-    }, 3000)
+    this.toastr.success('Artículo agregado al carrito');
   }
 
   removeItem(producto: Producto) {
     this.carritoService.removeItem(producto);
+    this.toastr.success('Artículo removido del carrito');
   }
 
   closeAviso() {
@@ -140,14 +138,13 @@ export class ModalproductComponent implements OnInit, OnDestroy {
     this.selector_error = false;
   }
 
-  getSelectorProducto(){
+  getSelectorProducto() {
     this.selector_to_cart = ' ';
     this.selectorService.selectorByProduct(this.product._id).subscribe(
-      response =>{
+      response => {
         this.selectores = response;
-        console.log(this.selectores)
       },
-      error=>{
+      error => {
 
       }
     );

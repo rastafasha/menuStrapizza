@@ -19,6 +19,10 @@
                 </ul>
             </div>
             <div class="product-card" *ngFor="let product of todo; let i = index" cdkDrag>
+                <!-- <app-product-item [activeCategory]="activeCategory" [tienda_moneda]="tienda_moneda"  [product]="product"
+                    
+                    (msm_success)="onMsmSuccess($event)">
+                </app-product-item> -->
                 <app-product-item [activeCategory]="activeCategory" [tienda_moneda]="tienda_moneda"  [product]="product"
                     data-bs-toggle="offcanvas" 
                     [attr.data-bs-target]="'#modalProduct-' + product._id"
