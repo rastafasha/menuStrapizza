@@ -6,7 +6,7 @@ export const environment = {
   //remoto vercel
   nombreSelected: 'Strapizza',
   baseUrl: 'https://back-ecomm-mall.vercel.app/api',
-  soketServer : 'https://back-ecomm-mall.vercel.app/',
+  soketServer : 'https://back-ecomm-mall.onrender.com',
   mediaUrl: 'https://back-ecomm-mall.vercel.app/api/uploads',
   mediaUrlRemoto: 'https://res.cloudinary.com/dmv6aukai/image/upload/v1741218430/mallConnect',
   urlBackedNotification:'https://back-ecomm-mall.onrender.com/api/notipush/save-subscription',
