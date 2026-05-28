@@ -1,0 +1,13 @@
+.animate.fadeIn {
+    animation: fadeIn 0.5s ease-in;
+}
+
+.btn-outline-primary.rounded-circle {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-width: 2px;
+  font-weight: bold;
+}

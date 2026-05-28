@@ -1,64 +1,49 @@
-<div class="cz-sidebar-static rounded-lg box-shadow-lg px-0 pb-0 mb-5 mb-lg-0">
- 
-
-  <ul class="list-unstyled mb-0">
+<div class="cz-sidebar-static ">
+  <ul class="listainterna ">
     <li>
-      <a
-        class="nav-link-style d-flex align-items-center px-4 py-3"
-        [routerLink]="['/my-account/perfil/', identity.uid]"
-        routerLinkActive="active"
-      >
-        <i class="czi-user opacity-60 mr-2"></i>Mis Datos
+      <a class="nav-links" [routerLink]="['/my-account/perfil/', identity.uid]" routerLinkActive="active"
+        [routerLinkActiveOptions]="{exact: true}">
+        <i class="fa fa-user opacity-60 mr-2"></i>Mis Datos
       </a>
     </li>
-
     <li *ngIf="identity.telefono">
-      <a
-        class="nav-link-style d-flex align-items-center px-4 py-3"
-        [routerLink]="['/my-account/direcciones']"
-        routerLinkActive="active"
-      >
-        <i class="czi-bag opacity-60 mr-2"></i>Mis Direcciones</a
-      >
-    </li>
-    <li *ngIf="identity.telefono">
-      <a
-        class="nav-link-style d-flex align-items-center px-4 py-3"
-        [routerLink]="['/my-account/ordenes']"
-        routerLinkActive="active"
-      >
-        <i class="czi-bag opacity-60 mr-2"></i>Mis Ordenes</a
-      >
+      <a class="nav-links" [routerLink]="['/my-account/direcciones']" routerLinkActive="active"
+        [routerLinkActiveOptions]="{exact: true}">
+        <i class="czi-bag opacity-60 mr-2"></i>Direcciones</a>
     </li>
 
-    <li></li>
     <li *ngIf="identity.telefono">
-      <a
-        class="nav-link-style d-flex align-items-center px-4 py-3"
-        [routerLink]="['/my-account/pedidos']"
-        routerLinkActive="active"
-      >
-        <i class="czi-bag opacity-60 mr-2"></i>Mis Pedidos</a
-      >
+      <a class="nav-links" [routerLink]="['/review']" routerLinkActive="active"
+        [routerLinkActiveOptions]="{exact: true}">
+        <i class="fa fa-shopping-basket opacity-60 mr-2"></i>Carrito</a>
     </li>
-
-    <li>
-      <!-- <a class="nav-link-style d-flex align-items-center px-4 py-3" 
-             [routerLink]="['/my-account/cart']" routerLinkActive="active">
-                <i class="czi-cart opacity-60 mr-2"></i>Mi carrito
-            </a> -->
-      <a
-        class="nav-link-style d-flex align-items-center px-4 py-3"
-        [routerLink]="['/my-account']"
-        routerLinkActive="active"
-      >
-        <i class="czi-cart opacity-60 mr-2"></i>Mi Cuenta
+    <li *ngIf="identity.telefono">
+      <a class="nav-links" [routerLink]="['/my-account/pedidos']" routerLinkActive="active"
+        [routerLinkActiveOptions]="{exact: true}">
+        <i class="czi-bag opacity-60 mr-2"></i>Pedidos</a>
+    </li>
+    <li *ngIf="identity.telefono">
+      <a class="nav-links" [routerLink]="['/my-account/ordenes']" routerLinkActive="active"
+        [routerLinkActiveOptions]="{exact: true}">
+        <i class="fa fa-shopping-basket opacity-60 mr-2"></i>Ordenes</a>
+    </li>
+    <li *ngIf="identity.telefono">
+      <a class="nav-links" [routerLink]="['/mis-pagos']" routerLinkActive="active"
+        [routerLinkActiveOptions]="{exact: true}">
+        <i class="fa fa-wallet"></i>
+        Mis Pagos
       </a>
     </li>
-
-    <!-- <li class="d-lg-none border-top mb-0">
-            <a class="nav-link-style d-flex align-items-center px-4 py-3" (click)="slir()">
-                <i class="czi-sign-out opacity-60 mr-2"></i>Salir</a>
-            </li> -->
   </ul>
 </div>
+<div class="setting-row shadow-sm">
+  <a [routerLink]="['/my-account']">
+    <div class="setting-info ">
+      <i class="fa fa-backward"></i>
+      <div class="text-container">
+        <strong>Inicio Cuenta</strong>
+      </div>
+    </div>
+  </a>
+</div>
+<hr>

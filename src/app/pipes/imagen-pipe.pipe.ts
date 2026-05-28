@@ -9,7 +9,7 @@ const base_url = environment.baseUrl
 export class ImagenPipe implements PipeTransform {
 
   transform(img: string, tipo: 'usuarios'|'categorias'|'marcas'|'productos'|'congenerals'
-  |'promocions'|'galerias'|'ingresos'|'blogs' |'pages' |'cursos'|'sliders'|'tiendas'): string {
+  |'promocions'|'galerias'|'ingresos'|'blogs' |'pages' |'cursos'|'sliders'|'tiendas'|'transferencias'): string {
 
     if(!img){
       // return `${base_url}/assets/images/no-image.jpg`;

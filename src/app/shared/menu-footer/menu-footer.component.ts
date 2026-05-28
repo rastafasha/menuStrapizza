@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, Input } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { Tienda } from '../../models/tienda.model';
 import { Usuario } from '../../models/usuario.model';
 import { CarritoService } from '../../services/carrito.service';
@@ -9,6 +9,7 @@ import { environment } from '../../../environments/environment';
 import { PedidomenuService } from '../../services/pedidomenu.service';
 import { Pedido } from '../../models/pedido.model';
 import { UsuarioService } from '../../services/usuario.service';
+import { NotificacionService } from '../../services/notificacion.service';
 
 @Component({
   selector: 'app-menu-footer',
@@ -33,15 +34,21 @@ export class MenuFooterComponent {
   pedido: any;
   public pedidos!: Pedido[] | null;
 
+   public unreadCount$!: Observable<number>;
+
   private pedidoService = inject(PedidomenuService);
   private carritoService = inject(CarritoService);
   private userService = inject(UsuarioService);
+  private notifService = inject(NotificacionService);
 
   private cartSubscription!: Subscription;
 
   ngOnInit(): void {
     this.user = this.userService.getLocalStorage();
     this.userId = this.user?.uid;
+    // 2. Vinculamos el flujo del servicio y disparamos la petición
+    this.unreadCount$ = this.notifService.unreadCount$;
+    this.notifService.cargarContador();
     // Subscribe to cart changes
     this.cartSubcrpt();
     this.chekpedidoguardado();

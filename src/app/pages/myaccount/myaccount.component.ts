@@ -51,7 +51,7 @@ export class MyaccountComponent implements OnInit {
     }
   }
 
-  slir(){
+  logout(){
     this.usuarioService.logout()
   }
 

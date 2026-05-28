@@ -6,6 +6,9 @@ export const environment = {
     soketServer : 'https://back-ecomm-mall.onrender.com/',
     mediaUrlRemoto: 'https://res.cloudinary.com/dmv6aukai/image/upload/v1741218430/mallConnect',
     nombreSelected: 'Slidedish',
+    urlBackedNotification:'https://back-ecomm-mall.onrender.com/api/notipush/save-subscription',
+  VAPI_KEY_PUBLIC: 'BBx1euNKfJff71NH7EPnxOptH0WJdOiw3YVg5lZXGLvp4BBBW4jXTAnmzaNQ1-jwNIBGwrNjS14zDQCzwb5g5O4',
+  
     //pluggins
     rapidapiKey: 'a7036a3222mshc2920e679cd1cafp141e56jsn81cbe707ac15',
     rapidapiHost: 'apidojo-17track-v1.p.rapidapi.com',

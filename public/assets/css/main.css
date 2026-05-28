@@ -1,4 +1,5 @@
 /* imports CSS */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
 @import url('./carrousel.css');
 @import url('./header.css');
 @import url('./hero.css');
@@ -20,8 +21,8 @@
     --dark-text: #2b2d42;
     --white: #ffffff;
     --light-brown: #0e5b04;
-    --font-primary: 'Poppins', sans-serif;
-    --font-Title: 'Retro Team';
+    --font-primary: "Roboto", sans-serif;;
+    --font-Title:"Noto Sans", sans-serif;
 }
 
 .clear {

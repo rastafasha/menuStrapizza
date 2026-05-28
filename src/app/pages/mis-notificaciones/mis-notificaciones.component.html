@@ -1,0 +1,113 @@
+<div class="container mt-3 animate fadeIn">
+    <!-- <app-back-button [title]="title"></app-back-button> -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <!-- <app-backButtn [pageTitle]='"🔔&nbsp; Mis Notificaciones"'></app-backButtn> -->
+        <!-- <button class="btn btn-outline-primary btn-sm rounded-circle shadow-sm" (click)="instruccionesModal.open()"
+            title="Ayuda de la sección">
+            <i class="fa fa-question"></i>
+        </button> -->
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <button (click)="limpiarCampana()" class="btn btn-outline-primary btn-sm">
+            <i class="fa fa-check-double"></i> Marcar todas como leídas
+        </button>
+    </div>
+
+
+    <div infiniteScroll [infiniteScrollDistance]="2" [infiniteScrollThrottle]="50" (scrolled)="onScroll()">
+
+
+        <!-- Lista de Notificaciones -->
+        <div class="animated fadeInUp" *ngIf="notificaciones().length > 0">
+            @for (n of notificaciones(); track n._id) {
+            <div (click)="abrirDetalle(n)" class="card mb-2 shadow-sm border-start border-4" [ngClass]="{
+                'border-success': n.tipo === 'PAGO_APROBADO',
+                'border-danger': n.tipo === 'PAGO_RECHAZADO' || n.tipo === 'AVISO_MOROSIDAD',
+                'border-warning': n.tipo === 'COMUNICADO_ADMIN',
+                'bg-light': n.leido
+             }">
+
+                <div class="card-body py-2">
+                    <div class="d-flex justify-content-between">
+                        <h6 class="card-title mb-1">
+                            <span *ngIf="!n.leido" class="badge bg-primary me-2">NUEVO</span>
+                            {{ n.titulo }}
+                        </h6>
+                        <small class="text-muted">{{ n.createdAt | date:'short' }}</small>
+                    </div>
+                    <p class="card-text small mb-0">{{ n.mensaje | slice:0:45 }}...</p>
+                </div>
+            </div>
+            } @empty {
+            <div class="alert alert-info">No tienes notificaciones.</div>
+            }
+
+        </div>
+
+
+        <!-- 1. SPINNER: Solo si HAY más y está CARGANDO -->
+        @if (hasMoreNotif() && loading()) {
+        <div class="text-center py-4">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p class="text-muted small mt-2">Buscando más notificaciones...</p>
+        </div>
+        }
+
+        <!-- 2. MENSAJE FINAL: Solo si NO hay más, NO está cargando y YA hay datos en pantalla -->
+        @if (!hasMoreNotif() && !loading() && notificaciones().length > 0) {
+        <div class="text-center my-4 animate fadeIn">
+            <p class="text-muted small">
+                <i class="fas fa-check-circle text-success me-1"></i>
+                Has visto todas tus notificaciones
+            </p>
+        </div>
+        }
+
+    </div>
+
+</div>
+
+<!-- OFFCANVAS DETALLE -->
+<div class="offcanvas offcanvas-bottom rounded-top-5 h-75" tabindex="-1" id="offcanvasNotif"
+    style="height: auto; max-height: 85vh; border-radius: 25px 25px 0 0;">
+    <div class="offcanvas-header border-bottom py-3">
+        <h5 class="offcanvas-title fw-bold text-primary">Detalle de Notificación</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+    </div>
+
+    <div class="offcanvas-body p-4" *ngIf="notifSeleccionada">
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-column">
+            <span class="badge rounded-pill px-3 py-2" [ngClass]="{'bg-success-soft text-success': notifSeleccionada.tipo === 'PAGO_APROBADO', 
+                          'bg-danger-soft text-danger': notifSeleccionada.tipo === 'PAGO_RECHAZADO',
+                          'bg-warning-soft text-warning': notifSeleccionada.tipo === 'COMUNICADO_ADMIN',
+                          'bg-info-soft text-info': notifSeleccionada.tipo === 'NUEVA_FACTURA',
+                          }">
+                {{ notifSeleccionada.tipo }}
+            </span>
+            <small class="text-muted">{{ notifSeleccionada.createdAt | date:'medium' }}</small>
+        </div>
+
+        <h3 class="fw-bold mb-3" style="color: #2d3748;">{{ notifSeleccionada.titulo }}</h3>
+        <p class="fs-5 text-secondary" style="line-height: 1.6;">{{ notifSeleccionada.mensaje }}</p>
+
+        <!-- Botón de acción dinámica (Ej: Ir al pago si fue rechazado) -->
+        <div class="mt-5" *ngIf="notifSeleccionada.tipo === 'PAGO_RECHAZADO'">
+            <button class="btn btn-primary w-100 py-3 rounded-4 fw-bold" (click)="irAPagos(notifSeleccionada.tipo)"
+                data-bs-dismiss="offcanvas">
+                Revisar mis Pagos
+            </button>
+        </div>
+
+        <!-- Botón de acción Facturas-->
+        <div class="mt-5" *ngIf="notifSeleccionada.tipo === 'NUEVA_FACTURA'">
+            <button class="btn btn-primary w-100 py-3 rounded-4 fw-bold" (click)="irAFacturas(notifSeleccionada.tipo)"
+                data-bs-dismiss="offcanvas">
+                Revisar mis Facturas
+            </button>
+        </div>
+    </div>
+
+</div>
+<app-menu-footer></app-menu-footer>
+<!-- <app-modal-instrucciones [info]="info" sectionId="misnotificaciones" #instruccionesModal></app-modal-instrucciones> -->

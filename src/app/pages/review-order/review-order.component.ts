@@ -73,12 +73,9 @@ export class ReviewOrderComponent implements OnInit, OnDestroy {
   private carritoService = inject(CarritoService);
   private pedidoService = inject(PedidomenuService);
   private usuarioService = inject(UsuarioService);
-  private direccionService = inject(DireccionService);
   private toastr = inject(ToastrService);
-  private geolocation$ = inject(WaGeolocationService);
   private _router = inject(Router);
   private fb = inject(FormBuilder);
-  private cdr = inject(ChangeDetectorRef);
 
   private cartSubscription!: Subscription;
 
@@ -103,9 +100,6 @@ export class ReviewOrderComponent implements OnInit, OnDestroy {
     this.loadBandejaListFromLocalStorage();
     this.chekpedidoguardado();
     this.crearFormularioExpress();
-    // Suscripción a geolocalización para centrar mapa inicialmente
-    this.SuscripciónGeolocalizacion();
-    this.iniciarFormularioDireccion();
   }
 
   SubscribeToCart() {
@@ -120,195 +114,10 @@ export class ReviewOrderComponent implements OnInit, OnDestroy {
   }
 
 
-  //mapa direccion
-  SuscripciónGeolocalizacion() {
-    this.locationSubscription = this.geolocation$.subscribe({
-      next: (position) => {
-        const lat = position.coords.latitude;
-        const lng = position.coords.longitude;
-        console.log('Initial geolocation success - Lat:', lat, 'Lng:', lng);
-        // Solo usar GPS si no hay coordenadas ya seleccionadas
-        if (!this.selectedCoords && this.map) {
-          this.map.setView([lat, lng], 15);
-        }
-        this.mapLoading = false;
-        this.mapError = '';
-      },
-      error: (error) => {
-        console.error('Error de geolocalización:', error);
-        this.mapLoading = false;
-        switch (error.code) {
-          case error.PERMISSION_DENIED:
-            this.mapError = 'Permiso de geolocalización denegado';
-            break;
-          case error.POSITION_UNAVAILABLE:
-            this.mapError = 'Ubicación no disponible';
-            break;
-          case error.TIMEOUT:
-            this.mapError = 'Tiempo de espera agotado';
-            break;
-          default:
-            this.mapError = 'Error desconocido';
-        }
-        // Centrar en ubicación por defecto (Venezuela) si hay error
-        if (this.map) {
-          this.map.setView([10.4806, -66.9036], 15);
-        }
-      }
-    });
-  }
-
-  iniciarFormularioDireccion(){
-    this.direccionForm = this.fb.group({
-      latitud: ['', Validators.required],
-      longitud: ['', Validators.required],
-      direccion: [''], // Puedes añadir los campos extra que necesites
-      referencia: [''], // Puedes añadir los campos extra que necesites
-    });
-  }
-
-  // ngAfterViewInit() {
-  //   // Delay aumentado para asegurar DOM listo y logging
-  //   setTimeout(() => {
-  //     console.log('Attempting to init map. Container ready?', !!this.mapContainer?.nativeElement);
-  //     this.initMap();
-  //   }, 300);
-  // }
-
-  /**
-     * Inicializa el mapa de Leaflet
-     */
-  private initMap(): void {
-    if (this.map) {
-    setTimeout(() => {
-      // Si usas Leaflet:
-      this.map.invalidateSize();
-      // Si usas Google Maps no necesitas invalidar, con el retorno basta.
-    }, 100);
-    return; 
-  }
-    console.log('Map container element:', this.mapContainer?.nativeElement);
-    // Verificar que el contenedor del mapa existe
-    if (!this.mapContainer?.nativeElement) {
-      console.error('Contenedor del mapa no encontrado');
-      this.mapError = 'Contenedor del mapa no disponible. Recarga la página.';
-      this.mapLoading = false;
-      return;
-    }
-
-    // Centro inicial: Venezuela por defecto
-    const centerLat = 10.4806;
-    const centerLng = -66.9036;
-
-    this.map = L.map(this.mapContainer.nativeElement, {
-      center: [centerLat, centerLng],
-      zoom: 15,
-      zoomControl: true
-    });
-
-    // Agregar tiles de OpenStreetMap
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-      maxZoom: 19
-    }).addTo(this.map);
-
-    // Evento click en el mapa para colocar marcador
-    this.map.on('click', (e: L.LeafletMouseEvent) => {
-      this.placeMarker(e.latlng.lat, e.latlng.lng);
-    });
-
-    // Si hay coordenadas en la dirección existente, mostrar marcador
-    if (this.direccion?.latitud && this.direccion?.longitud) {
-      this.placeMarker(this.direccion.latitud, this.direccion.longitud);
-      this.map.setView([this.direccion.latitud, this.direccion.longitud], 15);
-    }
-
-    this.mapLoading = false;
-  }
-  /**
-     * Usa la ubicación actual del GPS
-     */
-  useCurrentLocation(): void {
-    this.mapLoading = true;
-    console.log('Starting GPS location');
-    this.geolocation$.subscribe({
-      next: (position) => {
-        const lat = position.coords.latitude;
-        const lng = position.coords.longitude;
-        console.log('GPS Success:', lat, lng);
-        this.placeMarker(lat, lng);
-        this.mapLoading = false;
-      },
-      error: (error) => {
-        console.error('GPS Error:', error);
-        this.mapLoading = false;
-        this.toastr.warning('GPS Error', 'Habilita ubicación. Usa HTTPS.');
-      }
-    });
-  }
-
-  /**
-    * Coloca o mueve el marcador en las coordenadas especificadas
-    */
-  placeMarker(lat: number, lng: number): void {
-    console.log('placeMarker called with lat:', lat, 'lng:', lng);
-
-    // Always set coords FIRST
-    this.selectedCoords = { lat, lng };
-    console.log('selectedCoords set:', this.selectedCoords); // esta viene
-
-    // Patch form fields
-    this.direccionForm.patchValue({ latitud: lat, longitud: lng });
-    console.log('Form lat/lng:', this.direccionForm.value.latitud, this.direccionForm.value.longitud); //error aqui
-
-    if (!this.map) {
-      console.error('Map not ready - coords saved anyway');
-      this.fetchAddress(lat, lng);
-      return;
-    }
-
-    // Marker
-    if (this.marker) {
-      this.marker.setLatLng([lat, lng]);
-    } else {
-      this.marker = L.marker([lat, lng])
-        .addTo(this.map)
-        .bindPopup('<b>Ubicación GPS</b>')
-        .openPopup();
-    }
-
-    this.map.setView([lat, lng], 15);
-
-    // Address
-    this.fetchAddress(lat, lng);
-  }
-
-  fetchAddress(lat: number, lng: number): void {
-    console.log('Geocoding', lat, lng);
-    fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`)
-      .then(res => res.json())
-      .then(data => {
-        const address = data.display_name || `Lat ${lat.toFixed(4)}, Lng ${lng.toFixed(4)}`;
-        this.direccionForm.patchValue({ direccion: `📍 ${address}` });
-        console.log('Address:', address);
-      })
-      .catch(() => {
-        this.direccionForm.patchValue({ direccion: `📍 GPS: ${lat.toFixed(6)}, ${lng.toFixed(6)}` });
-      });
-  }
-  // fin mapa direccion
-
 
   ngOnDestroy() {
     if (this.cartSubscription) {
       this.cartSubscription.unsubscribe();
-    }
-    if (this.locationSubscription) {
-      this.locationSubscription.unsubscribe();
-    }
-    if (this.map) {
-      this.map.remove();
-      this.map = null;
     }
   }
 
@@ -470,95 +279,54 @@ export class ReviewOrderComponent implements OnInit, OnDestroy {
 
     // 1. Corres tu petición HTTP a Node.js para registrar al cliente de forma invisible (crearClienteExpress)
     this.usuarioService.crearClienteExpress(payloadExpress).subscribe((resp: any) => {
-      
+
       this.toastr.success('Gracias por Registrate');
       // 2. Al recibir la respuesta exitosa (y guardar el JWT/ID del usuario):
       const uidDirecto = resp.uid || resp.usuario?._id || resp.usuario?.uid || resp.id;
 
-
-      if (this.expressForm.value.tipoEntrega === 'pickup') {
-        // Si retira en tienda, no necesita mapa, disparamos el WhatsApp de una vez!
-       this.guardarPedido(uidDirecto);
-      } else {
-        // Si quiere delivery, lo pasamos al paso 3 para que use tu mapa potente
-        this.pasoActual = 3;
-        // Forzamos a Angular a renderizar el contenedor HTML (#mapContainer) inmediatamente
-      this.cdr.detectChanges(); 
-
-        // 💡 IMPORTANTE: Inicializas tu mapa aquí mismo usando un setTimeout de 50ms 
-        // para darle tiempo a Angular de renderizar el contenedor #mapContainer que estaba oculto
-        
-        this.initMap(); // Tu función existente que dibuja el mapa de Google o Leaflet
-        // setTimeout(() => {
-        // }, 50);
-      }
+      this.guardarPedido(uidDirecto);
 
     }, (err) => {
       this.toastr.error('Error', err.error.msg,);
     })
   }
 
-    // Recibimos el userId directamente para asegurar que no viaje como undefined
-guardarPedido(userId?: string) {
-  this.pedidoGuardado = false;
-  
-  // Prioridad 1: ID directo del backend. Prioridad 2: LocalStorage.
-  const localStorageData = this.usuarioService.getLocalStorage();
-  const uid = userId || localStorageData?.uid ;
+  // Recibimos el userId directamente para asegurar que no viaje como undefined
+  guardarPedido(userId?: string) {
+    this.pedidoGuardado = false;
 
-  // Si sigue vacío, lanzamos la alerta para diagnosticarlo
-  if (!uid) {
-    this.toastr.error('Error', 'No se encontró el identificador del usuario. Intente de nuevo.');
-    console.error('Estructura de localStorage actual:', localStorageData);
-    return;
-  }
+    // Prioridad 1: ID directo del backend. Prioridad 2: LocalStorage.
+    const localStorageData = this.usuarioService.getLocalStorage();
+    const uid = userId || localStorageData?.uid;
 
-  const data = {
-    user: uid, // Aquí ya viaja seguro el ID string
-    tienda: this.tiendaSelected._id,
-    pedidoList: this.bandejaList,
-    status: 'PENDING'
-  };
-
-  this.pedidoService.create(data).subscribe({
-    next: (resp: any) => {
-      this.pedidoGuardado = true;
-      this.toastr.success('¡Éxito!', 'Pedido Agregado');
-      
-      localStorage.removeItem('bandejaItems');
-      this.carritoService.clearCart();
-
-      if (this.expressForm.value.tipoEntrega === 'pickup') {
-        this.sendWhatsAppOrder();
-      }
-    },
-    error: (err) => {
-      this.toastr.error('Error al guardar', err.error.msg || 'No se pudo registrar el pedido');
+    // Si sigue vacío, lanzamos la alerta para diagnosticarlo
+    if (!uid) {
+      this.toastr.error('Error', 'No se encontró el identificador del usuario. Intente de nuevo.');
+      console.error('Estructura de localStorage actual:', localStorageData);
+      return;
     }
-  });
-}
 
-  onSubmitDireccionFinal() {
-    if (this.direccionForm.invalid) return;
-
-    // 1. Guardas la dirección en el backend llamando a tu servicio existente de direcciones.
-    // Como en el paso 2 ya registraste al cliente y tienes su ID/Token, la dirección se asociará perfectamente.
-    const data: any = {
-      ...this.direccionForm.value,
-      user: this.usuarioService.getLocalStorage()?.uid,
-      latitud: this.selectedCoords?.lat || this.direccionForm.value.latitud || 0,
-      longitud: this.selectedCoords?.lng || this.direccionForm.value.longitud || 0
+    const data = {
+      user: uid, // Aquí ya viaja seguro el ID string
+      tienda: this.tiendaSelected._id,
+      pedidoList: this.bandejaList,
+      status: 'PENDING'
     };
 
-    this.direccionService.registro(data).subscribe(
-      (resp: any) => {
-        this.toastr.success('¡Creado!', 'Dirección guardada correctamente');
-      }, error => this.toastr.error('Error', error.message,)
-    );
-    // 2. Teniendo las coordenadas (selectedCoords) y la dirección textual, abrimos el WhatsApp final
-    this.sendWhatsAppOrder();
-  }
+    this.pedidoService.create(data).subscribe({
+      next: (resp: any) => {
+        this.pedidoGuardado = true;
+        this.toastr.success('¡Éxito!', 'Pedido Agregado');
 
+
+        this.sendWhatsAppOrder();
+        this.carritoService.clearCart();
+      },
+      error: (err) => {
+        this.toastr.error('Error al guardar', err.error.msg || 'No se pudo registrar el pedido');
+      }
+    });
+  }
 
 
 
@@ -571,6 +339,7 @@ guardarPedido(userId?: string) {
 
     let message = `*Nuevo Pedido desde App Menu #${this.randomNum}*\n\n`;
     message += `*Cliente:* ${this.expressForm.value.first_name}\n`;
+    message += `*Tipo Entrega:* ${this.expressForm.value.tipoEntrega}\n`;
     message += `*Teléfono:* ${this.expressForm.value.telefono || 'No registrado'}\n\n`;
     message += `*Detalles del Pedido:*\n`;
     message += `─────────────────────\n`;
@@ -605,8 +374,8 @@ guardarPedido(userId?: string) {
       window.open(url, '_blank');
     }
     // Limpiamos carritos
-      localStorage.removeItem('bandejaItems');
-      this.carritoService.clearCart();
+    localStorage.removeItem('bandejaItems');
+    this.carritoService.clearCart();
 
   }
 

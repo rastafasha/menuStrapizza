@@ -22,73 +22,63 @@
             </div>
             <div class="row ">
                 <div class="opciones">
-                    <div class="iconop ">
-                        <div class="card">
-                            <div class="card-body">
-                                <a [routerLink]="['/my-account/perfil', identity.uid]">
-                                    <i class="fa fa-user"></i>
-                                    <p>Mis Datos</p>
-                                </a>
-                            </div>
-                        </div>
+                    <div class="iconop shadow-sm">
+                        <a [routerLink]="['/my-account/perfil', identity.uid]">
+                            <i class="fa fa-user"></i>
+                            <p>Mis Datos</p>
+                        </a>
                     </div>
-                    <div class="iconop " *ngIf="identity.telefono">
-                        <div class="card">
-                            <div class="card-body">
-                                <a [routerLink]="['/my-account/ordenes']">
-                                    <i class="fa fa-shopping-basket"></i>
-                                    <p>Ordenes</p>
+                    <div class="iconop shadow-sm" *ngIf="identity.telefono">
+                        <a [routerLink]="['/my-account/direcciones']">
+                            <i class="fa fa-book"></i>
+                            <p>Direcciones</p>
 
-                                </a>
-                            </div>
-                        </div>
+                        </a>
                     </div>
-                    <div class="iconop " *ngIf="identity.telefono">
-                        <div class="card">
-                            <div class="card-body">
-                                <a [routerLink]="['/my-account/pedidos']">
-                                    <i class="fa fa-shopping-basket"></i>
-                                    <p>Pedidos</p>
+                    <div class="iconop shadow-sm" *ngIf="identity.telefono">
+                        <a [routerLink]="['/review']">
+                            <i class="fa fa-shopping-cart"></i>
+                            <p>Mi Carrito</p>
 
-                                </a>
-                            </div>
-                        </div>
+                        </a>
                     </div>
-                    <div class="iconop " *ngIf="identity.telefono">
-                        <div class="card">
-                            <div class="card-body">
-                                <a [routerLink]="['/review']">
-                                    <i class="fa fa-shopping-cart"></i>
-                                    <p>Mi Carrito</p>
+                    <div class="iconop shadow-sm" *ngIf="identity.telefono">
+                        <a [routerLink]="['/my-account/pedidos']">
+                            <i class="fa fa-shopping-basket"></i>
+                            <p>Pedidos</p>
 
-                                </a>
-                            </div>
-                        </div>
+                        </a>
                     </div>
-                    <div class="iconop " *ngIf="identity.telefono">
-                        <div class="card">
-                            <div class="card-body">
-                                <a [routerLink]="['/my-account/direcciones']">
-                                    <i class="fa fa-book"></i>
-                                    <p>Direcciones</p>
+                    <div class="iconop shadow-sm" *ngIf="identity.telefono">
+                        <a [routerLink]="['/my-account/ordenes']">
+                            <i class="fa fa-shopping-basket"></i>
+                            <p>Ordenes</p>
 
-                                </a>
-                            </div>
-                        </div>
+                        </a>
                     </div>
-                    <div class="iconop ">
-                        <div class="card">
-                            <div class="card-body">
-                                <a (click)="slir()">
-                                    <i class="fa fa-power-off"></i>
-                                    <p>Salir</p>
+                    
+                    
+                    <div class="iconop shadow-sm" *ngIf="identity.telefono">
+                        <a [routerLink]="['/mis-pagos']">
+                            <i class="fa fa-wallet"></i>
+                            <p>Mis Pagos</p>
 
-                                </a>
-                            </div>
-                        </div>
+                        </a>
                     </div>
+                    
+
                 </div>
 
+                <div class="setting-row shadow-sm">
+                    <a (click)="logout()">
+                        <div class="setting-info ">
+                            <i class="fa fa-power-off"></i>
+                            <div class="text-container">
+                                <strong>Cerrar Sesión</strong>
+                            </div>
+                        </div>
+                    </a>
+                </div>
             </div>
         </div>
     </section>

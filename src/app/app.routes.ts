@@ -14,6 +14,8 @@ import { MispedidosComponent } from './pages/myaccount/mispedidos/mispedidos.com
 import { DireccionEditComponent } from './pages/myaccount/direcciones/direccion-edit/direccion-edit.component';
 import { DireccionesComponent } from './pages/myaccount/direcciones/direcciones.component';
 import { PayComponent } from './pages/pay/pay.component';
+import { MisNotificacionesComponent } from './pages/mis-notificaciones/mis-notificaciones.component';
+import { MisPagosComponent } from './pages/myaccount/mis-pagos/mis-pagos.component';
 // import { ReviewOrderComponent } from './pages/review-order/review-order.component';
 
 export const routes: Routes = [
@@ -51,5 +53,7 @@ export const routes: Routes = [
     {path: 'my-account/direcciones', component: DireccionesComponent },
     {path: 'my-account/direccion/create', component: DireccionEditComponent },
     { path: 'my-account/direccion/edit/:id', component: DireccionEditComponent},
+    { path: 'notificaciones', component: MisNotificacionesComponent},
+    { path: 'mis-pagos', component: MisPagosComponent},
 ];
 

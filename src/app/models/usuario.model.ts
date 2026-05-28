@@ -13,7 +13,8 @@ export class Usuario {
     public password?: string,
     public google?: boolean,
     public role?: 'ADMIN' | 'USER' | 'VENTAS',
-    public uid?: string
+    public uid?: string,
+    public createdAt?: Date
   ){}
 
   get imagenUrl(){
