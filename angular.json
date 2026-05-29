@@ -60,14 +60,11 @@
             },
             "strapizza": {
               "outputPath": "dist/strapizza",
-              "index": {
-                "input": "src/env/strapizza/index.html",
-                "output": "index.html"
-              },
+              
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.strapizza.ts"
+                  "with": "src/environments/environment.prod.ts"
                 }
               ],
               "assets": [
@@ -105,14 +102,11 @@
             },
             "slidedish": {
               "outputPath": "dist/slidedish",
-              "index": {
-                "input": "src/env/slidedish/index.html",
-                "output": "index.html"
-              },
+             
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.slidedish.ts"
+                  "with": "src/environments/environment.prod.ts"
                 }
               ],
              "assets": [
@@ -150,14 +144,11 @@
             },
             "hamburguesa": {
               "outputPath": "dist/hamburguesa",
-              "index": {
-                "input": "src/env/hamburguesa/index.html",
-                "output": "index.html"
-              },
+             
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.hamburguesa.ts"
+                  "with": "src/environments/environment.prod.ts"
                 }
               ],
              "assets": [
