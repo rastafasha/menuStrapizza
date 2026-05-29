@@ -1,0 +1,126 @@
+.menu-footer {
+    background-color: #f2f2f2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center; 
+    height: 52px;
+    position: fixed;
+    left: 50%; /* Requerido para que el translate -50% sepa de dónde partir */
+    bottom: 0;
+    z-index: 999;
+    transform: translate(-50%, 100px); /* Comienza oculto abajo */
+    animation: entradaMenu 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+/* Animación del contenedor principal */
+@keyframes entradaMenu {
+    0% {
+        width: 52px; 
+        border-radius: 50%;
+        transform: translate(-50%, 60px); /* Mantiene el centrado horizontal */
+    }
+    40% {
+        width: 52px;
+        border-radius: 50%;
+        transform: translate(-50%, -15px); /* Mantiene el centrado horizontal */
+    }
+    100% {
+        width: 70%; /* Ahora se expandirá equitativamente hacia ambos lados */
+        border-radius: 26px; 
+        transform: translate(-50%, -15px); /* Mantiene el centrado horizontal */
+    }
+}
+
+/* Ocultar los íconos al inicio y aparecerlos al final */
+.menu-footer ul {
+    display: flex;
+    width: 100%;
+    justify-content: space-around;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    
+    /* Animación de retraso para los íconos */
+    opacity: 0;
+    animation: aparecerIconos 0.4s ease-out 0.7s forwards;
+}
+
+@keyframes aparecerIconos {
+    0% {
+        opacity: 0;
+        transform: scale(0.7);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+
+.menu-footer ul {
+    display: flex;
+    width: 100%;
+    padding: 0px;
+    
+    
+}
+.menu-footer ul li a span{
+text-decoration: none !important;
+}
+
+.menu-footer ul li,
+.menu-footer ul li a i
+ {
+    display: flex;
+    font-size: 20px;
+    color: var(--light-brown);
+    margin: auto;
+    margin-top: 0px;
+    text-decoration: none !important;
+    
+}
+
+.menu-footer ul li:active,
+.menu-footer ul li a:active,
+.menu-footer ul li a.active,
+.menu-footer ul li a.active i {
+    color: var(--dark-brown) !important;
+    text-decoration: none !important;
+    
+}
+
+.menu-footer ul li a .fa-store-alt,
+.menu-footer ul li a .fa-camera,
+.menu-footer ul li a .fa-shopping-cart {
+    display: flex;
+    font-size: 1.2em !important;
+    color: var(--light-brown);
+    background-color: var(--white);
+    border: 3px solid #fff;
+    box-shadow: 0px 7px 10px #999;
+    border-radius: 100px;
+    height: 55px;
+    width: 55px;
+    text-align: center;
+    flex-direction: column;
+    padding-top: 10px;
+    margin-top: -40px;
+    text-decoration: none;
+    text-decoration: none !important;
+    animation: ease 2s ;
+}
+
+.menu-footer ul li a:has(.cart-count-badge) {
+  margin-top: -25px;
+}
+
+/* .menu-footer ul li a.cart:not(:has(.cart-count-badge)) i.fa-shopping-cart {
+  display: none !important;
+} */
+
+.menu-footer ul li.active.iconstore a i {
+    color: var(--green-gray);
+    text-decoration: none !important;
+    box-shadow: var(--shadow-brown);
+}

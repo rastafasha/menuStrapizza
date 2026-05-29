@@ -32,7 +32,6 @@ interface HtmlInputEvent extends Event{
     ReactiveFormsModule,
     FormsModule,
     ImagenPipe,
-    LoadingComponent
 
   ],
   templateUrl: './perfil.component.html',

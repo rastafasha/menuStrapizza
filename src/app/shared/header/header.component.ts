@@ -6,11 +6,12 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Usuario } from '../../models/usuario.model';
-import { Subscription } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { ImagenPipe } from '../../pipes/imagen-pipe.pipe';
 import { environment } from '../../../environments/environment';
 import { AvisoComponent } from '../aviso/aviso.component';
 import { LoadingComponent } from '../loading/loading.component';
+import { NotificacionService } from '../../services/notificacion.service';
 
 @Component({
   selector: 'app-header',
@@ -47,10 +48,13 @@ export class HeaderComponent implements OnDestroy {
    isAviso:boolean = false;
    aviso: string = 'Hala desde el header, para refrescar la pagina';
 
+   public unreadCount$!: Observable<number>;
+
   private tiendaService = inject(TiendaService);
   private carritoService = inject(CarritoService);
   private cartSubscription!: Subscription;
   private tiendaSubscription!: Subscription;
+   private notifService = inject(NotificacionService);
   
 
   @HostListener('touchstart', ['$event'])
@@ -74,6 +78,9 @@ export class HeaderComponent implements OnDestroy {
   }
 
   ngOnInit(): void {
+    // 2. Vinculamos el flujo del servicio y disparamos la petición
+    this.unreadCount$ = this.notifService.unreadCount$;
+    this.notifService.cargarContador();
     // Show aviso only once on initial app start
     const avisoShown = localStorage.getItem('avisoShown');
     if (!avisoShown) {

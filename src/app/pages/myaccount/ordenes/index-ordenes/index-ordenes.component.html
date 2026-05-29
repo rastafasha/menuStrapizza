@@ -1,21 +1,17 @@
 <app-header></app-header>
-<section class="sub-header d-flex justify-content-center mt-5" style="padding-top: 30px;">
-    <!-- <img class="rellax bg-overlay" src="images/sub-header/05.jpg" alt=""> -->
-    <div class="overlay-call-to-action"></div>
-    <!-- <h3 class="heading-style-3">Mis Ordenes</h3> -->
-</section>
+<aside class="col-lg-4 pt-4 pt-lg-0 " style="margin-top: 70px;">
+    <app-aside-cuenta [isNotvisible]="true"></app-aside-cuenta>
+</aside>
+
 <!-- Page Content-->
 <div class="container pb-5 mb-2 mb-md-3">
     <div class="row">
-        <!-- Sidebar-->
-       <aside class="col-lg-4 pt-4 pt-lg-0 " style="margin-top: 0px;">
-            <app-aside-cuenta [isNotvisible]="true"></app-aside-cuenta>
-        </aside>
         <!-- Content  -->
-        <section class="col-lg-8">
-            <!-- Addresses list-->
-
-            <hr class="pb-4">
+         <app-loading *ngIf="isLoading"></app-loading>
+         <div *ngIf="!isLoading && ventas?.length == 0">
+            <h4 class="text-center mt-3">No posees Compras</h4>
+         </div>
+        <section class="col-lg-8" *ngIf="!isLoading">
             <!-- <div *ngFor="let item_venta of ventas |  paginate: { itemsPerPage: count, currentPage: p }"> -->
             <div *ngFor="let item_venta of ventas  ">
                 <div class="card mb-4">

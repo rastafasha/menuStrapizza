@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
@@ -26,6 +26,8 @@ import { PagoEfectivoService } from '../../services/pago-efectivo.service';
 import { ICreateOrderRequest, IPayPalConfig, NgxPayPalModule } from 'ngx-paypal';
 import { Paypal } from '../../models/paypal.model';
 import { PaypalService } from '../../services/paypal.service';
+import { FileUploadService } from '../../services/file-upload.service';
+import { ToastrService } from 'ngx-toastr';
 declare var $: any;
 // declare var paypal;
 
@@ -108,6 +110,7 @@ export class PayComponent {
   selectedDelivery: string = 'Deseas Delivery?';
   habilitacionAddresLocal: boolean = false;
   habilitacionFormDelivery: boolean = false;
+  loading: boolean = false;
 
   direcciones: Direccion[] = [];
   direccionSelected!: Direccion;
@@ -119,15 +122,17 @@ export class PayComponent {
   paymentSelected!: PaymentMethod; //metodo de pago seleccionado por el usuario para transferencia
   paymentMethodinfo!: PaymentMethod; //metodo de pago seleccionado por el usuario para transferencia
 
+  imagePreview = signal<string | null>(null);
+  public selectedFile: File | null = null;
 
   formTransferencia = new FormGroup({
     metodo_pago: new FormControl(this.paymentMethodinfo, Validators.required),
-    bankName: new FormControl('', Validators.required),
+    // bankName: new FormControl(this.paymentSelected.bankName, Validators.required),
     // amount: new FormControl('', Validators.required),
     referencia: new FormControl('', Validators.required),
     // name_person: new FormControl('', Validators.required),
     // phone: new FormControl('', Validators.required),
-    paymentday: new FormControl('', Validators.required)
+    paymentday: new FormControl(new Date(), Validators.required)
   });
 
   formDelivery = new FormGroup({
@@ -162,6 +167,8 @@ export class PayComponent {
     private _router: Router,
     private _activatedRoute: ActivatedRoute,
     private _paypalService: PaypalService,
+    private fileUploadService: FileUploadService,
+    private toastr: ToastrService,
     //  private _postalService :PostalService,
   ) {
     window.scrollTo(0, 0);
@@ -207,26 +214,16 @@ export class PayComponent {
       if (paypals.length > 0) {
         this.paypalinfo = paypals[0];
         if (!this.paypalinfo?.clientIdPaypal || this.paypalinfo.clientIdPaypal.trim() === '') {
-          console.error('Invalid/empty PayPal clientIdPaypal from backend');
-          Swal.fire({
-            icon: 'error',
-            title: 'Configuración de PayPal inválida',
-            text: 'Contacte al administrador de la tienda.',
-            timer: 3000
-          });
+          // console.error('Invalid/empty PayPal clientIdPaypal from backend');
+          this.toastr.error('Configuración de PayPal inválida');
           return;
         }
-        console.log('PayPal config loaded:', this.paypalinfo!.clientIdPaypal);
+        // console.log('PayPal config loaded:', this.paypalinfo!.clientIdPaypal);
         // Init PayPal with service data only
         this.initPayPalConfig();
       } else {
         console.warn('No PayPal config for tienda');
-        Swal.fire({
-          icon: 'warning',
-          title: 'PayPal no configurado',
-          text: 'Este método de pago no está disponible para esta tienda.',
-          timer: 3000
-        });
+        this.toastr.warning('PayPal no configurado');
         this.paypalinfo = undefined;
       }
     });
@@ -301,53 +298,60 @@ export class PayComponent {
     })
   }
 
-  sendFormTransfer() {
+  onFileSelected(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      this.selectedFile = file;
+      const reader = new FileReader();
+      reader.onload = () => this.imagePreview.set(reader.result as string);
+      reader.readAsDataURL(file);
+    }
+  }
+
+  sendFormTransfer() {debugger
 
     if (this.formTransferencia.valid) {
 
-      const data = {
-        localId: this.tiendaSelected._id,
+      
+      this.loading = true;
+    const solicitudId = this.pedido._id;
+      // 💡 SOLUCIÓN SUBIDA DE IMAGEN: Usamos el Idel cliente logueado temporalmente para asegurar un archivo único,
+    // o el ID de la solicitud si tu fileUploadService está ruteado estrictamente de esa manera.
+    this.fileUploadService.actualizarFoto(this.selectedFile!, 'transferencias', solicitudId)
+      .then(imgUrl => {
+        
+        // CONSTRUCCIÓN DEL PAYLOAD FIEL A TU ESQUEMA REAL DE MONGO
+        const data = {
+        local: this.tiendaSelected._id,
         user: this.identity.uid,
-        name_person: this.identity.first_name + this.identity.last_name,
+        name_person: this.identity.first_name ,
         phone: this.identity.telefono,
         amount: this.totalAmount,
+        referencia: this.formTransferencia.value.referencia,
+        bankName: this.paymentSelected.bankName,
+        pedido: this.pedido._id,
+        img: imgUrl,
         ...this.formTransferencia.value
       }
 
-
-      // llamo al servicio
-      this._trasferencias.createTransfer(data).subscribe(resultado => {
-        // console.log('resultado: ',resultado);
-        // this.verify_dataComplete(Number(this.formTransferencia.value.amount));
-        this.verify_dataComplete(Number(this.totalAmount));
-        if (resultado.ok || resultado.status === 200) {
-          // transferencia registrada con exito
-          // console.log(resultado.payment);
-          // alert('Transferencia registrada con exito');
-          Swal.fire({
-            position: 'top-end',
-            icon: 'success',
-            title: 'Transferencia registrada con exito',
-            showConfirmButton: false,
-            timer: 1500,
-          });
-          this.onItemRemoved();
-          this._router.navigate(['/my-account/ordenes']);
-        }
-        else {
-          // error al registar la transferencia
-          // alert('Error al registrar la transferencia');
-          // console.log(resultado.msg);
-          Swal.fire({
-            position: 'top-end',
-            icon: 'warning',
-            title: 'Error al registrar la transferencia',
-            text: resultado.msg,
-            showConfirmButton: false,
-            timer: 1500,
-          });
-        }
+        this._trasferencias.createTransfer(data).subscribe({
+          next: () => {
+            this.toastr.success('¡Transferencia registrada con exito');
+            this.onItemRemoved();
+            this._router.navigate(['/my-account/ordenes']);
+          },
+          error: (err) => {
+            this.loading = false;
+            this.toastr.error('Error al registrar la transacción en el servidor');
+          }
+        });
+      })
+      .catch(err => {
+        this.loading = false;
+        this.toastr.error('Error al registrar la transferencia');
       });
+
+
     }
   }
 
@@ -371,30 +375,13 @@ export class PayComponent {
         this.verify_dataComplete(Number(this.totalAmount));
         if (resultado.ok || resultado.status === 200) {
           // transferencia registrada con exito
-          // console.log(resultado.payment);
-          // alert('Transferencia registrada con exito');
-          Swal.fire({
-            position: 'top-end',
-            icon: 'success',
-            title: 'Pago registrada con exito',
-            showConfirmButton: false,
-            timer: 1500,
-          });
+          this.toastr.success('Pago registrada con exito');
           this.onItemRemoved();
           this._router.navigate(['/my-account/ordenes']);
         }
         else {
           // error al registar la transferencia
-          // alert('Error al registrar la transferencia');
-          // console.log(resultado.msg);
-          Swal.fire({
-            position: 'top-end',
-            icon: 'warning',
-            title: 'Error al registrar el Pago',
-            text: resultado.msg,
-            showConfirmButton: false,
-            timer: 1500,
-          });
+          this.toastr.error('Error al registrar el Pago');
         }
       });
     }
@@ -434,7 +421,6 @@ export class PayComponent {
   listar_carrito() {
     this._carritoService.preview_carrito(this.identity.uid ?? '').subscribe(
       (response: any) => {
-        console.log(response)
         this.carrito = response;
         this.subtotal = 0;
         this.carrito.forEach(element => {

@@ -1,8 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
-import { HttpBackend, HttpClient } from '@angular/common/http';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import Swal from 'sweetalert2';
+import { HttpClient } from '@angular/common/http';
+import { FormGroup, FormBuilder } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { environment } from '../../../../environments/environment';
 import { Direccion } from '../../../models/direccion.model';
@@ -10,19 +9,20 @@ import { DireccionService } from '../../../services/direccion.service';
 import { UsuarioService } from '../../../services/usuario.service';
 import { Pais } from '../../../models/pais.model';
 import { LoadingComponent } from "../../../shared/loading/loading.component";
-// import { BackComponent } from "../../../shared/back/back.component";
 import { AvisoComponent } from "../../../shared/aviso/aviso.component";
-import { MenuFooterComponent } from "../../../shared/menu-footer/menu-footer.component";
 import { HeaderComponent } from "../../../shared/header/header.component";
 import { AsideCuentaComponent } from "../aside-cuenta/aside-cuenta.component";
 
 @Component({
   selector: 'app-direcciones',
   templateUrl: './direcciones.component.html',
-  imports: [LoadingComponent,
-    CommonModule, RouterModule,
-    AvisoComponent, MenuFooterComponent,
-    HeaderComponent, AsideCuentaComponent],
+  imports: [
+    LoadingComponent,
+    CommonModule, 
+    RouterModule,
+    AvisoComponent, 
+    HeaderComponent, 
+    AsideCuentaComponent],
     styleUrls: ['./direcciones.component.scss']
 })
 export class DireccionesComponent implements OnInit {

@@ -88,6 +88,9 @@ export class NotificacionService {
             case 'PEDIDO_RECHAZADO':
               toast = this.toastr.error(notif.mensaje, '❌ Pedido Rechazada', config);
               break;
+            case 'PEDIDO_FINALIZADO':
+              toast = this.toastr.error(notif.mensaje, '❌ Pedido Finalizado', config);
+              break;
            
             default:
               toast = this.toastr.info(notif.mensaje, '🔔 Aviso Nuevo', config);

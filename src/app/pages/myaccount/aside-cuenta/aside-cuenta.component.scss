@@ -45,6 +45,9 @@ a {
 
 .active {
     color: var(--light-brown);
+    & i{
+       color: var(--light-brown); 
+    }
 }
 
 .setting-row {

@@ -36,9 +36,9 @@
               <div class="col-md-4">
                 <select class="form-select" [(ngModel)]="status" (change)="search()">
                   <option value="">Todos los Estatus</option>
-                  <option value="PENDIENTE">Pendientes</option>
-                  <option value="APROBADO">Aprobados</option>
-                  <option value="RECHAZADO">Rechazados</option>
+                  <option value="pending">Pendientes</option>
+                  <option value="ok">Aprobados</option>
+                  <option value="no">Rechazados</option>
                 </select>
               </div>
 
@@ -63,11 +63,11 @@
     </div>
 
 
-    @for (payment of payments(); track payment._id) {
+    @for (payment of transferencias(); track payment._id) {
     <div class="card border-0 shadow-sm mb-3 border-start border-4 " [ngClass]="{
-           'border-success': payment.status === 'APROVED',
-           'border-warning': payment.status === 'PENDING',
-           'border-danger': payment.status === 'REFUSED'
+           'border-success': payment.status === 'ok',
+           'border-warning': payment.status === 'pending',
+           'border-danger': payment.status === 'no'
          }">
       <div class="card-body p-3">
         <!-- Fila Superior: Fecha y Estatus -->
@@ -78,15 +78,15 @@
             </h6>
           </div>
           <!-- Badge más estilizado -->
-          @if (payment.status === 'APROVED') {
+          @if (payment.status === 'ok') {
           <span
             class="badge rounded-pill bg-success-subtle text-success border border-success-subtle px-3">Aprobado</span>
           }
-          @if (payment.status === 'PENDING') {
+          @if (payment.status === 'pending') {
           <span
             class="badge rounded-pill bg-warning-subtle text-warning border border-warning-subtle px-3">Pendiente</span>
           }
-          @if (payment.status === 'REFUSED') {
+          @if (payment.status === 'no') {
           <span
             class="badge rounded-pill bg-danger-subtle text-danger border border-danger-subtle px-3">Rechazado</span>
 
@@ -97,7 +97,7 @@
         <!-- Fila Media: Monto -->
         <div class="mb-2">
           <p class="mb-0 h4 fw-bold text-dark">
-            {{payment.amount | currency}}
+            {{payment.amount | currency:tienda_moneda}}
           </p>
           <small class="text-muted d-block">Ref: #{{payment.referencia}}</small>
         </div>
@@ -124,7 +124,7 @@
     @if (!loading()) {
 
     <!-- Caso A: Se terminó el scroll normal -->
-    @if (!hasMore() && !isFiltering() && payments().length > 0) {
+    @if (!hasMore() && !isFiltering() && transferencias().length > 0) {
     <div class="text-center my-4 animate fadeIn">
       <p class="text-muted small">
         <i class="fas fa-check-circle me-1"></i> Has llegado al final del historial
@@ -168,15 +168,15 @@
     <div class="text-center mb-4">
       <!-- Badge de Estado Dinámico -->
       <span class="badge rounded-pill px-3 py-2 mb-2" [ngClass]="{
-                'bg-success-subtle text-success': pagoSeleccionado().status === 'APROVED',
-                'bg-warning-subtle text-warning': pagoSeleccionado().status === 'PENDING',
-                'bg-danger-subtle text-danger': pagoSeleccionado().status === 'REFUSED'
+                'bg-success-subtle text-success': pagoSeleccionado().status === 'ok',
+                'bg-warning-subtle text-warning': pagoSeleccionado().status === 'pending',
+                'bg-danger-subtle text-danger': pagoSeleccionado().status === 'no'
               }">
         {{ pagoSeleccionado().status }}
       </span>
-      <h2 class="display-6 fw-bold mb-0">{{ pagoSeleccionado().amount | currency }}</h2>
+      <h2 class="display-6 fw-bold mb-0">{{ pagoSeleccionado().amount | currency:tienda_moneda }}</h2>
       <p class="text-muted small">Ref: #{{ pagoSeleccionado().referencia }}</p>
-      @if (pagoSeleccionado().status === 'REFUSED') {
+      @if (pagoSeleccionado().status === 'no') {
       <p>Motivo: {{pagoSeleccionado().observaciones}}</p>
       }
     </div>
@@ -185,21 +185,67 @@
     <div class="bg-light rounded-4 p-3 mb-4" style="border-radius: 15px;">
       <div class="d-flex justify-content-between mb-3 border-bottom pb-2">
         <span class="text-muted small">Método</span>
-        <span class="fw-bold small">{{ pagoSeleccionado().metodo_pago }}</span>
+        <span class="fw-bold small">{{ pagoSeleccionado().metodo_pago.tipo }}</span>
       </div>
       <div class="d-flex justify-content-between mb-3 border-bottom pb-2">
         <span class="text-muted small">Banco Destino</span>
-        <span class="fw-bold small">{{ pagoSeleccionado().bank_destino }}</span>
+        <span class="fw-bold small">{{ pagoSeleccionado().metodo_pago.bankName }}</span>
       </div>
       <div class="d-flex justify-content-between mb-3 border-bottom pb-2">
         <span class="text-muted small">Fecha</span>
         <span class="fw-bold small">{{ pagoSeleccionado().createdAt | date:'dd/MM/yyyy' }}</span>
       </div>
-      <div class="d-flex justify-content-between">
+      @if (pagoSeleccionado().tasaBCV) {
+        <div class="d-flex justify-content-between" >
         <span class="text-muted small">Tasa Aplicada</span>
         <span class="fw-bold small">{{ pagoSeleccionado().tasaBCV }} Bs.</span>
       </div>
+      }
+      
     </div>
+
+    <!-- Datos del pedido-->
+    <span class="text-muted small">Items</span>
+    @for (item of pagoSeleccionado()?.pedido.pedidoList || []; track $index) {
+    <div class="bg-light rounded-4 p-3 mb-4" style="border-radius: 15px;">
+      <div class="d-flex justify-content-between mb-3 border-bottom pb-2">
+        <span class="text-muted small">Item #{{ $index + 1 }}</span>
+      </div>
+
+      <div class="d-flex justify-content-between mb-3 border-bottom pb-2">
+        <span class="text-muted small">Categoria</span>
+        <span class="fw-bold small">{{ item.subcategoria }}</span>
+      </div>
+      <div class="d-flex justify-content-between mb-3 border-bottom pb-2">
+        <span class="text-muted small">Nombre</span>
+        <span class="fw-bold small">{{ item.titulo }}</span>
+      </div>
+      <div class="d-flex justify-content-between mb-3 border-bottom pb-2 flex-column">
+        <span class="text-muted small">Detalle</span>
+        <span class="fw-bold small" [innerHtml]="item.detalle | safe: 'html'"></span>
+      </div>
+
+      <div class="d-flex justify-content-between">
+        <span class="text-muted small">Cantidad</span>
+        <span class="fw-bold small">{{ item.cantidad }}</span>
+      </div>
+
+      <div class="d-flex justify-content-between">
+        <span class="text-muted small">Precio</span>
+        <span class="fw-bold small">{{ +item.precio_ahora | currency:tienda_moneda  }}</span>
+      </div>
+
+      <div class="d-flex justify-content-between">
+        <span class="text-muted small">Total</span>
+        <!-- El símbolo + convierte el texto "20" y "10" en números reales antes de multiplicar -->
+        <span class="fw-bold small">{{ (+item.precio_ahora) * (+item.cantidad) | currency:tienda_moneda  }}</span>
+      </div>
+    </div>
+    } @empty {
+    <div class="text-center p-4 text-muted">
+      <p class="small mb-0">No hay artículos registrados en esta compra.</p>
+    </div>
+    }
 
     <!-- Imagen del Soporte (Si existe) -->
     @if (pagoSeleccionado().img) {

@@ -1,34 +1,35 @@
-<div class="cz-sidebar-static ">
+<div class="row">
+  <div class="cz-sidebar-static ">
   <ul class="listainterna ">
     <li>
-      <a class="nav-links" [routerLink]="['/my-account/perfil/', identity.uid]" routerLinkActive="active"
+      <a class="nav-links shadow-sm" [routerLink]="['/my-account/perfil/', identity.uid]" routerLinkActive="active"
         [routerLinkActiveOptions]="{exact: true}">
         <i class="fa fa-user opacity-60 mr-2"></i>Mis Datos
       </a>
     </li>
     <li *ngIf="identity.telefono">
-      <a class="nav-links" [routerLink]="['/my-account/direcciones']" routerLinkActive="active"
+      <a class="nav-links shadow-sm" [routerLink]="['/my-account/direcciones']" routerLinkActive="active"
         [routerLinkActiveOptions]="{exact: true}">
-        <i class="czi-bag opacity-60 mr-2"></i>Direcciones</a>
+        <i class="fa fa-book opacity-60 mr-2"></i>Direcciones</a>
     </li>
 
     <li *ngIf="identity.telefono">
-      <a class="nav-links" [routerLink]="['/review']" routerLinkActive="active"
+      <a class="nav-links shadow-sm" [routerLink]="['/review']" routerLinkActive="active"
         [routerLinkActiveOptions]="{exact: true}">
-        <i class="fa fa-shopping-basket opacity-60 mr-2"></i>Carrito</a>
+        <i class="fa fa-shopping-cart opacity-60 mr-2"></i>Carrito</a>
     </li>
     <li *ngIf="identity.telefono">
-      <a class="nav-links" [routerLink]="['/my-account/pedidos']" routerLinkActive="active"
+      <a class="nav-links shadow-sm" [routerLink]="['/my-account/pedidos']" routerLinkActive="active"
         [routerLinkActiveOptions]="{exact: true}">
-        <i class="czi-bag opacity-60 mr-2"></i>Pedidos</a>
+        <i class="fa fa-bag-shopping opacity-60 mr-2"></i>Pedidos</a>
     </li>
     <li *ngIf="identity.telefono">
-      <a class="nav-links" [routerLink]="['/my-account/ordenes']" routerLinkActive="active"
+      <a class="nav-links shadow-sm" [routerLink]="['/my-account/ordenes']" routerLinkActive="active"
         [routerLinkActiveOptions]="{exact: true}">
-        <i class="fa fa-shopping-basket opacity-60 mr-2"></i>Ordenes</a>
+        <i class="fa fa-ticket-alt opacity-60 mr-2"></i>Ordenes</a>
     </li>
     <li *ngIf="identity.telefono">
-      <a class="nav-links" [routerLink]="['/mis-pagos']" routerLinkActive="active"
+      <a class="nav-links shadow-sm" [routerLink]="['/mis-pagos']" routerLinkActive="active"
         [routerLinkActiveOptions]="{exact: true}">
         <i class="fa fa-wallet"></i>
         Mis Pagos
@@ -39,11 +40,12 @@
 <div class="setting-row shadow-sm">
   <a [routerLink]="['/my-account']">
     <div class="setting-info ">
-      <i class="fa fa-backward"></i>
+      <i class="fa fa-user-circle"></i>
       <div class="text-container">
         <strong>Inicio Cuenta</strong>
       </div>
     </div>
   </a>
+</div>
 </div>
 <hr>

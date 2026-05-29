@@ -34,21 +34,19 @@ export class MenuFooterComponent {
   pedido: any;
   public pedidos!: Pedido[] | null;
 
-   public unreadCount$!: Observable<number>;
+   
 
   private pedidoService = inject(PedidomenuService);
   private carritoService = inject(CarritoService);
   private userService = inject(UsuarioService);
-  private notifService = inject(NotificacionService);
+ 
 
   private cartSubscription!: Subscription;
 
   ngOnInit(): void {
     this.user = this.userService.getLocalStorage();
     this.userId = this.user?.uid;
-    // 2. Vinculamos el flujo del servicio y disparamos la petición
-    this.unreadCount$ = this.notifService.unreadCount$;
-    this.notifService.cargarContador();
+    
     // Subscribe to cart changes
     this.cartSubcrpt();
     this.chekpedidoguardado();

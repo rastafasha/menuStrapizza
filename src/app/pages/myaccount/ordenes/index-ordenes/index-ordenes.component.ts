@@ -11,6 +11,7 @@ import { AsideCuentaComponent } from '../../aside-cuenta/aside-cuenta.component'
 import { environment } from '../../../../../environments/environment';
 import { TiendaService } from '../../../../services/tienda.service';
 import { ModalinfoComentarioAppComponent } from "../../../../components/modalinfo-comentario-app/modalinfo-comentario-app.component";
+import { LoadingComponent } from '../../../../shared/loading/loading.component';
 
 declare var jQuery:any;
 declare var $:any;
@@ -24,7 +25,8 @@ declare var $:any;
     RouterModule,
     ReactiveFormsModule,
     FormsModule,
-    ModalinfoComentarioAppComponent
+    ModalinfoComentarioAppComponent,
+    LoadingComponent
 ],
   templateUrl: './index-ordenes.component.html',
   styleUrls: ['./index-ordenes.component.css']
@@ -34,6 +36,7 @@ export class IndexOrdenesComponent implements OnInit {
   public identity:any;
   public url:any;
   public msm_error = false;
+  public isLoading = false;
   public msm_success = false;
   public ordenes!:Venta;
   public cancelacion!: Cancelacion;
@@ -78,9 +81,11 @@ export class IndexOrdenesComponent implements OnInit {
   }
 
   listar_ventas(){
+    this.isLoading = true;
    this.ventaService.listarporUser(this.identity.uid).subscribe(
       response=>{
         this.ventas = response.ventas;
+        this.isLoading = false;
       },
       error=>{
 

@@ -1,20 +1,18 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { RouterModule } from '@angular/router';
 import { HeaderComponent } from '../../../shared/header/header.component';
 import { AsideCuentaComponent } from '../aside-cuenta/aside-cuenta.component';
-import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
 import { Venta, Cancelacion } from '../../../models/ventas.model';
 import { UsuarioService } from '../../../services/usuario.service';
-import { VentaService } from '../../../services/venta.service';
 import { PedidomenuService } from '../../../services/pedidomenu.service';
 import { Pedido } from '../../../models/pedido.model';
 import { Tienda } from '../../../models/tienda.model';
-import { MenuFooterComponent } from "../../../shared/menu-footer/menu-footer.component";
 import { TiendaService } from '../../../services/tienda.service';
 import { ModalinfoPedidosComponent } from "../../../components/modalinfo-pedidos/modalinfo-pedidos.component";
+import { LoadingComponent } from '../../../shared/loading/loading.component';
 
 @Component({
   selector: 'app-mispedidos',
@@ -25,8 +23,8 @@ import { ModalinfoPedidosComponent } from "../../../components/modalinfo-pedidos
     RouterModule,
     ReactiveFormsModule,
     FormsModule,
-    MenuFooterComponent,
-    ModalinfoPedidosComponent
+    ModalinfoPedidosComponent,
+    LoadingComponent
 ],
   templateUrl: './mispedidos.component.html',
   styleUrl: './mispedidos.component.scss'
@@ -35,6 +33,7 @@ export class MispedidosComponent {
   public url:any;
   public msm_error = false;
   public msm_success = false;
+  public isLoading = false;
   public ordenes!:Venta;
   public cancelacion!: Cancelacion;
   public pedidos!: Pedido[]|null;
@@ -81,9 +80,11 @@ export class MispedidosComponent {
  
 
   listar_pedidos(){
+    this.isLoading = true;
    this.pedidoService.getByTiendaUserId(this.tiendaSelected._id, this.user.uid).subscribe(
       (resp:any)=>{
         this.pedidos = resp;
+        this.isLoading = false;
       }
     );
   }

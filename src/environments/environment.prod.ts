@@ -10,7 +10,7 @@ export const environment = {
   mediaUrl: 'https://back-ecomm-mall.vercel.app/api/uploads',
   mediaUrlRemoto: 'https://res.cloudinary.com/dmv6aukai/image/upload/v1741218430/mallConnect',
   urlBackedNotification:'https://back-ecomm-mall.onrender.com/api/notipush/save-subscription',
-  VAPI_KEY_PUBLIC: 'BBx1euNKfJff71NH7EPnxOptH0WJdOiw3YVg5lZXGLvp4BBBW4jXTAnmzaNQ1-jwNIBGwrNjS14zDQCzwb5g5O4',
+  VAPI_KEY_PUBLIC: 'BGlxB4IqUGZq7BoOU1KLM0Yb4Olh7_zI0xfpvOIOYvQMZhjsrFgs5_ofdZpvMa7ohTQUCk0qLrOcW06U4XCajcw',
   
   //pluggins
   rapidapiKey: 'a7036a3222mshc2920e679cd1cafp141e56jsn81cbe707ac15',

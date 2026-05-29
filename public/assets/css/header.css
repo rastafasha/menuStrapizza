@@ -11,13 +11,8 @@
 }
 
 .header-container {
-    width: 100vw;
-    margin: 0 auto;
-    padding: 0 20px;
     display: flex;
-    justify-content: end;
-    align-items: center;
-    gap: 10px;
+    justify-content: space-around;
 }
 
 .logo {

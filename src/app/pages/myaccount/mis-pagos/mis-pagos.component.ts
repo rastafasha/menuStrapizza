@@ -4,32 +4,34 @@ import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 import { HeaderComponent } from '../../../shared/header/header.component';
-import { MenuFooterComponent } from '../../../shared/menu-footer/menu-footer.component';
 import { BusquedasService } from '../../../services/busqueda.service';
-// import { PaymentService } from '../../../services/payment.service';
 import { ImagenPipe } from '../../../pipes/imagen-pipe.pipe';
 import { UsuarioService } from '../../../services/usuario.service';
 import { AsideCuentaComponent } from '../aside-cuenta/aside-cuenta.component';
+import { TransferenciasService } from '../../../services/transferencias.service';
+import { TiendaService } from '../../../services/tienda.service';
+import { environment } from '../../../../environments/environment';
+import { SafePipe } from '../../../pipes/safe.pipe';
 
 declare var bootstrap: any;
 @Component({
   selector: 'app-mis-pagos',
   imports: [
-    CommonModule, 
-    HeaderComponent, 
-    
-     InfiniteScrollModule,
+    CommonModule,
+    HeaderComponent,
+    InfiniteScrollModule,
     FormsModule,
     //  ModalInstruccionesComponent,
-     ImagenPipe, 
-     AsideCuentaComponent
+    ImagenPipe,
+    AsideCuentaComponent,
+    SafePipe
   ],
   templateUrl: './mis-pagos.component.html',
   styleUrl: './mis-pagos.component.scss'
 })
 export class MisPagosComponent implements OnInit {
 
-  payments = signal<any[]>([]);
+  transferencias = signal<any[]>([]);
   loading = signal<boolean>(false);
   hasMore = signal<boolean>(true);
   isFiltering = signal(false);
@@ -43,6 +45,8 @@ export class MisPagosComponent implements OnInit {
   user: any;
   status!: string;
   statusPago: string = '';
+  nombreSelected = environment.nombreSelected;
+  tienda_moneda: string = '';
 
   info = `
   <h2>Sección: Mis Pagos</h2>
@@ -53,17 +57,21 @@ export class MisPagosComponent implements OnInit {
     <li><strong>Filtrar la lista</strong> para ver solo los pagos que te interesen según su estado actual.</li>
     <li><strong>Acceder al detalle</strong> completo de cada operación utilizando el botón "Ver Ticket".</li>
   </ul>`;
-  
+
 
 
   private router = inject(Router);
   private busquedasService = inject(BusquedasService);
   private usuarioService = inject(UsuarioService);
   private route = inject(ActivatedRoute);
+  private transferenciasService = inject(TransferenciasService);
+  private tiendaService = inject(TiendaService);
 
   ngOnInit() {
     window.scrollTo(0, 0);
-    this.user = this.usuarioService.getLocalStorage();
+    // this.user = this.usuarioService.getLocalStorage();
+     let USER = localStorage.getItem("user");
+    this.user = JSON.parse(USER ? USER : '');
     this.userId = this.user.uid;
 
     this.getPagosUsuario();
@@ -78,8 +86,15 @@ export class MisPagosComponent implements OnInit {
 
       // Ahora ejecutamos la carga (que ya usa this.status)
       this.getPagosUsuario();
+      this.getTienda();
     });
   }
+
+   getTienda() {
+      this.tiendaService.getTiendaByName(this.nombreSelected).subscribe((resp: any) => {
+        this.tienda_moneda = resp.moneda;
+      })
+    }
 
   onScroll(): void {
     if (this.loading() || !this.hasMore()) return;
@@ -94,45 +109,45 @@ export class MisPagosComponent implements OnInit {
     if (!this.hasMore()) return; // Si ya sabemos que no hay más en el servidor, paramos.
     this.loading.set(true);
 
-    // this.paymentService.getByUser(this.userId, this.page).subscribe({
-    //   next: (newData: any[]) => {
-    //     if (newData.length === 0) {
-    //       this.hasMore.set(false);
-    //       this.loading.set(false);
-    //     } else {
-    //       // 1. Filtrado local por estatus
-    //       let filteredData = newData;
-    //       if (this.status) {
-    //         filteredData = newData.filter(p => p.status === this.status);
-    //       }
-           
+    this.transferenciasService.getByUser(this.userId, this.page).subscribe({
+      next: (newData: any[]) => {
+        if (newData.length === 0) {
+          this.hasMore.set(false);
+          this.loading.set(false);
+        } else {
+          // 1. Filtrado local por estatus
+          let filteredData = newData;
+          if (this.status) {
+            filteredData = newData.filter(p => p.status === this.status);
+          }
 
-    //       // 2. Agregamos los únicos a la lista visible
-    //       this.payments.update(current => {
-    //         const ids = new Set(current.map(p => p._id));
-    //         const unique = filteredData.filter(p => !ids.has(p._id));
-    //         return [...current, ...unique];
-    //       });
 
-    //       // 3. LA CLAVE: Si estamos filtrando y trajo muy pocos (ej. menos de 5) 
-    //       // o ninguno, pero el API dice que hay más páginas, pedimos la siguiente YA.
-    //       if (this.status && filteredData.length < 5 && newData.length > 0) {
-    //         this.page++;
-    //         this.getPagosUsuario(); // Llamada recursiva controlada
-    //       } else {
-    //         this.loading.set(false);
-    //       }
-    //     }
-    //   },
-    //   error: () => this.loading.set(false)
-    // });
+          // 2. Agregamos los únicos a la lista visible
+          this.transferencias.update(current => {
+            const ids = new Set(current.map(p => p._id));
+            const unique = filteredData.filter(p => !ids.has(p._id));
+            return [...current, ...unique];
+          });
+
+          // 3. LA CLAVE: Si estamos filtrando y trajo muy pocos (ej. menos de 5) 
+          // o ninguno, pero el API dice que hay más páginas, pedimos la siguiente YA.
+          if (this.status && filteredData.length < 5 && newData.length > 0) {
+            this.page++;
+            this.getPagosUsuario(); // Llamada recursiva controlada
+          } else {
+            this.loading.set(false);
+          }
+        }
+      },
+      error: () => this.loading.set(false)
+    });
   }
 
   search(): void {
     // 1. Resetear estados de paginación cada vez que filtramos
     this.page = 1;
     this.hasMore.set(true);
-    this.payments.set([]);
+    this.transferencias.set([]);
 
     // CASO A: El usuario escribió algo en el buscador (Texto)
     if (this.query && this.query.trim() !== '') {
@@ -146,7 +161,7 @@ export class MisPagosComponent implements OnInit {
           if (this.status) {
             filtered = resultados.filter((p: any) => p.status === this.status);
           }
-          this.payments.set(filtered);
+          this.transferencias.set(filtered);
           this.loading.set(false);
         },
         error: () => this.loading.set(false)
@@ -172,7 +187,7 @@ export class MisPagosComponent implements OnInit {
     this.isFiltering.set(false);
     this.page = 1;
     this.hasMore.set(true);
-    this.payments.set([]);
+    this.transferencias.set([]);
 
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
