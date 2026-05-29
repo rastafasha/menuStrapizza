@@ -4,11 +4,15 @@ export const environment = {
   // mediaUrl: 'http://localhost:3003/api/uploads/',
   // soketServer : 'http://localhost:3003',
   //remoto vercel
-  nombreSelected: 'Strapizza',
+
   baseUrl: 'https://back-ecomm-mall.vercel.app/api',
   soketServer : 'https://back-ecomm-mall.onrender.com',
   mediaUrl: 'https://back-ecomm-mall.vercel.app/api/uploads',
   mediaUrlRemoto: 'https://res.cloudinary.com/dmv6aukai/image/upload/v1741218430/mallConnect',
+  // En lugar de texto fijo, lee lo que inyecta Vercel al compilar
+  //configurar el nombre directamente en el servidor vercel 
+  nombreSelected: (window as any)._env_?.NOMBRE_TIENDA || 'Pizzeria',
+  
   urlBackedNotification:'https://back-ecomm-mall.onrender.com/api/notipush/save-subscription',
   VAPI_KEY_PUBLIC: 'BGlxB4IqUGZq7BoOU1KLM0Yb4Olh7_zI0xfpvOIOYvQMZhjsrFgs5_ofdZpvMa7ohTQUCk0qLrOcW06U4XCajcw',
   

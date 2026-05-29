@@ -3,6 +3,8 @@ import { Router, RouterOutlet } from '@angular/router';
 import { SwPush } from '@angular/service-worker';
 import { ConectividadService } from './services/conectividad.service';
 import { NotificacionService } from './services/notificacion.service';
+import { environment } from '../environments/environment';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-root',
@@ -16,8 +18,16 @@ export class AppComponent {
   private router = inject(Router);
   private connectivity = inject(ConectividadService);
   private notificacionService = inject(NotificacionService);
+  private titleService = inject(Title);
 
   ngOnInit() {
+     // Toma el nombre inyectado desde Vercel (ej: 'Pizzeria')
+    const nombre = environment.nombreSelected; 
+    
+    // Cambia el título de la pestaña dinámicamente
+    this.titleService.setTitle(`Zlipmenu | ${nombre}`);
+
+    
   this.notificacionService.checkUnreadNotifications();
   // 1. Escuchar el CLICK en la notificación
   this.swPush.notificationClicks.subscribe(({ notification }) => {
