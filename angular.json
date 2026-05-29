@@ -60,14 +60,8 @@
             },
             "strapizza": {
               "outputPath": "dist/strapizza",
-              
-              "fileReplacements": [
-                {
-                  "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.prod.ts"
-                }
-              ],
               "assets": [
+                "src/favicon.ico",
                 "src/assets",
                 {
                   "glob": "_redirects",
@@ -80,8 +74,8 @@
                   "output": "/assets"
                 },
                 {
-                  "glob": "manifest.webmanifest", 
-                  "input": "src/env/strapizza/", 
+                  "glob": "manifest.webmanifest",
+                  "input": "src/env/strapizza/",
                   "output": "/"
                 }
               ],
@@ -102,14 +96,8 @@
             },
             "slidedish": {
               "outputPath": "dist/slidedish",
-             
-              "fileReplacements": [
-                {
-                  "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.prod.ts"
-                }
-              ],
-             "assets": [
+              "assets": [
+                "src/favicon.ico",
                 "src/assets",
                 {
                   "glob": "_redirects",
@@ -122,8 +110,8 @@
                   "output": "/assets"
                 },
                 {
-                  "glob": "manifest.webmanifest", 
-                  "input": "src/env/slidedish/", 
+                  "glob": "manifest.webmanifest",
+                  "input": "src/env/slidedish/",
                   "output": "/"
                 }
               ],
@@ -144,14 +132,8 @@
             },
             "hamburguesa": {
               "outputPath": "dist/hamburguesa",
-             
-              "fileReplacements": [
-                {
-                  "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.prod.ts"
-                }
-              ],
-             "assets": [
+              "assets": [
+                "src/favicon.ico",
                 "src/assets",
                 {
                   "glob": "_redirects",
@@ -164,8 +146,8 @@
                   "output": "/assets"
                 },
                 {
-                  "glob": "manifest.webmanifest", 
-                  "input": "src/env/hamburguesa/", 
+                  "glob": "manifest.webmanifest",
+                  "input": "src/env/hamburguesa/",
                   "output": "/"
                 }
               ],
