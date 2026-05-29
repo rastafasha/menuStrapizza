@@ -147,8 +147,14 @@
                   <label for="referencia" class="form-label">Num. referencia</label>
                   <input type="text" formControlName="referencia" class="form-control" name="referencia"
                     id="referencia">
+                     <div *ngIf="formTransferencia.get('referencia')?.touched && formTransferencia.get('referencia')?.invalid"
+                  class="text-danger">
+                  <div *ngIf="formTransferencia.get('referencia')?.errors?.['required']">
+                    Es Requerida los numeros de referencia minimo 4
+                  </div>
                 </div>
-                
+                </div>
+
 
                 <!-- botones -->
                 <!-- <div class="d-flex justify-content-center gap-2">
@@ -168,6 +174,13 @@
                   <label for="referencia" class="form-label">Num. referencia</label>
                   <input type="text" formControlName="referencia" class="form-control" name="referencia"
                     id="referencia">
+                  <div
+                    *ngIf="formTransferencia.get('referencia')?.touched && formTransferencia.get('referencia')?.invalid"
+                    class="text-danger">
+                    <div *ngIf="formTransferencia.get('referencia')?.errors?.['required']">
+                      Es Requerida los numeros de referencia minimo 4
+                    </div>
+                  </div>
                 </div>
                 <!-- monto -->
                 <div class="mb-3 col-xs-12 col-sm-6">
@@ -175,7 +188,7 @@
                   {{totalAmount |number:'1.2-2'| currency:tienda_moneda}}
                   <!-- <input type="number" formControlName="amount" class="form-control" name="amount" id="amount"> -->
                 </div>
-               
+
                 <!-- botones -->
                 <!-- <div class="d-flex justify-content-center gap-2">
                   <button class="check-button " type="submit">
@@ -193,6 +206,13 @@
                     <label for="referencia" class="form-label">Num. referencia</label>
                     <input type="text" formControlName="referencia" class="form-control" name="referencia"
                       id="referencia">
+                    <div
+                      *ngIf="formTransferencia.get('referencia')?.touched && formTransferencia.get('referencia')?.invalid"
+                      class="text-danger">
+                      <div *ngIf="formTransferencia.get('referencia')?.errors?.['required']">
+                        Es Requerida los numeros de referencia minimo 4
+                      </div>
+                    </div>
                   </div>
 
                   <!-- monto -->
@@ -201,7 +221,7 @@
                     {{totalAmount |number:'1.2-2'| currency:tienda_moneda}}
                     <!-- <input type="number" formControlName="amount" class="form-control" name="amount" id="amount"> -->
                   </div>
-                  
+
                 </div>
                 <!-- botones -->
                 <!-- <div class="d-flex justify-content-center gap-2">
@@ -212,34 +232,40 @@
                 </div> -->
               </div>
               <!-- 3. Subida de Captura (Lo más importante) -->
-                <div class="col-12 mt-4" *ngIf="paymentSelected && 
+              <div class="col-12 mt-4" *ngIf="paymentSelected && 
                 paymentSelected?.tipo === 'pagomovil' || paymentSelected?.tipo === 'zelle'|| 
                 paymentSelected?.tipo === 'Transferencia Dólares'|| 
                 paymentSelected?.tipo === 'Transferencia Bolivares' || 
                 paymentSelected && paymentSelected?.tipo === 'Transferencia Euro'">
-                  <label class="form-label text-muted small fw-bold">COMPROBANTE (CAPTURE)</label>
-                  <div class="upload-area border-2 border-dashed rounded-4 p-4 text-center cursor-pointer"
-                    (click)="fileInput.click()" [ngClass]="{'border-primary bg-primary-subtle': imagePreview()}">
+                <label class="form-label text-muted small fw-bold">COMPROBANTE (CAPTURE)</label>
+                <div class="upload-area border-2 border-dashed rounded-4 p-4 text-center cursor-pointer"
+                  (click)="fileInput.click()" [ngClass]="{'border-primary bg-primary-subtle': imagePreview()}">
 
-                    <input type="file" #fileInput hidden (change)="onFileSelected($event)" accept="image/*">
+                  <input type="file" #fileInput hidden (change)="onFileSelected($event)" accept="image/*">
 
-                    @if (!imagePreview()) {
-                    <i class="fas fa-cloud-arrow-up fs-1 text-primary"></i>
-                    <p class="mb-0 mt-2 small text-muted">Toca para subir o tomar foto</p>
-                    } @else {
-                    <img [src]="imagePreview()" class="img-fluid rounded-3 shadow-sm mb-2" style="max-height: 200px;">
-                    <p class="mb-0 small text-primary fw-bold">Cambiar imagen</p>
-                    }
+                  @if (!imagePreview()) {
+                  <i class="fas fa-cloud-arrow-up fs-1 text-primary"></i>
+                  <p class="mb-0 mt-2 small text-muted">Toca para subir o tomar foto</p>
+                  } @else {
+                  <img [src]="imagePreview()" class="img-fluid rounded-3 shadow-sm mb-2" style="max-height: 200px;">
+                  <p class="mb-0 small text-primary fw-bold">Cambiar imagen</p>
+                  }
+                </div>
+                <div *ngIf="formTransferencia.get('img')?.touched && formTransferencia.get('img')?.invalid"
+                  class="text-danger">
+                  <div *ngIf="formTransferencia.get('img')?.errors?.['required']">
+                    Es Requerida la imagen del comprobante de pago
                   </div>
                 </div>
+              </div>
 
-                <!-- botones -->
-                <div class="d-flex justify-content-center gap-2 mt-3" *ngIf="paymentSelected">
-                  <button class="check-button " type="submit">
-                    <i class="fa fa-money-check"></i>
-                    Procesar pago
-                  </button>
-                </div>
+              <!-- botones -->
+              <div class="d-flex justify-content-center gap-2 mt-3" *ngIf="paymentSelected">
+                <button class="check-button " type="submit">
+                  <i class="fa fa-money-check"></i>
+                  Procesar pago
+                </button>
+              </div>
 
             </form>
           </div>

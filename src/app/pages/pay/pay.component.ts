@@ -308,8 +308,14 @@ export class PayComponent {
     }
   }
 
-  sendFormTransfer() {debugger
+  sendFormTransfer() {
 
+
+     if(!this.formTransferencia.valid){
+      //mostramos las alertas de los campos requeridos
+      this.formTransferencia.markAllAsTouched(); // Esto activa las validaciones visuales
+      return
+    }
     if (this.formTransferencia.valid) {
 
       
