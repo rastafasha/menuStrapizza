@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, Input, Output, OnInit, OnDestroy, EventEmitter } from '@angular/core';
+import { Component, inject, Input, Output, OnInit, OnDestroy, EventEmitter, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
 import { Producto } from '../../models/producto.model';
 import { StorageService } from '../../services/storage.service';
 import { RouterModule } from '@angular/router';
@@ -13,6 +13,8 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ImagenPipe } from '../../pipes/imagen-pipe.pipe';
 import { ToastrService } from 'ngx-toastr';
 
+declare var bootstrap: any;
+
 @Component({
   selector: 'app-modalproduct',
   imports: [
@@ -25,7 +27,10 @@ import { ToastrService } from 'ngx-toastr';
   templateUrl: './modalproduct.component.html',
   styleUrl: './modalproduct.component.scss'
 })
-export class ModalproductComponent implements OnInit, OnDestroy {
+export class ModalproductComponent implements OnInit, OnDestroy, AfterViewInit {
+  // Capturamos el elemento HTML usando la referencia local que pusimos en el HTML
+  @ViewChild('offcanvasElement', { static: false }) offcanvasElement!: ElementRef;
+
   @Input() product: any;
   @Input() selectedProduct: any;
   @Input() tienda_moneda!: any;
@@ -72,6 +77,26 @@ export class ModalproductComponent implements OnInit, OnDestroy {
     this.getSelectorProducto();
   }
 
+  // 🚀 ESTA FUNCIÓN ES LA MAGIA: Se ejecuta AUTOMÁTICAMENTE cuando el HTML ya existe en el DOM
+  ngAfterViewInit() {
+    if (this.offcanvasElement && this.offcanvasElement.nativeElement) {
+      const offcanvas = bootstrap.Offcanvas.getOrCreateInstance(this.offcanvasElement.nativeElement);
+      offcanvas.show();
+
+      // 🚀 ESCUCHA CUANDO LA ANIMACIÓN DE CIERRE TERMINA POR COMPLETO
+      this.offcanvasElement.nativeElement.addEventListener('hidden.bs.offcanvas', () => {
+        // Ejecutamos la limpieza interna
+        this.selector_to_cart = ' ';
+        document.querySelectorAll('.offcanvas-backdrop').forEach(el => el.remove());
+        document.body.style.overflow = 'auto';
+        document.body.style.paddingRight = '0';
+
+        // Ahora sí, le avisamos al padre que ponga la variable en null
+        this.modalClosed.emit();
+      });
+    }
+  }
+
   ngOnDestroy(): void {
     if (this.cartSubscription) {
       this.cartSubscription.unsubscribe();
@@ -83,15 +108,12 @@ export class ModalproductComponent implements OnInit, OnDestroy {
 
   // ngOnChanges removed - no longer needed with Bootstrap data attributes
 
-
+  // Modificamos la función de la "X" para que NO emita directo, sino que use el JS de Bootstrap
   onModalHidden(): void {
-    this.modalClosed.emit();
-    this.selector_to_cart = ' ';
-
-    // Force removal if Bootstrap's JS fails to clean up
-    document.querySelectorAll('.offcanvas-backdrop').forEach(el => el.remove());
-    document.body.style.overflow = 'auto';
-    document.body.style.paddingRight = '0';
+    if (this.offcanvasElement && this.offcanvasElement.nativeElement) {
+      const offcanvas = bootstrap.Offcanvas.getOrCreateInstance(this.offcanvasElement.nativeElement);
+      offcanvas.hide(); // 👈 Esto dispara la animación nativa de Bootstrap primero
+    }
   }
 
 

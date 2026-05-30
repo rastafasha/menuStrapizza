@@ -1,25 +1,30 @@
 <div class="products-grid">
     <div class="product-card">
-        <div class="product-image" data-bs-toggle="offcanvas" [attr.data-bs-target]="'#modalProduct-' + product._id">
-            <img [src]="product.img | imagenPipe: 'productos'" [alt]="product.titulo  ">
+        <!-- 1. Quitamos data-bs de la imagen y agregamos (click) -->
+        <div class="product-image" (click)="verDetalles()">
+            <img [src]="product.img | imagenPipe: 'productos'" [alt]="product.titulo">
         </div>
         <div class="product-content">
             <div class="infpr">
                 <h4>{{product.titulo}}</h4>
-                <div class="product-price text-danger " style="text-decoration: line-through;"
+                <div class="product-price text-danger" style="text-decoration: line-through;"
                     *ngIf="product.precio_antes > product.precio_ahora">
                     {{product.precio_antes|number:'1.2-2'| currency:tienda_moneda}}</div>
                 <div class="product-price">{{product.precio_ahora|number:'1.2-2'| currency:tienda_moneda}}</div>
             </div>
             <div class="botns">
-                <button class="btn-secondary btn" data-bs-toggle="offcanvas"
-                    [attr.data-bs-target]="'#modalProduct-' + product._id">
-                    <i class="fa fa-eye"></i></button>
-                <button class="btn-success btn" *ngIf="activeCategory !== 'Pastas'" (click)="addItem(product)">
-                    <i class="fa fa-shopping-bag"></i>
-                </button>
+                <!-- 2. Quitamos data-bs del botón del ojo y agregamos (click) -->
+                <div class="botns">
+                    <button class="btn-secondary btn" (click)="verDetalles()">
+                        <i class="fa fa-eye"></i>
+                    </button>
+                    <!-- Tu botón de agregar se queda igual, sin propagar -->
+                    <button class="btn-success btn" *ngIf="activeCategory !== 'Pastas'"
+                        (click)="addItem(product); $event.stopPropagation()">
+                        <i class="fa fa-shopping-bag"></i>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
-
 </div>

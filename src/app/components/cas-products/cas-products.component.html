@@ -2,9 +2,6 @@
     <div class="container">
         <div class="title-section">
             <h3 class="title">{{title}}</h3>
-            <!-- <a href="javascript:;" *ngIf="isVisible" (click)="PageSize()" class="btn btn-primary circle"><i
-                    class="fa fa-refresh"></i>
-            </a> -->
         </div>
 
         <app-loading *ngIf="isLoading"></app-loading>
@@ -19,15 +16,11 @@
                 </ul>
             </div>
             <div class="product-card" *ngFor="let product of todo; let i = index" cdkDrag>
-                <!-- <app-product-item [activeCategory]="activeCategory" [tienda_moneda]="tienda_moneda"  [product]="product"
-                    
-                    (msm_success)="onMsmSuccess($event)">
-                </app-product-item> -->
-                <app-product-item [activeCategory]="activeCategory" [tienda_moneda]="tienda_moneda"  [product]="product"
-                    data-bs-toggle="offcanvas" 
-                    [attr.data-bs-target]="'#modalProduct-' + product._id"
-                    (click)="openModal(product)"
-                    (msm_success)="onMsmSuccess($event)">
+                <app-product-item 
+                [activeCategory]="activeCategory" 
+                [tienda_moneda]="tienda_moneda" 
+                [product]="product"
+                (onVerDetalles)="selectedProduct = $event">
                 </app-product-item>
             </div>
         </div>
@@ -37,4 +30,10 @@
 </section>
 <div class="clear"></div>
 
-<app-modalproduct [product]="selectedProduct" [activeCategory]="activeCategory" [tienda_moneda]="tienda_moneda" *ngIf="selectedProduct && !isLoading"></app-modalproduct>
+<app-modalproduct 
+    [product]="selectedProduct" 
+    [activeCategory]="activeCategory" 
+    [tienda_moneda]="tienda_moneda"
+    (modalClosed)="selectedProduct = null"  
+    *ngIf="selectedProduct && !isLoading">
+</app-modalproduct>

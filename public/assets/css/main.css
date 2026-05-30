@@ -147,22 +147,7 @@ a{
 
 
 
-.cart-count-badge {
-  position: relative;
-  top: auto;
-  right: 0;
-  bottom: 30px;
-  background-color: #ff0000;
-  color: white;
-  font-size: 0.75rem;
-  font-weight: bold;
-  border-radius: 50%;
-  padding: 2px 6px;
-  line-height: 1;
-  pointer-events: none;
-  transform: translate(50%, -50%);
-  z-index: 3;
-}
+
 /* .fa-shopping-cart{
   position: relative;
   z-index: 1;

@@ -3,9 +3,8 @@ import { CommonModule } from '@angular/common';
 import { Producto } from '../../models/producto.model';
 import { Usuario } from '../../models/usuario.model';
 import { Tienda } from '../../models/tienda.model';
-import { ActivatedRoute, RouterModule } from '@angular/router';
+import {  RouterModule } from '@angular/router';
 import { CarritoService } from '../../services/carrito.service';
-import { TiendaService } from '../../services/tienda.service';
 import { ImagenPipe } from '../../pipes/imagen-pipe.pipe';
 import { ColorService } from '../../services/color.service';
 import { ToastrService } from 'ngx-toastr';
@@ -26,7 +25,7 @@ export class ProductItemComponent {
   @Input() tienda_moneda: any;
   @Input() activeCategory!: string;
   @Output() productSelected: EventEmitter<any> = new EventEmitter<any>();
-  @Output() msm_success: EventEmitter<boolean> = new EventEmitter<boolean>();
+  @Output() onVerDetalles = new EventEmitter<any>();
 
   user!: Usuario;
   isUserLogged = false;
@@ -55,7 +54,6 @@ export class ProductItemComponent {
 
   addItem(producto: Producto) {
 
-    this.msm_success.emit(false);
       this.productoId = producto._id;
 
       this._colorService.colorByProduct(this.productoId).subscribe(
@@ -81,6 +79,10 @@ export class ProductItemComponent {
     this.isProductAdded = false;
   }
 
+    verDetalles() {
+    // Le enviamos este producto al componente padre
+    this.onVerDetalles.emit(this.product);
+  }
 
 
 }

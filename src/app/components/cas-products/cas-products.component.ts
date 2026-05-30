@@ -47,7 +47,7 @@ export class CasProductsComponent implements OnInit, OnDestroy {
   tiendaSelected: Tienda | null = null;
   
   todo: Producto[] = [];
-  selectedProduct: Producto | null = null;
+  selectedProduct: any = null;
 
   private categoryService = inject(CategoryService);
   private productoService = inject(ProductoService);
