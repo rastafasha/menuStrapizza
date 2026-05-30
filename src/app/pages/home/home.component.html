@@ -1,54 +1,68 @@
-<app-header (refreshApp)="onRefreshFromHeader()"></app-header>
+<div *ngIf="tiendaSelected">
 
-<app-loading *ngIf="isLoading"></app-loading>
-
-<div *ngIf="!isLoading && tiendaSelected">
-    <div class="clear"></div>
-    <br>
-    
-    <!-- Categoría Principal: Detecta automáticamente el rubro principal de la tienda (Ej: Pizzería, Hamburguesa, etc) -->
-    <app-cas-products 
-    *ngIf="categoriaPrincipal !== 'all'"
-    [activeCategory]="categoriaPrincipal" 
-    [isVisible]="true" 
-    [title]="'Menú'"  
-    (msm_success)="onMsmSuccess($event)" 
-    [refreshCasProducts]="refreshCasProducts">
-</app-cas-products>
-    
-    <!-- Hero Section -->
-    <app-hero></app-hero>
-   
-    <!-- Categorías Secundarias Dinámicas: Reemplaza las validaciones de texto fijo por iteración perezosa -->
-    @for (cat of categoriasAdicionales; track cat.id) {
-        @defer (on viewport) {
-            <app-cas-products 
-                [activeCategory]="cat.nombre" 
-                [title]="cat.nombre"  
-                (msm_success)="onMsmSuccess($event)" 
-                [refreshCasProducts]="refreshCasProducts">
-            </app-cas-products>
-        } @placeholder {
-            <div class="loading-placeholder" style="text-align: center; padding: 20px; color: #777;">
-                Cargando {{ cat.nombre }}...
-            </div>
-        } @loading {
-            <app-loading></app-loading>
-        }
+    @switch (tiendaSelected.theme) {
+    @case ('modern') {
+    <!-- Diseño minimalista moderno con scroll horizontal de categorías -->
+    <!-- <app-modern-header [tienda]="tiendaSelected"></app-modern-header>
+      <app-modern-products-grid></app-modern-products-grid> -->
     }
-   
-    <app-pwa-notif-installer></app-pwa-notif-installer>
-    
-    <!-- Pasamos el nombre real e histórico de la tienda directamente al modal inicial -->
-    <app-modal-inicial [nombreSelected]="tiendaSelected.nombre"></app-modal-inicial>
-    
-    <!-- Footer -->
-    <app-menu-footer></app-menu-footer>
-    <app-footer></app-footer>
+    @case ('vip-custom') {
+    <!-- El diseño súper exclusivo y costoso que programaste solo para esa marca -->
+    <!-- <app-vip-exclusive-layout></app-vip-exclusive-layout> -->
+    }
+    @default {
+    <!-- Tu diseño clásico actual (Pizzería, Hamburguesería, SlideDish) -->
+
+    <app-header (refreshApp)="onRefreshFromHeader()"></app-header>
+
+    <app-loading *ngIf="isLoading"></app-loading>
+
+    <div *ngIf="!isLoading && tiendaSelected">
+        <div class="clear"></div>
+        <br>
+
+        <!-- Categoría Principal: Detecta automáticamente el rubro principal de la tienda (Ej: Pizzería, Hamburguesa, etc) -->
+        <app-cas-products *ngIf="categoriaPrincipal !== 'all'" [activeCategory]="categoriaPrincipal" [isVisible]="true"
+            [title]="'Menú'" (msm_success)="onMsmSuccess($event)"
+            [refreshCasProducts]="refreshCasProducts"></app-cas-products>
+
+        <!-- Hero Section -->
+        <app-hero></app-hero>
+
+        <!-- Categorías Secundarias Dinámicas: Reemplaza las validaciones de texto fijo por iteración perezosa -->
+        @for (cat of categoriasAdicionales; track cat.id) {
+        @defer (on viewport) {
+        <app-cas-products [activeCategory]="cat.nombre" [title]="cat.nombre" (msm_success)="onMsmSuccess($event)"
+            [refreshCasProducts]="refreshCasProducts">
+        </app-cas-products>
+        } @placeholder {
+        <div class="loading-placeholder" style="text-align: center; padding: 20px; color: #777;">
+            Cargando {{ cat.nombre }}...
+        </div>
+        } @loading {
+        <app-loading></app-loading>
+        }
+        }
+
+        <app-pwa-notif-installer></app-pwa-notif-installer>
+
+        <!-- Pasamos el nombre real e histórico de la tienda directamente al modal inicial -->
+        <app-modal-inicial [nombreSelected]="tiendaSelected.nombre"></app-modal-inicial>
+
+        <!-- Footer -->
+        <app-menu-footer></app-menu-footer>
+        <app-footer></app-footer>
+    </div>
+    }
+    }
+
 </div>
+
+
 
 <!-- Fallback seguro en caso de que escriban un subdominio que no exista en Mongo Atlas -->
 <div *ngIf="!isLoading && !tiendaSelected" style="text-align: center; padding: 60px; font-family: sans-serif;">
     <h2 style="color: #e74c3c;">Menú No Disponible</h2>
-    <p style="color: #666;">El subdominio al que intentas acceder no coincide con ningún restaurante activo de Zlipmenu.</p>
+    <p style="color: #666;">El subdominio al que intentas acceder no coincide con ningún restaurante activo de Zlipmenu.
+    </p>
 </div>

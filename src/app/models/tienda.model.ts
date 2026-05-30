@@ -17,6 +17,8 @@ export class Tienda{
     public texto_hero_destacado: string,
     public texto_hero_dos: string,
     public color_fondo: string,
+    public theme: string,
+    public css_personalizado: string,
     public redssociales?: string,
     public telefono?: string,
     public productos?: string,

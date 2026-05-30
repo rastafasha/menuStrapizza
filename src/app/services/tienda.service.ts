@@ -44,7 +44,7 @@ export class TiendaService {
 
     // 1. Control para desarrollo local
     if (hostname === 'localhost' || hostname === '127.0.0.1') {
-      return 'Pizzeria'; // Pon aquí el nombre de una tienda real de tu Mongo Atlas para pruebas locales
+      return 'Pizzeria'; // Cambia a 'hamburguesas-tio' o 'slidedish' según tu prueba
     }
     
     // 2. Control para subdominios desplegados en Vercel

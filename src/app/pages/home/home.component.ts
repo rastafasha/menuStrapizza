@@ -12,6 +12,7 @@ import { ModalInicialComponent } from '../../components/modal-inicial/modal-inic
 import { Tienda } from '../../models/tienda.model';
 import { TiendaService } from '../../services/tienda.service';
 import { Subscription } from 'rxjs';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-home',
@@ -44,6 +45,7 @@ export class HomeComponent {
 
   // Inyección del servicio de tiendas optimizado por URL
   private tiendasService = inject(TiendaService);
+  private titleService = inject(Title);
 
   // Event emitter for refreshing cas-products
   @Output() refreshCasProducts: EventEmitter<void> = new EventEmitter<void>();
@@ -64,7 +66,16 @@ export class HomeComponent {
         this.tiendaSelected = tienda;
         
         if (tienda) {
+          this.titleService.setTitle(`Zlipmenu | ${tienda.nombre}`);
           this.configurarCategoriasFiltro(tienda);
+          // 🌟 INYECCIÓN DE CSS DINÁMICO SAAS AQUÍ:
+        // Si el restaurante VIP guardó estilos exclusivos en el CRM, se aplican en caliente
+        if (tienda.css_personalizado) {
+          const estilo = document.createElement('style');
+          estilo.id = 'css-dinamico-tienda'; // Le ponemos un ID para poder identificarlo
+          estilo.innerHTML = tienda.css_personalizado;
+          document.head.appendChild(estilo);
+        }
         }
         
         this.isLoading = false;
@@ -121,10 +132,17 @@ export class HomeComponent {
     this.isLoading = false;
   }
 
-  ngOnDestroy() {
-    if (this.tiendaSubscription) {
-      this.tiendaSubscription.unsubscribe();
-    }
+ ngOnDestroy() {
+  if (this.tiendaSubscription) {
+    this.tiendaSubscription.unsubscribe();
   }
+
+  // 🧼 Limpieza de seguridad de estilos inyectados
+  const estiloPrevio = document.getElementById('css-dinamico-tienda');
+  if (estiloPrevio) {
+    estiloPrevio.remove(); // Borra el CSS del head al salir del menú del restaurante
+  }
+}
+
 }
 
