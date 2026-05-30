@@ -81,23 +81,34 @@ export class HomeComponent {
   /**
    * Define qué bloques de categorías extras se van a renderizar de forma perezosa en el HTML.
    */
-  private configurarCategoriasFiltro(tienda: Tienda) {
-  // 1. Detectamos el rubro principal basándonos en el nombre o categoría de la tienda
-  // Si tu objeto tienda tiene la categoría en tienda.categoria.nombre, lo usamos:
-  if (tienda.categoria && tienda.categoria.nombre) {
-    this.categoriaPrincipal = tienda.categoria.nombre; // Ej: 'Pizzería'
+ private configurarCategoriasFiltro(tienda: Tienda) {
+  // 🌟 CORRECCIÓN MAESTRA SAAS:
+  // Si 'categoria' es un objeto y tiene slug, lo usamos. 
+  // Si viene solo el ID en String, usamos el subcategory o el propio slug de la tienda como fallback
+  if (tienda.categoria && typeof tienda.categoria === 'object' && (tienda.categoria as any).slug) {
+    this.categoriaPrincipal = (tienda.categoria as any).slug;
   } else {
-    // Fallback: Si no viene el objeto categoría, podemos deducirlo o usar el nombre
-    this.categoriaPrincipal = tienda.nombre; // Ej: 'Pizzeria' o 'Hamburguesa'
+    // Si viene solo el ID string, usamos la subcategoría limpia o el slug de la tienda
+    this.categoriaPrincipal = tienda.subcategoria === 'hamburgueseria' ? 'hamburguesa' : (tienda.slug || 'pizzeria');
   }
 
-  // 2. Definimos las categorías de scroll inferior (las secundarias que sí te funcionan)
-  this.categoriasAdicionales = [
-    { id: '1', nombre: 'Entradas' },
-    { id: '2', nombre: 'Combos' },
-    { id: '3', nombre: 'Bebidas' },
-    { id: '4', nombre: 'Postres' }
-  ];
+  console.log('Filtrando el catálogo superior con el slug de categoría:', this.categoriaPrincipal);
+
+  // Ajustamos los bloques inferiores dinámicos para este restaurante
+  if (this.categoriaPrincipal === 'hamburguesa') {
+    this.categoriasAdicionales = [
+      { id: '1', nombre: 'entradas' },
+      { id: '2', nombre: 'combos' },
+      { id: '3', nombre: 'bebidas' }
+    ];
+  } else {
+    this.categoriasAdicionales = [
+      { id: '1', nombre: 'pastas' },
+      { id: '2', nombre: 'pizza' },
+      { id: '3', nombre: 'bebidas' },
+      { id: '4', nombre: 'postres' }
+    ];
+  }
 }
 
   onMsmSuccess(value: boolean): void {
