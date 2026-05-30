@@ -9,7 +9,6 @@ import { ProductoService } from '../../services/product.service';
 import { ProductItemComponent } from "../product-item/product-item.component";
 import { ModalproductComponent } from "../modalproduct/modalproduct.component";
 import { LoadingComponent } from '../../shared/loading/loading.component';
-import { environment } from '../../../environments/environment';
 import { Subscription } from 'rxjs';
 declare var bootstrap: any;
 @Component({
@@ -23,31 +22,31 @@ declare var bootstrap: any;
 export class CasProductsComponent implements OnInit, OnDestroy {
   @Output() msm_success: EventEmitter<boolean> = new EventEmitter<boolean>();
   @Input() refreshCasProducts: EventEmitter<void> | null = null;
-  @Input() activeCategory: string = 'all';
+  @Input() activeCategory: string = 'all'; // Recibirá el slug dinámico (ej: 'pizzeria' o 'entradas')
   @Input() activeSubCategory: string = 'all';
-  @Input() title!: string ;
+  @Input() title!: string;
   @Input() isVisible = false;
   @Input() tienda_moneda!: any;
   @Input() isLoading: boolean = false;
 
   option_selectedd: number = 1;
   solicitud_selectedd: any = null;
-  tiendaNameSelected = environment.nombreSelected;
 
   isRefreshing = false;
   isEdnOfList = false;
-  nextUrl:string = '';
-  loadingTitle:string = '';
+  nextUrl: string = '';
+  loadingTitle: string = '';
 
   categories: Categoria[] = [];
   subcategories: any[] = [];
-  
+
   catname!: string;
   products: Producto[] = [];
   tiendaSelected: Tienda | null = null;
-  
+
   todo: Producto[] = [];
   selectedProduct: any = null;
+
 
   private categoryService = inject(CategoryService);
   private productoService = inject(ProductoService);
@@ -55,27 +54,20 @@ export class CasProductsComponent implements OnInit, OnDestroy {
   private tiendaSubscription!: Subscription;
 
   ngOnInit() {
-    // Get tiendaSelected from TiendaService (set by HeaderComponent)
-    // Use cached observable to avoid redundant API calls
-    if (this.tiendaNameSelected) {
-      this.tiendaSubscription = this.tiendasService.getTiendaByNameCached(this.tiendaNameSelected).subscribe(tienda => {
-        this.tiendaSelected = tienda;
-        this.tienda_moneda = this.tiendaSelected?.moneda;
-        // Refresh products when tienda changes
-        if (this.tiendaSelected) {
-          this.getProductosCatName();
-          this.updateTodo();
-          this.getProductosCatName();
-          this.getCategories();
-        }
-      });
+  this.tiendaSubscription = this.tiendasService.getTiendaByNameCached().subscribe(tienda => {
+    this.tiendaSelected = tienda;
+    if (this.tiendaSelected) {
+      this.tienda_moneda = this.tiendaSelected.moneda;
+      this.getProductosCatName();
+      // ❌ ELIMINA O COMENTA ESTA LÍNEA DE AQUÍ:
+      // this.getCategories(); 
     }
-    // Listen for refresh trigger from parent (header pull)
-    if (this.refreshCasProducts) {
-      this.refreshCasProducts.subscribe(() => this.refreshData());
-    }
+  });
 
+  if (this.refreshCasProducts) {
+    this.refreshCasProducts.subscribe(() => this.refreshData());
   }
+}
 
   ngOnDestroy() {
     if (this.tiendaSubscription) {
@@ -83,107 +75,114 @@ export class CasProductsComponent implements OnInit, OnDestroy {
     }
   }
 
-  getTiendaName(){
-    // Now using cached observable instead of direct API call
-    this.tiendasService.getTiendaByNameCached(this.tiendaNameSelected).subscribe(tienda => {
+  getTiendaName() {
+    // 2. Corregido para usar la URL dinámica del navegador
+    this.tiendasService.getTiendaByNameCached().subscribe(tienda => {
       this.tiendaSelected = tienda;
-      this.tienda_moneda = this.tiendaSelected?.moneda;
-      // Refresh products when tienda changes
       if (this.tiendaSelected) {
+        this.tienda_moneda = this.tiendaSelected.moneda;
         this.getProductosCatName();
-        this.updateTodo();
-        this.getProductosCatName();
-        // this.getCategories();
       }
     });
   }
 
 
   getProductosCatName() {
-    this.catname = this.tiendaSelected?.categoria?.nombre ?? this.activeCategory
-    this.isLoading = true
-    this.categoryService.find_by_nombre(this.catname).subscribe(
-      (resp: any) => {
-        this.products = resp.productos || [];
-        // console.log(this.products)
-        this.updateTodo();
-        this.isLoading = false
-      },
-      (error) => {
-        console.error('Error al obtener los productos', error);
-      }
-    );
-  }
+  this.catname = this.tiendaSelected?.categoria?.slug || this.activeCategory;
+  this.isLoading = true;
+  const localId = this.tiendaSelected?._id;
+
+  this.categoryService.find_by_nombre(this.catname, localId).subscribe({
+    next: (resp: any) => {
+      this.products = resp.productos || []; 
+      this.updateTodo();
+      
+      //  LÁZALO AQUÍ: Ahora que 'this.products' ya tiene las pizzas reales,
+      // el sistema podrá extraer sus subcategorías sin fallar.
+      this.getCategories(); 
+
+      this.isLoading = false;
+    },
+    error: (error) => {
+      console.error('Error al obtener los productos por slug', error);
+      this.isLoading = false;
+    }
+  });
+}
+
 
 
 
   //obtenemos las subcategorias de los productos
   getCategories() {
-    this.isLoading = true
-    this.productoService.getProductosActivos().subscribe((resp: any) => {
-      //filtramos los productos donde sea igual a la categoria
-      const productos = resp.filter((producto: any) => producto.categoria.nombre === this.catname);
-      //extraemos el campo subcategoria
-      const subcategorias = productos.map((producto: any) => producto.subcategoria);
-      //eliminamos los duplicados
-      const subcategoriasUnicas = [...new Set(subcategorias)];
-      //creamos un arreglo de objetos con el nombre de la subcategoria y el arreglo de productos
-      const categorias = subcategoriasUnicas.map((subcategoria: any) => ({
-        nombre: subcategoria,
-        products: productos.filter((product: any) => product.subcategoria === subcategoria),
-      }));
-      this.subcategories = categorias || [];
-      // console.log(this.subcategories)
-    })
-    this.isLoading = false
+  // Procesamos directamente el arreglo 'this.products' que ya descargó el backend
+  if (!this.products || this.products.length === 0) {
+    this.subcategories = [];
+    return;
   }
 
+  // Extraemos el campo 'subcategoria' de cada plato en memoria
+  const subcategorias = this.products.map((producto: any) => producto.subcategoria);
   
+  // Eliminamos los nombres duplicados para tener pestañas únicas
+  const subcategoriasUnicas = [...new Set(subcategorias.filter(sub => !!sub))];
+  
+  // Armamos el arreglo de objetos para el HTML de Angular
+  this.subcategories = subcategoriasUnicas.map((subcategoria: any) => ({
+    nombre: subcategoria,
+    // Filtramos los platos que corresponden a cada pestaña específica
+    products: this.products.filter((product: any) => product.subcategoria === subcategoria),
+  }));
+
+  console.log('Subcategorías dinámicas extraídas con éxito:', this.subcategories);
+}
+
 
   selectCategory(category: string) {
-    console.log('selectCategory called with:', category);
-    this.activeCategory = category;
-    this.isLoading = true
-    this.updateTodo();
-    this.isLoading = false
-  }
+  console.log('Filtro seleccionado por el usuario:', category);
+  this.activeCategory = category; // Guarda la subcategoría cliqueada (o 'all')
+  this.updateTodo(); // Re-calcula el contenido del arreglo 'this.todo'
+}
 
   updateTodo() {
-    // console.log('updateTodo called. activeCategory:', this.activeCategory, 'products:', this.products, 'subcategories:', this.subcategories);
-    this.isLoading = true
-    if (this.activeCategory === 'all') {
+    this.isLoading = true;
+
+    // Si activeCategory es 'all' O es igual al slug del restaurante activo, mostramos TODO
+    const esCategoriaPrincipal = this.activeCategory === 'all' ||
+      this.activeCategory === this.tiendaSelected?.categoria?.slug;
+
+    if (esCategoriaPrincipal) {
       this.todo = this.products ? this.products.slice() : [];
     } else {
-      const selectedCategory = this.subcategories ? this.subcategories.find(subcat => subcat.nombre === this.activeCategory) : null;
+      // Para los bloques @defer inferiores (Entradas, Combos, etc.), filtramos de forma normal
+      // Normalizamos a minúsculas para evitar que los acentos o mayúsculas rompan el filtro
+      const selectedCategory = this.subcategories ? this.subcategories.find(subcat =>
+        subcat.nombre.toLowerCase().trim() === this.activeCategory.toLowerCase().trim()
+      ) : null;
+
       this.todo = selectedCategory ? selectedCategory.products : [];
     }
-    // console.log('todo updated:', this.todo);
-    this.isLoading = false
+
+    console.log('Productos listos para mostrar en el HTML (todo):', this.todo);
+    this.isLoading = false;
   }
+
 
 
   openModal(product: any) {
     this.selectedProduct = product;
-    
-    // Un pequeño timeout asegura que Angular renderizó el ID dinámico antes de buscarlo
     setTimeout(() => {
-        const element = document.getElementById('modalProduct-' + product._id);
-        if (element) {
-            // Inicialización explícita con opciones para evitar el error de 'backdrop'
-            const myOffcanvas = new bootstrap.Offcanvas(element, {
-                backdrop: true, // o false según prefieras
-                keyboard: true,
-                scroll: true
-            });
-            myOffcanvas.show();
-        }
+      const element = document.getElementById('modalProduct-' + product._id);
+      if (element) {
+        const myOffcanvas = new bootstrap.Offcanvas(element, {
+          backdrop: true,
+          keyboard: true,
+          scroll: true
+        });
+        myOffcanvas.show();
+      }
     }, 0);
-}
-
-  // onProductSelected(product: any): void {
-  //   this.selectedProduct = product;
-  //   console.log(this.selectedProduct)
-  // }
+  }
 
   onMsmSuccess(value: boolean): void {
     this.msm_success.emit(value);
@@ -191,23 +190,19 @@ export class CasProductsComponent implements OnInit, OnDestroy {
 
 
 
-
   onScrollDown() {
     if (!this.nextUrl || this.isLoading) return;
     this.categoryService.find_by_nombre(this.nextUrl).subscribe({
       next: (resp: any) => {
-        if (resp.info.next) {
+        if (resp.info?.next) {
           this.nextUrl = resp.info.next;
           this.products = [...this.products, ...resp.results];
         } else {
           this.isEdnOfList = true;
           this.loadingTitle = 'No hay más personajes para mostrar';
-          alert('ultima pagina');
         }
       },
-      error: () => {
-        this.isLoading = false;
-      }
+      error: () => this.isLoading = false
     });
   }
 
@@ -217,13 +212,10 @@ export class CasProductsComponent implements OnInit, OnDestroy {
 
   trackByCharacterId: TrackByFunction<any> = (index: number, character: any) => character.id;
 
-
   refreshData() {
     this.isRefreshing = true;
-    // Simulate data fetching 
     setTimeout(() => {
       this.isRefreshing = false;
-      // Update your data here 
       this.getProductosCatName();
     }, 2000);
   }

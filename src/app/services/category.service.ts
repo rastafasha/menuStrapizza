@@ -64,13 +64,15 @@ export class CategoryService {
 
   }
 
-   find_by_nombre(nombre:string):Observable<any>{
-    const url = `${base_url}/categorias/category_by_nombre/nombre/${nombre}`;
-    return this.http.get<any>(url)
-    .pipe(
-      map((resp:{ok: boolean, categoria:any}) => resp)
-      );
+  find_by_nombre(nombre: string, localId?: string) {
+  let url = `${base_url}/categorias/category_by_nombre/nombre/${nombre}`;
+  
+  if (localId) {
+    url += `?localId=${localId}`;
   }
+  
+  return this.http.get(url, this.headers);
+}
    find_by_subcategory(id:string):Observable<any>{
     const url = `${base_url}/categorias/category_by_subcategoria/${id}`;
     return this.http.get<any>(url)

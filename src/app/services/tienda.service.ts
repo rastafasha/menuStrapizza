@@ -36,13 +36,40 @@ export class TiendaService {
   }
 
   /**
-   * Get tienda by name with caching to avoid redundant API calls.
-   * Uses cache with TTL (Time To Live) of 5 minutes.
+   * Extrae dinámicamente el slug/subdominio desde la URL del navegador.
    */
-  getTiendaByNameCached(nombre: string): Observable<Tienda | null> {
+  private obtenerSlugDeUrl(): string {
+    const hostname = window.location.hostname; // Ej: ://zlipmenu.com o localhost
+    const partes = hostname.split('.');
+
+    // 1. Control para desarrollo local
+    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+      return 'Pizzeria'; // Pon aquí el nombre de una tienda real de tu Mongo Atlas para pruebas locales
+    }
+    
+    // 2. Control para subdominios desplegados en Vercel
+    if (partes.length >= 3) {
+      const subdominio = partes[0];
+      if (subdominio !== 'www' && subdominio !== 'zlipmenu') {
+        return subdominio; // Retorna el subdominio dinámico (ej: 'pizzeria')
+      }
+    }
+
+    // 3. Fallback por si entran sin subdominio o falla el parseo
+    return environment.nombreSelected;
+  }
+
+  /**
+   * Get tienda by name with caching to avoid redundant API calls.
+   * Modificado: 'nombre' ahora es opcional. Si no se envía, se calcula desde la URL.
+   */
+  getTiendaByNameCached(nombre?: string): Observable<Tienda | null> {
+    // Si no se proporciona un nombre, extraemos el slug dinámico del subdominio
+    const nombreTienda = nombre || this.obtenerSlugDeUrl();
+
     const now = Date.now();
-    const cached = this.tiendaCache.get(nombre);
-    const cachedTimestamp = this.cacheTimestamps.get(nombre);
+    const cached = this.tiendaCache.get(nombreTienda);
+    const cachedTimestamp = this.cacheTimestamps.get(nombreTienda);
     
     // Check if cache is valid (exists and not expired)
     if (cached && cachedTimestamp && (now - cachedTimestamp) < this.CACHE_TTL) {
@@ -58,7 +85,7 @@ export class TiendaService {
       }
     }
     
-    const url = `${base_url}/tiendas/by_nombre/nombre/${nombre}`;
+    const url = `${base_url}/tiendas/by_nombre/nombre/${nombreTienda}`;
     const request = this.http.get<any>(url, this.headers).pipe(
       map((resp:{ok: boolean, tienda: Tienda}) => resp.tienda),
       tap(tienda => {
@@ -69,8 +96,8 @@ export class TiendaService {
     );
     
     // Store in cache
-    this.tiendaCache.set(nombre, request);
-    this.cacheTimestamps.set(nombre, now);
+    this.tiendaCache.set(nombreTienda, request);
+    this.cacheTimestamps.set(nombreTienda, now);
     
     return request;
   }
@@ -87,23 +114,25 @@ export class TiendaService {
   /**
    * Force refresh the cached tienda for a specific name
    */
-  refreshTienda(nombre: string): Observable<Tienda | null> {
-    const url = `${base_url}/tiendas/by_nombre/nombre/${nombre}`;
+  refreshTienda(nombre?: string): Observable<Tienda | null> {
+    const nombreTienda = nombre || this.obtenerSlugDeUrl();
+
+    const url = `${base_url}/tiendas/by_nombre/nombre/${nombreTienda}`;
     const request = this.http.get<any>(url, this.headers).pipe(
       map((resp:{ok: boolean, tienda: Tienda}) => resp.tienda),
       tap(tienda => {
         this.selectedTiendaSubject.next(tienda);
         // Update cache
-        this.tiendaCache.set(nombre, request);
-        this.cacheTimestamps.set(nombre, Date.now());
+        this.tiendaCache.set(nombreTienda, request);
+        this.cacheTimestamps.set(nombreTienda, Date.now());
       }),
       shareReplay(1)
     );
     
     // Remove old cache entry and set new one
-    this.tiendaCache.delete(nombre);
-    this.tiendaCache.set(nombre, request);
-    this.cacheTimestamps.set(nombre, Date.now());
+    this.tiendaCache.delete(nombreTienda);
+    this.tiendaCache.set(nombreTienda, request);
+    this.cacheTimestamps.set(nombreTienda, Date.now());
     
     return request;
   }
@@ -123,8 +152,10 @@ export class TiendaService {
         map((resp:{ok: boolean, tienda: Tienda}) => resp.tienda)
         );
   }
-  getTiendaByName(nombre: any){
-    const url = `${base_url}/tiendas/by_nombre/nombre/${nombre}`;
+  
+  getTiendaByName(nombre?: any){
+    const nombreTienda = nombre || this.obtenerSlugDeUrl();
+    const url = `${base_url}/tiendas/by_nombre/nombre/${nombreTienda}`;
     return this.http.get<any>(url, this.headers)
       .pipe(
         map((resp:{ok: boolean, tienda: Tienda}) => resp.tienda)
