@@ -64,14 +64,21 @@ export class HomeComponent {
   this.cargarDatosTiendaPorSubdominio();
     
   }
-private cargarDatosTiendaPorSubdominio() {
+  // TU FUNCIÓN NATIVA CORREGIDA CON LOS DOS ENDPOINTS CLAROS:
+  private cargarDatosTiendaPorSubdominio() {
     this.isLoading = true;
 
-    // 1. Capturamos el host del navegador (ej: ://onrender.com o localhost)
+    // 1. Capturamos el host del navegador (ej: pizzeria.onrender.com o localhost)
     const host = window.location.hostname.toLowerCase().trim();
-    const primerSegmento = host.split('.')[0]; // Toma la palabra clave antes del primer punto
+    const primerSegmento = host.split('.')[0]; // Captura 'pizzeria', 'hamburguesa', etc.
 
-    // 2. Diccionario de traducción para asegurar que la API reciba el término exacto con tildes
+    // 2. DICCIONARIO PARA LAS TIENDAS (Siempre en minúsculas y limpio para la URL de tiendas)
+    let nombreTiendaReal = 'pizzeria'; // Fallback por si estás en localhost
+    if (primerSegmento !== 'localhost' && primerSegmento !== '127') {
+      nombreTiendaReal = primerSegmento;
+    }
+
+    // 3. DICCIONARIO PARA LAS CATEGORÍAS (Para traducir al texto exacto que pide el endpoint de platos)
     const mapaCategorias: { [key: string]: string } = {
       'pizzeria': 'Pizzería',
       'hamburguesa': 'Hamburguesa',
@@ -81,33 +88,26 @@ private cargarDatosTiendaPorSubdominio() {
       'churros': 'Churros'
     };
 
-    // 3. Establecemos el nombre real. Si estás en local en tu PC, usamos 'Pizzería' por defecto
-    let nombreTiendaReal = 'Pizzería'; 
-    if (primerSegmento !== 'localhost' && primerSegmento !== '127') {
-      nombreTiendaReal = mapaCategorias[primerSegmento] || primerSegmento;
-    }
+    console.log(`📡 Buscando tienda en la API con el slug: ${nombreTiendaReal}`);
 
-    console.log('📡 Conectando SaaS Zlipmenu para el subdominio:', nombreTiendaReal);
-
-    // 4. Pasamos el nombre corregido al servicio original para que la caché responda perfecto en Render
+    // 4. Invocamos tu servicio de tiendas original pasándole el parámetro plano en minúsculas
+    // URL resultante: https://back-ecomm-mall.onrender.com/api/tiendas/by_nombre/nombre/pizzeria
     this.tiendaSubscription = this.tiendasService.getTiendaByNameCached(nombreTiendaReal).subscribe({
       next: (tienda: any) => {
         this.tiendaSelected = tienda;
 
         if (tienda) {
-          // Guardamos la categoría real traducida para activar las pestañas de cas-products
-          this.categoriaActiva = mapaCategorias[primerSegmento] || tienda.categoria?.nombre || 'Pizzería';
+          // 🌟 ASIGNACIÓN MAESTRA: Asignamos el término con el acento correcto para los productos
+          // URL resultante en cas-products: .../category_by_nombre/nombre/Pizzería
+          this.categoriaActiva = mapaCategorias[nombreTiendaReal] || tienda.categoria?.nombre || 'Pizzería';
 
-          // Cambiamos el título del navegador dinámicamente
           this.titleService.setTitle(`Zlipmenu | ${tienda.nombre || nombreTiendaReal}`);
           
-          // Ejecuta tus configuraciones de filtros nativas
           if (typeof (this as any).configurarCategoriasFiltro === 'function') {
             (this as any).configurarCategoriasFiltro(tienda);
           }
 
-          // 🎨 INYECCIÓN DE CSS DINÁMICO SAAS (Tu código original intacto):
-          // Remueve estilos viejos antes de inyectar por si acaso
+          // 🎨 INYECCIÓN DE CSS DINÁMICO SAAS INTACTO
           const estiloPrevio = document.getElementById('css-dinamico-tienda');
           if (estiloPrevio) estiloPrevio.remove();
 
@@ -116,15 +116,14 @@ private cargarDatosTiendaPorSubdominio() {
             estilo.id = 'css-dinamico-tienda'; 
             estilo.innerHTML = tienda.css_personalizado;
             document.head.appendChild(estilo);
-            console.log('🎨 ¡Estilos CSS personalizados aplicados para el cliente VIP!');
           }
         } else {
-          // Fallback si la respuesta de Render viene vacía
-          this.categoriaActiva = 'Pizzería';
+          // Fallback por si la respuesta viene vacía en tus pruebas locales
+          this.categoriaActiva = mapaCategorias[nombreTiendaReal] || 'Pizzería';
         }
 
         this.isLoading = false;
-        console.log('✅ Carga del Home completada de forma dinámica.');
+        console.log(`✅ Tienda encontrada. Categoria asignada a los productos: ${this.categoriaActiva}`);
       },
       error: (err) => {
         console.error('Error al obtener la tienda por subdominio:', err);
@@ -132,6 +131,7 @@ private cargarDatosTiendaPorSubdominio() {
       }
     });
   }
+
 
   onMsmSuccess(value: boolean): void {
     this.msm_success.emit(value);
