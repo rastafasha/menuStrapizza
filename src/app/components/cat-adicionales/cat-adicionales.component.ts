@@ -71,25 +71,27 @@ export class CatAdicionalesComponent {
     }
   }
 
-  getCategories() {
+   getCategories() {
     if (!this.activeCategory || !this.tiendaSelected?._id) return;
 
     this.isLoading = true;
     this.productoService.getProductosActivos().subscribe({
       next: (resp: any) => {
-        // Capturamos el ID de la tienda activa actual y la subcategoría que buscamos (ej: 'bebidas')
         const idTiendaActual = this.tiendaSelected._id;
+        
+        // 🌟 NORMALIZAMOS EL TARGET DEL HOME: Lo pasamos a minúsculas y quitamos espacios (ej: 'bebidas')
         const subcategoriaTarget = this.activeCategory.toLowerCase().trim();
 
-        // 1. FILTRADO SEGURO POR ID: Trae los platos que pertenezcan estrictamente a ESTE local
+        // 1. FILTRADO POR ID DE TIENDA: Aislamos solo los platos de este comercio
         const productosDelLocal = resp.filter((producto: any) => {
-          // Validamos contra el campo 'local' del producto que vimos en tu JSON
           return producto.local === idTiendaActual;
         });
         
-        // 2. De los productos de este negocio, aislamos solo los de la sección actual (ej: 'Bebidas')
+        // 2. FILTRADO BLINDADO POR SUBCATEGORÍA: Convertimos ambos lados a minúsculas
         this.products = productosDelLocal.filter((p: any) => {
           if (!p.subcategoria) return false;
+          
+          // Pasamos la subcategoría de la base de datos también a minúsculas para comparar manzanas con manzanas
           return p.subcategoria.toLowerCase().trim() === subcategoriaTarget;
         });
 
@@ -102,10 +104,10 @@ export class CatAdicionalesComponent {
           products: this.products.filter((product: any) => product.subcategoria === subcategoria),
         }));
 
-        // 4. Cargamos la grilla visible
+        // 4. Cargamos la grilla visible (todo)
         this.todo = this.products.slice();
         this.isLoading = false;
-        console.log(`📡 Adicionales cargados por ID de local (${idTiendaActual}) para sección (${this.activeCategory}):`, this.todo);
+        console.log(`✅ Adicionales sincronizados para la sección [${this.activeCategory}]:`, this.todo);
       },
       error: (err) => {
         console.error('Error cargando adicionales activos por ID:', err);
@@ -113,6 +115,7 @@ export class CatAdicionalesComponent {
       }
     });
   }
+
 
  getProductosPorSubcategoria() {
     if (!this.activeCategory) return;
