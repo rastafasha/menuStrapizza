@@ -14,7 +14,8 @@ export const environment = {
 
   // En lugar de texto fijo, lee lo que inyecta Vercel al compilar
   //configurar el nombre directamente en el servidor vercel 
-  nombreSelected: (window as any)._env_?.NOMBRE_TIENDA || 'Pizzeria',
+  // nombreSelected: (window as any)._env_?.NOMBRE_TIENDA || 'Pizzeria',
+  nombreSelected: 'zlipmenu-generic',
   
   mediaUrlRemoto: 'https://res.cloudinary.com/dmv6aukai/image/upload/v1741218430/mallConnect',
   urlBackedNotification:'https://back-ecomm-mall.onrender.com/api/notipush/save-subscription',

@@ -54,20 +54,20 @@ export class CasProductsComponent implements OnInit, OnDestroy {
   private tiendaSubscription!: Subscription;
 
   ngOnInit() {
-  this.tiendaSubscription = this.tiendasService.getTiendaByNameCached().subscribe(tienda => {
-    this.tiendaSelected = tienda;
-    if (this.tiendaSelected) {
-      this.tienda_moneda = this.tiendaSelected.moneda;
-      this.getProductosCatName();
-      // ❌ ELIMINA O COMENTA ESTA LÍNEA DE AQUÍ:
-      // this.getCategories(); 
-    }
-  });
+    this.tiendaSubscription = this.tiendasService.getTiendaByNameCached().subscribe(tienda => {
+      this.tiendaSelected = tienda;
+      if (this.tiendaSelected) {
+        this.tienda_moneda = this.tiendaSelected.moneda;
+        this.getProductosCatName();
+        // ❌ ELIMINA O COMENTA ESTA LÍNEA DE AQUÍ:
+        // this.getCategories(); 
+      }
+    });
 
-  if (this.refreshCasProducts) {
-    this.refreshCasProducts.subscribe(() => this.refreshData());
+    if (this.refreshCasProducts) {
+      this.refreshCasProducts.subscribe(() => this.refreshData());
+    }
   }
-}
 
   ngOnDestroy() {
     if (this.tiendaSubscription) {
@@ -87,45 +87,45 @@ export class CasProductsComponent implements OnInit, OnDestroy {
   }
 
 
- getProductosCatName() {
-  this.isLoading = true;
+  getProductosCatName() {
+    this.isLoading = true;
 
-  // 🌟 CORRECCIÓN MAESTRA:
-  // 1. Si la tienda tiene el objeto 'categoria' populado con su slug, lo usamos (ej: 'panaderia').
-  // 2. Si viene solo el ID string, evaluamos el campo 'subcategoria' de la tienda para saber el rubro real.
-  if (this.tiendaSelected?.categoria && typeof this.tiendaSelected.categoria === 'object' && (this.tiendaSelected.categoria as any).slug) {
-    this.catname = (this.tiendaSelected.categoria as any).slug;
-  } else {
-    // Fallback inteligente: si la subcategoría es 'Panadería', forzamos a que busque 'panaderia' o 'panaderia' limpia
-    const rubro = this.tiendaSelected?.subcategoria?.toLowerCase().trim().normalize('NFD').replace(/[\u0300-\u036f]/g, '') || '';
-    
-    if (rubro === 'panaderia') {
-      this.catname = 'panaderia'; // ◄--- El slug real de tu colección de categorías para los panes
-    } else if (rubro === 'hamburgueseria') {
-      this.catname = 'hamburguesa';
+    // 🌟 CORRECCIÓN MAESTRA:
+    // 1. Si la tienda tiene el objeto 'categoria' populado con su slug, lo usamos (ej: 'panaderia').
+    // 2. Si viene solo el ID string, evaluamos el campo 'subcategoria' de la tienda para saber el rubro real.
+    if (this.tiendaSelected?.categoria && typeof this.tiendaSelected.categoria === 'object' && (this.tiendaSelected.categoria as any).slug) {
+      this.catname = (this.tiendaSelected.categoria as any).slug;
     } else {
-      this.catname = 'pizzeria';
+      // Fallback inteligente: si la subcategoría es 'Panadería', forzamos a que busque 'panaderia' o 'panaderia' limpia
+      const rubro = this.tiendaSelected?.subcategoria?.toLowerCase().trim().normalize('NFD').replace(/[\u0300-\u036f]/g, '') || '';
+
+      if (rubro === 'panaderia') {
+        this.catname = 'panaderia'; // ◄--- El slug real de tu colección de categorías para los panes
+      } else if (rubro === 'hamburgueseria') {
+        this.catname = 'hamburguesa';
+      } else {
+        this.catname = 'pizzeria';
+      }
     }
+
+    console.log('🚀 Petición HTTP enviada a Categorías con el término correcto:', this.catname);
+
+    const localId = this.tiendaSelected?._id;
+
+    // 3. Ahora la URL se armará perfecta: /category_by_nombre/nombre/panaderia?localId=...
+    this.categoryService.find_by_nombre(this.catname, localId).subscribe({
+      next: (resp: any) => {
+        this.products = resp.productos || [];
+        this.updateTodo();
+        this.getCategories(); // Extrae las pestañas internas (PASTAS, PIZZAS, PANES, etc.)
+        this.isLoading = false;
+      },
+      error: (error) => {
+        console.error('Error al obtener los productos por slug', error);
+        this.isLoading = false;
+      }
+    });
   }
-
-  console.log('🚀 Petición HTTP enviada a Categorías con el término correcto:', this.catname);
-
-  const localId = this.tiendaSelected?._id;
-
-  // 3. Ahora la URL se armará perfecta: /category_by_nombre/nombre/panaderia?localId=...
-  this.categoryService.find_by_nombre(this.catname, localId).subscribe({
-    next: (resp: any) => {
-      this.products = resp.productos || []; 
-      this.updateTodo();
-      this.getCategories(); // Extrae las pestañas internas (PASTAS, PIZZAS, PANES, etc.)
-      this.isLoading = false;
-    },
-    error: (error) => {
-      console.error('Error al obtener los productos por slug', error);
-      this.isLoading = false;
-    }
-  });
-}
 
 
 
@@ -133,34 +133,34 @@ export class CasProductsComponent implements OnInit, OnDestroy {
 
   //obtenemos las subcategorias de los productos
   getCategories() {
-  // Procesamos directamente el arreglo 'this.products' que ya descargó el backend
-  if (!this.products || this.products.length === 0) {
-    this.subcategories = [];
-    return;
+    // Procesamos directamente el arreglo 'this.products' que ya descargó el backend
+    if (!this.products || this.products.length === 0) {
+      this.subcategories = [];
+      return;
+    }
+
+    // Extraemos el campo 'subcategoria' de cada plato en memoria
+    const subcategorias = this.products.map((producto: any) => producto.subcategoria);
+
+    // Eliminamos los nombres duplicados para tener pestañas únicas
+    const subcategoriasUnicas = [...new Set(subcategorias.filter(sub => !!sub))];
+
+    // Armamos el arreglo de objetos para el HTML de Angular
+    this.subcategories = subcategoriasUnicas.map((subcategoria: any) => ({
+      nombre: subcategoria,
+      // Filtramos los platos que corresponden a cada pestaña específica
+      products: this.products.filter((product: any) => product.subcategoria === subcategoria),
+    }));
+
+    console.log('Subcategorías dinámicas extraídas con éxito:', this.subcategories);
   }
-
-  // Extraemos el campo 'subcategoria' de cada plato en memoria
-  const subcategorias = this.products.map((producto: any) => producto.subcategoria);
-  
-  // Eliminamos los nombres duplicados para tener pestañas únicas
-  const subcategoriasUnicas = [...new Set(subcategorias.filter(sub => !!sub))];
-  
-  // Armamos el arreglo de objetos para el HTML de Angular
-  this.subcategories = subcategoriasUnicas.map((subcategoria: any) => ({
-    nombre: subcategoria,
-    // Filtramos los platos que corresponden a cada pestaña específica
-    products: this.products.filter((product: any) => product.subcategoria === subcategoria),
-  }));
-
-  console.log('Subcategorías dinámicas extraídas con éxito:', this.subcategories);
-}
 
 
   selectCategory(category: string) {
-  console.log('Filtro seleccionado por el usuario:', category);
-  this.activeCategory = category; // Guarda la subcategoría cliqueada (o 'all')
-  this.updateTodo(); // Re-calcula el contenido del arreglo 'this.todo'
-}
+    console.log('Filtro seleccionado por el usuario:', category);
+    this.activeCategory = category; // Guarda la subcategoría cliqueada (o 'all')
+    this.updateTodo(); // Re-calcula el contenido del arreglo 'this.todo'
+  }
 
   updateTodo() {
     this.isLoading = true;
