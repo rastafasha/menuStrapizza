@@ -23,12 +23,12 @@ declare var bootstrap: any;
 })
 export class CatAdicionalesComponent {
   // Recibe la subcategoría base desde el bloque @defer del Home (ej: 'Entradas', 'Bebidas')
-  @Input() activeCategory: string = ''; 
+  @Input() activeCategory: string = ''; // Recibe 'Entradas', 'Bebidas', etc.
   @Input() title!: string;
   @Input() tienda_moneda!: any;
+  @Input() catname: string = ''; // 🌟 NUEVO: Recibe 'Pizzería' o 'Panadería' directo del Home
 
   isLoading: boolean = false;
-  catname!: string;
   subcategories: any[] = [];
   products: any[] = [];
   todo: any[] = []; 
@@ -41,21 +41,26 @@ export class CatAdicionalesComponent {
   private tiendaSubscription!: Subscription;
 
   ngOnChanges(changes: SimpleChanges) {
-    // Si cambia el input de la categoría y ya tenemos el ID de la tienda, refrescamos la petición
-    if (changes['activeCategory'] && this.tiendaSelected) {
-      this.getProductosPorSubcategoria();
+    // Si cambia el rubro o la subcategoría desde el Home, volvemos a filtrar de forma limpia
+    if ((changes['activeCategory'] || changes['catname']) && this.tiendaSelected) {
+      this.getCategories();
     }
   }
 
 
-  ngOnInit() {
+
+    ngOnInit() {
     this.tiendaSubscription = this.tiendasService.getTiendaByNameCached().subscribe(tienda => {
       this.tiendaSelected = tienda;
       if (this.tiendaSelected) {
         this.tienda_moneda = this.tiendaSelected.moneda;
         
-        // Ejecutamos la petición HTTP directa con el término correcto
-        this.getProductosPorSubcategoria(); 
+        // Si por alguna razón el Input del Home viene vacío, usamos el del objeto como respaldo
+        if (!this.catname) {
+          this.catname = this.tiendaSelected?.categoria?.nombre || 'Pizzería';
+        }
+
+        this.getCategories(); 
       }
     });
   }
@@ -64,6 +69,52 @@ export class CatAdicionalesComponent {
     if (this.tiendaSubscription) {
       this.tiendaSubscription.unsubscribe();
     }
+  }
+
+  getCategories() {
+    if (!this.activeCategory || !this.catname) return;
+
+    this.isLoading = true;
+    this.productoService.getProductosActivos().subscribe({
+      next: (resp: any) => {
+        // Normalizamos los nombres para que el filtro no falle por acentos o mayúsculas
+        const rubroTiendaLimpio = this.catname.toLowerCase().trim().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+        const subcategoriaTarget = this.activeCategory.toLowerCase().trim();
+
+        // 1. Filtramos los productos que pertenezcan ÚNICAMENTE a la categoría de esta tienda (ej: 'panaderia')
+        const productosDelRubro = resp.filter((producto: any) => {
+          if (!producto.categoria?.nombre) return false;
+          
+          // Opcional: Si tus productos traen el ID del local, puedes validar 'producto.local === this.tiendaSelected._id'
+          const productoCatLimpio = producto.categoria.nombre.toLowerCase().trim().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+          return productoCatLimpio === rubroTiendaLimpio;
+        });
+        
+        // 2. De los productos de este negocio, extraemos solo los de la sección actual (ej: 'Bebidas')
+        this.products = productosDelRubro.filter((p: any) => {
+          if (!p.subcategoria) return false;
+          return p.subcategoria.toLowerCase().trim() === subcategoriaTarget;
+        });
+
+        // 3. Mapeamos las subcategorías internas de la sección
+        const subcats = this.products.map((producto: any) => producto.subcategoria);
+        const subcategoriasUnicas = [...new Set(subcats.filter((sub: any) => !!sub))];
+
+        this.subcategories = subcategoriasUnicas.map((subcategoria: any) => ({
+          nombre: subcategoria,
+          products: this.products.filter((product: any) => product.subcategoria === subcategoria),
+        }));
+
+        // 4. Cargamos la grilla limpia en pantalla
+        this.todo = this.products.slice();
+        this.isLoading = false;
+        console.log(`📡 Adicionales aislados con éxito para la tienda (${this.catname}) - Sección (${this.activeCategory}):`, this.todo);
+      },
+      error: (err) => {
+        console.error('Error cargando adicionales activos:', err);
+        this.isLoading = false;
+      }
+    });
   }
 
  getProductosPorSubcategoria() {
