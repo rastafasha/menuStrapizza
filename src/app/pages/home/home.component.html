@@ -9,7 +9,7 @@
     <!-- Eliminamos el filtro manual por texto; el componente interno ya sabe qué cargar usando la tienda activa -->
     <app-cas-products 
     *ngIf="!isLoading" 
-    [activeCategory]="'Pizzería'" 
+    [activeCategory]="categoriaActiva" 
     [isVisible]="true" 
     [title]="'Menú'"  
     (msm_success)="onMsmSuccess($event)" 

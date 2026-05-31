@@ -32,7 +32,6 @@ export class CasProductsComponent implements OnInit, OnDestroy {
 
   option_selectedd: number = 1;
   solicitud_selectedd: any = null;
-  tiendaNameSelected = environment.nombreSelected;
 
   isRefreshing = false;
   isEdnOfList = false;
@@ -55,39 +54,28 @@ export class CasProductsComponent implements OnInit, OnDestroy {
   private tiendaSubscription!: Subscription;
 
   ngOnInit() {
-    if (this.tiendaNameSelected) {
-      this.tiendaSubscription = this.tiendasService.getTiendaByNameCached(this.tiendaNameSelected).subscribe(tienda => {
-        this.tiendaSelected = tienda;
-        this.tienda_moneda = this.tiendaSelected?.moneda;
+    // Escucha la tienda que ya resolvió el Home en la caché de forma reactiva
+    this.tiendaSubscription = this.tiendasService.getTiendaByNameCached().subscribe(tienda => {
+      this.tiendaSelected = tienda;
+      if (this.tiendaSelected) {
+        this.tienda_moneda = this.tiendaSelected.moneda;
         
-        if (this.tiendaSelected) {
-          // 🌟 CORRECCIÓN 1: Priorizamos el activeCategory que viene del HTML del Home ('Pizzería')
-          // Si no viene nada en el Input, entonces usamos el objeto de la tienda por defecto
-          this.catname = this.activeCategory !== 'all' ? this.activeCategory : (this.tiendaSelected?.categoria?.nombre || 'Pizzería');
-          
-          console.log('🎯 Catname establecido firmemente en:', this.catname);
-          
-          this.getCategories();
-        }
-      });
-    }
+        // Prioriza la categoría limpia enviada desde el Home para el endpoint
+        this.catname = this.activeCategory !== 'all' ? this.activeCategory : (this.tiendaSelected?.categoria?.nombre || 'Pizzería');
+        
+        this.getCategories();
+      }
+    });
+
+    // this.escucharTiendaActiva();
 
     if (this.refreshCasProducts) {
       this.refreshCasProducts.subscribe(() => this.refreshData());
     }
   }
 
-  getTiendaName(){
-    this.tiendasService.getTiendaByNameCached(this.tiendaNameSelected).subscribe(tienda => {
-      this.tiendaSelected = tienda;
-      this.tienda_moneda = this.tiendaSelected?.moneda;
-      if (this.tiendaSelected) {
-        // 🌟 CORRECCIÓN 2: Replicamos la misma lógica aquí
-        this.catname = this.activeCategory !== 'all' ? this.activeCategory : (this.tiendaSelected?.categoria?.nombre || 'Pizzería');
-        this.getCategories();
-      }
-    });
-  }
+ 
+ 
 
   ngOnDestroy() {
     if (this.tiendaSubscription) {

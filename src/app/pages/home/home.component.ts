@@ -59,10 +59,40 @@ export class HomeComponent {
   @Output() refreshCasProducts: EventEmitter<void> = new EventEmitter<void>();
 
   ngOnInit() {
-    this.user = this.authService.getLocalStorage();
-    this.cargarDatosTiendaPorSubdominio();
+    this.isLoading = true;
 
-    
+    // 🌟 RECOLECTOR DE SUBDOMINIO DE EMERGENCIA:
+    // Captura el subdominio de la URL real de internet (ej: '://zlipmenu.com' -> 'pizzeria')
+    const host = window.location.hostname; 
+    let nombreTiendaReal = '';
+
+    if (host === 'localhost' || host === '127.0.0.1') {
+      nombreTiendaReal = 'Pizzeria'; // Fallback seguro para cuando estés programando en tu PC
+    } else {
+      // En internet, divide la URL por puntos y toma el primer fragmento (el subdominio)
+      const partes = host.split('.');
+      nombreTiendaReal = partes[0]; 
+    }
+
+    console.log('🌐 Subdominio remoto detectado de forma dinámica:', nombreTiendaReal);
+
+    // Pasamos de forma obligatoria el nombre extraído al servicio para que la caché responda
+    this.tiendaSubscription = this.tiendasService.getTiendaByNameCached(nombreTiendaReal).subscribe({
+      next: (tienda) => {
+        if (tienda) {
+          // Guardamos la categoría real de la base de datos ('Pizzería', 'Panadería', etc.)
+          this.categoriaActiva = tienda.categoria?.nombre || '';
+          console.log('✅ Datos de la tienda remota cargados con éxito. Categoría:', this.categoriaActiva);
+        } else {
+          console.warn('⚠️ El backend respondió con éxito pero no encontró la tienda con ese subdominio.');
+        }
+        this.isLoading = false;
+      },
+      error: (err) => {
+        console.error('❌ Error crítico al conectar con TiendaService en remoto:', err);
+        this.isLoading = false;
+      }
+    });
   }
 
   private cargarDatosTiendaPorSubdominio() {
