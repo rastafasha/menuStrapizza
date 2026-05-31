@@ -42,9 +42,6 @@ export class HomeComponent {
   activeCategory!: string;
   categoriaPrincipal: string = 'all';
 
-  
-
-
   // Variables dinámicas para el control del inquilino (Tenant)
   tiendaSelected: Tienda | null = null;
   categoriasAdicionales: Array<{ id: string, nombre: string }> = [];
