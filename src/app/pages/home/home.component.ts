@@ -148,87 +148,92 @@ export class HomeComponent {
 }
 
 private configurarManifestDinamico(tienda: any) {
-  // 1. Armamos el objeto manifest en caliente con los datos vivos de la BD
+  
+  // 🌟 CORRECCIÓN DE RUTAS PÚBLICAS DE ANGULAR:
+  // Eliminamos el prefijo 'src/' porque en producción la carpeta 'assets' queda expuesta en la raíz pública
+  const icono72 = 'assets/icons/icon-72x72.png';
+  const icono96 = 'assets/icons/icon-96x96.png';
+  const icono128 = 'assets/icons/icon-128x128.png';
+  const icono144 = 'assets/icons/icon-144x144.png';
+  const icono152 = 'assets/icons/icon-152x152.png';
+  const icono192 = 'assets/icons/icon-192x192.png';
+  const icono384 = 'assets/icons/icon-384x384.png';
+  const icono512 = 'assets/icons/icon-512x512.png';
+
+  // Armamos el objeto manifest en caliente con las rutas públicas oficiales
   const miManifestDinamico = {
     name: tienda.nombre || 'Zlipmenu',
     short_name: tienda.nombre || 'Zlipmenu',
-    theme_color: tienda.color_primario || '#333',
-    background_color: '#fafafa',
+    theme_color: tienda.color_primario || '#e74c3c',
+    background_color: '#ffffff',
     display: 'standalone',
     orientation: 'portrait',
-    start_url: window.location.origin,
+    // Usamos el origen actual de la URL dinámica
+    start_url: window.location.origin + '/', 
     icons: [
-      
-      // {
-      //   src: tienda.img || 'assets/icons/icon-72x72.png',
-      //   sizes: '72x72',
-      //   type: 'image/png',
-      //   purpose: 'any maskable'
-      // },
       {
-        src:  'assets/icons/icon-72x72.png',
+        src: icono72,
         sizes: '72x72',
         type: 'image/png',
         purpose: 'any maskable'
       },
       {
-        src:  'assets/icons/icon-96x96.png',
+        src: icono96,
         sizes: '96x96',
         type: 'image/png',
         purpose: 'any maskable'
       },
       {
-        src:  'assets/icons/icon-128x128.png',
-        sizes: '128x128',
+        src: icono128,
+        sizes: "128x128",
         type: 'image/png',
         purpose: 'any maskable'
       },
       {
-        src:  'assets/icons/icon-144x144.png',
+        src: icono144,
         sizes: '144x144',
         type: 'image/png',
         purpose: 'any maskable'
       },
       {
-        src:  'assets/icons/icon-152x152.png',
+        src: icono152,
         sizes: '152x152',
         type: 'image/png',
         purpose: 'any maskable'
       },
       {
-        // Usamos el logo que el restaurante subió a Cloudinary como icono de la App
-        src:  'assets/icons/icon-192x192.png',
+        src: icono192,
         sizes: '192x192',
         type: 'image/png',
         purpose: 'any maskable'
       },
       {
-        // Usamos el logo que el restaurante subió a Cloudinary como icono de la App
-        src:  'assets/icons/icon-384x384.png',
+        src: icono384,
         sizes: '384x384',
         type: 'image/png',
         purpose: 'any maskable'
       },
       {
-        src:  'assets/icons/icon-512x512.png',
+        src: icono512,
         sizes: '512x512',
         type: 'image/png'
       }
     ]
   };
 
-  // 2. Convertimos el objeto en un archivo Blob de texto plano en memoria
+  // Convertimos el objeto manifest en un archivo Blob de memoria
   const stringManifest = JSON.stringify(miManifestDinamico);
-  const blob = new Blob([stringManifest], { type: 'application/json' });
-  const urlManifest = URL.createObjectURL(blob);
+  const blobManifest = new Blob([stringManifest], { type: 'application/json' });
+  const urlManifest = URL.createObjectURL(blobManifest);
 
-  // 3. Reemplazamos el manifest estático por nuestra versión viva
+  // Inyectamos el manifest limpio en el HTML
   const etiquetaManifest = document.getElementById('pwa-manifest') as HTMLLinkElement;
   if (etiquetaManifest) {
     etiquetaManifest.href = urlManifest;
-    console.log('¡Manifest PWA actualizado dinámicamente para:', tienda.nombre);
+    console.log('¡Manifest PWA con iconos locales validado con éxito para:', tienda.nombre);
   }
 }
+
 
 
 }
