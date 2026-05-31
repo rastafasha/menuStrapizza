@@ -9,8 +9,7 @@
             </div>
             
             <!-- Grilla de productos filtrados -->
-            <div>
-                <div class="product-card" *ngFor="let product of todo">
+            <div  *ngFor="let product of todo">
                     <app-product-item 
                         [activeCategory]="activeCategory" 
                         [tienda_moneda]="tienda_moneda" 
@@ -20,7 +19,6 @@
                         (click)="openModal(product)">
                     </app-product-item>
                 </div>
-            </div>
 
         </div>
     </section>
