@@ -2,23 +2,19 @@
 <ng-container *ngIf="!isLoading && todo && todo.length > 0">
     <section class="categories-section" [id]="title">
         <div class="container">
-            
+
             <!-- Título de la sección (ej: Entradas, Bebidas, etc.) -->
             <div class="title-section" *ngIf="title">
                 <h3 class="title">{{title}}</h3>
             </div>
-            
+
             <!-- Grilla de productos filtrados -->
-            <div  *ngFor="let product of todo">
-                    <app-product-item 
-                        [activeCategory]="activeCategory" 
-                        [tienda_moneda]="tienda_moneda" 
-                        [product]="product"
-                        data-bs-toggle="offcanvas" 
-                        [attr.data-bs-target]="'#modalProduct-' + product._id"
-                        (click)="openModal(product)">
-                    </app-product-item>
-                </div>
+            <div *ngFor="let product of todo">
+                <app-product-item [activeCategory]="activeCategory" [tienda_moneda]="tienda_moneda" [product]="product"
+                    data-bs-toggle="offcanvas" [attr.data-bs-target]="'#modalProduct-' + product._id"
+                    (click)="openModal(product)">
+                </app-product-item>
+            </div>
 
         </div>
     </section>
@@ -29,10 +25,6 @@
 <app-loading *ngIf="isLoading"></app-loading>
 
 <!-- Modal independiente para ver el detalle del producto seleccionado -->
-<app-modalproduct 
-    [product]="selectedProduct" 
-    [activeCategory]="activeCategory" 
-    [tienda_moneda]="tienda_moneda"
-    (modalClosed)="selectedProduct = null"  
-    *ngIf="selectedProduct && !isLoading">
+<app-modalproduct [product]="selectedProduct" [activeCategory]="activeCategory" [tienda_moneda]="tienda_moneda"
+    (modalClosed)="selectedProduct = null" *ngIf="selectedProduct && !isLoading">
 </app-modalproduct>
