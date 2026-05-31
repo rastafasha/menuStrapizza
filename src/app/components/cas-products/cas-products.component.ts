@@ -87,20 +87,37 @@ export class CasProductsComponent implements OnInit, OnDestroy {
   }
 
 
-  getProductosCatName() {
-  this.catname = this.tiendaSelected?.categoria?.slug || this.activeCategory;
+ getProductosCatName() {
   this.isLoading = true;
+
+  // 🌟 CORRECCIÓN MAESTRA:
+  // 1. Si la tienda tiene el objeto 'categoria' populado con su slug, lo usamos (ej: 'panaderia').
+  // 2. Si viene solo el ID string, evaluamos el campo 'subcategoria' de la tienda para saber el rubro real.
+  if (this.tiendaSelected?.categoria && typeof this.tiendaSelected.categoria === 'object' && (this.tiendaSelected.categoria as any).slug) {
+    this.catname = (this.tiendaSelected.categoria as any).slug;
+  } else {
+    // Fallback inteligente: si la subcategoría es 'Panadería', forzamos a que busque 'panaderia' o 'panaderia' limpia
+    const rubro = this.tiendaSelected?.subcategoria?.toLowerCase().trim().normalize('NFD').replace(/[\u0300-\u036f]/g, '') || '';
+    
+    if (rubro === 'panaderia') {
+      this.catname = 'panaderia'; // ◄--- El slug real de tu colección de categorías para los panes
+    } else if (rubro === 'hamburgueseria') {
+      this.catname = 'hamburguesa';
+    } else {
+      this.catname = 'pizzeria';
+    }
+  }
+
+  console.log('🚀 Petición HTTP enviada a Categorías con el término correcto:', this.catname);
+
   const localId = this.tiendaSelected?._id;
 
+  // 3. Ahora la URL se armará perfecta: /category_by_nombre/nombre/panaderia?localId=...
   this.categoryService.find_by_nombre(this.catname, localId).subscribe({
     next: (resp: any) => {
       this.products = resp.productos || []; 
       this.updateTodo();
-      
-      //  LÁZALO AQUÍ: Ahora que 'this.products' ya tiene las pizzas reales,
-      // el sistema podrá extraer sus subcategorías sin fallar.
-      this.getCategories(); 
-
+      this.getCategories(); // Extrae las pestañas internas (PASTAS, PIZZAS, PANES, etc.)
       this.isLoading = false;
     },
     error: (error) => {
@@ -109,6 +126,7 @@ export class CasProductsComponent implements OnInit, OnDestroy {
     }
   });
 }
+
 
 
 
