@@ -22,19 +22,24 @@
     <!-- Subcategorías adicionales con Lazy Loading (Se cargan al hacer scroll) -->
     <!-- Lazy loaded secondary sections -->
 @defer (on viewport) {
-    <app-cat-adicionales *ngIf="!isLoading && categoriaActiva" [activeCategory]="'Entradas'" [title]="'Entradas'"></app-cat-adicionales>
+    <app-cat-adicionales *ngIf="!isLoading && categoriaActiva" [catname]="categoriaActiva" [activeCategory]="'Entradas'" [title]="'Entradas'"></app-cat-adicionales>
 } @placeholder {
     <div class="loading-placeholder" style="text-align: center; padding: 20px;">Cargando Entradas...</div>
 }
 
 @defer (on viewport) {
-    <app-cat-adicionales *ngIf="!isLoading && categoriaActiva" [activeCategory]="'Bebidas'" [title]="'Bebidas'"></app-cat-adicionales>
+    <app-cat-adicionales *ngIf="!isLoading && categoriaActiva" [catname]="categoriaActiva" [activeCategory]="'Combos'" [title]="'Combos'"></app-cat-adicionales>
 } @placeholder {
-    <div class="loading-placeholder" style="text-align: center; padding: 20px;">Cargando Bebidas...</div>
+    <div class="loading-placeholder" style="text-align: center; padding: 20px;">Cargando Combos...</div>
 }
 
 @defer (on viewport) {
-    <app-cat-adicionales *ngIf="!isLoading && categoriaActiva" [activeCategory]="'Postres'" [title]="'Postres'"></app-cat-adicionales>
+    <app-cat-adicionales *ngIf="!isLoading && categoriaActiva" [catname]="categoriaActiva" [activeCategory]="'Bebidas'" [title]="'Bebidas'"></app-cat-adicionales>
+} @placeholder {
+    <div class="loading-placeholder" style="text-align: center; padding: 20px;">Cargando Bebidas...</div>
+}
+@defer (on viewport) {
+    <app-cat-adicionales *ngIf="!isLoading && categoriaActiva" [catname]="categoriaActiva" [activeCategory]="'Postres'" [title]="'Postres'"></app-cat-adicionales>
 } @placeholder {
     <div class="loading-placeholder" style="text-align: center; padding: 20px;">Cargando Postres...</div>
 }

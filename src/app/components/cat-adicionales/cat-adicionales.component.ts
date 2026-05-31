@@ -1,32 +1,18 @@
-import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, inject, Input, Output, SimpleChanges, TrackByFunction } from '@angular/core';
+import { Component, OnInit, OnDestroy, OnChanges, SimpleChanges, Input, inject } from '@angular/core';
 import { Subscription } from 'rxjs';
-import { CategoryService } from '../../services/category.service';
 import { TiendaService } from '../../services/tienda.service';
-import { LoadingComponent } from '../../shared/loading/loading.component';
-import { ModalproductComponent } from '../modalproduct/modalproduct.component';
-import { ProductItemComponent } from '../product-item/product-item.component';
 import { ProductoService } from '../../services/product.service';
-
-declare var bootstrap: any;
 
 @Component({
   selector: 'app-cat-adicionales',
-  imports: [
-    CommonModule, 
-    LoadingComponent,
-    ProductItemComponent, 
-    ModalproductComponent,
-  ],
   templateUrl: './cat-adicionales.component.html',
-  styleUrl: './cat-adicionales.component.scss'
+  styleUrls: ['./cat-adicionales.component.css']
 })
-export class CatAdicionalesComponent {
-  // Recibe la subcategoría base desde el bloque @defer del Home (ej: 'Entradas', 'Bebidas')
-  @Input() activeCategory: string = ''; // Recibe 'Entradas', 'Bebidas', etc.
+export class CatAdicionalesComponent implements OnInit, OnDestroy, OnChanges {
+  @Input() activeCategory: string = ''; 
   @Input() title!: string;
   @Input() tienda_moneda!: any;
-  @Input() catname: string = ''; // 🌟 NUEVO: Recibe 'Pizzería' o 'Panadería' directo del Home
+  @Input() catname: string = ''; // Recibe 'Pizzería', 'Hamburguesa' o 'Panadería' del Home
 
   isLoading: boolean = false;
   subcategories: any[] = [];
@@ -35,27 +21,22 @@ export class CatAdicionalesComponent {
   selectedProduct: any = null;
   tiendaSelected: any = null;
 
-  private categoryService = inject(CategoryService);
   private productoService = inject(ProductoService);
   private tiendasService = inject(TiendaService);
   private tiendaSubscription!: Subscription;
 
   ngOnChanges(changes: SimpleChanges) {
-    // Si cambia el rubro o la subcategoría desde el Home, volvemos a filtrar de forma limpia
     if ((changes['activeCategory'] || changes['catname']) && this.tiendaSelected) {
       this.getCategories();
     }
   }
 
-
-
-    ngOnInit() {
+  ngOnInit() {
     this.tiendaSubscription = this.tiendasService.getTiendaByNameCached().subscribe(tienda => {
       this.tiendaSelected = tienda;
       if (this.tiendaSelected) {
         this.tienda_moneda = this.tiendaSelected.moneda;
         
-        // Si por alguna razón el Input del Home viene vacío, usamos el del objeto como respaldo
         if (!this.catname) {
           this.catname = this.tiendaSelected?.categoria?.nombre || 'Pizzería';
         }
@@ -71,31 +52,33 @@ export class CatAdicionalesComponent {
     }
   }
 
-   getCategories() {
-    if (!this.activeCategory || !this.tiendaSelected?._id) return;
+  getCategories() {
+    if (!this.activeCategory || !this.catname) return;
 
     this.isLoading = true;
     this.productoService.getProductosActivos().subscribe({
       next: (resp: any) => {
-        const idTiendaActual = this.tiendaSelected._id;
-        
-        // 🌟 NORMALIZAMOS EL TARGET DEL HOME: Lo pasamos a minúsculas y quitamos espacios (ej: 'bebidas')
-        const subcategoriaTarget = this.activeCategory.toLowerCase().trim();
+        // 🌟 NORMALIZACIÓN TOTAL DE LAS VARIABLES DEL HOME:
+        const rubroTiendaLimpio = this.catname.toLowerCase().trim().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+        const subcategoriaTarget = this.activeCategory.toLowerCase().trim().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 
-        // 1. FILTRADO POR ID DE TIENDA: Aislamos solo los platos de este comercio
-        const productosDelLocal = resp.filter((producto: any) => {
-          return producto.local === idTiendaActual;
+        // 1. FILTRADO FLEXIBLE POR RUBRO: Aísla los platos que pertenezcan a la categoría (ej: 'pizzeria' o 'panaderia')
+        const productosDelRubro = resp.filter((producto: any) => {
+          if (!producto.categoria?.nombre) return false;
+          
+          const productoCatLimpio = producto.categoria.nombre.toLowerCase().trim().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+          return productoCatLimpio.includes(rubroTiendaLimpio) || rubroTiendaLimpio.includes(productoCatLimpio);
         });
         
-        // 2. FILTRADO BLINDADO POR SUBCATEGORÍA: Convertimos ambos lados a minúsculas
-        this.products = productosDelLocal.filter((p: any) => {
+        // 2. FILTRADO FLEXIBLE POR SUBCATEGORÍA: Empareja singular/plural (ej: 'bebida' con 'bebidas')
+        this.products = productosDelRubro.filter((p: any) => {
           if (!p.subcategoria) return false;
           
-          // Pasamos la subcategoría de la base de datos también a minúsculas para comparar manzanas con manzanas
-          return p.subcategoria.toLowerCase().trim() === subcategoriaTarget;
+          const subcategoriaProductoLimplia = p.subcategoria.toLowerCase().trim().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+          return subcategoriaProductoLimplia.includes(subcategoriaTarget) || subcategoriaTarget.includes(subcategoriaProductoLimplia);
         });
 
-        // 3. Mapeamos las subcategorías internas por si acaso
+        // 3. Mapeamos las subcategorías internas
         const subcats = this.products.map((producto: any) => producto.subcategoria);
         const subcategoriasUnicas = [...new Set(subcats.filter((sub: any) => !!sub))];
 
@@ -107,48 +90,10 @@ export class CatAdicionalesComponent {
         // 4. Cargamos la grilla visible (todo)
         this.todo = this.products.slice();
         this.isLoading = false;
-        console.log(`✅ Adicionales sincronizados para la sección [${this.activeCategory}]:`, this.todo);
+        console.log(`✅ ¡Éxito en bloque! Sincronizados adicionales para la tienda [${this.catname}] - Sección [${this.activeCategory}]:`, this.todo);
       },
       error: (err) => {
-        console.error('Error cargando adicionales activos por ID:', err);
-        this.isLoading = false;
-      }
-    });
-  }
-
-
- getProductosPorSubcategoria() {
-    if (!this.activeCategory) return;
-    
-    this.isLoading = true;
-    const localId = this.tiendaSelected?._id;
-
-    // 🌟 AQUÍ SE CONFIGURA TU URL:
-    // Al pasarle 'this.activeCategory' (ej: 'Entradas'), el servicio armará internamente:
-    // https://onrender.com...
-    console.log(`🚀 Conectando a Zlipmenu API. Solicitando URL para: ${this.activeCategory}`);
-
-    this.categoryService.find_by_nombre(this.activeCategory, localId).subscribe({
-      next: (resp: any) => {
-        // Guardamos los platos que devuelve directamente tu endpoint de categorías
-        this.products = resp.productos || [];
-        
-        // Replicamos tu lógica original para armar el menú de pestañas internas si existen
-        const subcats = this.products.map((producto: any) => producto.subcategoria);
-        const subcategoriasUnicas = [...new Set(subcats.filter(sub => !!sub))];
-
-        this.subcategories = subcategoriasUnicas.map((subcategoria: any) => ({
-          nombre: subcategoria,
-          products: this.products.filter((product: any) => product.subcategoria === subcategoria),
-        }));
-
-        // Inicializamos la grilla de platos (todo) con la respuesta directa del servidor
-        this.todo = this.products.slice();
-        this.isLoading = false;
-        console.log(`✅ ¡Petición HTTP Exitosa! Platos renderizados para ${this.activeCategory}:`, this.todo);
-      },
-      error: (error) => {
-        console.error(`❌ Error en la llamada HTTP para ${this.activeCategory}:`, error);
+        console.error('Error cargando adicionales activos:', err);
         this.isLoading = false;
       }
     });
@@ -162,7 +107,6 @@ export class CatAdicionalesComponent {
 
   openModal(product: any) {
     this.selectedProduct = product;
-    // Lógica para asegurar que Bootstrap inicialice el Offcanvas/Modal correctamente
     setTimeout(() => {
       const element = document.getElementById('modalProduct-' + product._id);
       if (element && (window as any).bootstrap) {
