@@ -8,6 +8,7 @@ import { ProductItemComponent } from "../product-item/product-item.component";
 import { ModalproductComponent } from "../modalproduct/modalproduct.component";
 import { LoadingComponent } from '../../shared/loading/loading.component';
 import { Subscription } from 'rxjs';
+import { ProductoService } from '../../services/product.service';
 declare var bootstrap: any;
 @Component({
   selector: 'app-cas-products',
@@ -35,77 +36,88 @@ export class CasProductsComponent implements OnInit, OnDestroy {
   selectedProduct: Producto | null = null;
 
   private categoryService = inject(CategoryService);
+  private productoService = inject(ProductoService);
   private tiendasService = inject(TiendaService);
   private tiendaSubscription!: Subscription;
 
-  ngOnInit() {
-    // 🌟 DINÁMICO: Nos suscribimos al caché reactivo de la tienda activa en el navegador.
-    // Ya no dependemos de 'environment.nombreSelected' para gatillar las llamadas HTTP.
+ ngOnInit() {
     this.tiendaSubscription = this.tiendasService.getTiendaByNameCached().subscribe({
       next: (tienda) => {
         this.tiendaSelected = tienda;
         if (this.tiendaSelected) {
           this.tienda_moneda = this.tiendaSelected.moneda;
-          this.getProductosCatName();
+          
+          // Resolvemos el catname basado en el objeto de la tienda activa
+          this.catname = this.tiendaSelected?.categoria?.nombre || 'Pizzería';
+          
+          // Ejecutamos tu función recuperada y blindada
+          this.getCategories();
         }
-      },
-      error: (err) => console.error('Error al recuperar la tienda en caché', err)
+      }
     });
 
-    // Escucha el trigger de recarga (pull to refresh de la cabecera)
     if (this.refreshCasProducts) {
       this.refreshCasProducts.subscribe(() => this.refreshData());
     }
   }
+
   ngOnDestroy() {
     if (this.tiendaSubscription) {
       this.tiendaSubscription.unsubscribe();
     }
   }
 
-  getProductosCatName() {
-    // Usamos el nombre de la categoría populada por el backend en el objeto Tienda (ej: 'Pizzería')
-    this.catname = this.tiendaSelected?.nombre ?? this.activeCategory;
-    this.isLoading = true;
+   //obtenemos las subcategorias de los productos
+  // getCategories() {
+  //   this.isLoading = true
+  //   this.productoService.getProductosActivos().subscribe((resp: any) => {
+  //     //filtramos los productos donde sea igual a la categoria
+  //     const productos = resp.filter((producto: any) => producto.categoria.nombre === this.catname);
+  //     //extraemos el campo subcategoria
+  //     const subcategorias = productos.map((producto: any) => producto.subcategoria);
+  //     //eliminamos los duplicados
+  //     const subcategoriasUnicas = [...new Set(subcategorias)];
+  //     //creamos un arreglo de objetos con el nombre de la subcategoria y el arreglo de productos
+  //     const categorias = subcategoriasUnicas.map((subcategoria: any) => ({
+  //       nombre: subcategoria,
+  //       products: productos.filter((product: any) => product.subcategoria === subcategoria),
+  //     }));
+  //     this.subcategories = categorias || [];
+  //     // console.log(this.subcategories)
+  //   })
+  //   this.isLoading = false
+  // }
 
-    // Ejecuta la petición HTTP limpia: /category_by_nombre/nombre/Pizzería
-    this.categoryService.find_by_nombre(this.catname).subscribe({
-      next: (resp: any) => {
-        this.products = resp.productos || [];
-        
-        // Mapea las subcategorías (las pestañas internas como Pastas, Pizza, etc.)
-        this.generarPestañasInternas();
-        
-        // Inicializa la grilla de visualización
-        this.updateTodo();
-        this.isLoading = false;
-      },
-      error: (error) => {
-        console.error('Error al obtener los productos principales', error);
-        this.isLoading = false;
-      }
+    // Tu función original intacta con los tipados necesarios para TypeScript
+  getCategories() {
+    this.isLoading = true;
+    this.productoService.getProductosActivos().subscribe((resp: any) => {
+      // filtramos los productos donde sea igual a la categoria
+      const productos = resp.filter((producto: any) => producto.categoria.nombre === this.catname);
+      
+      // extraemos el campo subcategoria
+      const subcategorias = productos.map((producto: any) => producto.subcategoria);
+      
+      // eliminamos los duplicados (aquí agregamos : any para corregir tu error)
+      const subcategoriasUnicas = [...new Set(subcategorias.filter((sub: any) => !!sub))];
+      
+      // creamos un arreglo de objetos con el nombre de la subcategoria y el arreglo de productos
+      const categorias = subcategoriasUnicas.map((subcategoria: any) => ({
+        nombre: subcategoria,
+        products: productos.filter((product: any) => product.subcategoria === subcategoria),
+      }));
+      
+      this.subcategories = categorias || [];
+      // console.log(this.subcategories)
+      
+      // Inicializamos la grilla con tu método original
+      this.updateTodo();
+      this.isLoading = false;
     });
   }
 
-  generarPestañasInternas() {
-    if (!this.products || this.products.length === 0) {
-      this.subcategories = [];
-      return;
-    }
 
-    // Mapeamos el campo subcategoria de los platos descargados (Pastas, Pizza, Especiales...)
-    const subcats = this.products.map((producto: any) => producto.subcategoria);
-    const subcategoriasUnicas = [...new Set(subcats.filter(sub => !!sub))];
-
-    // Sincronizamos las pestañas con sus respectivos productos vinculados en memoria
-    this.subcategories = subcategoriasUnicas.map((subcategoria: any) => ({
-      nombre: subcategoria,
-      products: this.products.filter((product: any) => product.subcategoria === subcategoria),
-    }));
-  }
-
-  selectCategory(category: string) {
-    console.log('Filtro de pestaña seleccionado:', category);
+   selectCategory(category: string) {
     this.activeCategory = category;
     this.updateTodo();
   }
@@ -114,7 +126,9 @@ export class CasProductsComponent implements OnInit, OnDestroy {
     if (this.activeCategory === 'all') {
       this.todo = this.products ? this.products.slice() : [];
     } else {
-      const selectedCategory = this.subcategories ? this.subcategories.find(subcat => subcat.nombre === this.activeCategory) : null;
+      const selectedCategory = this.subcategories ? this.subcategories.find(subcat => 
+        subcat.nombre.toLowerCase().trim() === this.activeCategory.toLowerCase().trim()
+      ) : null;
       this.todo = selectedCategory ? selectedCategory.products : [];
     }
   }
@@ -140,7 +154,7 @@ export class CasProductsComponent implements OnInit, OnDestroy {
 
   refreshData() {
     setTimeout(() => {
-      this.getProductosCatName();
+      this.getCategories();
     }, 1000);
   }
 
