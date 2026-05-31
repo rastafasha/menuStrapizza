@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, OnChanges, SimpleChanges, Input, inject } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { TiendaService } from '../../services/tienda.service';
-import { ProductoService } from '../../services/product.service';
+import { CategoryService } from '../../services/category.service'; // ◄--- Usamos el servicio de categorías especializado
 
 @Component({
   selector: 'app-cat-adicionales',
@@ -9,10 +9,10 @@ import { ProductoService } from '../../services/product.service';
   styleUrls: ['./cat-adicionales.component.css']
 })
 export class CatAdicionalesComponent implements OnInit, OnDestroy, OnChanges {
+  // Recibe del Home el término exacto: 'Entradas', 'Combos', 'Bebidas' o 'Postres'
   @Input() activeCategory: string = ''; 
   @Input() title!: string;
   @Input() tienda_moneda!: any;
-  @Input() catname: string = ''; // Recibe 'Pizzería', 'Hamburguesa' o 'Panadería' del Home
 
   isLoading: boolean = false;
   subcategories: any[] = [];
@@ -21,13 +21,14 @@ export class CatAdicionalesComponent implements OnInit, OnDestroy, OnChanges {
   selectedProduct: any = null;
   tiendaSelected: any = null;
 
-  private productoService = inject(ProductoService);
+  private categoryService = inject(CategoryService); // ◄--- Inyección del servicio correcto
   private tiendasService = inject(TiendaService);
   private tiendaSubscription!: Subscription;
 
   ngOnChanges(changes: SimpleChanges) {
-    if ((changes['activeCategory'] || changes['catname']) && this.tiendaSelected) {
-      this.getCategories();
+    // Si el bloque @defer se activa o cambia de sección en el Home, dispara la red instantáneamente
+    if (changes['activeCategory'] && this.tiendaSelected) {
+      this.getProductosPorSubcategoria();
     }
   }
 
@@ -36,12 +37,7 @@ export class CatAdicionalesComponent implements OnInit, OnDestroy, OnChanges {
       this.tiendaSelected = tienda;
       if (this.tiendaSelected) {
         this.tienda_moneda = this.tiendaSelected.moneda;
-        
-        if (!this.catname) {
-          this.catname = this.tiendaSelected?.categoria?.nombre || 'Pizzería';
-        }
-
-        this.getCategories(); 
+        this.getProductosPorSubcategoria(); 
       }
     });
   }
@@ -52,33 +48,23 @@ export class CatAdicionalesComponent implements OnInit, OnDestroy, OnChanges {
     }
   }
 
-  getCategories() {
-    if (!this.activeCategory || !this.catname) return;
-
+  getProductosPorSubcategoria() {
+    if (!this.activeCategory) return;
+    
     this.isLoading = true;
-    this.productoService.getProductosActivos().subscribe({
+    const localId = this.tiendaSelected?._id;
+
+    // 🚀 PETICIÓN DIRECTA POR URL EN RED:
+    // Le pega exactamente a: /category_by_nombre/nombre/Entradas?localId=...
+    // o /category_by_nombre/nombre/Bebidas?localId=...
+    console.log(`📡 Solicitando a Render los adicionales completos para: ${this.activeCategory}`);
+
+    this.categoryService.find_by_nombre(this.activeCategory, localId).subscribe({
       next: (resp: any) => {
-        // 🌟 NORMALIZACIÓN TOTAL DE LAS VARIABLES DEL HOME:
-        const rubroTiendaLimpio = this.catname.toLowerCase().trim().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-        const subcategoriaTarget = this.activeCategory.toLowerCase().trim().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-
-        // 1. FILTRADO FLEXIBLE POR RUBRO: Aísla los platos que pertenezcan a la categoría (ej: 'pizzeria' o 'panaderia')
-        const productosDelRubro = resp.filter((producto: any) => {
-          if (!producto.categoria?.nombre) return false;
-          
-          const productoCatLimpio = producto.categoria.nombre.toLowerCase().trim().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-          return productoCatLimpio.includes(rubroTiendaLimpio) || rubroTiendaLimpio.includes(productoCatLimpio);
-        });
+        // Guardamos los platos que el endpoint especializado limpia y empaqueta desde la base de datos
+        this.products = resp.productos || [];
         
-        // 2. FILTRADO FLEXIBLE POR SUBCATEGORÍA: Empareja singular/plural (ej: 'bebida' con 'bebidas')
-        this.products = productosDelRubro.filter((p: any) => {
-          if (!p.subcategoria) return false;
-          
-          const subcategoriaProductoLimplia = p.subcategoria.toLowerCase().trim().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-          return subcategoriaProductoLimplia.includes(subcategoriaTarget) || subcategoriaTarget.includes(subcategoriaProductoLimplia);
-        });
-
-        // 3. Mapeamos las subcategorías internas
+        // Mapeamos las pestañas internas si el bloque tuviera subdivisiones
         const subcats = this.products.map((producto: any) => producto.subcategoria);
         const subcategoriasUnicas = [...new Set(subcats.filter((sub: any) => !!sub))];
 
@@ -87,13 +73,13 @@ export class CatAdicionalesComponent implements OnInit, OnDestroy, OnChanges {
           products: this.products.filter((product: any) => product.subcategoria === subcategoria),
         }));
 
-        // 4. Cargamos la grilla visible (todo)
+        // Cargamos la grilla directo con la respuesta completa del servidor
         this.todo = this.products.slice();
         this.isLoading = false;
-        console.log(`✅ ¡Éxito en bloque! Sincronizados adicionales para la tienda [${this.catname}] - Sección [${this.activeCategory}]:`, this.todo);
+        console.log(`✅ ¡Petición de adicionales exitosa! Renderizados para ${this.activeCategory}:`, this.todo);
       },
-      error: (err) => {
-        console.error('Error cargando adicionales activos:', err);
+      error: (error) => {
+        console.error(`❌ Error en la llamada HTTP de adicionales para ${this.activeCategory}:`, error);
         this.isLoading = false;
       }
     });
