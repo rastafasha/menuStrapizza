@@ -1,7 +1,6 @@
 import { NgIf } from '@angular/common';
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { environment } from '../../../environments/environment';
 import { Subscription } from 'rxjs';
 import { Tienda } from '../../models/tienda.model';
 import { TiendaService } from '../../services/tienda.service';
@@ -15,7 +14,6 @@ import { TiendaService } from '../../services/tienda.service';
 export class HeroComponent implements OnInit, OnDestroy {
 
   isLogued: boolean = false;
-  nombreSelected = environment.nombreSelected;
 
   tiendaSelected: Tienda | null = null;
   private tiendaSubscription!: Subscription;

@@ -1,4 +1,4 @@
-import { Component, inject, OnDestroy, Output, EventEmitter, HostListener } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit, Output, EventEmitter, HostListener } from '@angular/core';
 import { TiendaService } from '../../services/tienda.service';
 import { CarritoService } from '../../services/carrito.service';
 import { Tienda } from '../../models/tienda.model';
@@ -8,54 +8,59 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Usuario } from '../../models/usuario.model';
 import { Observable, Subscription } from 'rxjs';
 import { ImagenPipe } from '../../pipes/imagen-pipe.pipe';
-import { environment } from '../../../environments/environment';
 import { AvisoComponent } from '../aviso/aviso.component';
 import { LoadingComponent } from '../loading/loading.component';
 import { NotificacionService } from '../../services/notificacion.service';
 
 @Component({
   selector: 'app-header',
-  imports: [RouterModule, CommonModule, ReactiveFormsModule,
-    FormsModule, ImagenPipe, AvisoComponent, LoadingComponent
+  standalone: true,
+  imports: [
+    RouterModule, 
+    CommonModule, 
+    ReactiveFormsModule,
+    FormsModule, 
+    ImagenPipe, 
+    AvisoComponent, 
+    LoadingComponent
   ],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss'
 })
-export class HeaderComponent implements OnDestroy {
+export class HeaderComponent implements OnInit, OnDestroy {
 
-  tiendaSelected: Tienda | undefined | null;
+  tiendaSelected: Tienda | undefined | null = null;
   @Output() refreshApp: EventEmitter<void> = new EventEmitter<void>();
   totalList: number = 0;
   tiendas: Tienda[] = [];
   tienda!: Tienda;
   bandejaList: any[] = [];
   public user!: Usuario;
-  img:string | null = '../assets/images/no-image.jpg';
-  isLoading=false;
+  img: string | null = '../assets/images/no-image.jpg';
+  isLoading = false;
 
   year: number = new Date().getFullYear();
-  nombreSelected = environment.nombreSelected;
-  titleapp = environment.nombreSelected;
   
+  // 🌟 SaaS DIGITAL: Eliminamos el uso de variables estáticas del environment
+  titleapp: string = 'Zlipmenu';
 
   // Pull-to-refresh tracking
   private touchStartY: number = 0;
   private touchStartX: number = 0;
   private readonly PULL_THRESHOLD = 100; // pixels needed to trigger refresh
 
-  isReloadig=false;
+  isReloadig = false;
+  isAviso: boolean = false;
+  aviso: string = 'Hola desde el header, para refrescar la página';
 
-   isAviso:boolean = false;
-   aviso: string = 'Hala desde el header, para refrescar la pagina';
-
-   public unreadCount$!: Observable<number>;
+  public unreadCount$!: Observable<number>;
 
   private tiendaService = inject(TiendaService);
   private carritoService = inject(CarritoService);
+  private notifService = inject(NotificacionService);
+
   private cartSubscription!: Subscription;
   private tiendaSubscription!: Subscription;
-   private notifService = inject(NotificacionService);
-  
 
   @HostListener('touchstart', ['$event'])
   onTouchStart(event: TouchEvent) {
@@ -71,16 +76,15 @@ export class HeaderComponent implements OnDestroy {
     const deltaY = touchEndY - this.touchStartY;
     const deltaX = Math.abs(touchEndX - this.touchStartX);
 
-    // Detect downward pull (jale hacia abajo) with minimal horizontal movement
     if (deltaY > this.PULL_THRESHOLD && deltaX < 50) {
       this.onPullRefresh();
     }
   }
 
   ngOnInit(): void {
-    // 2. Vinculamos el flujo del servicio y disparamos la petición
     this.unreadCount$ = this.notifService.unreadCount$;
     this.notifService.cargarContador();
+
     // Show aviso only once on initial app start
     const avisoShown = localStorage.getItem('avisoShown');
     if (!avisoShown) {
@@ -101,12 +105,15 @@ export class HeaderComponent implements OnDestroy {
       this.bandejaList = items;
       this.totalList = items.length;
     });
-
-    this.nombreSelected;
     
-    // Use cached observable to avoid redundant API calls
-    this.tiendaSubscription = this.tiendaService.getTiendaByNameCached(this.nombreSelected).subscribe(tienda => {
+    // 🌟 CORRECCIÓN SAAS MULTI-TENANT: 
+    // Nos suscribimos directamente al canal reactivo del servicio que ya resolvió el subdominio.
+    // Ya no le enviamos parámetros estáticos ni deudas técnicas.
+    this.tiendaSubscription = this.tiendaService.selectedTiendaObservable$.subscribe(tienda => {
       this.tiendaSelected = tienda;
+      if (tienda && tienda.nombre) {
+        this.titleapp = tienda.nombre;
+      }
     });
   }
 
@@ -121,29 +128,20 @@ export class HeaderComponent implements OnDestroy {
   
   getTiendas() {
     this.tiendaService.cargarTiendas().subscribe((resp: Tienda[]) => {
-      // Asignamos el array filtrado directamente
-      this.tiendas = resp.filter((tienda: Tienda) => tienda.subcategoria && tienda.subcategoria === 'Pizzería');
-      // console.log(this.tiendas);
-
+      // Mapeo genérico por si necesitas lógicas internas
+      this.tiendas = resp.filter((tienda: Tienda) => tienda.status === 'Activo');
       this.setTiendaDefault();
-
-    })
+    });
   }
 
-
-
   setTiendaDefault() {
-    // Check if TiendaService already has a selected tienda
     const serviceTienda = this.tiendaService.getSelectedTiendaSync();
     if (serviceTienda) {
       this.tiendaSelected = serviceTienda;
       localStorage.setItem('tiendaSelected', JSON.stringify(this.tiendaSelected.nombre));
-      console.log('Tienda from service:', this.tiendaSelected);
       return;
     }
   }
-
-
 
   get iconBagColorClass(): string {
     const colors = ['icon-bag-red', 'icon-bag-black', 'icon-bag-yellow'];
@@ -153,7 +151,7 @@ export class HeaderComponent implements OnDestroy {
     return '';
   }
 
-openMenu() {
+  openMenu() {
     const menuLateral = document.getElementsByClassName("sidemenu");
     for (let i = 0; i < menuLateral.length; i++) {
       menuLateral[i].classList.add("active");
@@ -165,7 +163,6 @@ openMenu() {
     const logotext = document.querySelector('.logo-text');
     headerReload?.animate([{ background: '#ccc', color: '#f2f2f2' }], { duration: 300 });
 
-    // Update title and animate logo text opacity
     this.titleapp = 'Cargando';
     if (logotext instanceof HTMLElement) {
       logotext.animate([{ opacity: '0.5' }, { opacity: '1' }], { duration: 300 });

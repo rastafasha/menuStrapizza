@@ -49,7 +49,6 @@ export class MispedidosComponent {
   
   // Modal control - Angular way (no jQuery needed)
   public modalAbierto: string | null = null;
-  nombreSelected = environment.nombreSelected;
   tiendaSelected: any;
 
   constructor(
@@ -66,15 +65,18 @@ export class MispedidosComponent {
   ngOnInit(): void {
      let USER = localStorage.getItem("user");
     this.user = JSON.parse(USER ? USER : '');
-    this. getTienda();
+    this.escucharTiendaActiva();
   }
 
-   getTienda() {
-    this.tiendaService.getTiendaByName(this.nombreSelected).subscribe((resp: Tienda) => {
-      this.tiendaSelected = resp;
-      this.listar_pedidos();
+  
 
-    })
+
+    escucharTiendaActiva() {
+    this.tiendaService.selectedTiendaObservable$.subscribe(tienda => {
+      if (tienda) {
+        this.tiendaSelected = tienda;
+      }
+    });
   }
 
  

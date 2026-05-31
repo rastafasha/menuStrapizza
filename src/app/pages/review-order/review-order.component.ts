@@ -42,7 +42,6 @@ export class ReviewOrderComponent implements OnInit, OnDestroy {
   tienda_moneda: any;
 
   tiendas: Tienda[] = [];
-  nombreSelected = environment.nombreSelected;
   identity: any;
   userId: any;
   pedido: any;
@@ -92,10 +91,9 @@ export class ReviewOrderComponent implements OnInit, OnDestroy {
       this.userId = this.identity.uid;
     }
 
-    this.nombreSelected;
     // Subscribe to cart changes from CarritoService
     this.SubscribeToCart();
-    this.getTienda();
+    this.escucharTiendaActiva();
     this.geneardorOrdeneNumero();
     this.loadBandejaListFromLocalStorage();
     this.chekpedidoguardado();
@@ -123,12 +121,14 @@ export class ReviewOrderComponent implements OnInit, OnDestroy {
 
 
   //tienda
-  getTienda() {
-    this.tiendaService.getTiendaByName(this.nombreSelected).subscribe((resp: Tienda) => {
-      // Asignamos el array filtrado directamente
-      this.tiendaSelected = resp;
+ 
+   escucharTiendaActiva() {
+    this.tiendaService.selectedTiendaObservable$.subscribe(tienda => {
+      if (tienda) {
+        this.tiendaSelected = tienda;
       this.tienda_moneda = this.tiendaSelected.moneda
-    })
+      }
+    });
   }
   total() {
     const total = this.bandejaList.reduce((sum, item) =>

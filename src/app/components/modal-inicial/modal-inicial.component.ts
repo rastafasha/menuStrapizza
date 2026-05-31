@@ -24,7 +24,7 @@ export class ModalInicialComponent implements AfterViewInit {
     }
     // Auto open modal after DOM ready
     setTimeout(() => {
-      const modalElement = document.getElementById('exampleModal');
+      const modalElement = document.getElementById('inicialModal');
       if (modalElement) {
         const modal = new (window as any).bootstrap.Modal(modalElement);
         modal.show();
@@ -34,7 +34,7 @@ export class ModalInicialComponent implements AfterViewInit {
 
   onNoShowMore() {
     localStorage.setItem('modalInicialDismissed', 'true');
-    const modalElement = document.getElementById('exampleModal');
+    const modalElement = document.getElementById('inicialModal');
     if (modalElement) {
       const modal = (window as any).bootstrap.Modal.getInstance(modalElement);
       if (modal) {
@@ -44,7 +44,7 @@ export class ModalInicialComponent implements AfterViewInit {
   }
   onRegister() {
     // localStorage.setItem('modalInicialDismissed', 'true');
-    const modalElement = document.getElementById('exampleModal');
+    const modalElement = document.getElementById('inicialModal');
     if (modalElement) {
       const modal = (window as any).bootstrap.Modal.getInstance(modalElement);
       if (modal) {

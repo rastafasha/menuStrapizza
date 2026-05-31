@@ -91,7 +91,6 @@ export class CheckoutComponent {
   deliveryAddres!: string;
   tienda!: Tienda;
   tiendas: Tienda[] = [];
-  nombreSelected = environment.nombreSelected;
   tiendaSelected: any;
   selectedMethod: string = 'Selecciona un método de pago';
   public clienteSeleccionado: any;
@@ -141,9 +140,8 @@ export class CheckoutComponent {
       this.identity = JSON.parse(USER);
       // console.log(this.identity);
     }
-    this.nombreSelected;
     this.userId = this.identity.uid;
-    this.getTienda();
+    this.escucharTiendaActiva();
     this.loadBandejaListFromLocalStorage();
     this.pedidoGuardado = false;
 
@@ -153,13 +151,15 @@ export class CheckoutComponent {
     // this.listar_carrito();
   }
 
-  getTienda() {
-    this.tiendaService.getTiendaByName(this.nombreSelected).subscribe((resp: Tienda) => {
-      // Asignamos el array filtrado directamente
-      this.tiendaSelected = resp;
-      this.tienda_moneda = this.tiendaSelected.moneda
-      
-    })
+  
+
+  escucharTiendaActiva() {
+    this.tiendaService.selectedTiendaObservable$.subscribe(tienda => {
+      if (tienda) {
+        this.tiendaSelected = tienda;
+        console.log('LoginComponent sincronizado con la tienda:', this.tiendaSelected.nombre);
+      }
+    });
   }
 
 

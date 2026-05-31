@@ -98,7 +98,6 @@ export class PayComponent {
   deliveryAddres!: string;
   tienda!: Tienda;
   tiendas: Tienda[] = [];
-  nombreSelected = environment.nombreSelected;
   tiendaSelected: any;
   selectedMethod: string = 'Selecciona un método de pago';
   public clienteSeleccionado: any;
@@ -191,22 +190,22 @@ export class PayComponent {
       this.identity = JSON.parse(USER);
     }
     this.userId = this.identity.uid;
-    this.nombreSelected;
-    this.getTienda();
+    this.escucharTiendaActiva();
     this.getDireccionbyUser();
     this._activatedRoute.params.subscribe(({ id }) => this.loadPedido(id));
     // initPayPalConfig moved to after getPaypalByTienda()
   }
 
-  getTienda() {
-    this.tiendaService.getTiendaByName(this.nombreSelected).subscribe((resp: Tienda) => {
-      // Asignamos el array filtrado directamente
-      this.tiendaSelected = resp;
+
+    escucharTiendaActiva() {
+    this.tiendaService.selectedTiendaObservable$.subscribe(tienda => {
+      if (tienda) {
+        this.tiendaSelected = tienda;
       this.tienda_moneda = this.tiendaSelected.moneda
       this.getTiposdePagoByLocal();
       this.getPaypalByTienda();
-
-    })
+      }
+    });
   }
 
   getPaypalByTienda() {

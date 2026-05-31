@@ -26,7 +26,6 @@ export class MenuFooterComponent {
   bandejaList: any[] = [];
 
   year: number = new Date().getFullYear();
-  nombreSelected = environment.nombreSelected;
   public user!: any;
 
   pedidoGuardado = false;

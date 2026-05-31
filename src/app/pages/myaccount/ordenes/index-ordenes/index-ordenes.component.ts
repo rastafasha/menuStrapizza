@@ -47,7 +47,6 @@ export class IndexOrdenesComponent implements OnInit {
   public tienda_moneda!: any;
   public detalle : any = {};
 
-   nombreSelected = environment.nombreSelected;
 
   p: number = 1;
   count: number = 8;
@@ -76,7 +75,7 @@ export class IndexOrdenesComponent implements OnInit {
     }else{
       this._router.navigate(['/']);
     }
-    this.getTienda();
+    this.escucharTiendaActiva();
 
   }
 
@@ -93,14 +92,18 @@ export class IndexOrdenesComponent implements OnInit {
     );
   }
 
-  getTienda(){
-    this.tiendaService.getTiendaByName(this.nombreSelected).subscribe((resp:any)=>{
-      this.local = resp;
+ 
+
+   escucharTiendaActiva() {
+    this.tiendaService.selectedTiendaObservable$.subscribe((resp:any) => {
+      if (resp) {
+        this.local = resp;
       this.localId = resp._id;
       this.tienda_moneda = resp.moneda;
-      
-    })
+      }
+    });
   }
+
 
 
 

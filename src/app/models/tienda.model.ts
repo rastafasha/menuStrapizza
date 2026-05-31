@@ -32,7 +32,7 @@ export class Tienda{
     public subcategoria?: string,
     public isFeatured?: boolean,
     public iva?: number,
-    public status?: boolean,
+    public status?: string,
     public _id?: string
 
   ){

@@ -12,6 +12,7 @@ import { TransferenciasService } from '../../../services/transferencias.service'
 import { TiendaService } from '../../../services/tienda.service';
 import { environment } from '../../../../environments/environment';
 import { SafePipe } from '../../../pipes/safe.pipe';
+import { Tienda } from '../../../models/tienda.model';
 
 declare var bootstrap: any;
 @Component({
@@ -45,8 +46,8 @@ export class MisPagosComponent implements OnInit {
   user: any;
   status!: string;
   statusPago: string = '';
-  nombreSelected = environment.nombreSelected;
   tienda_moneda: string = '';
+  tiendaSelected!: any;
 
   info = `
   <h2>Sección: Mis Pagos</h2>
@@ -86,15 +87,20 @@ export class MisPagosComponent implements OnInit {
 
       // Ahora ejecutamos la carga (que ya usa this.status)
       this.getPagosUsuario();
-      this.getTienda();
+      this.escucharTiendaActiva();
     });
   }
 
-   getTienda() {
-      this.tiendaService.getTiendaByName(this.nombreSelected).subscribe((resp: any) => {
-        this.tienda_moneda = resp.moneda;
-      })
-    }
+  
+
+    escucharTiendaActiva() {
+    this.tiendaService.selectedTiendaObservable$.subscribe(tienda => {
+      if (tienda) {
+        this.tiendaSelected = tienda;
+        this.tienda_moneda  = this.tiendaSelected.moneda
+      }
+    });
+  }
 
   onScroll(): void {
     if (this.loading() || !this.hasMore()) return;

@@ -25,7 +25,6 @@ import { environment } from '../../../environments/environment';
 export class RegisterComponent implements OnInit {
 
   public formSumitted = false;
-  nombreSelected = environment.nombreSelected;
   registerForm: FormGroup;
   tiendas!: Tienda[];
   tienda!: Tienda;
@@ -56,26 +55,18 @@ export class RegisterComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.getTienda();
+    this.escucharTiendaActiva();
   }
 
-  getTienda() {
-    this.tiendaService.getTiendaByName(this.nombreSelected).subscribe((resp: any) => {
-      this.tiendaSelected = resp;
-      // console.log(this.tiendaSelected)
-    })
+  escucharTiendaActiva() {
+    this.tiendaService.selectedTiendaObservable$.subscribe(tienda => {
+      if (tienda) {
+        this.tiendaSelected = tienda;
+        console.log('LoginComponent sincronizado con la tienda:', this.tiendaSelected.nombre);
+      }
+    });
   }
 
-  getTiendas() {
-    // this.tiendaService.cargarTiendas().subscribe((resp:any)=>{
-    //   this.tiendas = resp;
-    //   //filtramos las tiendas y buscamos la que se llama web
-    //   this.tiendas = this.tiendas.filter((tienda:Tienda) => tienda.nombre === 'Web');
-    //   //mostramos la info de la tienda con el nombre web
-    //   this.tienda = this.tiendas[0];
-
-    // })
-  }
 
 
   nextStep() {
