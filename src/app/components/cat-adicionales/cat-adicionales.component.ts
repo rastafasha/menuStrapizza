@@ -1,11 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, inject, Input, Output, TrackByFunction } from '@angular/core';
+import { Component, EventEmitter, inject, Input, Output, SimpleChanges, TrackByFunction } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { CategoryService } from '../../services/category.service';
 import { TiendaService } from '../../services/tienda.service';
 import { LoadingComponent } from '../../shared/loading/loading.component';
 import { ModalproductComponent } from '../modalproduct/modalproduct.component';
 import { ProductItemComponent } from '../product-item/product-item.component';
+import { ProductoService } from '../../services/product.service';
 
 declare var bootstrap: any;
 
@@ -21,29 +22,40 @@ declare var bootstrap: any;
   styleUrl: './cat-adicionales.component.scss'
 })
 export class CatAdicionalesComponent {
-  // Recibirá desde el Home 'Entradas', 'Combos', 'Bebidas' o 'Postres'
+  // Recibe la subcategoría base desde el bloque @defer del Home (ej: 'Entradas', 'Bebidas')
   @Input() activeCategory: string = ''; 
   @Input() title!: string;
-  @Input() isLoading: boolean = false;
   @Input() tienda_moneda!: any;
 
+  isLoading: boolean = false;
   catname!: string;
   subcategories: any[] = [];
   products: any[] = [];
-  todo: any[] = []; // ◄--- Crucial: Aquí se guardan los platos filtrados de esta sección
-  selectedProduct: any = null; // ◄--- Controla el producto activo en el modal
+  todo: any[] = []; 
+  selectedProduct: any = null;
   tiendaSelected: any = null;
 
   private categoryService = inject(CategoryService);
+  private productoService = inject(ProductoService);
   private tiendasService = inject(TiendaService);
   private tiendaSubscription!: Subscription;
+
+  ngOnChanges(changes: SimpleChanges) {
+    // Si cambia el input de la categoría y ya tenemos el ID de la tienda, refrescamos la petición
+    if (changes['activeCategory'] && this.tiendaSelected) {
+      this.getProductosPorSubcategoria();
+    }
+  }
+
 
   ngOnInit() {
     this.tiendaSubscription = this.tiendasService.getTiendaByNameCached().subscribe(tienda => {
       this.tiendaSelected = tienda;
       if (this.tiendaSelected) {
         this.tienda_moneda = this.tiendaSelected.moneda;
-        this.getProductosCatName();
+        
+        // Ejecutamos la petición HTTP directa con el término correcto
+        this.getProductosPorSubcategoria(); 
       }
     });
   }
@@ -54,50 +66,62 @@ export class CatAdicionalesComponent {
     }
   }
 
-  getProductosCatName() {
+ getProductosPorSubcategoria() {
+    if (!this.activeCategory) return;
+    
     this.isLoading = true;
-
-    if (this.tiendaSelected?.categoria && typeof this.tiendaSelected.categoria === 'object' && (this.tiendaSelected.categoria as any).slug) {
-      this.catname = (this.tiendaSelected.categoria as any).slug;
-    } else {
-      const rubro = this.tiendaSelected?.subcategoria?.toLowerCase().trim().normalize('NFD').replace(/[\u0300-\u036f]/g, '') || '';
-      if (rubro === 'panaderia') {
-        this.catname = 'panaderia'; 
-      } else if (rubro === 'hamburgueseria') {
-        this.catname = 'hamburguesa';
-      } else {
-        this.catname = 'pizzeria';
-      }
-    }
-
     const localId = this.tiendaSelected?._id;
 
-    this.categoryService.find_by_nombre(this.catname, localId).subscribe({
+    // 🌟 AQUÍ SE CONFIGURA TU URL:
+    // Al pasarle 'this.activeCategory' (ej: 'Entradas'), el servicio armará internamente:
+    // https://onrender.com...
+    console.log(`🚀 Conectando a Zlipmenu API. Solicitando URL para: ${this.activeCategory}`);
+
+    this.categoryService.find_by_nombre(this.activeCategory, localId).subscribe({
       next: (resp: any) => {
+        // Guardamos los platos que devuelve directamente tu endpoint de categorías
         this.products = resp.productos || [];
-        this.updateTodo(); // ◄--- Filtra de inmediato los platos asignados a este bloque
+        
+        // Replicamos tu lógica original para armar el menú de pestañas internas si existen
+        const subcats = this.products.map((producto: any) => producto.subcategoria);
+        const subcategoriasUnicas = [...new Set(subcats.filter(sub => !!sub))];
+
+        this.subcategories = subcategoriasUnicas.map((subcategoria: any) => ({
+          nombre: subcategoria,
+          products: this.products.filter((product: any) => product.subcategoria === subcategoria),
+        }));
+
+        // Inicializamos la grilla de platos (todo) con la respuesta directa del servidor
+        this.todo = this.products.slice();
         this.isLoading = false;
+        console.log(`✅ ¡Petición HTTP Exitosa! Platos renderizados para ${this.activeCategory}:`, this.todo);
       },
       error: (error) => {
-        console.error('Error al obtener los productos por slug', error);
+        console.error(`❌ Error en la llamada HTTP para ${this.activeCategory}:`, error);
         this.isLoading = false;
       }
     });
   }
 
-  // Filtra los productos en memoria basándose en la categoría asignada al componente desde el Home
-  updateTodo() {
-    if (!this.products || this.products.length === 0) {
-      this.todo = [];
-      return;
-    }
+  selectCategory(category: string) {
+    this.activeCategory = category;
+    const selected = this.subcategories.find(sub => sub.nombre === category);
+    this.todo = selected ? selected.products : [];
+  }
 
-    // Busca los productos que correspondan exactamente a la subcategoría del bloque (Bebidas, Entradas, etc.)
-    this.todo = this.products.filter((product: any) => {
-      if (!product.subcategoria) return false;
-      return product.subcategoria.toLowerCase().trim() === this.activeCategory.toLowerCase().trim();
-    });
-
-    console.log(`Productos listos para la sección (${this.activeCategory}):`, this.todo);
+  openModal(product: any) {
+    this.selectedProduct = product;
+    // Lógica para asegurar que Bootstrap inicialice el Offcanvas/Modal correctamente
+    setTimeout(() => {
+      const element = document.getElementById('modalProduct-' + product._id);
+      if (element && (window as any).bootstrap) {
+        const myOffcanvas = new (window as any).bootstrap.Offcanvas(element, {
+          backdrop: true,
+          keyboard: true,
+          scroll: true
+        });
+        myOffcanvas.show();
+      }
+    }, 0);
   }
 }

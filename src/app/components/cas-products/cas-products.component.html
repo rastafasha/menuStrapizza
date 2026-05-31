@@ -1,16 +1,19 @@
 <section class="categories-section" id="categorias">
     <div class="container">
-        <div class="title-section">
-            <h3 class="title">{{title}}</h3>
+        <!-- Título Principal de la Carta -->
+        <div class="title-section text-center">
+            <h2 class="title-carta">Carta</h2>
+            <div class="divider-line"></div>
         </div>
 
+        <!-- Indicador de carga -->
         <app-loading *ngIf="isLoading"></app-loading>
+        
         <div *ngIf="!isLoading">
-            
-            <!-- Menú de pestañas / Filtros de Subcategorías -->
+            <!-- Menú de Pestañas Horizontales / Filtros dinámicos -->
             <div class="tab-content-set">
                 <ul class="nav">
-                    <!-- 1. Botón estático para ver TODO el catálogo de la categoría -->
+                    <!-- Botón estático para ver TODO el menú principal -->
                     <li [class.active]="activeCategory === 'all'">
                         <a href="#" onclick="return false;" 
                            [ngClass]="{'active': activeCategory === 'all'}"
@@ -19,26 +22,28 @@
                         </a>
                     </li>
                     
-                    <!-- 2. Ciclo de subcategorías dinámicas de tus productos -->
-                    <ng-container *ngFor="let category of subcategories">
-                        <li [class.active]="activeCategory.toLowerCase() === category.nombre.toLowerCase()">
+                    <!-- Ciclo de subcategorías internas (Pastas, Pizza, Especiales...) -->
+                    <ng-container *ngFor="let subcat of subcategories">
+                        <li [class.active]="activeCategory.toLowerCase() === subcat.nombre.toLowerCase()">
                             <a href="#" onclick="return false;" 
-                               [ngClass]="{'active': activeCategory.toLowerCase() === category.nombre.toLowerCase()}"
-                               (click)="selectCategory(category.nombre)">
-                               {{ category.nombre }}
+                               [ngClass]="{'active': activeCategory.toLowerCase() === subcat.nombre.toLowerCase()}"
+                               (click)="selectCategory(subcat.nombre)">
+                               {{ subcat.nombre | uppercase }}
                             </a>
                         </li>
                     </ng-container>
                 </ul>
             </div>
 
-            <!-- Grilla / Lista de productos -->
+            <!-- Grilla / Lista de productos filtrados -->
             <div class="product-card" *ngFor="let product of todo; let i = index">
                 <app-product-item 
                     [activeCategory]="activeCategory" 
                     [tienda_moneda]="tienda_moneda" 
                     [product]="product"
-                    (onVerDetalles)="selectedProduct = $event">
+                    data-bs-toggle="offcanvas" 
+                    [attr.data-bs-target]="'#modalProduct-' + product._id"
+                    (click)="openModal(product)">
                 </app-product-item>
             </div>
         </div>
@@ -46,6 +51,7 @@
 </section>
 <div class="clear"></div>
 
+<!-- Modal global e independiente para el detalle del plato seleccionado -->
 <app-modalproduct 
     [product]="selectedProduct" 
     [activeCategory]="activeCategory" 

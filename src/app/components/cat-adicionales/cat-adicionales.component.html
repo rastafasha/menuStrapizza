@@ -1,32 +1,43 @@
 <section class="categories-section" [id]="title?.toLowerCase()">
     <div class="container">
         
-        <!-- Título de la sección (Entradas, Combos, Bebidas o Postres) -->
+        <!-- Título de la sección secundaria (ej: Entradas, Bebidas, etc.) -->
         <div class="title-section" *ngIf="title">
             <h3 class="title">{{title}}</h3>
         </div>
 
-        <!-- Indicador de carga -->
         <app-loading *ngIf="isLoading"></app-loading>
         
-        <!-- Grilla de productos filtrados -->
         <div *ngIf="!isLoading">
-            <div class="product-card" *ngFor="let product of todo">
+            <!-- Menú de pestañas dinámicas filtradas -->
+            <div class="tab-content-set">
+                <ul class="nav" *ngFor="let category of subcategories"
+                    [class.active]="activeCategory === category.nombre">
+                    <li>
+                        <a href="#" onclick="return false;" [ngClass]="{'active': activeCategory === category.nombre}"
+                            (click)="selectCategory(category.nombre)">{{ category.nombre }}</a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Grilla de productos de la subcategoría seleccionada -->
+            <div class="product-card" *ngFor="let product of todo; let i = index">
                 <app-product-item 
                     [activeCategory]="activeCategory" 
-                    [tienda_moneda]="tienda_moneda" 
+                    [tienda_moneda]="tienda_moneda"  
                     [product]="product"
-                    (onVerDetalles)="selectedProduct = $event">
+                    data-bs-toggle="offcanvas" 
+                    [attr.data-bs-target]="'#modalProduct-' + product._id"
+                    (click)="openModal(product)">
                 </app-product-item>
             </div>
         </div>
-
     </div>
 </section>
 
 <div class="clear"></div>
 
-<!-- Modal independiente para ver el detalle del producto seleccionado -->
+<!-- Modal de producto integrado -->
 <app-modalproduct 
     [product]="selectedProduct" 
     [activeCategory]="activeCategory" 
