@@ -1,43 +1,36 @@
-<section class="categories-section" [id]="title">
-    <div class="container">
-        
-        <!-- Título de la sección secundaria (ej: Entradas, Bebidas, etc.) -->
-        <div class="title-section" *ngIf="title">
-            <h3 class="title">{{title}}</h3>
-        </div>
-
-        <app-loading *ngIf="isLoading"></app-loading>
-        
-        <div *ngIf="!isLoading">
-            <!-- Menú de pestañas dinámicas filtradas -->
-            <div class="tab-content-set">
-                <ul class="nav" *ngFor="let category of subcategories"
-                    [class.active]="activeCategory === category.nombre">
-                    <li>
-                        <a href="#" onclick="return false;" [ngClass]="{'active': activeCategory === category.nombre}"
-                            (click)="selectCategory(category.nombre)">{{ category.nombre }}</a>
-                    </li>
-                </ul>
+<!-- 🌟 Envolvemos todo en un contenedor para que la sección desaparezca si está vacía -->
+<ng-container *ngIf="!isLoading && todo && todo.length > 0">
+    <section class="categories-section" [id]="title">
+        <div class="container">
+            
+            <!-- Título de la sección (ej: Entradas, Bebidas, etc.) -->
+            <div class="title-section" *ngIf="title">
+                <h3 class="title">{{title}}</h3>
+            </div>
+            
+            <!-- Grilla de productos filtrados -->
+            <div>
+                <div class="product-card" *ngFor="let product of todo">
+                    <app-product-item 
+                        [activeCategory]="activeCategory" 
+                        [tienda_moneda]="tienda_moneda" 
+                        [product]="product"
+                        data-bs-toggle="offcanvas" 
+                        [attr.data-bs-target]="'#modalProduct-' + product._id"
+                        (click)="openModal(product)">
+                    </app-product-item>
+                </div>
             </div>
 
-            <!-- Grilla de productos de la subcategoría seleccionada -->
-            <div class="product-card" *ngFor="let product of todo; let i = index">
-                <app-product-item 
-                    [activeCategory]="activeCategory" 
-                    [tienda_moneda]="tienda_moneda"  
-                    [product]="product"
-                    data-bs-toggle="offcanvas" 
-                    [attr.data-bs-target]="'#modalProduct-' + product._id"
-                    (click)="openModal(product)">
-                </app-product-item>
-            </div>
         </div>
-    </div>
-</section>
+    </section>
+    <div class="clear"></div>
+</ng-container>
 
-<div class="clear"></div>
+<!-- Mantén el indicador de carga por fuera para que se vea mientras la API responde -->
+<app-loading *ngIf="isLoading"></app-loading>
 
-<!-- Modal de producto integrado -->
+<!-- Modal independiente para ver el detalle del producto seleccionado -->
 <app-modalproduct 
     [product]="selectedProduct" 
     [activeCategory]="activeCategory" 
