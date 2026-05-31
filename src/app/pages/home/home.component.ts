@@ -151,14 +151,14 @@ private configurarManifestDinamico(tienda: any) {
   
   // 🌟 CORRECCIÓN DE RUTAS PÚBLICAS DE ANGULAR:
   // Eliminamos el prefijo 'src/' porque en producción la carpeta 'assets' queda expuesta en la raíz pública
-  const icono72 = 'assets/icons/icon-72x72.png';
-  const icono96 = 'assets/icons/icon-96x96.png';
-  const icono128 = 'assets/icons/icon-128x128.png';
-  const icono144 = 'assets/icons/icon-144x144.png';
-  const icono152 = 'assets/icons/icon-152x152.png';
-  const icono192 = 'assets/icons/icon-192x192.png';
-  const icono384 = 'assets/icons/icon-384x384.png';
-  const icono512 = 'assets/icons/icon-512x512.png';
+  // const icono72 = 'assets/icons/icon-72x72.png';
+  // const icono96 = 'assets/icons/icon-96x96.png';
+  // const icono128 = 'assets/icons/icon-128x128.png';
+  // const icono144 = 'assets/icons/icon-144x144.png';
+  // const icono152 = 'assets/icons/icon-152x152.png';
+  // const icono192 = 'assets/icons/icon-192x192.png';
+  // const icono384 = 'assets/icons/icon-384x384.png';
+  // const icono512 = 'assets/icons/icon-512x512.png';
 
   // Armamos el objeto manifest en caliente con las rutas públicas oficiales
   const miManifestDinamico = {
@@ -170,55 +170,55 @@ private configurarManifestDinamico(tienda: any) {
     orientation: 'portrait',
     // Usamos el origen actual de la URL dinámica
     start_url: window.location.origin + '/', 
-    icons: [
-      {
-        src: icono72,
-        sizes: '72x72',
-        type: 'image/png',
-        purpose: 'any maskable'
-      },
-      {
-        src: icono96,
-        sizes: '96x96',
-        type: 'image/png',
-        purpose: 'any maskable'
-      },
-      {
-        src: icono128,
-        sizes: "128x128",
-        type: 'image/png',
-        purpose: 'any maskable'
-      },
-      {
-        src: icono144,
-        sizes: '144x144',
-        type: 'image/png',
-        purpose: 'any maskable'
-      },
-      {
-        src: icono152,
-        sizes: '152x152',
-        type: 'image/png',
-        purpose: 'any maskable'
-      },
-      {
-        src: icono192,
-        sizes: '192x192',
-        type: 'image/png',
-        purpose: 'any maskable'
-      },
-      {
-        src: icono384,
-        sizes: '384x384',
-        type: 'image/png',
-        purpose: 'any maskable'
-      },
-      {
-        src: icono512,
-        sizes: '512x512',
-        type: 'image/png'
-      }
-    ]
+    // icons: [
+    //   {
+    //     src: icono72,
+    //     sizes: '72x72',
+    //     type: 'image/png',
+    //     purpose: 'any maskable'
+    //   },
+    //   {
+    //     src: icono96,
+    //     sizes: '96x96',
+    //     type: 'image/png',
+    //     purpose: 'any maskable'
+    //   },
+    //   {
+    //     src: icono128,
+    //     sizes: "128x128",
+    //     type: 'image/png',
+    //     purpose: 'any maskable'
+    //   },
+    //   {
+    //     src: icono144,
+    //     sizes: '144x144',
+    //     type: 'image/png',
+    //     purpose: 'any maskable'
+    //   },
+    //   {
+    //     src: icono152,
+    //     sizes: '152x152',
+    //     type: 'image/png',
+    //     purpose: 'any maskable'
+    //   },
+    //   {
+    //     src: icono192,
+    //     sizes: '192x192',
+    //     type: 'image/png',
+    //     purpose: 'any maskable'
+    //   },
+    //   {
+    //     src: icono384,
+    //     sizes: '384x384',
+    //     type: 'image/png',
+    //     purpose: 'any maskable'
+    //   },
+    //   {
+    //     src: icono512,
+    //     sizes: '512x512',
+    //     type: 'image/png'
+    //   }
+    // ]
   };
 
   // Convertimos el objeto manifest en un archivo Blob de memoria
