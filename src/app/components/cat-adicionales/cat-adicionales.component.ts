@@ -2,9 +2,19 @@ import { Component, OnInit, OnDestroy, OnChanges, SimpleChanges, Input, inject }
 import { Subscription } from 'rxjs';
 import { TiendaService } from '../../services/tienda.service';
 import { CategoryService } from '../../services/category.service'; // ◄--- Usamos el servicio de categorías especializado
+import { ProductItemComponent } from '../product-item/product-item.component';
+import { LoadingComponent } from '../../shared/loading/loading.component';
+import { ModalproductComponent } from '../modalproduct/modalproduct.component';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-cat-adicionales',
+  imports:[
+    ProductItemComponent,
+    LoadingComponent,
+    ModalproductComponent,
+    CommonModule
+  ],
   templateUrl: './cat-adicionales.component.html',
   styleUrls: ['./cat-adicionales.component.css']
 })
