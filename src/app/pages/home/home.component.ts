@@ -58,118 +58,79 @@ export class HomeComponent {
   // Event emitter for refreshing cas-products
   @Output() refreshCasProducts: EventEmitter<void> = new EventEmitter<void>();
 
-  ngOnInit() {
+ ngOnInit() {
+    this.isLoading = true;
+    this.user = this.authService.getLocalStorage();
+  this.cargarDatosTiendaPorSubdominio();
+    
+  }
+private cargarDatosTiendaPorSubdominio() {
     this.isLoading = true;
 
-    // 🌟 RECOLECTOR DE SUBDOMINIO DE EMERGENCIA:
-    // Captura el subdominio de la URL real de internet (ej: '://zlipmenu.com' -> 'pizzeria')
-    const host = window.location.hostname;
-    let nombreTiendaReal = '';
+    // 1. Capturamos el host del navegador (ej: ://onrender.com o localhost)
+    const host = window.location.hostname.toLowerCase().trim();
+    const primerSegmento = host.split('.')[0]; // Toma la palabra clave antes del primer punto
 
-    if (host === 'localhost' || host === '127.0.0.1') {
-      nombreTiendaReal = 'Pizzeria'; // Fallback seguro para cuando estés programando en tu PC
-    } else {
-      // En internet, divide la URL por puntos y toma el primer fragmento (el subdominio)
-      const partes = host.split('.');
-      nombreTiendaReal = partes[0];
+    // 2. Diccionario de traducción para asegurar que la API reciba el término exacto con tildes
+    const mapaCategorias: { [key: string]: string } = {
+      'pizzeria': 'Pizzería',
+      'hamburguesa': 'Hamburguesa',
+      'hamburgueseria': 'Hamburguesa',
+      'panaderia': 'Panadería',
+      'slidedish': 'Panadería',
+      'churros': 'Churros'
+    };
+
+    // 3. Establecemos el nombre real. Si estás en local en tu PC, usamos 'Pizzería' por defecto
+    let nombreTiendaReal = 'Pizzería'; 
+    if (primerSegmento !== 'localhost' && primerSegmento !== '127') {
+      nombreTiendaReal = mapaCategorias[primerSegmento] || primerSegmento;
     }
 
-    console.log('🌐 Subdominio remoto detectado de forma dinámica:', nombreTiendaReal);
+    console.log('📡 Conectando SaaS Zlipmenu para el subdominio:', nombreTiendaReal);
 
-    // Pasamos de forma obligatoria el nombre extraído al servicio para que la caché responda
+    // 4. Pasamos el nombre corregido al servicio original para que la caché responda perfecto en Render
     this.tiendaSubscription = this.tiendasService.getTiendaByNameCached(nombreTiendaReal).subscribe({
-      next: (tienda) => {
-        if (tienda) {
-          // 🌟 SOLUCIÓN MAESTRA: Capturamos lo que viene de la base de datos
-          let categoriaDeBaseDatos = tienda.categoria?.nombre || '';
-
-          // Blindaje temporal: Si el subdominio es de la pizzería pero la BD dice "Comida Rápida", lo corregimos a mano
-          if (nombreTiendaReal.toLowerCase().trim() === 'pizzeria' && categoriaDeBaseDatos === 'Comida Rápida') {
-            this.categoriaActiva = 'Pizzería';
-          } else {
-            // Para los demás locales (Hamburguesa, Panadería) que sí están bien, dejamos su valor nativo
-            this.categoriaActiva = categoriaDeBaseDatos;
-          }
-
-          console.log('✅ Categoría final asignada al componente:', this.categoriaActiva);
-        }
-        this.isLoading = false;
-      },
-      error: (err) => {
-        console.error(err);
-        this.isLoading = false;
-      }
-    });
-  }
-
-  private cargarDatosTiendaPorSubdominio() {
-    this.isLoading = true;
-
-    // El servicio inspecciona la URL, pide los datos a Render y los expone aquí
-    this.tiendaSubscription = this.tiendasService.getTiendaByNameCached().subscribe({
-      next: (tienda) => {
+      next: (tienda: any) => {
         this.tiendaSelected = tienda;
 
         if (tienda) {
-          // Guardamos el nombre exacto de la categoría (ej: 'Pizzería', 'Panadería', 'Churros')
-          this.categoriaActiva = tienda.categoria?.nombre || '';
+          // Guardamos la categoría real traducida para activar las pestañas de cas-products
+          this.categoriaActiva = mapaCategorias[primerSegmento] || tienda.categoria?.nombre || 'Pizzería';
 
-          this.titleService.setTitle(`Zlipmenu | ${tienda.nombre}`);
-          this.configurarCategoriasFiltro(tienda);
+          // Cambiamos el título del navegador dinámicamente
+          this.titleService.setTitle(`Zlipmenu | ${tienda.nombre || nombreTiendaReal}`);
+          
+          // Ejecuta tus configuraciones de filtros nativas
+          if (typeof (this as any).configurarCategoriasFiltro === 'function') {
+            (this as any).configurarCategoriasFiltro(tienda);
+          }
 
-          // this.configurarManifestDinamico(tienda);
-          // 🌟 INYECCIÓN DE CSS DINÁMICO SAAS AQUÍ:
-          // Si el restaurante VIP guardó estilos exclusivos en el CRM, se aplican en caliente
+          // 🎨 INYECCIÓN DE CSS DINÁMICO SAAS (Tu código original intacto):
+          // Remueve estilos viejos antes de inyectar por si acaso
+          const estiloPrevio = document.getElementById('css-dinamico-tienda');
+          if (estiloPrevio) estiloPrevio.remove();
+
           if (tienda.css_personalizado) {
             const estilo = document.createElement('style');
-            estilo.id = 'css-dinamico-tienda'; // Le ponemos un ID para poder identificarlo
+            estilo.id = 'css-dinamico-tienda'; 
             estilo.innerHTML = tienda.css_personalizado;
             document.head.appendChild(estilo);
+            console.log('🎨 ¡Estilos CSS personalizados aplicados para el cliente VIP!');
           }
+        } else {
+          // Fallback si la respuesta de Render viene vacía
+          this.categoriaActiva = 'Pizzería';
         }
 
         this.isLoading = false;
+        console.log('✅ Carga del Home completada de forma dinámica.');
       },
       error: (err) => {
         console.error('Error al obtener la tienda por subdominio:', err);
         this.isLoading = false;
       }
     });
-  }
-
-
-
-  /**
-   * Define qué bloques de categorías extras se van a renderizar de forma perezosa en el HTML.
-   */
-  private configurarCategoriasFiltro(tienda: Tienda) {
-    // 🌟 CORRECCIÓN MAESTRA SAAS:
-    // Si 'categoria' es un objeto y tiene slug, lo usamos. 
-    // Si viene solo el ID en String, usamos el subcategory o el propio slug de la tienda como fallback
-    if (tienda.categoria && typeof tienda.categoria === 'object' && (tienda.categoria as any).slug) {
-      this.categoriaPrincipal = (tienda.categoria as any).slug;
-    } else {
-      // Si viene solo el ID string, usamos la subcategoría limpia o el slug de la tienda
-      this.categoriaPrincipal = tienda.subcategoria === 'hamburgueseria' ? 'hamburguesa' : (tienda.slug || 'pizzeria');
-    }
-
-    console.log('Filtrando el catálogo superior con el slug de categoría:', this.categoriaPrincipal);
-
-    // Ajustamos los bloques inferiores dinámicos para este restaurante
-    if (this.categoriaPrincipal === 'hamburguesa') {
-      this.categoriasAdicionales = [
-        { id: '1', nombre: 'entradas' },
-        { id: '2', nombre: 'combos' },
-        { id: '3', nombre: 'bebidas' }
-      ];
-    } else {
-      this.categoriasAdicionales = [
-        { id: '1', nombre: 'pastas' },
-        { id: '2', nombre: 'pizza' },
-        { id: '3', nombre: 'bebidas' },
-        { id: '4', nombre: 'postres' }
-      ];
-    }
   }
 
   onMsmSuccess(value: boolean): void {
