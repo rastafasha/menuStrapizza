@@ -1,0 +1,46 @@
+<section class="additional-categories-section">
+    <div class="container">
+        <!-- Título corto opcional -->
+        <div class="title-section-sm" *ngIf="title">
+            <h4 class="title-sm">{{title}}</h4>
+        </div>
+
+        <app-loading *ngIf="isLoading"></app-loading>
+        
+        <div *ngIf="!isLoading" class="categories-scroll-container">
+            <ul class="categories-nav-list">
+                
+                <!-- 1. Botón para ver TODO -->
+                <li [class.active]="activeCategory === 'all'">
+                    <a href="#" onclick="return false;" 
+                       [ngClass]="{'active': activeCategory === 'all'}"
+                       (click)="selectCategory('all')">
+                       Todo
+                    </a>
+                </li>
+                
+                <!-- 2. Ciclo de categorías adicionales -->
+                <ng-container *ngFor="let category of subcategories">
+                    <li [class.active]="activeCategory.toLowerCase() === category.nombre.toLowerCase()">
+                        <a href="#" onclick="return false;" 
+                           [ngClass]="{'active': activeCategory.toLowerCase() === category.nombre.toLowerCase()}"
+                           (click)="selectCategory(category.nombre)">
+                           {{ category.nombre }}
+                        </a>
+                    </li>
+                </ng-container>
+            </ul>
+        </div>
+        
+    </div>
+</section>
+
+<div class="clear"></div>
+
+<app-modalproduct 
+    [product]="selectedProduct" 
+    [activeCategory]="activeCategory" 
+    [tienda_moneda]="tienda_moneda"
+    (modalClosed)="selectedProduct = null"  
+    *ngIf="selectedProduct && !isLoading">
+</app-modalproduct>

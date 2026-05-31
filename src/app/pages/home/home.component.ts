@@ -13,6 +13,7 @@ import { Tienda } from '../../models/tienda.model';
 import { TiendaService } from '../../services/tienda.service';
 import { Subscription } from 'rxjs';
 import { Title } from '@angular/platform-browser';
+import { CatAdicionalesComponent } from '../../components/cat-adicionales/cat-adicionales.component';
 
 @Component({
   selector: 'app-home',
@@ -22,7 +23,8 @@ import { Title } from '@angular/platform-browser';
     MenuFooterComponent, NgIf,
     LoadingComponent,
     PwaNotifInstallerComponent,
-    ModalInicialComponent
+    ModalInicialComponent,
+    CatAdicionalesComponent
   ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'

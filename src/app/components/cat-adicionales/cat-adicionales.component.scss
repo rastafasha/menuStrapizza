@@ -1,0 +1,31 @@
+.categories-scroll-container {
+    overflow-x: auto;
+    white-space: nowrap;
+    padding: 10px 0;
+    scrollbar-width: none; /* Oculta scroll en Firefox */
+}
+.categories-scroll-container::-webkit-scrollbar {
+    display: none; /* Oculta scroll en Chrome/Safari */
+}
+.categories-nav-list {
+    display: flex;
+    gap: 8px;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.categories-nav-list a {
+    display: inline-block;
+    padding: 8px 16px;
+    background: #f3f4f6;
+    color: #374151;
+    border-radius: 20px;
+    text-decoration: none;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+.categories-nav-list a.active {
+    background: #000; /* O el color principal de Zlipmenu */
+    color: #fff;
+    font-weight: bold;
+}

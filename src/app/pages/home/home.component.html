@@ -32,9 +32,9 @@
         <!-- Categorías Secundarias Dinámicas: Reemplaza las validaciones de texto fijo por iteración perezosa -->
         @for (cat of categoriasAdicionales; track cat.id) {
         @defer (on viewport) {
-        <app-cas-products [activeCategory]="cat.nombre" [title]="cat.nombre" (msm_success)="onMsmSuccess($event)"
+        <app-cat-adicionales [activeCategory]="cat.nombre" [title]="cat.nombre" (msm_success)="onMsmSuccess($event)"
             [refreshCasProducts]="refreshCasProducts">
-        </app-cas-products>
+        </app-cat-adicionales>
         } @placeholder {
         <div class="loading-placeholder" style="text-align: center; padding: 20px; color: #777;">
             Cargando {{ cat.nombre }}...

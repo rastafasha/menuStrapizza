@@ -7,7 +7,7 @@ import { TiendaService } from '../../services/tienda.service';
 
 @Component({
   selector: 'app-hero',
-  imports: [RouterModule, NgIf],
+  imports: [RouterModule],
   templateUrl: './hero.component.html',
   styleUrl: './hero.component.scss'
 })
