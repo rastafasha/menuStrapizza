@@ -16,7 +16,7 @@ import { CommonModule } from '@angular/common';
     CommonModule
   ],
   templateUrl: './cat-adicionales.component.html',
-  styleUrls: ['./cat-adicionales.component.css']
+  styleUrls: ['./cat-adicionales.component.scss']
 })
 export class CatAdicionalesComponent implements OnInit, OnDestroy, OnChanges {
   // Recibe del Home el término exacto: 'Entradas', 'Combos', 'Bebidas' o 'Postres'
