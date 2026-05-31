@@ -8,13 +8,13 @@
     <!-- Catálogo Principal (Carga de inmediato) -->
     <!-- Eliminamos el filtro manual por texto; el componente interno ya sabe qué cargar usando la tienda activa -->
     <app-cas-products 
-        *ngIf="!isLoading" 
-        [activeCategory]="'all'" 
-        [isVisible]="true" 
-        [title]="'Menú'"  
-        (msm_success)="onMsmSuccess($event)" 
-        [refreshCasProducts]="refreshCasProducts">
-    </app-cas-products>
+    *ngIf="!isLoading" 
+    [activeCategory]="'Pizzería'" 
+    [isVisible]="true" 
+    [title]="'Menú'"  
+    (msm_success)="onMsmSuccess($event)" 
+    [refreshCasProducts]="refreshCasProducts">
+</app-cas-products>
     
     <!-- Hero Section -->
     <app-hero></app-hero>

@@ -14,6 +14,7 @@ import { TiendaService } from '../../services/tienda.service';
 import { Subscription } from 'rxjs';
 import { Title } from '@angular/platform-browser';
 import { CatAdicionalesComponent } from '../../components/cat-adicionales/cat-adicionales.component';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-home',
@@ -35,29 +36,32 @@ export class HomeComponent {
  @Output() msm_success: EventEmitter<boolean> = new EventEmitter<boolean>();
   @Input() msm_success_value: boolean = false;
   
-  user!: Usuario;
+  user!: any;
   isLoading = false;
   isVisible = false;
   activeCategory!: string;
   categoriaPrincipal: string = 'all';
+
   
   // Variables dinámicas para el control del inquilino (Tenant)
   tiendaSelected: Tienda | null = null;
   categoriasAdicionales: Array<{ id: string, nombre: string }> = [];
   private tiendaSubscription!: Subscription;
 
+  categoriaActiva: string = ''; 
+
   // Inyección del servicio de tiendas optimizado por URL
   private tiendasService = inject(TiendaService);
   private titleService = inject(Title);
+  private authService = inject(AuthService);
 
   // Event emitter for refreshing cas-products
   @Output() refreshCasProducts: EventEmitter<void> = new EventEmitter<void>();
 
   ngOnInit() {
-    let USER = localStorage.getItem("user");
-    this.user = USER ? JSON.parse(USER) : null;
-
+    this.user = this.authService.getLocalStorage();
     this.cargarDatosTiendaPorSubdominio();
+
     
   }
 
@@ -70,6 +74,9 @@ export class HomeComponent {
         this.tiendaSelected = tienda;
         
         if (tienda) {
+          // Guardamos el nombre exacto de la categoría (ej: 'Pizzería', 'Panadería', 'Churros')
+          this.categoriaActiva = tienda.categoria?.nombre || '';
+          
           this.titleService.setTitle(`Zlipmenu | ${tienda.nombre}`);
           this.configurarCategoriasFiltro(tienda);
 
