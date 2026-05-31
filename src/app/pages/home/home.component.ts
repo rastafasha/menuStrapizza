@@ -148,92 +148,87 @@ export class HomeComponent {
 }
 
 private configurarManifestDinamico(tienda: any) {
-  
-  // 🌟 CORRECCIÓN DE RUTAS PÚBLICAS DE ANGULAR:
-  // Eliminamos el prefijo 'src/' porque en producción la carpeta 'assets' queda expuesta en la raíz pública
-  // const icono72 = 'assets/icons/icon-72x72.png';
-  // const icono96 = 'assets/icons/icon-96x96.png';
-  // const icono128 = 'assets/icons/icon-128x128.png';
-  // const icono144 = 'assets/icons/icon-144x144.png';
-  // const icono152 = 'assets/icons/icon-152x152.png';
-  // const icono192 = 'assets/icons/icon-192x192.png';
-  // const icono384 = 'assets/icons/icon-384x384.png';
-  // const icono512 = 'assets/icons/icon-512x512.png';
-
-  // Armamos el objeto manifest en caliente con las rutas públicas oficiales
+  // 1. Armamos el objeto manifest en caliente con los datos vivos de la BD
   const miManifestDinamico = {
     name: tienda.nombre || 'Zlipmenu',
     short_name: tienda.nombre || 'Zlipmenu',
-    theme_color: tienda.color_primario || '#e74c3c',
-    background_color: '#ffffff',
+    theme_color: tienda.color_primario || '#333',
+    background_color: '#fafafa',
     display: 'standalone',
     orientation: 'portrait',
-    // Usamos el origen actual de la URL dinámica
-    start_url: window.location.origin + '/', 
+    start_url: window.location.origin,
     // icons: [
+      
+    //   // {
+    //   //   src: tienda.img || 'assets/icons/icon-72x72.png',
+    //   //   sizes: '72x72',
+    //   //   type: 'image/png',
+    //   //   purpose: 'any maskable'
+    //   // },
     //   {
-    //     src: icono72,
+    //     src:  'assets/icons/icon-72x72.png',
     //     sizes: '72x72',
     //     type: 'image/png',
     //     purpose: 'any maskable'
     //   },
     //   {
-    //     src: icono96,
+    //     src:  'assets/icons/icon-96x96.png',
     //     sizes: '96x96',
     //     type: 'image/png',
     //     purpose: 'any maskable'
     //   },
     //   {
-    //     src: icono128,
-    //     sizes: "128x128",
+    //     src:  'assets/icons/icon-128x128.png',
+    //     sizes: '128x128',
     //     type: 'image/png',
     //     purpose: 'any maskable'
     //   },
     //   {
-    //     src: icono144,
+    //     src:  'assets/icons/icon-144x144.png',
     //     sizes: '144x144',
     //     type: 'image/png',
     //     purpose: 'any maskable'
     //   },
     //   {
-    //     src: icono152,
+    //     src:  'assets/icons/icon-152x152.png',
     //     sizes: '152x152',
     //     type: 'image/png',
     //     purpose: 'any maskable'
     //   },
     //   {
-    //     src: icono192,
+    //     // Usamos el logo que el restaurante subió a Cloudinary como icono de la App
+    //     src:  'assets/icons/icon-192x192.png',
     //     sizes: '192x192',
     //     type: 'image/png',
     //     purpose: 'any maskable'
     //   },
     //   {
-    //     src: icono384,
+    //     // Usamos el logo que el restaurante subió a Cloudinary como icono de la App
+    //     src:  'assets/icons/icon-384x384.png',
     //     sizes: '384x384',
     //     type: 'image/png',
     //     purpose: 'any maskable'
     //   },
     //   {
-    //     src: icono512,
+    //     src:  'assets/icons/icon-512x512.png',
     //     sizes: '512x512',
     //     type: 'image/png'
     //   }
     // ]
   };
 
-  // Convertimos el objeto manifest en un archivo Blob de memoria
+  // 2. Convertimos el objeto en un archivo Blob de texto plano en memoria
   const stringManifest = JSON.stringify(miManifestDinamico);
-  const blobManifest = new Blob([stringManifest], { type: 'application/json' });
-  const urlManifest = URL.createObjectURL(blobManifest);
+  const blob = new Blob([stringManifest], { type: 'application/json' });
+  const urlManifest = URL.createObjectURL(blob);
 
-  // Inyectamos el manifest limpio en el HTML
+  // 3. Reemplazamos el manifest estático por nuestra versión viva
   const etiquetaManifest = document.getElementById('pwa-manifest') as HTMLLinkElement;
   if (etiquetaManifest) {
     etiquetaManifest.href = urlManifest;
-    console.log('¡Manifest PWA con iconos locales validado con éxito para:', tienda.nombre);
+    console.log('¡Manifest PWA actualizado dinámicamente para:', tienda.nombre);
   }
 }
-
 
 
 }
