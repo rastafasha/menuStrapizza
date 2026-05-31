@@ -55,6 +55,7 @@ export class HomeComponent {
     this.user = USER ? JSON.parse(USER) : null;
 
     this.cargarDatosTiendaPorSubdominio();
+    
   }
 
   private cargarDatosTiendaPorSubdominio() {
@@ -68,6 +69,8 @@ export class HomeComponent {
         if (tienda) {
           this.titleService.setTitle(`Zlipmenu | ${tienda.nombre}`);
           this.configurarCategoriasFiltro(tienda);
+
+          this.configurarManifestDinamico(tienda);
           // 🌟 INYECCIÓN DE CSS DINÁMICO SAAS AQUÍ:
         // Si el restaurante VIP guardó estilos exclusivos en el CRM, se aplican en caliente
         if (tienda.css_personalizado) {
@@ -143,6 +146,46 @@ export class HomeComponent {
     estiloPrevio.remove(); // Borra el CSS del head al salir del menú del restaurante
   }
 }
+
+private configurarManifestDinamico(tienda: any) {
+  // 1. Armamos el objeto manifest en caliente con los datos vivos de la BD
+  const miManifestDinamico = {
+    name: tienda.nombre || 'Zlipmenu',
+    short_name: tienda.nombre || 'Zlipmenu',
+    theme_color: tienda.color_primario || '#333',
+    background_color: '#fafafa',
+    display: 'standalone',
+    orientation: 'portrait',
+    start_url: window.location.origin,
+    icons: [
+      {
+        // Usamos el logo que el restaurante subió a Cloudinary como icono de la App
+        src: tienda.img || 'assets/icons/icon-192x192.png',
+        sizes: '192x192',
+        type: 'image/png',
+        purpose: 'any maskable'
+      },
+      {
+        src: tienda.img || 'assets/icons/icon-512x512.png',
+        sizes: '512x512',
+        type: 'image/png'
+      }
+    ]
+  };
+
+  // 2. Convertimos el objeto en un archivo Blob de texto plano en memoria
+  const stringManifest = JSON.stringify(miManifestDinamico);
+  const blob = new Blob([stringManifest], { type: 'application/json' });
+  const urlManifest = URL.createObjectURL(blob);
+
+  // 3. Reemplazamos el manifest estático por nuestra versión viva
+  const etiquetaManifest = document.getElementById('pwa-manifest') as HTMLLinkElement;
+  if (etiquetaManifest) {
+    etiquetaManifest.href = urlManifest;
+    console.log('¡Manifest PWA actualizado dinámicamente para:', tienda.nombre);
+  }
+}
+
 
 }
 
