@@ -17,8 +17,9 @@ import { CatAdicionalesComponent } from '../../components/cat-adicionales/cat-ad
 
 @Component({
   selector: 'app-home',
-  imports: [HeaderComponent,
-     CasProductsComponent,
+  imports: [
+    HeaderComponent,
+    CasProductsComponent,
     HeroComponent, FooterComponent, 
     MenuFooterComponent, NgIf,
     LoadingComponent,
