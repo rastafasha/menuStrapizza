@@ -70,7 +70,7 @@ export class HomeComponent {
           this.titleService.setTitle(`Zlipmenu | ${tienda.nombre}`);
           this.configurarCategoriasFiltro(tienda);
 
-          this.configurarManifestDinamico(tienda);
+          // this.configurarManifestDinamico(tienda);
           // 🌟 INYECCIÓN DE CSS DINÁMICO SAAS AQUÍ:
         // Si el restaurante VIP guardó estilos exclusivos en el CRM, se aplican en caliente
         if (tienda.css_personalizado) {
