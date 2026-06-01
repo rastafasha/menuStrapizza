@@ -195,10 +195,11 @@
         <span class="text-muted small">Fecha</span>
         <span class="fw-bold small">{{ pagoSeleccionado().createdAt | date:'dd/MM/yyyy' }}</span>
       </div>
-      @if (pagoSeleccionado().tasaBCV) {
+
+      @if (pagoSeleccionado().tasa) {
         <div class="d-flex justify-content-between" >
         <span class="text-muted small">Tasa Aplicada</span>
-        <span class="fw-bold small">{{ pagoSeleccionado().tasaBCV }} Bs.</span>
+        <span class="fw-bold small">{{ pagoSeleccionado().tasa }} Bs.</span>
       </div>
       }
       

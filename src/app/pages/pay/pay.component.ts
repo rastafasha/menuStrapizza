@@ -28,16 +28,25 @@ import { Paypal } from '../../models/paypal.model';
 import { PaypalService } from '../../services/paypal.service';
 import { FileUploadService } from '../../services/file-upload.service';
 import { ToastrService } from 'ngx-toastr';
+import { TasadollarbcvService } from '../../services/tasadollarbcv.service';
+import { TasaeurobcvService } from '../../services/tasaeurobcv.service';
+import { PagosFilterPipe } from '../../pipes/pagos-filter.pipe';
+import { AuthService } from '../../services/auth.service';
+import { LoadingComponent } from '../../shared/loading/loading.component';
 declare var $: any;
 // declare var paypal;
 
 @Component({
   selector: 'app-pay',
   imports: [
-    HeaderComponent, CommonModule, RouterModule,
-    ReactiveFormsModule, FormsModule,
+    HeaderComponent, 
+    CommonModule, RouterModule,
+    ReactiveFormsModule, 
+    FormsModule,
     ImagenPipe,
-    NgxPayPalModule
+    NgxPayPalModule,
+    PagosFilterPipe, 
+    LoadingComponent
   ],
   templateUrl: './pay.component.html',
   styleUrl: './pay.component.scss'
@@ -84,6 +93,7 @@ export class PayComponent {
   public no_direccion = 'no necesita direccion';
 
   public payPalConfig?: IPayPalConfig;
+  public payPalCardConfig?: IPayPalConfig;
   cartItems: any[] = [];
 
   pedidoGuardado = false;
@@ -123,14 +133,12 @@ export class PayComponent {
 
   imagePreview = signal<string | null>(null);
   public selectedFile: File | null = null;
+  tasadollar = signal(0);
+  tasaeuro = signal(0);
 
   formTransferencia = new FormGroup({
     metodo_pago: new FormControl(this.paymentMethodinfo, Validators.required),
-    // bankName: new FormControl(this.paymentSelected.bankName, Validators.required),
-    // amount: new FormControl('', Validators.required),
     referencia: new FormControl('', Validators.required),
-    // name_person: new FormControl('', Validators.required),
-    // phone: new FormControl('', Validators.required),
     paymentday: new FormControl(new Date(), Validators.required)
   });
 
@@ -139,13 +147,6 @@ export class PayComponent {
     deliveryAddres: new FormControl('', Validators.required),
   });
 
-  // formCheque = new FormGroup({
-  //   amount: new FormControl('', Validators.required),
-  //   name_person: new FormControl(''),
-  //   ncheck: new FormControl('', Validators.required),
-  //   phone: new FormControl('', Validators.required),
-  //   paymentday: new FormControl('', Validators.required)
-  // });
 
   formEfectivo = new FormGroup({
     paymentday: new FormControl('', Validators.required)
@@ -155,7 +156,6 @@ export class PayComponent {
   constructor(
     private _trasferencias: TransferenciasService,
     private _efectivo: PagoEfectivoService,
-    // private _pagoCheque: PagochequeService,
     private _tipoPagosService: TiposdepagoService,
     private _carritoService: CarritoService,
     private tiendaService: TiendaService,
@@ -168,7 +168,9 @@ export class PayComponent {
     private _paypalService: PaypalService,
     private fileUploadService: FileUploadService,
     private toastr: ToastrService,
-    //  private _postalService :PostalService,
+    private tasaDollarService: TasadollarbcvService,
+    private tasaEuroService: TasaeurobcvService,
+    private authService: AuthService,
   ) {
     window.scrollTo(0, 0);
     // obtenemos el cliente del localstorage
@@ -184,29 +186,44 @@ export class PayComponent {
   }
   ngOnInit() {
 
-
-    let USER = localStorage.getItem('user');
-    if (USER) {
-      this.identity = JSON.parse(USER);
-    }
+    this.identity = this.authService.getLocalStorage() as Usuario;
     this.userId = this.identity.uid;
     this.escucharTiendaActiva();
     this.getDireccionbyUser();
     this._activatedRoute.params.subscribe(({ id }) => this.loadPedido(id));
-    // initPayPalConfig moved to after getPaypalByTienda()
   }
 
 
-    escucharTiendaActiva() {
+  escucharTiendaActiva() {
     this.tiendaService.selectedTiendaObservable$.subscribe(tienda => {
       if (tienda) {
         this.tiendaSelected = tienda;
-      this.tienda_moneda = this.tiendaSelected.moneda
-      this.getTiposdePagoByLocal();
-      this.getPaypalByTienda();
+        this.tienda_moneda = this.tiendaSelected.moneda;
+        this.getTiposdePagoByLocal();
+        this.getPaypalByTienda();
+
+        if (this.tienda_moneda === 'USD') {
+          this.getTasadelDia();
+        } else if (this.tienda_moneda === 'EUR') {
+          this.getTasaeuro();
+        }
       }
     });
   }
+
+  getTasadelDia() {
+    this.tasaDollarService.getUltimaTasa().subscribe((resp: any) => {
+      this.tasadollar.set(resp.precio_dia);
+    })
+  }
+
+  getTasaeuro() {
+    this.tasaEuroService.getUltimaTasa().subscribe((resp: any) => {
+      this.tasaeuro.set(resp.precio_dia);
+    })
+  }
+
+
 
   getPaypalByTienda() {
     this._paypalService.getPaypalByTiendaId(this.tiendaSelected._id).subscribe((paypals: any[]) => {
@@ -229,6 +246,7 @@ export class PayComponent {
   }
 
   loadPedido(id: string) {
+    this.loading = true;
     this.pedidosService.getById(id).subscribe((resp: any) => {
       this.pedido = resp;
       this.pedidos = resp.pedidoList;
@@ -246,6 +264,7 @@ export class PayComponent {
           selector: element.nombre_selector
         });
       })
+      this.loading = false;
     })
   }
 
@@ -308,53 +327,55 @@ export class PayComponent {
   }
 
   sendFormTransfer() {
-
-
-     if(!this.formTransferencia.valid){
+    if (!this.formTransferencia.valid) {
       //mostramos las alertas de los campos requeridos
       this.formTransferencia.markAllAsTouched(); // Esto activa las validaciones visuales
       return
     }
     if (this.formTransferencia.valid) {
 
-      
-      this.loading = true;
-    const solicitudId = this.pedido._id;
-      // 💡 SOLUCIÓN SUBIDA DE IMAGEN: Usamos el Idel cliente logueado temporalmente para asegurar un archivo único,
-    // o el ID de la solicitud si tu fileUploadService está ruteado estrictamente de esa manera.
-    this.fileUploadService.actualizarFoto(this.selectedFile!, 'transferencias', solicitudId)
-      .then(imgUrl => {
-        
-        // CONSTRUCCIÓN DEL PAYLOAD FIEL A TU ESQUEMA REAL DE MONGO
-        const data = {
-        local: this.tiendaSelected._id,
-        user: this.identity.uid,
-        name_person: this.identity.first_name ,
-        phone: this.identity.telefono,
-        amount: this.totalAmount,
-        referencia: this.formTransferencia.value.referencia,
-        bankName: this.paymentSelected.bankName,
-        pedido: this.pedido._id,
-        img: imgUrl,
-        ...this.formTransferencia.value
-      }
 
-        this._trasferencias.createTransfer(data).subscribe({
-          next: () => {
-            this.toastr.success('¡Transferencia registrada con exito');
-            this.onItemRemoved();
-            this._router.navigate(['/my-account/ordenes']);
-          },
-          error: (err) => {
-            this.loading = false;
-            this.toastr.error('Error al registrar la transacción en el servidor');
+      this.loading = true;
+      const solicitudId = this.pedido._id;
+      // 💡 SOLUCIÓN SUBIDA DE IMAGEN: Usamos el Idel cliente logueado temporalmente para asegurar un archivo único,
+      // o el ID de la solicitud si tu fileUploadService está ruteado estrictamente de esa manera.
+      this.fileUploadService.actualizarFoto(this.selectedFile!, 'transferencias', solicitudId)
+        .then(imgUrl => {
+
+          // CONSTRUCCIÓN DEL PAYLOAD FIEL A TU ESQUEMA REAL DE MONGO
+          const data = {
+            local: this.tiendaSelected._id,
+            user: this.identity.uid,
+            name_person: this.identity.first_name,
+            phone: this.identity.telefono,
+            amount: this.totalAmount,
+            referencia: this.formTransferencia.value.referencia,
+            bankName: this.paymentSelected.bankName,
+            pedido: this.pedido._id,
+            // Condicional dinámica para seleccionar la tasa correcta usando tus Signals
+            tasa: this.tienda_moneda === 'USD'
+              ? (this.tasadollar() || 0)
+              : (this.tienda_moneda === 'EUR' ? (this.tasaeuro() || 0) : 1),
+            img: imgUrl,
+            ...this.formTransferencia.value
           }
+
+          this._trasferencias.createTransfer(data).subscribe({
+            next: () => {
+              this.toastr.success('¡Transferencia registrada con exito');
+              this.onItemRemoved();
+              this._router.navigate(['/my-account/ordenes']);
+            },
+            error: (err) => {
+              this.loading = false;
+              this.toastr.error('Error al registrar la transacción en el servidor');
+            }
+          });
+        })
+        .catch(err => {
+          this.loading = false;
+          this.toastr.error('Error al registrar la transferencia');
         });
-      })
-      .catch(err => {
-        this.loading = false;
-        this.toastr.error('Error al registrar la transferencia');
-      });
 
 
     }
@@ -668,18 +689,19 @@ export class PayComponent {
   private initPayPalConfig(): void {
     if (!this.paypalinfo!.clientIdPaypal || this.paypalinfo!.clientIdPaypal.trim() === '') {
       console.error('No valid PayPal client ID from service');
-      Swal.fire({
-        icon: 'error',
-        title: 'Error de PayPal',
-        text: 'Client ID inválido. Contacte al administrador.',
-        timer: 3000
+      this.toastr.error('Client ID inválido. Contacte al administrador.', 'Error de PayPal', {
+        timeOut: 3000,
+        progressBar: true
       });
       return;
     }
 
+    // Determinamos el estilo visual de acuerdo al método seleccionado en el formulario
+    const esTarjeta = this.selectedMethod === 'card';
+
     this.payPalConfig = {
       currency: this.tienda_moneda,
-      clientId: this.paypalinfo!.clientIdPaypal, // Use service data only
+      clientId: this.paypalinfo!.clientIdPaypal,
       createOrderOnClient: (data) => <ICreateOrderRequest>{
         intent: 'CAPTURE',
         purchase_units: [{
@@ -699,10 +721,17 @@ export class PayComponent {
       advanced: {
         commit: 'true'
       },
+
+      // CONFIGURACIÓN VISUAL DINÁMICA DE BOTONES
+      fundingSource: esTarjeta ? 'CARD' : 'PAYPAL', // Fuerza el renderizado exclusivo del botón elegido
       style: {
-        label: 'paypal',
-        layout: 'vertical'
+        label: esTarjeta ? 'buynow' : 'paypal',
+        layout: 'vertical',
+        color: esTarjeta ? 'black' : 'gold',
+        shape: 'rect'
+        // Removido disableFunding de aquí para eliminar el error ts(2353)
       },
+
       onApprove: (data, actions) => {
         console.log('onApprove - transaction approved', data, actions);
         actions.order.get().then((details: any) => {
@@ -712,18 +741,25 @@ export class PayComponent {
       onClientAuthorization: (data) => {
         console.log('Payment authorized:', data);
         this.data_venta.idtransaccion = data.id;
+
+        // Notificación de éxito con Toastr
+        this.toastr.success('¡Pago procesado con éxito!', 'Autorizado', {
+          progressBar: true
+        });
+
         this.saveVenta();
       },
       onCancel: (data, actions) => {
         console.log('Payment cancelled', data, actions);
+        this.toastr.warning('El proceso de pago ha sido cancelado.', 'Pago Cancelado');
       },
       onError: err => {
         console.error('PayPal Error:', err);
-        Swal.fire({
-          icon: 'error',
-          title: 'Error en PayPal',
-          text: 'Transacción fallida. Intente nuevamente.',
-          timer: 3000
+
+        // Alerta de error con Toastr
+        this.toastr.error('Transacción fallida. Intente nuevamente.', 'Error en PayPal', {
+          timeOut: 4000,
+          progressBar: true
         });
       },
       onClick: (data, actions) => {
@@ -731,6 +767,9 @@ export class PayComponent {
       },
     };
   }
+
+
+
 
   getItemsList(): any[] {
 

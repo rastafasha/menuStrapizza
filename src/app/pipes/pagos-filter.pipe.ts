@@ -10,7 +10,7 @@ export class PagosFilterPipe implements PipeTransform {
     if (!paymentMethods) {
       return [];
     }
-    return paymentMethods.filter(method => method.tipo !== 'cheque');
+    return paymentMethods.filter(method => method.tipo !== 'paypal' && method.tipo !== 'card');
   }
 
 }
