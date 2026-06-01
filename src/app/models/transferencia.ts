@@ -10,6 +10,7 @@ export class Transferencia{
         public referencia: string,
         public paymentday: Date,
         public status: boolean,
+        public observaciones: string,
         public local: Tienda,
         public createdAt: Date,
         public updatedAt: Date,
