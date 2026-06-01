@@ -364,7 +364,7 @@ export class PayComponent {
             next: () => {
               this.toastr.success('¡Transferencia registrada con exito');
               this.onItemRemoved();
-              this._router.navigate(['/my-account/ordenes']);
+              this._router.navigate(['/mis-pagos']);
             },
             error: (err) => {
               this.loading = false;

@@ -8,14 +8,13 @@ export const environment = {
   // mediaUrl: 'http://localhost:3000/api/uploads',
   // soketServer : 'http://localhost:3000',
   // nombreSelected: 'Pizzeria',
+
   //remoto vercel
   baseUrl: 'https://back-ecomm-mall.onrender.com/api',
   mediaUrl: 'https://back-ecomm-mall.onrender.com/api/uploads/',
   soketServer : 'https://back-ecomm-mall.onrender.com',
-
   // En lugar de texto fijo, lee lo que inyecta Vercel al compilar
   //configurar el nombre directamente en el servidor vercel 
-  
   nombreSelected: 'zlipmenu-generic',
   
   mediaUrlRemoto: 'https://res.cloudinary.com/dmv6aukai/image/upload/v1741218430/mallConnect',

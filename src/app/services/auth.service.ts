@@ -107,6 +107,17 @@ export class AuthService {
       )
   }
 
+  loginExpress(telefono: any) {
+  // 🟢 CORRECCIÓN DEFINITIVA: Cambiado a '/login/express'
+  return this.http.post(`${baseUrl}/login/express`, { telefono })
+    .pipe(
+      tap((resp: any) => {
+        localStorage.setItem('estaAutenticado', 'true');
+        this.guardarLocalStorage(resp.token, resp.usuario);
+      })
+    );
+}
+
   logout(){
     this.currentUserSubject.next(null);
     this.refresh();

@@ -7,6 +7,8 @@ import { CommonModule } from '@angular/common';
 import { TiendaService } from '../../services/tienda.service';
 import { Tienda } from '../../models/tienda.model';
 import { ImagenPipe } from '../../pipes/imagen-pipe.pipe';
+import { AuthService } from '../../services/auth.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-login',
@@ -27,13 +29,18 @@ export class LoginComponent implements OnInit {
   public auth2: any;
 
   loginForm: FormGroup;
+  formExpress: FormGroup;
   tiendaSelected!: Tienda;
+  option_selectedd: number = 1;
+  solicitud_selectedd: any = 1;
 
   // Modernización con 'inject' para mayor limpieza
   private router = inject(Router);
   private fb = inject(FormBuilder);
   private usuarioService = inject(UsuarioService);
+  private authService = inject(AuthService);
   private tiendaService = inject(TiendaService);
+  private toastr = inject(ToastrService);
   private ngZone = inject(NgZone);
 
   constructor() {
@@ -42,11 +49,27 @@ export class LoginComponent implements OnInit {
       password: ['', Validators.required],
       remember: [false]
     });
+    this.formExpress = this.fb.group({
+      first_name: ['', [Validators.required, Validators.email]],
+      telefono: ['', Validators.required],
+      remember: [false]
+    });
   }
 
   ngOnInit() {
     this.usuarioService.getLocalStorage();
     this.escucharTiendaActiva();
+  }
+
+  optionSelected(value: number) {
+    this.option_selectedd = value;
+    if (this.option_selectedd === 1) {
+
+
+    }
+    if (this.option_selectedd === 2) {
+
+    }
   }
 
   // 🌟 CORRECCIÓN SAAS MULTI-TENANT:
@@ -64,15 +87,15 @@ export class LoginComponent implements OnInit {
     this.formSumitted = true;
     if (this.loginForm.invalid) { return; }
 
-    this.usuarioService.login(this.loginForm.value).subscribe({
+    this.authService.login(this.loginForm.value).subscribe({
       next: (resp) => {
         if (this.loginForm.get('remember')?.value) {
           localStorage.setItem('email', this.loginForm.get('email')?.value);
         } else {
           localStorage.removeItem('email');
         }
-        this.usuarioService.getLocalStorage();
-        
+        this.authService.getLocalStorage();
+
         if (localStorage.getItem('user') !== 'undefined') {
           setTimeout(() => {
             this.router.navigateByUrl('/my-account');
@@ -82,13 +105,44 @@ export class LoginComponent implements OnInit {
         }
       },
       error: (err) => {
-        Swal.fire('Error', err.error.msg, 'error');
+        this.toastr.error('Error al iniciar sesión.  Verifica tus credenciales.');
+        // Swal.fire('Error', err.error.msg, 'error');
       }
     });
   }
+
+enviarFormularioExpress() {
+    // 1. Extraemos solo el teléfono del formulario
+    const { telefono } = this.formExpress.value;
+
+    // 2. Enviamos únicamente el teléfono al servicio
+    this.authService.loginExpress(telefono).subscribe({
+      next: (resp: any) => {
+        if (resp && resp.ok) {
+          this.ngZone.run(() => {
+            this.router.navigate(['/my-account/pedidos']).then(navExitoso => {
+              if (!navExitoso) {
+                window.location.href = '/my-account/pedidos';
+              }
+            });
+          });
+        }
+      },
+      error: (err) => {
+        console.error('Error en el login express:', err);
+      }
+    });
+}
+
+
+
+
 
   async startApp() {
     this.usuarioService.googleInit();
     this.auth2 = this.usuarioService.auth2;
   }
+
+
+
 }

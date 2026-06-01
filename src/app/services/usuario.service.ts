@@ -186,22 +186,6 @@ export class UsuarioService {
     );
   }
 
-  login(formData: LoginForm) {
-    return this.http.post(`${base_url}/login`, formData).pipe(
-      tap((resp: any) => {
-        this.guardarLocalStorage(resp.token, resp.usuario);
-      })
-    );
-  }
-
-  loginGoogle(token: any) {
-    return this.http.post(`${base_url}/login/google`, { token }).pipe(
-      tap((resp: any) => {
-        this.guardarLocalStorage(resp.token, resp.menu);
-      })
-    );
-  }
-
   cargarUsuarios(desde: number = 0) {
     const url = `${base_url}/usuarios?desde=${desde}`;
     return this.http.get<CargarUsuario>(url, this.headers).pipe(
