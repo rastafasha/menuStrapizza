@@ -104,7 +104,7 @@ cargarProductosPorTiendaId(localId: any) {
     this.isLoading = true;
     
     // Consumimos tu endpoint nativo del backend
-    this.productoService.find_by_storeIdActive(localId).subscribe({
+    this.productoService.find_by_storeId(localId).subscribe({
       next: (productos: any[]) => {
         // Guardamos únicamente los productos que le pertenecen a este local
         this.products = productos || [];
