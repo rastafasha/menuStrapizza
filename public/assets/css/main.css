@@ -1,5 +1,8 @@
 /* imports CSS */
-@import url("https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap");
+
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Oswald:wght@200..700&display=swap');
+
 @import url("./carrousel.css");
 @import url("./header.css");
 @import url("./products-list.css");
@@ -20,9 +23,8 @@
   --dark-text: #2b2d42;
   --white: #ffffff;
   --light-brown: #0e5b04;
-  --font-primary: "Roboto", sans-serif;
-  --font-Title: "Noto Sans", sans-serif;
-  --font-Title2: "Retro Team";
+  --font-primary: "Inter", sans-serif;
+  --font-Title2: "Oswald", sans-serif;
 }
 
 .clear {
@@ -102,7 +104,7 @@ a {
 
 .tab-content-set .nav li a {
   color: var(--azulclaro);
-  font-family: "Retro Team";
+  font-family: var(--font-Title2);
 }
 
 .container {
