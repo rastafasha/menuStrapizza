@@ -22,8 +22,8 @@
             <span class="logo-text" [ngStyle]="{'color': tiendaSelected?.color_primario }">| {{titleapp}}</span>
             <app-loading *ngIf="isLoading"></app-loading>
             <a routerLink="/" *ngIf="tiendaSelected && !isLoading">
-                <img [src]="tiendaSelected.img | imagenPipe: 'tiendas'" [alt]="tiendaSelected.nombre">
-                <!-- <img src="assets/images/logo.png" alt="Strapizza Logo"> -->
+                <img style="border-radius: 100px;" [src]="tiendaSelected.img | imagenPipe: 'tiendas'" [alt]="tiendaSelected.nombre">
+                
             </a>
 
         </div>

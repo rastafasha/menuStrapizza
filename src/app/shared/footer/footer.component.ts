@@ -3,12 +3,12 @@ import { RouterModule } from '@angular/router';
 import { RedesSociales, Tienda } from '../../models/tienda.model';
 import { TiendaService } from '../../services/tienda.service';
 import { Subscription } from 'rxjs';
-import { NgFor, NgIf } from '@angular/common';
+import { NgFor, NgIf, NgStyle } from '@angular/common';
 
 @Component({
   selector: 'app-footer',
   standalone: true,
-  imports: [RouterModule, NgFor, NgIf],
+  imports: [RouterModule, NgFor, NgIf, NgStyle],
   templateUrl: './footer.component.html',
   styleUrl: './footer.component.scss'
 })
