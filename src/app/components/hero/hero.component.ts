@@ -1,4 +1,4 @@
-import { NgIf } from '@angular/common';
+import { CommonModule, NgStyle } from '@angular/common';
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { Subscription } from 'rxjs';
@@ -7,7 +7,7 @@ import { TiendaService } from '../../services/tienda.service';
 
 @Component({
   selector: 'app-hero',
-  imports: [RouterModule],
+  imports: [RouterModule, CommonModule, NgStyle],
   templateUrl: './hero.component.html',
   styleUrl: './hero.component.scss'
 })

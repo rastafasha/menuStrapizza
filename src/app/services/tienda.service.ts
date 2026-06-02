@@ -44,7 +44,7 @@ export class TiendaService {
 
     // 1. Control para desarrollo local
     if (hostname === 'localhost' || hostname === '127.0.0.1') {
-      return 'pizzeria'; // Cambia a 'hamburguesas-tio' o 'slidedish' según tu prueba
+      return environment.nombreSelected; // Cambia a 'hamburguesas-tio' o 'slidedish' según tu prueba
     }
     
     // 2. Control para subdominios desplegados en Vercel

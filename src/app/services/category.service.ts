@@ -64,6 +64,15 @@ export class CategoryService {
 
   }
 
+  getCategoriaByLocal(_id: any){
+    const url = `${base_url}/categorias/local/${_id}`;
+    return this.http.get<any>(url, this.headers)
+      .pipe(
+        map((resp:{ok: boolean, categorias: Categoria[]}) => resp.categorias)
+        );
+
+  }
+
   find_by_nombre(nombre: string, localId?: string) {
   let url = `${base_url}/categorias/category_by_nombre/nombre/${nombre}`;
   

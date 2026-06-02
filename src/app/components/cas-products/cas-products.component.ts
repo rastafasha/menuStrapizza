@@ -25,7 +25,7 @@ export class CasProductsComponent implements OnInit, OnDestroy {
   @Input() refreshCasProducts: EventEmitter<void> | null = null;
   @Input() activeCategory: string = 'all';
   @Input() activeSubCategory: string = 'all';
-  @Input() title!: string ;
+  @Input() title!: string;
   @Input() isVisible = false;
   @Input() tienda_moneda!: any;
   @Input() isLoading: boolean = false;
@@ -35,16 +35,16 @@ export class CasProductsComponent implements OnInit, OnDestroy {
 
   isRefreshing = false;
   isEdnOfList = false;
-  nextUrl:string = '';
-  loadingTitle:string = '';
+  nextUrl: string = '';
+  loadingTitle: string = '';
 
   categories: Categoria[] = [];
   subcategories: any[] = [];
-  
+
   catname!: string;
   products: Producto[] = [];
   tiendaSelected: Tienda | null = null;
-  
+
   todo: Producto[] = [];
   selectedProduct: Producto | null = null;
 
@@ -54,28 +54,26 @@ export class CasProductsComponent implements OnInit, OnDestroy {
   private tiendaSubscription!: Subscription;
 
   ngOnInit() {
-    // Escucha la tienda que ya resolvió el Home en la caché de forma reactiva
+    this.isLoading = true;
+    
+    // 1. Escuchamos la tienda activa resuelta en la caché
     this.tiendaSubscription = this.tiendasService.getTiendaByNameCached().subscribe(tienda => {
-      this.tiendaSelected = tienda;
-      if (this.tiendaSelected) {
+      if (tienda) {
+        this.tiendaSelected = tienda;
         this.tienda_moneda = this.tiendaSelected.moneda;
-        
-        // Prioriza la categoría limpia enviada desde el Home para el endpoint
-        this.catname = this.activeCategory !== 'all' ? this.activeCategory : (this.tiendaSelected?.categoria?.nombre || 'Pizzería');
-        
-        this.getCategories();
+
+        // 2. 🚀 CONEXIÓN DIRECTA: Ejecutamos el filtro usando tu función nativa por ID
+        this.cargarProductosPorTiendaId(this.tiendaSelected._id);
       }
     });
-
-    // this.escucharTiendaActiva();
 
     if (this.refreshCasProducts) {
       this.refreshCasProducts.subscribe(() => this.refreshData());
     }
-  }
+}
 
- 
- 
+
+
 
   ngOnDestroy() {
     if (this.tiendaSubscription) {
@@ -83,12 +81,12 @@ export class CasProductsComponent implements OnInit, OnDestroy {
     }
   }
 
- 
+
 
   // Mantenemos tu función por si la necesitas, pero limpia de llamadas duplicadas
   getProductosCatName() {
     this.isLoading = true;
-    this.categoryService.find_by_nombre(this.catname).subscribe({
+    this.categoryService.getCategoriaByLocal(this.tiendaSelected?._id).subscribe({
       next: (resp: any) => {
         this.products = resp.productos || [];
         this.updateTodo();
@@ -101,43 +99,41 @@ export class CasProductsComponent implements OnInit, OnDestroy {
     });
   }
 
-  // 🌟 TU FUNCIÓN MAESTRA ORIGINAL (Ordenada y tipada para evitar cruce de datos)
-    // Tu función original corregida y blindada contra fallas de acentos y mayúsculas
- 
-      getCategories() {
+  // 🟢 TU NUEVA FUNCIÓN MAESTRA INTEGRAL (Limpia, rápida y libre de cruce de datos)
+cargarProductosPorTiendaId(localId: any) {
     this.isLoading = true;
-    this.productoService.getProductosActivos().subscribe((resp: any) => {
-      // 1. Filtramos los productos que pertenecen a la categoría del restaurante actual
-      const productos = resp.filter((producto: any) => producto.categoria?.nombre === this.catname);
-      
-      this.products = productos;
+    
+    // Consumimos tu endpoint nativo del backend
+    this.productoService.find_by_storeIdActive(localId).subscribe({
+      next: (productos: any[]) => {
+        // Guardamos únicamente los productos que le pertenecen a este local
+        this.products = productos || [];
 
-      // 2. Extraemos el campo subcategoria asegurando que no procese valores nulos o vacíos
-      const subcategorias = productos.map((producto: any) => {
-        return producto.subcategoria ? producto.subcategoria.trim() : null;
-      });
-      
-      // 3. Eliminamos duplicados y limpiamos valores falsos/nulos para que el Set no se rompa
-      const subcategoriasUnicas = [...new Set(subcategorias.filter((sub: any) => !!sub))];
-      
-      console.log('📋 Las subcategorías únicas reales encontradas son:', subcategoriasUnicas);
+        // 1. Extraemos el campo subcategoria de forma segura protegiendo contra nulos
+        const subcategorias = this.products.map((producto: any) => {
+          return producto.subcategoria ? producto.subcategoria.trim() : null;
+        });
 
-      // 4. Creamos el arreglo de objetos con el nombre de la subcategoria y el arreglo de productos
-      const categorias = subcategoriasUnicas.map((subcategoria: any) => ({
-        nombre: subcategoria,
-        products: productos.filter((product: any) => {
-          if (!product.subcategoria) return false;
-          return product.subcategoria.trim() === subcategoria;
-        }),
-      }));
-      
-      this.subcategories = categorias || [];
-      
-      // 5. Sincronizamos la grilla de platos
-      this.updateTodo();
-      this.isLoading = false;
+        // 2. Eliminamos duplicados y limpiamos valores vacíos
+        const subcategoriasUnicas = [...new Set(subcategorias.filter((sub: any) => !!sub))];
+        console.log('📋 Las subcategorías únicas de esta tienda son:', subcategoriasUnicas);
+
+        // 3. Agrupamos los productos correspondientes bajo cada subcategoría exclusiva
+        this.subcategories = subcategoriasUnicas.map((subcatName: string) => ({
+          nombre: subcatName,
+          products: this.products.filter((product: any) => product.subcategoria?.trim() === subcatName)
+        })) || [];
+
+        // 4. Sincronizamos la grilla de platos e indicamos que cargue todo por defecto
+        this.updateTodo();
+        this.isLoading = false;
+      },
+      error: (err) => {
+        console.error('Error al obtener los productos por tienda:', err);
+        this.isLoading = false;
+      }
     });
-  }
+}
 
 
   selectCategory(category: string) {
@@ -198,12 +194,15 @@ export class CasProductsComponent implements OnInit, OnDestroy {
 
   trackByCharacterId: TrackByFunction<any> = (index: number, character: any) => character.id;
 
-  refreshData() {
+  // Actualizamos la función de refresco para que use el nuevo flujo limpio
+refreshData() {
     this.isRefreshing = true;
     setTimeout(() => {
       this.isRefreshing = false;
-      this.getCategories(); // Refrescamos usando el flujo limpio
+      if (this.tiendaSelected?._id) {
+        this.cargarProductosPorTiendaId(this.tiendaSelected._id);
+      }
     }, 2000);
-  }
+}
 
 }

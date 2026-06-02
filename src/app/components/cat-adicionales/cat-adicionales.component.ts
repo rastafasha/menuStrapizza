@@ -6,6 +6,7 @@ import { ProductItemComponent } from '../product-item/product-item.component';
 import { LoadingComponent } from '../../shared/loading/loading.component';
 import { ModalproductComponent } from '../modalproduct/modalproduct.component';
 import { CommonModule } from '@angular/common';
+import { ProductoService } from '../../services/product.service';
 
 @Component({
   selector: 'app-cat-adicionales',
@@ -33,6 +34,7 @@ export class CatAdicionalesComponent implements OnInit, OnDestroy, OnChanges {
 
   private categoryService = inject(CategoryService); // ◄--- Inyección del servicio correcto
   private tiendasService = inject(TiendaService);
+  private productoService = inject(ProductoService); // ◄--- Asegúrate de tener un servicio de productos que traiga por tienda
   private tiendaSubscription!: Subscription;
 
   ngOnChanges(changes: SimpleChanges) {
@@ -44,8 +46,8 @@ export class CatAdicionalesComponent implements OnInit, OnDestroy, OnChanges {
 
   ngOnInit() {
     this.tiendaSubscription = this.tiendasService.getTiendaByNameCached().subscribe(tienda => {
-      this.tiendaSelected = tienda;
-      if (this.tiendaSelected) {
+      if (tienda) {
+        this.tiendaSelected = tienda;
         this.tienda_moneda = this.tiendaSelected.moneda;
         this.getProductosPorSubcategoria(); 
       }
@@ -58,38 +60,45 @@ export class CatAdicionalesComponent implements OnInit, OnDestroy, OnChanges {
     }
   }
 
+  // 🟢 LOGICA CORREGIDA: Filtramos por ID de tienda y por el nombre de la categoría principal
   getProductosPorSubcategoria() {
-    if (!this.activeCategory) return;
+    if (!this.activeCategory || !this.tiendaSelected?._id) return;
     
     this.isLoading = true;
-    const localId = this.tiendaSelected?._id;
+    const localId = this.tiendaSelected._id;
 
-    // 🚀 PETICIÓN DIRECTA POR URL EN RED:
-    // Le pega exactamente a: /category_by_nombre/nombre/Entradas?localId=...
-    // o /category_by_nombre/nombre/Bebidas?localId=...
-    console.log(`📡 Solicitando a Render los adicionales completos para: ${this.activeCategory}`);
+    console.log(`📡 Filtrando adicionales locales de ${this.tiendaSelected.nombre} para: ${this.activeCategory}`);
 
-    this.categoryService.find_by_nombre(this.activeCategory, localId).subscribe({
-      next: (resp: any) => {
-        // Guardamos los platos que el endpoint especializado limpia y empaqueta desde la base de datos
-        this.products = resp.productos || [];
+    // Usamos tu servicio nativo que trae los productos exclusivos de esta tienda
+    this.productoService.find_by_storeIdActive(localId).subscribe({
+      next: (productos: any[]) => {
         
-        // Mapeamos las pestañas internas si el bloque tuviera subdivisiones
-        const subcats = this.products.map((producto: any) => producto.subcategoria);
+        // 1. Filtramos en caliente para que SOLO pasen los productos que correspondan a la categoría activa (Bebidas, Cajas, etc.)
+        // Comparamos contra el slug o el nombre de forma limpia
+        this.products = (productos || []).filter((prod: any) => {
+          if (!prod.categoria) return false;
+          const catNombre = prod.categoria.nombre ? prod.categoria.nombre.toLowerCase().trim() : '';
+          return catNombre === this.activeCategory.toLowerCase().trim();
+        });
+
+        // 2. Extraemos las subcategorías internas si el bloque tuviera subdivisiones
+        const subcats = this.products.map((producto: any) => {
+          return producto.subcategoria ? producto.subcategoria.trim() : null;
+        });
         const subcategoriasUnicas = [...new Set(subcats.filter((sub: any) => !!sub))];
 
-        this.subcategories = subcategoriasUnicas.map((subcategoria: any) => ({
-          nombre: subcategoria,
-          products: this.products.filter((product: any) => product.subcategoria === subcategoria),
+        this.subcategories = subcategoriasUnicas.map((subcategoriaName: string) => ({
+          nombre: subcategoriaName,
+          products: this.products.filter((product: any) => product.subcategoria?.trim() === subcategoriaName),
         }));
 
-        // Cargamos la grilla directo con la respuesta completa del servidor
+        // 3. Cargamos la grilla directo con los productos del local correspondientes a esa sección
         this.todo = this.products.slice();
         this.isLoading = false;
-        console.log(`✅ ¡Petición de adicionales exitosa! Renderizados para ${this.activeCategory}:`, this.todo);
+        console.log(`✅ ¡Filtro de adicionales exitoso! Renderizados para ${this.activeCategory}:`, this.todo.length);
       },
       error: (error) => {
-        console.error(`❌ Error en la llamada HTTP de adicionales para ${this.activeCategory}:`, error);
+        console.error(`❌ Error al obtener productos para adicionales de ${this.activeCategory}:`, error);
         this.isLoading = false;
       }
     });
@@ -115,4 +124,5 @@ export class CatAdicionalesComponent implements OnInit, OnDestroy, OnChanges {
       }
     }, 0);
   }
+
 }

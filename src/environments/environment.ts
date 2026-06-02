@@ -7,7 +7,7 @@ export const environment = {
   // baseUrl: 'http://localhost:3000/api',
   // mediaUrl: 'http://localhost:3000/api/uploads',
   // soketServer : 'http://localhost:3000',
-  // nombreSelected: 'Pizzeria',
+  // nombreSelected: 'miolunetto',
 
   //remoto vercel
   baseUrl: 'https://back-ecomm-mall.onrender.com/api',

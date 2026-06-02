@@ -1,4 +1,4 @@
-<section class="hero" id="inicio" [style.background-color]="tiendaSelected?.color_fondo">
+<section class="hero" id="inicio" [ngStyle]="{'background': tiendaSelected?.color_primario || '#000000'}">
     <div class="hero-container">
         <div class="hero-content">
             

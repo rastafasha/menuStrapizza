@@ -13,24 +13,32 @@
             <!-- Menú de Pestañas Horizontales / Filtros dinámicos -->
             <div class="tab-content-set">
                 <ul class="nav">
+                    
+
+                    <!-- Ciclo de subcategorías internas (Pastas, Pizza, Especiales...) -->
+                    <ng-container *ngFor="let subcat of subcategories">
+                        <li [class.active]="activeCategory.toLowerCase() === subcat.nombre.toLowerCase()"
+                            [ngStyle]="activeCategory.toLowerCase() === subcat.nombre.toLowerCase()  ? {'color': tiendaSelected?.color_primario} : {}">
+                            <a href="javascript:void(0);"
+                                [ngClass]="{'active': activeCategory.toLowerCase() === subcat.nombre.toLowerCase()}"
+                                (click)="selectCategory(subcat.nombre)"
+                                [style.color]="activeCategory.toLowerCase() === subcat.nombre.toLowerCase() ? (tiendaSelected?.color_primario + ' !important') : null">
+
+                                {{ subcat.nombre }}
+                            </a>
+
+
+                        </li>
+                    </ng-container>
+
                     <!-- Botón estático para ver TODO el menú principal -->
-                    <li [class.active]="activeCategory === 'all'">
+                    <li [class.active]="activeCategory === 'all'"
+                        [ngStyle]="{'color': tiendaSelected?.color_primario }">
                         <a href="#" onclick="return false;" [ngClass]="{'active': activeCategory === 'all'}"
                             (click)="selectCategory('all')">
                             Todo
                         </a>
                     </li>
-
-                    <!-- Ciclo de subcategorías internas (Pastas, Pizza, Especiales...) -->
-                    <ng-container *ngFor="let subcat of subcategories">
-                        <li [class.active]="activeCategory.toLowerCase() === subcat.nombre.toLowerCase()">
-                            <a href="#" onclick="return false;"
-                                [ngClass]="{'active': activeCategory.toLowerCase() === subcat.nombre.toLowerCase()}"
-                                (click)="selectCategory(subcat.nombre)">
-                                {{ subcat.nombre }}
-                            </a>
-                        </li>
-                    </ng-container>
                 </ul>
             </div>
 

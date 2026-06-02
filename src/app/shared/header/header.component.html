@@ -1,5 +1,5 @@
 <!-- Header -->
-<header class="header">
+<header class="header" >
     <div class="header-container" (pulldown)="onPullRefresh()">
         <div class="logo">
             <span class="logo-text"><img src="assets/svg/logo-zlipmenu_logotipo.svg" > </span>
@@ -19,7 +19,7 @@
                 </div>
 
 
-            <span class="logo-text">| {{titleapp}}</span>
+            <span class="logo-text" [ngStyle]="{'color': tiendaSelected?.color_primario }">| {{titleapp}}</span>
             <app-loading *ngIf="isLoading"></app-loading>
             <a routerLink="/" *ngIf="tiendaSelected && !isLoading">
                 <img [src]="tiendaSelected.img | imagenPipe: 'tiendas'" [alt]="tiendaSelected.nombre">
