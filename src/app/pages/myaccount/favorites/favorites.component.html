@@ -1,0 +1,130 @@
+<app-header></app-header>
+<section style="margin-top: 120px;">
+
+
+    <app-loading *ngIf="isLoading"></app-loading>
+    <div class="container-fluid cuadro-modal animated fadeInUp" *ngIf="!isLoading">
+        <div class="titlePage animated fadeIn">
+            <h3>Mis Favoritos</h3>
+        </div>
+        <div class="lineamedio"></div>
+        <!----info-->
+        <div class="areablanc areablanc-interna animated fadeInUp">
+            <div class="div-responsive1">
+                <div>
+                    <div class="post navTabs" *ngFor="let product of favoritos">
+                        <div class="products-grid">
+                            <div class="product-card">
+                                <!-- 1. Quitamos data-bs de la imagen y agregamos (click) -->
+                                <div class="product-image" (click)="verDetalles(product.producto)">
+                                    <img [src]="product.img | imagenPipe: 'productos'" [alt]="product.titulo">
+                                </div>
+                                <div class="product-content">
+                                    <div class="infpr">
+                                        <h4>{{product.producto.titulo}}</h4>
+                                        <div class="product-price text-danger" style="text-decoration: line-through;"
+                                            *ngIf="product.producto.precio_antes > product.producto.precio_ahora">
+                                            {{product.producto.precio_antes|number:'1.2-2'| currency:tienda_moneda}}
+                                        </div>
+                                        <div class="product-price">{{product.producto.precio_ahora|number:'1.2-2'|
+                                            currency:tienda_moneda}}</div>
+                                    </div>
+                                    <div class="botns">
+                                        <!-- 2. Quitamos data-bs del botón del ojo y agregamos (click) -->
+                                        <div class="botns">
+                                            <button class="btn-secondary btn" (click)="verDetalles(product.producto)">
+                                                <i class="fa fa-eye"></i>
+                                            </button>
+                                            <!-- Tu botón de agregar se queda igual, sin propagar -->
+                                            <button class="btn-danger btn" (click)="removeFavorito(product._id)"><i
+                                                    class="fa fa-trash" id="myBtn "></i></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!---info-->
+
+    </div>
+</section>
+
+<!-- modal -->
+ 
+<div #offcanvasElement class="offcanvas offcanvas-bottom" id="offcanvasProducto"
+    data-bs-backdrop="true" data-bs-keyboard="true" [attr.aria-labelledby]="'modalProductLabel-' + (selectedProduct?._id || '')"
+    style="height: auto; max-height: 90vh; border-radius: 25px 25px 0 0;">
+    <!-- Pure Bootstrap 5 Offcanvas with backdrop fix -->
+
+    <div class="offcanvas-header p-3" *ngIf="selectedProduct">
+        <h5 class="offcanvas-title" [id]="'modalProductLabel-' + selectedProduct._id">{{selectedProduct.titulo}}</h5>
+        <!-- El atributo data-bs-dismiss ahora debe ser "offcanvas" -->
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" 
+            aria-label="Close"></button>
+    </div>
+
+    <div class="offcanvas-body" *ngIf="selectedProduct">
+        <div class="ft-recipe">
+            <div class="ft-recipe__thumb grid-item">
+                <!-- Imagen del producto -->
+                <div class="imagen">
+                    <img [src]="selectedProduct.img | imagenPipe: 'productos'" [alt]="selectedProduct.titulo" class="img-fluid mb-5" />
+
+                </div>
+                <div class="infoinicial">
+                        <h2 class="recipe-title">{{selectedProduct.titulo}}</h2>
+                        <ul class="recipe-details list-unstyled">
+                        <li class="recipe-details-item servings">
+                            <span class="value text-muted me-2" style="text-decoration: line-through;"
+                                *ngIf="+selectedProduct.precio_antes > +selectedProduct.precio_ahora">
+                                {{selectedProduct.precio_antes | number:'1.2-2' | currency:tienda_moneda}}
+                            </span>
+                            <span class="value fw-bold">
+                                {{selectedProduct.precio_ahora | number:'1.2-2' | currency:tienda_moneda}}
+                            </span>
+                        </li>
+                    </ul>
+                    </div>
+                    
+            </div>
+
+            <div class="ft-recipe__content mt-3">
+                
+
+                <p class="description" [innerHTML]="selectedProduct.detalle"></p>
+
+                <!-- selectores -->
+                <div *ngIf="selectedProduct.nombre_selector !== 'unico'" class="mb-3">
+                    <p class="small">Selecciona alguna opción por favor.</p>
+                    <select class="form-select" id="product-size" name="selector_to_cart" [(ngModel)]="selector_to_cart"
+                        (change)="selector_error = false">
+                        <option value=" " selected disabled>Selecciona</option>
+                        <option value="{{selector.titulo}}" *ngFor="let selector of selectores">
+                            {{selector.titulo}}
+                        </option>
+                    </select>
+                </div>
+
+                <div class="d-grid gap-2">
+                    <button class="btn btn-outline-success w-100 py-3 rounded-pill" (click)="addItem(selectedProduct)">
+                        <i class="fa fa-shopping-bag"></i> Agregar al Pedido
+                    </button>
+                </div>
+
+                <!-- mensajes de alerta -->
+                <div *ngIf="selector_error" class="alert alert-warning mt-3">
+                    <i class="fa fa-close float-end" (click)="closeAviso()" style="cursor:pointer"></i>
+                    <p class="mb-0">Selecciona alguna opción por favor</p>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- modal -->
+<app-menu-footer></app-menu-footer>

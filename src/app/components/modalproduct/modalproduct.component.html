@@ -1,23 +1,22 @@
-
 <div #offcanvasElement class="offcanvas offcanvas-bottom" [id]="'modalProduct-' + (product?._id || '')" tabindex="-1"
-    data-bs-backdrop="true" 
-    data-bs-keyboard="true"
-    [attr.aria-labelledby]="'modalProductLabel-' + (product?._id || '')" 
-    style="height: auto; max-height: 90vh; border-radius: 25px 25px 0 0;"> <!-- Pure Bootstrap 5 Offcanvas with backdrop fix -->
+    data-bs-backdrop="true" data-bs-keyboard="true" [attr.aria-labelledby]="'modalProductLabel-' + (product?._id || '')"
+    style="height: auto; max-height: 90vh; border-radius: 25px 25px 0 0;">
+    <!-- Pure Bootstrap 5 Offcanvas with backdrop fix -->
 
     <div class="offcanvas-header p-3" *ngIf="product">
         <h5 class="offcanvas-title" [id]="'modalProductLabel-' + product._id">{{product.titulo}}</h5>
         <!-- El atributo data-bs-dismiss ahora debe ser "offcanvas" -->
-        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" (click)="onModalHidden()" aria-label="Close"></button>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" (click)="onModalHidden()"
+            aria-label="Close"></button>
     </div>
 
     <div class="offcanvas-body" *ngIf="product">
         <div class="ft-recipe">
-            <div class="ft-recipe__thumb" >
+            <div class="ft-recipe__thumb">
                 <!-- Imagen del producto -->
                 <img [src]="product.img | imagenPipe: 'productos'" [alt]="product.titulo" class="img-fluid mb-5" />
             </div>
-            
+
             <div class="ft-recipe__content mt-3">
                 <header class="content__header">
                     <div class="row-wrapper">
@@ -25,7 +24,6 @@
                     </div>
                     <ul class="recipe-details list-unstyled">
                         <li class="recipe-details-item servings">
-                            <i class="fa fa-users icon-small"></i>
                             <span class="value text-muted me-2" style="text-decoration: line-through;"
                                 *ngIf="+product.precio_antes > +product.precio_ahora">
                                 {{product.precio_antes | number:'1.2-2' | currency:tienda_moneda}}
@@ -40,10 +38,10 @@
                 <p class="description" [innerHTML]="product.detalle"></p>
 
                 <!-- selectores -->
-                <div *ngIf="activeCategory === 'Pastas'" class="mb-3">
+                <div *ngIf="product.nombre_selector !== 'unico'" class="mb-3">
                     <p class="small">Selecciona alguna opción por favor.</p>
-                    <select class="form-select" id="product-size" name="selector_to_cart"
-                        [(ngModel)]="selector_to_cart" (change)="selector_error = false">
+                    <select class="form-select" id="product-size" name="selector_to_cart" [(ngModel)]="selector_to_cart"
+                        (change)="selector_error = false">
                         <option value=" " selected disabled>Selecciona</option>
                         <option value="{{selector.titulo}}" *ngFor="let selector of selectores">
                             {{selector.titulo}}
@@ -52,14 +50,18 @@
                 </div>
 
                 <div class="d-grid gap-2">
-                    <button class="btn btn-success" (click)="addItem(product)">
+                    <button class="btn btn-outline-success w-100 py-3 rounded-pill" (click)="addItem(product)">
                         <i class="fa fa-shopping-bag"></i> Agregar al Pedido
+                    </button>
+                    <button class="btn btn-outline-danger w-100 py-3 rounded-pill" *ngIf="user" (click)="addToFavorites(product)" 
+                    type="button">
+                        <i class="fa fa-heart"></i> agregar a favoritos
                     </button>
                 </div>
 
                 <!-- mensajes de alerta -->
                 <div *ngIf="selector_error" class="alert alert-warning mt-3">
-                    <i class="fa fa-close float-end" (click)="closeAviso()"  style="cursor:pointer"></i>
+                    <i class="fa fa-close float-end" (click)="closeAviso()" style="cursor:pointer"></i>
                     <p class="mb-0">Selecciona alguna opción por favor</p>
                 </div>
 

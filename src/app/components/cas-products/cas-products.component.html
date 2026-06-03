@@ -16,7 +16,7 @@
                     
 
                     <!-- Ciclo de subcategorías internas (Pastas, Pizza, Especiales...) -->
-                    <ng-container *ngFor="let subcat of subcategories">
+                    <ng-container *ngFor="let subcat of subcategories | categoriasPipe">
                         <li [class.active]="activeCategory.toLowerCase() === subcat.nombre.toLowerCase()"
                             [ngStyle]="activeCategory.toLowerCase() === subcat.nombre.toLowerCase()  ? {'color': tiendaSelected?.color_primario} : {}">
                             <a href="javascript:void(0);"

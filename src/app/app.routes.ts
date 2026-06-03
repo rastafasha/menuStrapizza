@@ -16,6 +16,7 @@ import { DireccionesComponent } from './pages/myaccount/direcciones/direcciones.
 import { PayComponent } from './pages/pay/pay.component';
 import { MisNotificacionesComponent } from './pages/mis-notificaciones/mis-notificaciones.component';
 import { MisPagosComponent } from './pages/myaccount/mis-pagos/mis-pagos.component';
+import { FavoritesComponent } from './pages/myaccount/favorites/favorites.component';
 // import { ReviewOrderComponent } from './pages/review-order/review-order.component';
 
 export const routes: Routes = [
@@ -55,5 +56,6 @@ export const routes: Routes = [
     { path: 'my-account/direccion/edit/:id', component: DireccionEditComponent},
     { path: 'notificaciones', component: MisNotificacionesComponent},
     { path: 'mis-pagos', component: MisPagosComponent},
+    { path: 'favoritos', component: FavoritesComponent},
 ];
 

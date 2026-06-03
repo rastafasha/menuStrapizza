@@ -12,6 +12,7 @@ import { SelectorService } from '../../services/selector.service';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ImagenPipe } from '../../pipes/imagen-pipe.pipe';
 import { ToastrService } from 'ngx-toastr';
+import { FavoritoService } from '../../services/favorito.service';
 
 declare var bootstrap: any;
 
@@ -42,9 +43,13 @@ export class ModalproductComponent implements OnInit, OnDestroy, AfterViewInit {
   public msm_success = false;
   public msm_alert = false;
 
+  producto: any;
+  favoriteItem: any;
+
   private tiendaService = inject(TiendaService);
   private carritoService = inject(CarritoService);
   private selectorService = inject(SelectorService);
+  private favoritoService = inject(FavoritoService);
   private toastr = inject(ToastrService);
 
   user!: Usuario;
@@ -153,6 +158,19 @@ export class ModalproductComponent implements OnInit, OnDestroy, AfterViewInit {
     this.carritoService.removeItem(producto);
     this.toastr.success('Artículo removido del carrito');
   }
+  addToFavorites(producto: Producto) {
+    console.log(this.producto);
+
+    const data = {
+      producto: producto._id,
+      usuario: this.user.uid,
+    };
+
+    this.favoritoService.registro(data).subscribe((res: any) => {
+      this.favoriteItem = res;
+      this.toastr.success('Producto agregado a favoritos');
+    });
+  }
 
   closeAviso() {
     this.msm_success = false;
@@ -171,4 +189,6 @@ export class ModalproductComponent implements OnInit, OnDestroy, AfterViewInit {
       }
     );
   }
+
+  
 }

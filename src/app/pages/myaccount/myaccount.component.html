@@ -56,13 +56,16 @@
 
                         </a>
                     </div>
-                    
-                    
                     <div class="iconop shadow-sm" *ngIf="identity.telefono">
                         <a [routerLink]="['/mis-pagos']">
                             <i class="fa fa-wallet"></i>
                             <p>Mis Pagos</p>
-
+                        </a>
+                    </div>
+                    <div class="iconop shadow-sm" *ngIf="identity.telefono">
+                        <a [routerLink]="['/favoritos']">
+                            <i class="fa fa-heart"></i>
+                            <p>Mis Favoritos</p>
                         </a>
                     </div>
                     

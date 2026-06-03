@@ -19,7 +19,7 @@
                         <i class="fa fa-eye"></i>
                     </button>
                     <!-- Tu botón de agregar se queda igual, sin propagar -->
-                    <button class="btn-success btn" *ngIf="activeCategory !== 'Pastas'"
+                    <button class="btn-success btn" *ngIf="product.nombre_selector === 'unico'"
                         (click)="addItem(product); $event.stopPropagation()">
                         <i class="fa fa-shopping-bag"></i>
                     </button>

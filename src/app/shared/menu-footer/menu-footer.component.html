@@ -22,6 +22,11 @@
                 <i class="fa fa-user"></i>
             </a>
         </li>
+        <li *ngIf="user">
+            <a [routerLink]="['/favoritos']" routerLinkActive="active">
+                <i class="fa fa-heart"></i>
+            </a>
+        </li>
         
 
     </ul>

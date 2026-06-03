@@ -11,11 +11,13 @@ import { Subscription } from 'rxjs';
 import { ProductoService } from '../../services/product.service';
 import { environment } from '../../../environments/environment';
 import { Categoria } from '../../models/categoria.model';
+import { CategoriasPipePipe } from '../../pipes/categorias-pipe.pipe';
 declare var bootstrap: any;
 @Component({
   selector: 'app-cas-products',
   imports: [CommonModule, LoadingComponent,
     ProductItemComponent, ModalproductComponent,
+    CategoriasPipePipe
   ],
   templateUrl: './cas-products.component.html',
   styleUrl: './cas-products.component.scss'

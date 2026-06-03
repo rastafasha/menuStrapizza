@@ -35,6 +35,13 @@
         Mis Pagos
       </a>
     </li>
+    <li *ngIf="identity.telefono">
+      <a class="nav-links shadow-sm" [routerLink]="['/favoritos']" routerLinkActive="active"
+        [routerLinkActiveOptions]="{exact: true}">
+        <i class="fa fa-heart"></i>
+        Mis Favoritos
+      </a>
+    </li>
   </ul>
 </div>
 <div class="setting-row shadow-sm">
