@@ -46,9 +46,9 @@ export class ProductItemComponent {
   ngOnInit(): void {
     let USER = localStorage.getItem("user");
     this.user = USER ? JSON.parse(USER) : null;
-    if (!this.product.img) {
-      this.img = '../assets/images/no-image.jpg';
-    }
+    if (!this.product?.img) {
+  this.img = '../assets/images/no-image.jpg';
+}
   }
 
 

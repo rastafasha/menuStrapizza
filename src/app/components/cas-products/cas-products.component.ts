@@ -118,7 +118,7 @@ cargarProductosPorTiendaId(localId: any) {
 
         // 2. Eliminamos duplicados y limpiamos valores vacíos
         const subcategoriasUnicas = [...new Set(subcategorias.filter((sub: any) => !!sub))];
-        console.log('📋 Las subcategorías únicas de esta tienda son:', subcategoriasUnicas);
+        // console.log('📋 Las subcategorías únicas de esta tienda son:', subcategoriasUnicas);
 
         // 3. Agrupamos los productos correspondientes bajo cada subcategoría exclusiva
         this.subcategories = subcategoriasUnicas.map((subcatName: string) => ({

@@ -112,6 +112,7 @@ export class CatAdicionalesComponent implements OnInit, OnDestroy, OnChanges {
 
   openModal(product: any) {
     this.selectedProduct = product;
+    console.log(product)
     setTimeout(() => {
       const element = document.getElementById('modalProduct-' + product._id);
       if (element && (window as any).bootstrap) {
