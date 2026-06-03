@@ -4,7 +4,7 @@ import { Router, RouterModule } from '@angular/router';
 import Swal from 'sweetalert2';
 import { Tienda } from '../../models/tienda.model';
 import { UsuarioService } from '../../services/usuario.service';
-import { NgClass, NgIf } from '@angular/common';
+import { NgClass, NgIf, NgStyle } from '@angular/common';
 import { ImagenPipe } from '../../pipes/imagen-pipe.pipe';
 import { TiendaService } from '../../services/tienda.service';
 import { environment } from '../../../environments/environment';
@@ -17,7 +17,7 @@ import { environment } from '../../../environments/environment';
     RouterModule,
     NgIf,
     NgClass,
-    ImagenPipe
+    ImagenPipe,
   ],
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.scss']

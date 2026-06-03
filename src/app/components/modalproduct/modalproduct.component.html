@@ -3,7 +3,7 @@
     data-bs-backdrop="true" 
     data-bs-keyboard="true"
     [attr.aria-labelledby]="'modalProductLabel-' + (product?._id || '')" 
-    style="height: auto; max-height: 100vh; border-radius: 25px 25px 0 0;"> <!-- Pure Bootstrap 5 Offcanvas with backdrop fix -->
+    style="height: auto; max-height: 90vh; border-radius: 25px 25px 0 0;"> <!-- Pure Bootstrap 5 Offcanvas with backdrop fix -->
 
     <div class="offcanvas-header p-3" *ngIf="product">
         <h5 class="offcanvas-title" [id]="'modalProductLabel-' + product._id">{{product.titulo}}</h5>
@@ -13,7 +13,7 @@
 
     <div class="offcanvas-body" *ngIf="product">
         <div class="ft-recipe">
-            <div class="ft-recipe__thumb" style="height: max-content;">
+            <div class="ft-recipe__thumb" >
                 <!-- Imagen del producto -->
                 <img [src]="product.img | imagenPipe: 'productos'" [alt]="product.titulo" class="img-fluid mb-5" />
             </div>

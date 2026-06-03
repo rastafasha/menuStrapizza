@@ -31,6 +31,7 @@
     justify-content: end;
     align-self: flex-start;
     flex-wrap: nowrap;
+    gap:10px
 }
 
 .product-card{
