@@ -87,7 +87,7 @@ export class HomeComponent {
       'churros': 'Churros'
     };
 
-    console.log(`📡 Buscando tienda en la API con el slug: ${nombreTiendaReal}`);
+    // console.log(`📡 Buscando tienda en la API con el slug: ${nombreTiendaReal}`);
 
     // 4. Invocamos tu servicio de tiendas original pasándole el parámetro plano en minúsculas
     // URL resultante: https://back-ecomm-mall.onrender.com/api/tiendas/by_nombre/nombre/pizzeria
@@ -122,7 +122,7 @@ export class HomeComponent {
         }
 
         this.isLoading = false;
-        console.log(`✅ Tienda encontrada. Categoria asignada a los productos: ${this.categoriaActiva}`);
+        // console.log(`✅ Tienda encontrada. Categoria asignada a los productos: ${this.categoriaActiva}`);
       },
       error: (err) => {
         console.error('Error al obtener la tienda por subdominio:', err);

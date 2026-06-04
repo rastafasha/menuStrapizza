@@ -67,7 +67,7 @@ export class CatAdicionalesComponent implements OnInit, OnDestroy, OnChanges {
     this.isLoading = true;
     const localId = this.tiendaSelected._id;
 
-    console.log(`📡 Filtrando adicionales locales de ${this.tiendaSelected.nombre} para: ${this.activeCategory}`);
+    // console.log(`📡 Filtrando adicionales locales de ${this.tiendaSelected.nombre} para: ${this.activeCategory}`);
 
     // Usamos tu servicio nativo que trae los productos exclusivos de esta tienda
     this.productoService.find_by_storeIdActive(localId).subscribe({
@@ -95,7 +95,7 @@ export class CatAdicionalesComponent implements OnInit, OnDestroy, OnChanges {
         // 3. Cargamos la grilla directo con los productos del local correspondientes a esa sección
         this.todo = this.products.slice();
         this.isLoading = false;
-        console.log(`✅ ¡Filtro de adicionales exitoso! Renderizados para ${this.activeCategory}:`, this.todo.length);
+        // console.log(`✅ ¡Filtro de adicionales exitoso! Renderizados para ${this.activeCategory}:`, this.todo.length);
       },
       error: (error) => {
         console.error(`❌ Error al obtener productos para adicionales de ${this.activeCategory}:`, error);

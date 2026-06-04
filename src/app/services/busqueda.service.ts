@@ -60,7 +60,7 @@ export class BusquedasService {
 
 
  buscar(
-    tipo: 'usuarios' | 'transferencias', 
+    tipo: 'usuarios' | 'transferencias'|'reservaciones' ,
     termino: string = ''
   ) {
     // Si el término está vacío, podrías retornar un array vacío o manejarlo según tu UX

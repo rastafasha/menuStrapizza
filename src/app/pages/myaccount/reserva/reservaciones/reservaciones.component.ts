@@ -1,43 +1,44 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { InfiniteScrollModule } from 'ngx-infinite-scroll';
-import { HeaderComponent } from '../../../shared/header/header.component';
-import { BusquedasService } from '../../../services/busqueda.service';
-import { ImagenPipe } from '../../../pipes/imagen-pipe.pipe';
-import { UsuarioService } from '../../../services/usuario.service';
-import { AsideCuentaComponent } from '../aside-cuenta/aside-cuenta.component';
-import { TransferenciasService } from '../../../services/transferencias.service';
-import { TiendaService } from '../../../services/tienda.service';
-import { SafePipe } from '../../../pipes/safe.pipe';
-
+import { BusquedasService } from '../../../../services/busqueda.service';
+import { ReservacionService } from '../../../../services/reservacion.service';
+import { TiendaService } from '../../../../services/tienda.service';
+import { UsuarioService } from '../../../../services/usuario.service';
+import { HeaderComponent } from '../../../../shared/header/header.component';
+import { AsideCuentaComponent } from '../../aside-cuenta/aside-cuenta.component';
+import { ReservaCrearComponent } from '../reserva-crear/reserva-crear.component';
+import { MenuFooterComponent } from "../../../../shared/menu-footer/menu-footer.component";
+import { Reservacion } from '../../../../models/reservacion.model';
 declare var bootstrap: any;
+
 @Component({
-  selector: 'app-mis-pagos',
+  selector: 'app-reservaciones',
   imports: [
     CommonModule,
     HeaderComponent,
     InfiniteScrollModule,
     FormsModule,
     //  ModalInstruccionesComponent,
-    ImagenPipe,
     AsideCuentaComponent,
-    SafePipe
-  ],
-  templateUrl: './mis-pagos.component.html',
-  styleUrl: './mis-pagos.component.scss'
+    ReservaCrearComponent,
+    MenuFooterComponent
+],
+  templateUrl: './reservaciones.component.html',
+  styleUrl: './reservaciones.component.scss'
 })
-export class MisPagosComponent implements OnInit {
+export class ReservacionesComponent {
 
-  transferencias = signal<any[]>([]);
+  reservaciones = signal<any[]>([]);
   loading = signal<boolean>(false);
   hasMore = signal<boolean>(true);
   isFiltering = signal(false);
   showToast = signal(false);
-  showToastFactura = signal(false);
-  isFilteringFactura = signal(false);
-  pagoSeleccionado = signal<any>(null);
+  showToastReservacion = signal(false);
+  isFilteringReservacion = signal(false);
+  reservacionSeleccionado = signal<any>(null);
   page = 1;
   userId!: string;
   query: string = '';
@@ -47,11 +48,13 @@ export class MisPagosComponent implements OnInit {
   tienda_moneda: string = '';
   tiendaSelected!: any;
 
+  presupuestoSeleccionado = signal<any>(null);
+
   info = `
-  <h2>Sección: Mis Pagos</h2>
+  <h2>Sección: Mis Reservaciones</h2>
   <p>En este apartado podrás:</p>
   <ul>
-    <li><strong>Consultar el historial</strong> de tus pagos, identificados con colores según su estatus (Pendiente, Aprobado o Rechazado).</li>
+    <li><strong>Consultar el historial</strong> de tus reservaciones, identificadas con colores según su estatus (Pendiente, Aprobada o Rechazada).</li>
     <li><strong>Localizar transacciones</strong> rápidamente buscando por fecha, número de referencia o monto.</li>
     <li><strong>Filtrar la lista</strong> para ver solo los pagos que te interesen según su estado actual.</li>
     <li><strong>Acceder al detalle</strong> completo de cada operación utilizando el botón "Ver Ticket".</li>
@@ -63,7 +66,7 @@ export class MisPagosComponent implements OnInit {
   private busquedasService = inject(BusquedasService);
   private usuarioService = inject(UsuarioService);
   private route = inject(ActivatedRoute);
-  private transferenciasService = inject(TransferenciasService);
+  private reservacionService = inject(ReservacionService);
   private tiendaService = inject(TiendaService);
 
   ngOnInit() {
@@ -73,18 +76,18 @@ export class MisPagosComponent implements OnInit {
     this.user = JSON.parse(USER ? USER : '');
     this.userId = this.user.uid;
 
-    this.getPagosUsuario();
+    this.getReservacionUsuario();
 
     // LEER PARÁMETROS DE LA URL
     this.route.queryParams.subscribe(params => {
       if (params['status']) {
         // Asignamos 'RECHAZADO' según envíes desde el Home
         this.status = params['status'];
-        this.isFilteringFactura.set(true);
+        this.isFilteringReservacion.set(true);
       }
 
       // Ahora ejecutamos la carga (que ya usa this.status)
-      this.getPagosUsuario();
+      this.getReservacionUsuario();
       this.escucharTiendaActiva();
     });
   }
@@ -106,14 +109,14 @@ export class MisPagosComponent implements OnInit {
     // Si hay búsqueda por TEXTO (query), normalmente el backend devuelve todo de golpe.
     // Pero si es por ESTATUS, queremos seguir bajando:
     this.page++;
-    this.getPagosUsuario();
+    this.getReservacionUsuario();
   }
 
-  getPagosUsuario() {
+  getReservacionUsuario() {
     if (!this.hasMore()) return; // Si ya sabemos que no hay más en el servidor, paramos.
     this.loading.set(true);
 
-    this.transferenciasService.getByUser(this.userId, this.page).subscribe({
+    this.reservacionService.getReservacionByUser(this.userId, this.page).subscribe({
       next: (newData: any[]) => {
         if (newData.length === 0) {
           this.hasMore.set(false);
@@ -127,7 +130,7 @@ export class MisPagosComponent implements OnInit {
 
 
           // 2. Agregamos los únicos a la lista visible
-          this.transferencias.update(current => {
+          this.reservaciones.update(current => {
             const ids = new Set(current.map(p => p._id));
             const unique = filteredData.filter(p => !ids.has(p._id));
             return [...current, ...unique];
@@ -137,7 +140,7 @@ export class MisPagosComponent implements OnInit {
           // o ninguno, pero el API dice que hay más páginas, pedimos la siguiente YA.
           if (this.status && filteredData.length < 5 && newData.length > 0) {
             this.page++;
-            this.getPagosUsuario(); // Llamada recursiva controlada
+            this.getReservacionUsuario(); // Llamada recursiva controlada
           } else {
             this.loading.set(false);
           }
@@ -151,21 +154,21 @@ export class MisPagosComponent implements OnInit {
     // 1. Resetear estados de paginación cada vez que filtramos
     this.page = 1;
     this.hasMore.set(true);
-    this.transferencias.set([]);
+    this.reservaciones.set([]);
 
     // CASO A: El usuario escribió algo en el buscador (Texto)
     if (this.query && this.query.trim() !== '') {
       this.isFiltering.set(true);
       this.loading.set(true);
 
-      this.busquedasService.buscar('transferencias', this.query).subscribe({
+      this.busquedasService.buscar('reservaciones', this.query).subscribe({
         next: (resultados: any[]) => {
           let filtered = resultados;
           // Si además de texto seleccionó un estatus, filtramos el array
           if (this.status) {
             filtered = resultados.filter((p: any) => p.status === this.status);
           }
-          this.transferencias.set(filtered);
+          this.reservaciones.set(filtered);
           this.loading.set(false);
         },
         error: () => this.loading.set(false)
@@ -175,9 +178,9 @@ export class MisPagosComponent implements OnInit {
     // CASO B: No hay texto, pero quizás seleccionó un Estatus (o "Todos")
     else {
       // Si seleccionó un estatus o volvió a "Todos", usamos la carga normal
-      // getPagosUsuario ahora debe enviar this.status al servicio
+      // getReservacionUsuario ahora debe enviar this.status al servicio
       this.isFiltering.set(this.status !== '');
-      this.getPagosUsuario();
+      this.getReservacionUsuario();
     }
   }
 
@@ -191,7 +194,7 @@ export class MisPagosComponent implements OnInit {
     this.isFiltering.set(false);
     this.page = 1;
     this.hasMore.set(true);
-    this.transferencias.set([]);
+    this.reservaciones.set([]);
 
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
@@ -202,30 +205,22 @@ export class MisPagosComponent implements OnInit {
       this.showToast.set(false);
     }, 2500); // Se ocultará solo después de 2.5 segundos
 
-    this.getPagosUsuario();
+    this.getReservacionUsuario();
   }
 
-  verDetallePago(pago: any) {
-    this.pagoSeleccionado.set(pago);
+  verDetallePago(resev: any) {
+    this.reservacionSeleccionado.set(resev);
 
     const el = document.getElementById('offcanvasPago');
     const bsOffcanvas = new bootstrap.Offcanvas(el);
     bsOffcanvas.show();
   }
 
-  reportarPago(payment: any) {
-    // Verificamos si el objeto tiene el ID de la factura
-    const facturaId = payment.factura?._id || payment.factura;
+  
 
-    if (facturaId) {
-      this.router.navigate(['/reportar-pago', facturaId]);
-    } else {
-      // Si no hay factura (pago huérfano), podrías mandarlo a una ruta general
-      console.warn('Este pago no tiene una factura asociada');
-      this.router.navigate(['/reportar-pago', 'nuevo']);
+  onEditProject(resev: Reservacion) {
+      this.reservacionSeleccionado.set(resev);
+      
     }
-  }
-
-
 
 }

@@ -37,7 +37,7 @@ export class FooterComponent implements OnInit, OnDestroy {
           console.error('Error al procesar el JSON de redes sociales en el footer:', e);
           this.redssociales = [];
         }
-        console.log('FooterComponent actualizó sus redes sociales con éxito:', this.redssociales);
+        // console.log('FooterComponent actualizó sus redes sociales con éxito:', this.redssociales);
       }
     });
   }

@@ -4,10 +4,11 @@ import { RouterModule } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { Tienda } from '../../models/tienda.model';
 import { TiendaService } from '../../services/tienda.service';
+import { ReservaCrearComponent } from '../../pages/myaccount/reserva/reserva-crear/reserva-crear.component';
 
 @Component({
   selector: 'app-hero',
-  imports: [RouterModule, CommonModule, NgStyle],
+  imports: [RouterModule, CommonModule, NgStyle, ReservaCrearComponent],
   templateUrl: './hero.component.html',
   styleUrl: './hero.component.scss'
 })

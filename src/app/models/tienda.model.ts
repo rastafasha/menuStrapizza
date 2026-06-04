@@ -20,6 +20,7 @@ export class Tienda{
     public color_primario: string,
     public theme: string,
     public css_personalizado: string,
+    public has_reservacion: boolean,
     public redssociales?: string,
     public telefono?: string,
     public productos?: string,

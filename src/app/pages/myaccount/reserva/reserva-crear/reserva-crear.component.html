@@ -1,0 +1,180 @@
+<div id="add_presupuesto" class="offcanvas offcanvas-bottom rounded-top-5 h-100"
+    style="height: auto; max-height: 100vh; border-radius: 25px 25px 0 0;">
+    <div class="offcanvas-header border-bottom py-3">
+        <h5 class="offcanvas-title fw-bold text-primary">{{pageTitle}}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" (click)="onClose()"></button>
+    </div>
+    <div class="offcanvas-body p-4">
+        <div class="row">
+            <!-- <app-loading *ngIf="isLoading"></app-loading> -->
+            <div class="container my-4" style="max-width: 500px;">
+
+                <!-- Cabecera del Formulario -->
+                <form [formGroup]="reservaForm" (ngSubmit)="onSubmit()" novalidate>
+
+                    <!-- Campo: fecha -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-secondary mb-1">Fecha</label>
+                        <input type="date" formControlName="fecha" class="form-control form-control-lg bg-light">
+                    </div>
+                    <!-- Campo: Nombre -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-secondary mb-1">Nombre</label>
+                        <input type="text" formControlName="first_name" class="form-control form-control-lg bg-light"
+                            placeholder="Nombre"
+                            [ngClass]="{'is-invalid': reservaForm.get('first_name')?.touched && reservaForm.get('first_name')?.invalid}">
+                    </div>
+
+                    <!-- Campo: Apellidos -->
+                    <div class="mb-2">
+                        <label class="form-label fw-bold text-secondary mb-1">Apellidos</label>
+                        <input type="text" formControlName="last_name" class="form-control form-control-lg bg-light"
+                            placeholder="Apellidos"
+                            [ngClass]="{'is-invalid': reservaForm.get('last_name')?.touched && reservaForm.get('last_name')?.invalid}">
+                    </div>
+
+                    
+
+                    <!-- Campo: Email -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-secondary mb-1">Email</label>
+                        <input type="email" formControlName="email" class="form-control form-control-lg bg-light"
+                            placeholder="Email"
+                            [ngClass]="{'is-invalid': reservaForm.get('email')?.touched && reservaForm.get('email')?.invalid}">
+                    </div>
+
+                    <!-- Campos del Teléfono combinados -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-secondary mb-1">Teléfono</label>
+                        <div class="input-group">
+                            <!-- Selector de código de país simulado con Bootstrap -->
+                            <!-- <select formControlName="phone_code" class="form-select form-select-lg bg-light" style="max-width: 130px;">
+          <option value="+58">🇻🇪 Venez</option>
+          <option value="+1">🇺🇸 USA</option>
+          <option value="+34">🇪🇸 España</option>
+        </select> -->
+                            <!-- Entrada del número telefónico -->
+                            <input type="tel" formControlName="telefono" class="form-control form-control-lg bg-light"
+                                placeholder="Teléfono"
+                                [ngClass]="{'is-invalid': reservaForm.get('telefono')?.touched && reservaForm.get('phone')?.invalid}">
+                        </div>
+                    </div>
+
+                    <!-- Fila de Personas y Hora -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-6">
+                            <label class="form-label fw-bold text-secondary mb-1">Personas</label>
+                            <select formControlName="personas" class="form-select form-select-lg bg-light"
+                                [ngClass]="{'is-invalid': reservaForm.get('personas')?.touched && reservaForm.get('personas')?.invalid}">
+                                <option value="" disabled selected hidden></option>
+                                <option value="1">1 Persona</option>
+                                <option value="2">2 Personas</option>
+                                <option value="3">3 Personas</option>
+                                <option value="4">4 Personas</option>
+                                <option value="5">5+ Personas</option>
+                            </select>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label fw-bold text-secondary mb-1">Hora</label>
+                            <select formControlName="hora" class="form-select form-select-lg bg-light"
+                                [ngClass]="{'is-invalid': reservaForm.get('hora')?.touched && reservaForm.get('hora')?.invalid}">
+                                <option value="15:30">15:30</option>
+                                <option value="16:00">16:00</option>
+                                <option value="16:30">16:30</option>
+                                <option value="17:00">17:00</option>
+                                <option value="17:30">17:30</option>
+                                <option value="18:00">18:00</option>
+                                <option value="18:30">18:30</option>
+                                <option value="19:00">19:00</option>
+                                <option value="19:30">19:30</option>
+                                <option value="20:00">20:00</option>
+                                <option value="20:30">20:30</option>
+                            </select>
+                        </div>
+                    </div>
+                    <!-- Botón Dinámico: Añadir un comentario -->
+                    <div class="text-end mb-3">
+                        <a href="#" (click)="toggleComentario($event)"
+                            class="text-decoration-none fw-semibold small text-primary">
+                            {{ mostrarComentario ? '- Quitar comentario' : 'Añadir un comentario' }}
+                        </a>
+                    </div>
+
+                    <!-- Área de texto opcional para Comentarios -->
+                    <div class="mb-3" *ngIf="mostrarComentario">
+                        <textarea formControlName="comentarios" class="form-control bg-light" rows="3"
+                            placeholder="Escribe tus notas o comentarios aquí..."></textarea>
+                    </div>
+
+                    <!-- Sección Interactiva: Intolerancia/Alergia -->
+                    <div class="mb-4 text-secondary">
+                        <p class="fw-bold mb-2">¿Tiene algún comensal alguna intolerancia/alergia?</p>
+                        <div class="d-flex gap-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" value="Si" id="alergiaSi"
+                                    formControlName="comensal_alergia">
+                                <label class="form-check-label fw-semibold" for="alergiaSi">Si</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" value="No" id="alergiaNo"
+                                    formControlName="comensal_alergia">
+                                <label class="form-check-label fw-semibold" for="alergiaNo">No</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Campo adicional dinámico si marca que 'Si' posee alergias -->
+                    <div class="mb-4" *ngIf="reservaForm.get('comensal_alergia')?.value === 'Si'">
+                        <label class="form-label fw-bold text-danger mb-1">Especificar alergias o intolerancias</label>
+                        <textarea formControlName="comentarios_alergia" class="form-control bg-light" rows="2"
+                            placeholder="Ejemplo: Celíaco, Alergia al maní..."
+                            [ngClass]="{'is-invalid': reservaForm.get('comentarios_alergia')?.touched && reservaForm.get('comentarios_alergia')?.invalid}"></textarea>
+                    </div>
+
+                    <!-- Checkboxes de Políticas de Privacidad y Publicidad -->
+                    <!-- <div class="mb-3 form-check text-secondary">
+                        <input type="checkbox" class="form-check-input" id="checkPrivacidad"
+                            formControlName="acepta_privacidad"
+                            [ngClass]="{'is-invalid': reservaForm.get('acepta_privacidad')?.touched && reservaForm.get('acepta_privacidad')?.invalid}">
+                        <label class="form-check-label small fw-semibold" for="checkPrivacidad">
+                            Acepto el <a href="#" class="text-decoration-none text-primary">Tratamiento de Datos</a> y
+                            <a href="#" class="text-decoration-none text-primary">Política de Privacidad</a>
+                        </label>
+                    </div>
+
+                    <div class="mb-4 form-check text-secondary">
+                        <input type="checkbox" class="form-check-input" id="checkComercial"
+                            formControlName="recibir_comercial">
+                        <label class="form-check-label small fw-semibold" for="checkComercial">
+                            Quiero recibir información comercial del restaurante por mail y SMS
+                        </label>
+                    </div> -->
+                    <!-- 🎛️ NUEVO: Switch para Lista de Espera -->
+    <div class="mb-4 p-3 bg-light rounded border d-flex justify-content-between align-items-center">
+      <div>
+        <label class="form-check-label fw-bold text-secondary mb-0" for="switchListaEspera">
+          ¿Unirse a la lista de espera?
+        </label>
+        <div class="small text-muted">Te notificaremos si se libera una mesa.</div>
+      </div>
+      <div class="form-check form-switch fs-4 m-0 p-0 d-flex align-items-center">
+        <!-- El estilo inline contrarresta el padding por defecto de Bootstrap para alinearlo a la derecha -->
+        <input class="form-check-input m-0 cursor-pointer" type="checkbox" role="switch" 
+               id="switchListaEspera" formControlName="listaespera" style="float: none;">
+      </div>
+    </div>
+
+                    <!-- Botón para procesar los datos -->
+                    <button type="submit" class="btn btn-primary btn-lg w-100 fw-bold" [disabled]="reservaForm.invalid">
+                        Confirmar Reservación
+                    </button>
+
+                </form>
+            </div>
+
+
+        </div>
+
+
+    </div>
+</div>

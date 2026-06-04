@@ -91,6 +91,15 @@ export class NotificacionService {
             case 'PEDIDO_FINALIZADO':
               toast = this.toastr.error(notif.mensaje, '❌ Pedido Finalizado', config);
               break;
+            case 'RESERVACION_CONFIRMADA':
+              toast = this.toastr.success(notif.mensaje, '✅ Reservación Confirmada', config);
+              break;
+            case 'RESERVACION_CANCELADA':
+              toast = this.toastr.error(notif.mensaje, '❌ Reservación Cancelada', config);
+              break;
+            case 'RESERVACION_COMPLETADA':
+              toast = this.toastr.error(notif.mensaje, '✅ Reservación Completada', config);
+              break;
            
             default:
               toast = this.toastr.info(notif.mensaje, '🔔 Aviso Nuevo', config);
@@ -145,6 +154,7 @@ export class NotificacionService {
     if (!refId) return '/home';
     if (tipo.startsWith('PAGO_') || tipo === 'NUEVO_PAGO') return `/mis-pagos`;
     if (tipo.startsWith('PEDIDO_') || tipo === 'NUEVA_SOLICITUD') return `/solicitudes`;
+    if (tipo.startsWith('RESERVACION_')) return `/reservaciones`;
     return '/home';
   }
 }

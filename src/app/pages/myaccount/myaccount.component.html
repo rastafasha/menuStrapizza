@@ -68,6 +68,12 @@
                             <p>Mis Favoritos</p>
                         </a>
                     </div>
+                    <div class="iconop shadow-sm" *ngIf="identity.telefono">
+                        <a [routerLink]="['/reservaciones']">
+                            <i class="fa fa-receipt"></i>
+                            <p>Reservaciones</p>
+                        </a>
+                    </div>
                     
 
                 </div>

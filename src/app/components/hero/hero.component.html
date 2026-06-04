@@ -21,6 +21,12 @@
                 Comienza a agregar productos!
             </p>
             
+            <div class="botns" *ngIf="tiendaSelected?.has_reservacion === true">
+                <button  class="btn btn-primary rounded-rounded " 
+                data-bs-target="#add_presupuesto" data-bs-toggle="offcanvas">
+                Reservación
+                </button>
+            </div>
             <!-- <div class="botns">
                 <a routerLink="registro" class="btn-primary" *ngIf="!isLogued">
                     <i class="fas fa-pizza-slice"></i> Registrarme
@@ -33,3 +39,4 @@
     </div>
 </section>
 <div class="clear"></div>
+<app-reserva-crear #presupuestoEditModal [tiendaSelected]="tiendaSelected"></app-reserva-crear>
