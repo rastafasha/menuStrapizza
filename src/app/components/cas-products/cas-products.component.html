@@ -44,7 +44,7 @@
 
             <!-- Grilla / Lista de productos filtrados -->
             <div *ngFor="let product of todo; let i = index">
-                <app-product-item [activeCategory]="activeCategory" [tienda_moneda]="tienda_moneda" [product]="product"
+                <app-product-item [activeCategory]="activeCategory" [tienda_moneda]="tienda_moneda" [product]="product" 
                     data-bs-toggle="offcanvas" [attr.data-bs-target]="'#modalProduct-' + product._id"
                     (click)="openModal(product)">
                 </app-product-item>

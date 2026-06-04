@@ -111,32 +111,33 @@
                                                 </div>
                                             </div>
                                             <!-- modal cancelacion -->
-                                            <ng-container *ngIf="venta.estado == 'Enviado' || venta.estado == 'Venta en proceso' || venta.estado == 'Finalizado'">
+                                            <!-- <ng-container *ngIf="venta.estado == 'Enviado' || venta.estado == 'Venta en proceso' || venta.estado == 'Finalizado'">
                                                 <a [routerLink]="['/my-account/ordenes/tickets/',venta._id]" type="button" class="btn btn-primary">
                                                     <i class="fa fa-help mr-1"></i> Tickets
                                                 </a>
-                                            </ng-container>
+                                            </ng-container> -->
 
 
                                         </div>
-                                        <div class="btn-group mr-2 mb-2" role="group" aria-label="Apply settings" *ngIf="venta.estado == 'Enviado'">
-                                            <button type="button" class="btn btn-success" data-toggle="modal" [attr.data-target]="'#finalizar'">
+                                        <!-- Confirmar entrega -->
+                                        <div class="btn-group mr-2 mb-2" role="group" aria-bs-label="Apply settings" *ngIf="venta.estado == 'Enviado'">
+                                            <button type="button" class="btn btn-success" data-bs-toggle="modal" [attr.data-bs-target]="'#finalizar'">
                                                 <i class="fa fa-check mr-2"></i>
                                                 Confirmar entrega
                                               </button>
 
-                                            <div class="modal fade" id="finalizar" tabindex="-1" role="dialog" style="display: none;" aria-hidden="true">
+                                            <div class="modal fade" id="finalizar" tabindex="-1" role="dialog" style="display: none;" aria-bs-hidden="true">
                                                 <div class="modal-dialog modal-dialog-centered" role="document">
                                                     <div class="modal-content">
                                                         <div class="modal-header">
                                                             <h4 class="modal-title">Confirmación</h4>
-                                                            <button class="close" type="button" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                                                            <button class="close" type="button" data-bs-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
                                                         </div>
                                                         <div class="modal-body">
                                                             <p class="font-size-sm">Al aceptar estas confimando la recepción de la compra.</p>
                                                         </div>
                                                         <div class="modal-footer">
-                                                            <button class="btn btn-secondary btn-sm" type="button" data-dismiss="modal">Cerrar</button>
+                                                            <button class="btn btn-secondary btn-sm" type="button" data-bs-dismiss="modal">Cerrar</button>
                                                             <button class="btn btn-primary btn-shadow btn-sm" type="button" (click)="finalizar(id)">Confirmar</button>
                                                         </div>
                                                     </div>
@@ -146,6 +147,7 @@
 
                                     </div>
                                 </div>
+                                <!-- data_cancelacion -->
                                 <div class="col-lg-12 form-group" *ngIf="!data_cancelacion || data_cancelacion.estado == 'Denegado'">
                                     <div class="bg-secondary rounded-lg px-4 pt-4 pb-2">
                                         <div class="row">
@@ -212,23 +214,27 @@
                                         <!-- Horizontal card layout -->
                                         <div class="card">
                                             <div class="row ">
-                                                <div class="col-sm-3">
+                                                <div class="col-sm-3 topedesc">
                                                     <img [src]="item.producto.img | imagenPipe: 'productos'" style="width:100%" class="rounded-left" alt="Card image">
+                                                    <div class="ifdet">
+                                                        <h3 class="product-title font-size-base mb-2"><a [routerLink]="['/producto/',item.producto.slug]">{{item.producto.titulo}}</a></h3>
+                                                    <div class="font-size-sm"><span class="text-muted mr-2">Cantidad:</span>{{item.cantidad}}</div>
+                                                    <div class="font-size-lg text-accent"><span class="font-size-sm text-muted mr-2">Precio unitario:</span><br> {{item.precio |currency: tienda_moneda}}</div>
+                                                    </div>
                                                 </div>
                                                 <div class="col-sm-9">
                                                     <div class="card-body">
                                                         <div class="media-body pt-2">
                                                             <div class="row">
-                                                                <div class="col-lg-12">
-                                                                    <h3 class="product-title font-size-base mb-2"><a [routerLink]="['/producto/',item.producto.slug]">{{item.producto.titulo}}</a></h3>
-                                                                </div>
                                                                 <div class="col-lg-6">
-                                                                    <div class="font-size-sm"><span class="text-muted mr-2">Cantidad:</span>{{item.cantidad}}</div>
+                                                                    
+                                                                    
                                                                     <div class="font-size-sm"><span class="text-muted mr-2">{{item.producto.nombre_selector}}:</span>{{item.selector}}</div>
+                                                                    <div class="font-size-sm"><span class="text-muted mr-2">Selector:</span>{{item.selector_elegido}}</div>
                                                                     <div class="font-size-sm"><span class="text-muted mr-2">Color:</span>
                                                                         <span [ngStyle]="{'background': item.color,'color': item.color}" style="font-weight: 900;">||||||||||||||||||||</span>
                                                                     </div>
-                                                                    <div class="font-size-lg text-accent"><span class="font-size-sm text-muted mr-2">Precio unitario:</span><br> {{item.precio |currency: tienda_moneda}}</div>
+                                                                    
                                                                 </div>
                                                                 <div class="col-lg-6">
 

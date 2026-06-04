@@ -54,17 +54,16 @@
 </section>
 
 <!-- modal -->
- 
-<div #offcanvasElement class="offcanvas offcanvas-bottom" id="offcanvasProducto"
-    data-bs-backdrop="true" data-bs-keyboard="true" [attr.aria-labelledby]="'modalProductLabel-' + (selectedProduct?._id || '')"
+
+<div #offcanvasElement class="offcanvas offcanvas-bottom" id="offcanvasProducto" data-bs-backdrop="true"
+    data-bs-keyboard="true" [attr.aria-labelledby]="'modalProductLabel-' + (selectedProduct?._id || '')"
     style="height: auto; max-height: 90vh; border-radius: 25px 25px 0 0;">
     <!-- Pure Bootstrap 5 Offcanvas with backdrop fix -->
 
     <div class="offcanvas-header p-3" *ngIf="selectedProduct">
         <h5 class="offcanvas-title" [id]="'modalProductLabel-' + selectedProduct._id">{{selectedProduct.titulo}}</h5>
         <!-- El atributo data-bs-dismiss ahora debe ser "offcanvas" -->
-        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" 
-            aria-label="Close"></button>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>
 
     <div class="offcanvas-body" *ngIf="selectedProduct">
@@ -72,12 +71,13 @@
             <div class="ft-recipe__thumb grid-item">
                 <!-- Imagen del producto -->
                 <div class="imagen">
-                    <img [src]="selectedProduct.img | imagenPipe: 'productos'" [alt]="selectedProduct.titulo" class="img-fluid mb-5" />
+                    <img [src]="selectedProduct.img | imagenPipe: 'productos'" [alt]="selectedProduct.titulo"
+                        class="img-fluid mb-5" />
 
                 </div>
                 <div class="infoinicial">
-                        <h2 class="recipe-title">{{selectedProduct.titulo}}</h2>
-                        <ul class="recipe-details list-unstyled">
+                    <h2 class="recipe-title">{{selectedProduct.titulo}}</h2>
+                    <ul class="recipe-details list-unstyled">
                         <li class="recipe-details-item servings">
                             <span class="value text-muted me-2" style="text-decoration: line-through;"
                                 *ngIf="+selectedProduct.precio_antes > +selectedProduct.precio_ahora">
@@ -88,12 +88,12 @@
                             </span>
                         </li>
                     </ul>
-                    </div>
-                    
+                </div>
+
             </div>
 
             <div class="ft-recipe__content mt-3">
-                
+
 
                 <p class="description" [innerHTML]="selectedProduct.detalle"></p>
 

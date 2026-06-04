@@ -84,7 +84,7 @@ export class DetalleOrdenComponent implements OnInit {
 
 
   ngOnInit(): void {
-
+    window.scrollTo(0, 0);
     if(this.identity){
       this.url = environment.baseUrl;
       this._route.params.subscribe(

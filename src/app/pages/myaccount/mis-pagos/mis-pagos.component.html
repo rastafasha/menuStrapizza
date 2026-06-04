@@ -217,9 +217,12 @@
         <span class="text-muted small">Categoria</span>
         <span class="fw-bold small">{{ item.subcategoria }}</span>
       </div>
-      <div class="d-flex justify-content-between mb-3 border-bottom pb-2">
+      <div class="d-flex justify-content-between mb-3 border-bottom pb-2 flex-column">
         <span class="text-muted small">Nombre</span>
-        <span class="fw-bold small">{{ item.titulo }}</span>
+        <div class="d-flex flex-column ">
+          <span class="fw-bold small">{{ item.titulo }}</span>
+          <span class="fw-bold small">{{ item.selector_elegido }}</span>
+        </div>
       </div>
       <div class="d-flex justify-content-between mb-3 border-bottom pb-2 flex-column">
         <span class="text-muted small">Detalle</span>

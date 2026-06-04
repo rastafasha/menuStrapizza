@@ -5,7 +5,7 @@
     </div>
 
 
-    <div class="container m-t-20">
+    <div class="row m-t-20">
 
         <!-- PASO 1: RESUMEN DEL CARRITO (Tu vista actual con la bandejaList) -->
         <div class="step-container" *ngIf="pasoActual === 1">
@@ -39,7 +39,10 @@
                             <div class="clear"></div>
                             <div class="info-item">
                                 <img [src]="item.img | imagenPipe:'productos' " alt="">
-                                <h2>{{item.titulo | slice:0:8}}...</h2>
+                                <div class="d-flex flex-column ">
+                                    <h2>{{item.titulo | slice:0:8}}...</h2>
+                                <p class="small">{{item.selector_elegido | slice:0:8}}...</p>
+                                </div>
                                 <p *ngIf="item.subcategoria === 'Pastas'">{{item.nombre_selector | slice:0:6}}...</p>
                                 <div class="add-items justify-content-center">
                                     <i class="fa fa-minus icon-small" (click)="removeItem(item,i )"></i>

@@ -133,26 +133,35 @@ export class ModalproductComponent implements OnInit, OnDestroy, AfterViewInit {
     this.msm_success = false;
     this.selector_error = false;
 
-    if (producto.subcategoria === 'Pastas') {
-      // Validar que se haya seleccionado un selector
-      if (!this.selector_to_cart || this.selector_to_cart === ' ') {
+    // 🟢 CONDICIÓN UNIVERSAL: Si el plato REQUIERE que el cliente elija un modificador
+    if (producto.nombre_selector && producto.nombre_selector.toLowerCase() !== 'unico') {
+      
+      // Validar de forma segura que no venga vacío o con puros espacios
+      if (!this.selector_to_cart || this.selector_to_cart.trim() === '') {
         this.selector_error = true;
         setTimeout(() => {
           this.selector_error = false;
-        }, 3000)
+        }, 3000);
         return;
       }
-
-      // Agregamos el selector al producto
-      producto.nombre_selector = this.selector_to_cart;
-
     }
 
-    this.carritoService.addItem(producto);
-    // Reset selector after adding
+    // 🟢 INYECCIÓN DINÁMICA: Clonamos el objeto y guardamos la elección real
+    let productoParaCarrito = {
+      ...producto,
+      selector_elegido: (producto.nombre_selector && producto.nombre_selector.toLowerCase() !== 'unico') 
+                        ? this.selector_to_cart 
+                        : 'Único'
+    };
+
+    // Enviamos el objeto con la salsa/opción inyectada al servicio
+    this.carritoService.addItem(productoParaCarrito);
+    
+    // Reset de seguridad para la próxima selección
     this.selector_to_cart = ' ';
     this.toastr.success('Artículo agregado al carrito');
-  }
+}
+
 
   removeItem(producto: Producto) {
     this.carritoService.removeItem(producto);

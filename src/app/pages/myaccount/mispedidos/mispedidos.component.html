@@ -64,12 +64,26 @@
                     <div class="card-body">
                         <div class="row">
                             <div class="col-lg-5">
-                                <div class="font-size-sm"><span class="text-muted mr-2">Fecha:</span>{{
-                                    item_pedido.createdAt | date:'MMM d, y, h:mm:ss a' }}</div>
-                                <!-- <div class="font-size-sm"><span class="text-muted mr-2">Tienda:</span>{{ tienda.nombre }}</div> -->
-                                <ul *ngFor="let item_pedido of item_pedido.pedidoList">
-                                    <li>{{ item_pedido.titulo }} | {{ item_pedido.cantidad }} |{{
-                                        item_pedido.precio_ahora|currency}}</li>
+                                <div class="font-size-sm">
+                                    <span class="text-muted mr-2">Fecha:</span>
+                                    {{ item_pedido.createdAt | date:'MMM d, y, h:mm:ss a' }}
+                                </div>
+                                
+                                <ul class="listpedido" *ngFor="let item_pedido of item_pedido.pedidoList">
+                                    <li>
+                                        <div class="itempedido ">
+                                            <div class="infoitempedi">
+                                                <h2 [ngStyle]="{'color': tiendaSelected?.color_primario }">{{item_pedido.titulo }}</h2>
+                                                <p class="small">{{item_pedido.selector_elegido | slice:0:8}}...</p>
+                                            </div>
+                                            <div class="preciocantidad">
+                                                <p>Cant:&nbsp;{{ item_pedido.cantidad }}</p>
+                                            <p>{{item_pedido.precio_ahora|currency}}</p>
+                                            </div>
+                                        </div>
+                                    </li>
+
+                                        
                                 </ul>
                             </div>
                         </div>

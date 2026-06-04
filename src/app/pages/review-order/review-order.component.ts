@@ -347,7 +347,7 @@ export class ReviewOrderComponent implements OnInit, OnDestroy {
     this.bandejaList.forEach((item: any) => {
       const itemTotal = (item.precio_ahora * item.cantidad).toFixed(2);
       message += `• ${item.titulo || item.titulo}\n`;
-      if (item.subcategoria === 'Pastas') {
+      if (item.nombre_selector !== 'unico') {
         message += `• ${item.nombre_selector}\n`;
       }
       message += `  Cant: ${item.cantidad} x ${item.precio_ahora.toFixed(2)} = ${itemTotal}\n\n`;

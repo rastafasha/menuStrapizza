@@ -53,9 +53,7 @@ export class ProductItemComponent {
 
 
   addItem(producto: Producto) {
-
       this.productoId = producto._id;
-
       this._colorService.colorByProduct(this.productoId).subscribe(
         response => {
           this.colores = response;

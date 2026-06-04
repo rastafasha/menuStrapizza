@@ -110,7 +110,6 @@ cargarProductosPorTiendaId(localId: any) {
       next: (productos: any[]) => {
         // Guardamos únicamente los productos que le pertenecen a este local
         this.products = productos || [];
-
         // 1. Extraemos el campo subcategoria de forma segura protegiendo contra nulos
         const subcategorias = this.products.map((producto: any) => {
           return producto.subcategoria ? producto.subcategoria.trim() : null;
@@ -155,8 +154,9 @@ cargarProductosPorTiendaId(localId: any) {
     this.isLoading = false;
   }
 
-  openModal(product: any) {
+  openModal(product: Producto) {
     this.selectedProduct = product;
+    console.log(product)
     setTimeout(() => {
       const element = document.getElementById('modalProduct-' + product._id);
       if (element) {

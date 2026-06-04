@@ -47,9 +47,9 @@
                                                 <button class="btn btn-accent" style="color:white !important" disabled><span class="czi-plane" style="color:white !important"></span> Sin seguimiento</button>
                                             </div>
                                         </div>
-                                        <div *ngIf="item_venta.estado == 'Venta en proceso' || item_venta.estado == 'Finalizado'">
+                                        <!-- <div *ngIf="item_venta.estado == 'Venta en proceso' || item_venta.estado == 'Finalizado'">
                                             <button disabled class="btn btn-accent"><span class="czi-plane"></span> Track</button>
-                                        </div>
+                                        </div> -->
 
                                         <a class="btn btn-dark" [routerLink]="['/my-account/ordenes/detalles/',item_venta._id]"><span class="czi-package"></span> Detalles</a>
 

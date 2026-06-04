@@ -12,14 +12,17 @@
         <h3>Pagar</h3>
       </div>
       <div class="clear"></div>
-      
+
       <!-- listado -->
       <div class=" overf">
         <div class="list-item" *ngFor="let item of pedidos; let i = index">
           <div class="clear"></div>
           <div class="info-item">
             <img [src]="item.img | imagenPipe:'productos' " alt="">
-            <h2>{{item.titulo}}</h2>
+            <div class="d-flex flex-column ">
+              <h2>{{item.titulo | slice:0:8}}...</h2>
+              <p class="small">{{item.selector_elegido | slice:0:8}}...</p>
+            </div>
             <div class="add-items justify-content-center">
               <span>{{item.cantidad}}</span>
             </div>
@@ -299,13 +302,13 @@
                   </div>
                 </div>
 
-                 <!-- botones -->
-              <div class="d-flex justify-content-center gap-2 mt-3">
-                <button class="check-button " type="submit">
-                  <i class="fa fa-money-check"></i>
-                  Procesar
-                </button>
-              </div>
+                <!-- botones -->
+                <div class="d-flex justify-content-center gap-2 mt-3">
+                  <button class="check-button " type="submit">
+                    <i class="fa fa-money-check"></i>
+                    Procesar
+                  </button>
+                </div>
 
               </form>
             </div>

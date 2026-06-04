@@ -66,6 +66,7 @@ export class IndexOrdenesComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    window.scrollTo(0, 0);
     let USER = localStorage.getItem('user');
     if(USER){
       this.identity = JSON.parse(USER);

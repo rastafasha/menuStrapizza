@@ -18,6 +18,7 @@ import { MisNotificacionesComponent } from './pages/mis-notificaciones/mis-notif
 import { MisPagosComponent } from './pages/myaccount/mis-pagos/mis-pagos.component';
 import { FavoritesComponent } from './pages/myaccount/favorites/favorites.component';
 import { ReservacionesComponent } from './pages/myaccount/reserva/reservaciones/reservaciones.component';
+import { TrackOrdenComponent } from './pages/myaccount/ordenes/track-orden/track-orden.component';
 // import { ReviewOrderComponent } from './pages/review-order/review-order.component';
 
 export const routes: Routes = [
@@ -51,6 +52,7 @@ export const routes: Routes = [
     { path: 'my-account/ordenes', component: IndexOrdenesComponent},
     { path: 'my-account/pedidos', component: MispedidosComponent},
     { path: 'my-account/ordenes/detalles/:id', component: DetalleOrdenComponent},
+    { path: 'my-account/ordenes/tracking/:id', component: TrackOrdenComponent},
     {path: 'my-account/cart', component: CartCheckoutComponent },
     {path: 'my-account/direcciones', component: DireccionesComponent },
     {path: 'my-account/direccion/create', component: DireccionEditComponent },

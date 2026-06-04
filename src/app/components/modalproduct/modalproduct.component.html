@@ -1,9 +1,9 @@
 <div #offcanvasElement class="offcanvas offcanvas-bottom" [id]="'modalProduct-' + (product?._id || '')" tabindex="-1"
     data-bs-backdrop="true" data-bs-keyboard="true" [attr.aria-labelledby]="'modalProductLabel-' + (product?._id || '')"
-    style="height: auto; max-height: 90vh; border-radius: 25px 25px 0 0;">
+    style="height: auto; max-height: 70vh; border-radius: 25px 25px 0 0;">
     <!-- Pure Bootstrap 5 Offcanvas with backdrop fix -->
 
-    <div class="offcanvas-header p-3" *ngIf="product">
+    <div class="offcanvas-header p-4" *ngIf="product">
         <h5 class="offcanvas-title" [id]="'modalProductLabel-' + product._id">{{product.titulo}}</h5>
         <!-- El atributo data-bs-dismiss ahora debe ser "offcanvas" -->
         <button type="button" class="btn-close" data-bs-dismiss="offcanvas" (click)="onModalHidden()"
@@ -12,13 +12,29 @@
 
     <div class="offcanvas-body" *ngIf="product">
         <div class="ft-recipe">
-            <div class="ft-recipe__thumb">
-                <!-- Imagen del producto -->
-                <img [src]="product.img | imagenPipe: 'productos'" [alt]="product.titulo" class="img-fluid mb-5" />
+            <div class="ft-recipe__thumb grid-item">
+                <div class="imagen">
+                    <img [src]="product.img | imagenPipe: 'productos'" [alt]="product.titulo" class="img-fluid mb-5" />
+                </div>
+                <div class="infoinicial">
+                    <h2 class="recipe-title">{{product.titulo}}</h2>
+                    <ul class="recipe-details list-unstyled">
+                        <li class="recipe-details-item servings">
+                            <span class="value text-muted me-2" style="text-decoration: line-through;"
+                                *ngIf="+product.precio_antes > +product.precio_ahora">
+                                {{product.precio_antes | number:'1.2-2' | currency:tienda_moneda}}
+                            </span>
+                            <span class="value fw-bold">
+                                {{product.precio_ahora | number:'1.2-2' | currency:tienda_moneda}}
+                            </span>
+                        </li>
+                    </ul>
+                </div>
+
             </div>
 
             <div class="ft-recipe__content mt-3">
-                <header class="content__header">
+                <!-- <header class="content__header">
                     <div class="row-wrapper">
                         <h2 class="recipe-title">{{product.titulo}}</h2>
                     </div>
@@ -33,7 +49,7 @@
                             </span>
                         </li>
                     </ul>
-                </header>
+                </header> -->
 
                 <p class="description" [innerHTML]="product.detalle"></p>
 
@@ -49,7 +65,7 @@
                     </select>
                 </div>
 
-                <div class="d-grid gap-2">
+                <div class="d-grid gap-2 mt-3">
                     <button class="btn btn-outline-success w-100 py-3 rounded-pill" (click)="addItem(product)">
                         <i class="fa fa-shopping-bag"></i> Agregar al Pedido
                     </button>

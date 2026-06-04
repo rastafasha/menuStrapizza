@@ -1,9 +1,15 @@
 import { Component, OnInit } from '@angular/core';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { UsuarioService } from '../../../../services/usuario.service';
 import { VentaService } from '../../../../services/venta.service';
 import { environment } from '../../../../../environments/environment';
+import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { ImagenPipe } from '../../../../pipes/imagen-pipe.pipe';
+import { HeaderComponent } from '../../../../shared/header/header.component';
+import { AsideCuentaComponent } from '../../aside-cuenta/aside-cuenta.component';
+import { MenuFooterComponent } from '../../../../shared/menu-footer/menu-footer.component';
 
 
 declare var jQuery:any;
@@ -11,6 +17,16 @@ declare var $:any;
 
 @Component({
   selector: 'app-track-orden',
+   imports:[
+    HeaderComponent,
+    CommonModule,
+    AsideCuentaComponent,
+    RouterModule,
+    ReactiveFormsModule,
+    FormsModule,
+    MenuFooterComponent
+
+  ],
   templateUrl: './track-orden.component.html',
   styleUrls: ['./track-orden.component.css']
 })
@@ -40,6 +56,7 @@ export class TrackOrdenComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    window.scrollTo(0, 0);
 
     if(this.identity){
 
