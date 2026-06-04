@@ -210,7 +210,8 @@ toggleComentario(event: Event): void {
           }
           // Emit event to refresh project list
           this.refreshPostList.emit();
-          this.onClose()
+          this.onClose();
+          this.router.navigateByUrl('/reservaciones')
         }
       })
     }
