@@ -40,9 +40,9 @@
                                 <div *ngIf="item_venta.estado !== 'Cancelado' && item_venta.estado !== 'Reembolsado'">
                                     <div class="btn-group btn-group mt-4" role="group" aria-label="Small group">
                                         <div *ngIf="item_venta.estado == 'Enviado'">
-                                            <div *ngIf="item_venta.tracking_number">
+                                            <!-- <div *ngIf="item_venta.tracking_number">
                                                 <a class="btn btn-accent" [routerLink]="['/my-account/ordenes/tracking/',item_venta._id]"><span class="czi-plane"></span> Track</a>
-                                            </div>
+                                            </div> -->
                                             <div *ngIf="!item_venta.tracking_number">
                                                 <button class="btn btn-accent" style="color:white !important" disabled><span class="czi-plane" style="color:white !important"></span> Sin seguimiento</button>
                                             </div>
