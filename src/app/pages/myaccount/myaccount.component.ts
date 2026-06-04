@@ -6,8 +6,9 @@ import { Usuario } from '../../models/usuario.model';
 import { UsuarioService } from '../../services/usuario.service';
 import { HeaderComponent } from "../../shared/header/header.component";
 import { environment } from '../../../environments/environment';
-import { NgIf } from '@angular/common';
+import { CommonModule, NgIf } from '@angular/common';
 import { MenuFooterComponent } from "../../shared/menu-footer/menu-footer.component";
+import { PushNotificationService } from '../../services/push-notification.service';
 
 @Component({
   selector: 'app-myaccount',
@@ -15,7 +16,8 @@ import { MenuFooterComponent } from "../../shared/menu-footer/menu-footer.compon
     RouterModule,
     NgIf,
     HeaderComponent,
-    MenuFooterComponent
+    MenuFooterComponent,
+    CommonModule
 ],
   templateUrl: './myaccount.component.html',
   styleUrls: ['./myaccount.component.scss'],
@@ -24,7 +26,7 @@ export class MyaccountComponent implements OnInit {
 
   identity!: Usuario;
   imagenSerUrl = environment.mediaUrl;
-
+  public isLoading:boolean = false;
   user_id:any;
 
   constructor(
@@ -32,6 +34,7 @@ export class MyaccountComponent implements OnInit {
     public http: HttpClient,
     private usuarioService: UsuarioService,
     public activatedRoute: ActivatedRoute,
+    public pushService: PushNotificationService,
     handler: HttpBackend
   ) {
     this.http = new HttpClient(handler);
@@ -64,6 +67,26 @@ export class MyaccountComponent implements OnInit {
   }
 
 
+  async togglePush() {
+    this.pushService.isProcessing$.next(true); // Activa el cargando
+
+    try {
+      const estaSuscrito = this.pushService.isSubscribed$.value;
+      if (estaSuscrito) {
+        const reg = await navigator.serviceWorker.ready;
+        const sub = await reg.pushManager.getSubscription();
+        if (sub) {
+          await sub.unsubscribe();
+          // Llamada opcional a tu backend para limpiar
+          this.pushService.setSubscriptionStatus(false);
+        }
+      } else {
+        await this.pushService.subscribeToNotifications();
+      }
+    } finally {
+      this.pushService.isProcessing$.next(false); // Desactiva el cargando
+    }
+  }
 
 
 

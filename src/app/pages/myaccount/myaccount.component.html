@@ -77,7 +77,29 @@
                     
 
                 </div>
+                <div class="d-flex flex-column">
+                      <!-- configurar notificaciones push -->
+            <div class="setting-row" *ngIf="!isLoading" [class.loading]="pushService.isProcessing$ | async">
+              <div class="setting-info">
+                <i class="fa fa-bell"></i>
+                <div class="text-container">
+                  <strong>Notificaciones Push</strong>
+                  <span>Avisos importantes</span>
+                </div>
+              </div>
 
+              <div class="switch-wrapper">
+                <!-- Spinner pequeño que solo aparece al cargar -->
+                <div *ngIf="pushService.isProcessing$ | async" class="mini-spinner"></div>
+
+                <label class="switch">
+                  <input type="checkbox" [disabled]="pushService.isProcessing$ | async"
+                    [checked]="pushService.isSubscribed$ | async" (change)="togglePush()">
+                  <span class="slider round"></span>
+                </label>
+              </div>
+            </div>
+            <!-- configurar notificaciones push -->
                 <div class="setting-row shadow-sm">
                     <a (click)="logout()">
                         <div class="setting-info ">
@@ -87,6 +109,7 @@
                             </div>
                         </div>
                     </a>
+                </div>
                 </div>
             </div>
         </div>
