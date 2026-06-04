@@ -9,6 +9,7 @@ import { environment } from '../../../environments/environment';
 import { CommonModule, NgIf } from '@angular/common';
 import { MenuFooterComponent } from "../../shared/menu-footer/menu-footer.component";
 import { PushNotificationService } from '../../services/push-notification.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-myaccount',
@@ -35,6 +36,7 @@ export class MyaccountComponent implements OnInit {
     private usuarioService: UsuarioService,
     public activatedRoute: ActivatedRoute,
     public pushService: PushNotificationService,
+    public toastr: ToastrService,
     handler: HttpBackend
   ) {
     this.http = new HttpClient(handler);

@@ -74,42 +74,42 @@
                             <p>Reservaciones</p>
                         </a>
                     </div>
-                    
+
 
                 </div>
-                <div class="d-flex flex-column">
-                      <!-- configurar notificaciones push -->
-            <div class="setting-row" *ngIf="!isLoading" [class.loading]="pushService.isProcessing$ | async">
-              <div class="setting-info">
-                <i class="fa fa-bell"></i>
-                <div class="text-container">
-                  <strong>Notificaciones Push</strong>
-                  <span>Avisos importantes</span>
-                </div>
-              </div>
-
-              <div class="switch-wrapper">
-                <!-- Spinner pequeño que solo aparece al cargar -->
-                <div *ngIf="pushService.isProcessing$ | async" class="mini-spinner"></div>
-
-                <label class="switch">
-                  <input type="checkbox" [disabled]="pushService.isProcessing$ | async"
-                    [checked]="pushService.isSubscribed$ | async" (change)="togglePush()">
-                  <span class="slider round"></span>
-                </label>
-              </div>
-            </div>
-            <!-- configurar notificaciones push -->
-                <div class="setting-row shadow-sm">
-                    <a (click)="logout()">
-                        <div class="setting-info ">
-                            <i class="fa fa-power-off"></i>
+                <div class="d-flex flex-column mb-5">
+                    <!-- configurar notificaciones push -->
+                    <div class="setting-row" *ngIf="!isLoading" [class.loading]="pushService.isProcessing$ | async">
+                        <div class="setting-info">
+                            <i class="fa fa-bell"></i>
                             <div class="text-container">
-                                <strong>Cerrar Sesión</strong>
+                                <strong>Notificaciones Push</strong>
+                                <span>Avisos importantes</span>
                             </div>
                         </div>
-                    </a>
-                </div>
+
+                        <div class="switch-wrapper">
+                            <!-- Spinner pequeño que solo aparece al cargar -->
+                            <div *ngIf="pushService.isProcessing$ | async" class="mini-spinner"></div>
+
+                            <label class="switch">
+                                <input type="checkbox" [disabled]="pushService.isProcessing$ | async"
+                                    [checked]="pushService.isSubscribed$ | async" (change)="togglePush()">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                    </div>
+                    <!-- configurar notificaciones push -->
+                    <div class="setting-row shadow-sm">
+                        <a (click)="logout()">
+                            <div class="setting-info ">
+                                <i class="fa fa-power-off"></i>
+                                <div class="text-container">
+                                    <strong>Cerrar Sesión</strong>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
