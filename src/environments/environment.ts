@@ -4,16 +4,16 @@
 
 export const environment = {
   production: true,
-  // baseUrl: 'http://localhost:3000/api',
-  // mediaUrl: 'http://localhost:3000/api/uploads',
-  // soketServer : 'http://localhost:3000',
-  // nombreSelected: 'pizzeria',
+  baseUrl: 'http://localhost:3000/api',
+  mediaUrl: 'http://localhost:3000/api/uploads',
+  soketServer : 'http://localhost:3000',
+  nombreSelected: 'pizzeria',
 
   //remoto vercel
-  baseUrl: 'https://back-zlipmenu.onrender.com/api',
-  mediaUrl: 'https://back-zlipmenu.onrender.com/api/uploads',
-  soketServer: 'https://back-zlipmenu.onrender.com',
-  nombreSelected: 'zlipmenu-generic',
+  // baseUrl: 'https://back-zlipmenu.onrender.com/api',
+  // mediaUrl: 'https://back-zlipmenu.onrender.com/api/uploads',
+  // soketServer: 'https://back-zlipmenu.onrender.com',
+  // nombreSelected: 'zlipmenu-generic',
   
   mediaUrlRemoto: 'https://res.cloudinary.com/dmv6aukai/image/upload/v1741218430/zlipmenu',
   urlBackedNotification:'https://back-zlipmenu.onrender.com/api/notipush/save-subscription',

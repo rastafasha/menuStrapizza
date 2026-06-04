@@ -127,10 +127,10 @@
               <select id="paymentMethod" class="form-select form-select-lg rounded-3"
                 (change)="onPaymentMethodChange($event)" [(ngModel)]="selectedMethod">
                 <option value=" ">Selecciona un método de pago</option>
-                <option value="paypal">Paypal</option>
-                <option value="card">Tarjeta de Crédito/Débito</option>
+                <option value="paypal" *ngIf="paypalinfo">Paypal</option>
+                <option value="card" *ngIf="paypalinfo">Tarjeta de Crédito/Débito</option>
                 <option value="transferencia">Transferencia Bancaria</option>
-                <option value="efectivo">Efectivo</option>
+                <!-- <option value="efectivo">Efectivo</option> -->
               </select>
             </div>
 
@@ -166,8 +166,6 @@
               </div>
             </div>
 
-
-
             <!-- Contenedor para el botón de transferencia-->
             <div *ngIf="habilitacionFormTransferencia" class="mt-2">
               <form [formGroup]="formTransferencia" (ngSubmit)="sendFormTransfer()">
@@ -185,7 +183,7 @@
                   </select>
                 </div>
 
-                <!-- Datos de la cuenta Destino (Estilo Alerta Bootstrap 5.3) -->
+                <!-- Datos de la cuenta Destino  -->
                 <div class="alert alert-warning border-0 shadow-sm rounded-3 p-3 mb-4" *ngIf="paymentSelected">
                   <div class="d-flex gap-2 align-items-center mb-2">
                     <i class="fas fa-info-circle text-warning fs-5"></i>

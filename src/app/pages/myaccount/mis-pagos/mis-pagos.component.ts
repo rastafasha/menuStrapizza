@@ -11,6 +11,7 @@ import { AsideCuentaComponent } from '../aside-cuenta/aside-cuenta.component';
 import { TransferenciasService } from '../../../services/transferencias.service';
 import { TiendaService } from '../../../services/tienda.service';
 import { SafePipe } from '../../../pipes/safe.pipe';
+import { ModalInstruccionesComponent } from '../../../components/modal-instrucciones/modal-instrucciones.component';
 
 declare var bootstrap: any;
 @Component({
@@ -20,7 +21,7 @@ declare var bootstrap: any;
     HeaderComponent,
     InfiniteScrollModule,
     FormsModule,
-    //  ModalInstruccionesComponent,
+     ModalInstruccionesComponent,
     ImagenPipe,
     AsideCuentaComponent,
     SafePipe

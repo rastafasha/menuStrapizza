@@ -231,7 +231,7 @@ export class PayComponent {
         this.paypalinfo = paypals[0];
         if (!this.paypalinfo?.clientIdPaypal || this.paypalinfo.clientIdPaypal.trim() === '') {
           // console.error('Invalid/empty PayPal clientIdPaypal from backend');
-          this.toastr.error('Configuración de PayPal inválida');
+          // this.toastr.error('Configuración de PayPal inválida');
           return;
         }
         // console.log('PayPal config loaded:', this.paypalinfo!.clientIdPaypal);
@@ -239,7 +239,7 @@ export class PayComponent {
         this.initPayPalConfig();
       } else {
         console.warn('No PayPal config for tienda');
-        this.toastr.warning('PayPal no configurado');
+        // this.toastr.warning('PayPal no configurado');
         this.paypalinfo = undefined;
       }
     });

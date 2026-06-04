@@ -6,11 +6,10 @@
     (scrolled)="onScroll()">
 
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <!-- <app-backButtn pageTitle="Mis Pagos"></app-backButtn> -->
-        <!-- <button class="btn btn-outline-primary btn-sm rounded-circle shadow-sm" (click)="instruccionesModal.open()"
+        <button class="btn btn-outline-primary btn-sm rounded-circle shadow-sm" (click)="instruccionesModal.open()"
         title="Ayuda de la sección">
         <i class="fa fa-question"></i>
-      </button> -->
+      </button>
     </div>
 
 
@@ -278,5 +277,4 @@
 </div>
 }
 <app-reserva-crear #presupuestoEditModal (reloadList)="getReservacionUsuario()" [reservacionSeleccionado]="reservacionSeleccionado()" [tiendaSelected]="tiendaSelected"></app-reserva-crear>
-<!-- <app-modal-instrucciones [info]="info" sectionId="mispagos" #instruccionesModal></app-modal-instrucciones> -->
- <!-- <app-menu-footer></app-menu-footer> -->
+<app-modal-instrucciones [info]="info" sectionId="Reservaciones" #instruccionesModal></app-modal-instrucciones>

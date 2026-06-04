@@ -10,8 +10,8 @@ import { UsuarioService } from '../../../../services/usuario.service';
 import { HeaderComponent } from '../../../../shared/header/header.component';
 import { AsideCuentaComponent } from '../../aside-cuenta/aside-cuenta.component';
 import { ReservaCrearComponent } from '../reserva-crear/reserva-crear.component';
-import { MenuFooterComponent } from "../../../../shared/menu-footer/menu-footer.component";
 import { Reservacion } from '../../../../models/reservacion.model';
+import { ModalInstruccionesComponent } from '../../../../components/modal-instrucciones/modal-instrucciones.component';
 declare var bootstrap: any;
 
 @Component({
@@ -21,10 +21,9 @@ declare var bootstrap: any;
     HeaderComponent,
     InfiniteScrollModule,
     FormsModule,
-    //  ModalInstruccionesComponent,
+     ModalInstruccionesComponent,
     AsideCuentaComponent,
     ReservaCrearComponent,
-    MenuFooterComponent
 ],
   templateUrl: './reservaciones.component.html',
   styleUrl: './reservaciones.component.scss'
