@@ -329,55 +329,72 @@ export class ReviewOrderComponent implements OnInit, OnDestroy {
   }
 
 
-
-  // Generate WhatsApp message with order items
-  getWhatsAppMessage(): string {
-
-    if (!this.identity || this.bandejaList.length === 0) {
-      return '';
-    }
-
-    let message = `*Nuevo Pedido desde App Menu #${this.randomNum}*\n\n`;
-    message += `*Cliente:* ${this.expressForm.value.first_name}\n`;
-    message += `*Tipo Entrega:* ${this.expressForm.value.tipoEntrega}\n`;
-    message += `*Teléfono:* ${this.expressForm.value.telefono || 'No registrado'}\n\n`;
-    message += `*Detalles del Pedido:*\n`;
-    message += `─────────────────────\n`;
-
-    this.bandejaList.forEach((item: any) => {
-      const itemTotal = (item.precio_ahora * item.cantidad).toFixed(2);
-      message += `• ${item.titulo || item.titulo}\n`;
-      if (item.nombre_selector !== 'unico') {
-        message += `• ${item.nombre_selector}\n`;
-      }
-      message += `  Cant: ${item.cantidad} x ${item.precio_ahora.toFixed(2)} = ${itemTotal}\n\n`;
-    });
-
-    // message += `─────────────────────\n`;
-    // message += `*Delivery:* ${this.pedido.delivery}\n`;
-    message += `─────────────────────\n`;
-    message += `*TOTAL:* ${this.tienda_moneda} ${this.total().toFixed(2)}\n\n`;
-    message += `Por favor confirmar disponibilidad y método de pago.`;
-
-    return encodeURIComponent(message);
+// Generate WhatsApp message with order items
+getWhatsAppMessage(): string {
+  // Aseguramos que existan el usuario y elementos en la bandeja
+  if (!this.identity || !this.bandejaList || this.bandejaList.length === 0) {
+    return '';
   }
 
-  // Open WhatsApp with pre-filled message
-  sendWhatsAppOrder(): void {
+  // Extraemos los valores de expressForm de forma segura usando fallback ('') si vienen vacíos
+  const formValues = this.expressForm?.value || {};
+  const firstName = formValues.first_name || this.identity.first_name || 'Cliente';
+  const tipoEntrega = formValues.tipoEntrega || 'No especificado';
+  const telefono = formValues.telefono || this.identity.telefono || 'No registrado';
 
-    this.whatsapp = this.tiendaSelected.telefono;
-    const phone = this.whatsapp.replace(/\D/g, '');
-    const message = this.getWhatsAppMessage();
+  let message = `*Nuevo Pedido desde App Menu #${this.randomNum}*\n\n`;
+  message += `*Cliente:* ${firstName}\n`;
+  message += `*Tipo Entrega:* ${tipoEntrega}\n`;
+  message += `*Teléfono:* ${telefono}\n\n`;
+  message += `*Detalles del Pedido:*\n`;
+  message += `─────────────────────\n`;
 
-    if (message) {
-      const url = `https://wa.me/${phone}?text=${message}`;
-      window.open(url, '_blank');
+  this.bandejaList.forEach((item: any) => {
+    const itemTotal = (item.precio_ahora * item.cantidad).toFixed(2);
+    message += `• ${item.titulo}\n`;
+    
+    // Filtro seguro para el selector
+    if (item.nombre_selector && item.nombre_selector !== 'unico') {
+      message += `• ${item.nombre_selector}\n`;
     }
-    // Limpiamos carritos
+    
+    message += `  Cant: ${item.cantidad} x ${item.precio_ahora.toFixed(2)} = ${itemTotal}\n\n`;
+  });
+
+  message += `─────────────────────\n`;
+  message += `*TOTAL:* ${this.tienda_moneda} ${this.total().toFixed(2)}\n\n`;
+  message += `Por favor confirmar disponibilidad y método de pago.`;
+
+  return encodeURIComponent(message);
+}
+
+// Open WhatsApp with pre-filled message
+sendWhatsAppOrder(): void {
+  // 1. Validar que la tienda tenga un teléfono asignado
+  if (!this.tiendaSelected || !this.tiendaSelected.telefono) {
+    console.error('La tienda seleccionada no tiene un número de teléfono configurado.');
+    return;
+  }
+
+  this.whatsapp = this.tiendaSelected.telefono;
+  const phone = this.whatsapp.replace(/\D/g, ''); // Deja solo números
+  const message = this.getWhatsAppMessage();
+
+  // 2. Abrir la ventana inmediatamente para evitar el bloqueo de popups del navegador
+  if (message && phone) {
+    const url = `https://wa.me/${phone}?text=${message}`;
+    window.open(url, '_blank');
+    
+    // 3. Limpiar el almacenamiento SOLAMENTE si el mensaje fue enviado con éxito
     localStorage.removeItem('bandejaItems');
-    this.carritoService.clearCart();
-
+    if (this.carritoService) {
+      this.carritoService.clearCart();
+    }
+  } else {
+    console.warn('No se pudo generar el mensaje de WhatsApp. Verifica los datos del carrito o del formulario.');
   }
+}
+
 
 
 
