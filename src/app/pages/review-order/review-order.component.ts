@@ -318,8 +318,6 @@ export class ReviewOrderComponent implements OnInit, OnDestroy {
       next: (resp: any) => {
         this.pedidoGuardado = true;
         this.toastr.success('¡Éxito!', 'Pedido Agregado');
-
-
         this.sendWhatsAppOrder();
         this.carritoService.clearCart();
       },
@@ -377,17 +375,26 @@ sendWhatsAppOrder(): void {
   }
 
   this.whatsapp = this.tiendaSelected.telefono;
-  const phone = this.whatsapp.replace(/\D/g, ''); // Limpia caracteres
+  const phone = this.whatsapp.replace(/\D/g, ''); 
   const message = this.getWhatsAppMessage();
 
   if (message && phone) {
-    // 1. Usamos la API global que tiene mejor soporte en WebViews y PWAs móviles
     const url = `https://whatsapp.com{phone}&text=${message}`;
     
-    // 2. Redirección directa sobre la misma ventana para activar el deep-linking del móvil
-    window.location.href = url;
+    // 🔥 TRUCO DEFINITIVO PARA PWA: Inyección de enlace nativo en el DOM
+    const link = document.createElement('a');
+    link.href = url;
     
-    // 3. Limpieza del estado del carrito
+    // Forzamos el comportamiento nativo del sistema operativo (Deep Linking)
+    link.target = '_blank'; 
+    link.rel = 'noopener noreferrer';
+    
+    // Añadimos al documento, hacemos clic programático instantáneo y removemos
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    // Limpieza del estado del carrito posterior al disparo
     localStorage.removeItem('bandejaItems');
     if (this.carritoService) {
       this.carritoService.clearCart();
@@ -396,6 +403,7 @@ sendWhatsAppOrder(): void {
     console.warn('Faltan datos para procesar el envío.');
   }
 }
+
 
 
 
