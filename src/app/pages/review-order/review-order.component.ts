@@ -83,9 +83,10 @@ export class ReviewOrderComponent implements OnInit, OnDestroy {
   constructor(
     private router: Router
   ) {
-    window.scrollTo(0, 0);
+    
   }
   ngOnInit() {
+    window.scrollTo(0, 0);
     this.identity = this.usuarioService.getLocalStorage()
     if (this.identity) {
       this.userId = this.identity.uid;
@@ -370,28 +371,29 @@ getWhatsAppMessage(): string {
 
 // Open WhatsApp with pre-filled message
 sendWhatsAppOrder(): void {
-  // 1. Validar que la tienda tenga un teléfono asignado
   if (!this.tiendaSelected || !this.tiendaSelected.telefono) {
-    console.error('La tienda seleccionada no tiene un número de teléfono configurado.');
+    console.error('La tienda seleccionada no tiene teléfono.');
     return;
   }
 
   this.whatsapp = this.tiendaSelected.telefono;
-  const phone = this.whatsapp.replace(/\D/g, ''); // Deja solo números
+  const phone = this.whatsapp.replace(/\D/g, ''); // Limpia caracteres
   const message = this.getWhatsAppMessage();
 
-  // 2. Abrir la ventana inmediatamente para evitar el bloqueo de popups del navegador
   if (message && phone) {
-    const url = `https://wa.me/${phone}?text=${message}`;
-    window.open(url, '_blank');
+    // 1. Usamos la API global que tiene mejor soporte en WebViews y PWAs móviles
+    const url = `https://whatsapp.com{phone}&text=${message}`;
     
-    // 3. Limpiar el almacenamiento SOLAMENTE si el mensaje fue enviado con éxito
+    // 2. Redirección directa sobre la misma ventana para activar el deep-linking del móvil
+    window.location.href = url;
+    
+    // 3. Limpieza del estado del carrito
     localStorage.removeItem('bandejaItems');
     if (this.carritoService) {
       this.carritoService.clearCart();
     }
   } else {
-    console.warn('No se pudo generar el mensaje de WhatsApp. Verifica los datos del carrito o del formulario.');
+    console.warn('Faltan datos para procesar el envío.');
   }
 }
 
