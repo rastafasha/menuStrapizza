@@ -32,6 +32,13 @@
     margin: 0 auto;
 }
 
+/* Estilo para deshabilitar el enlace si el formulario es inválido */
+.disabled-link {
+    opacity: 0.5;
+    pointer-events: none; /* Evita que el usuario haga clic */
+    cursor: not-allowed;
+}
+
 
 @keyframes reveal {
     from { 

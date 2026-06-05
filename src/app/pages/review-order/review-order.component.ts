@@ -66,7 +66,7 @@ export class ReviewOrderComponent implements OnInit, OnDestroy {
   pasoActual: number = 1;
   public data_detalle: Array<any> = [];
   public subtotal: any = 0;
-
+  public urlWhatsApp: string = '';
 
   private tiendaService = inject(TiendaService);
   private carritoService = inject(CarritoService);
@@ -83,7 +83,7 @@ export class ReviewOrderComponent implements OnInit, OnDestroy {
   constructor(
     private router: Router
   ) {
-    
+
   }
   ngOnInit() {
     window.scrollTo(0, 0);
@@ -99,6 +99,10 @@ export class ReviewOrderComponent implements OnInit, OnDestroy {
     this.loadBandejaListFromLocalStorage();
     this.chekpedidoguardado();
     this.crearFormularioExpress();
+
+    this.expressForm.valueChanges.subscribe(() => {
+      this.actualizarUrlWhatsApp();
+    });
   }
 
   SubscribeToCart() {
@@ -122,12 +126,12 @@ export class ReviewOrderComponent implements OnInit, OnDestroy {
 
 
   //tienda
- 
-   escucharTiendaActiva() {
+
+  escucharTiendaActiva() {
     this.tiendaService.selectedTiendaObservable$.subscribe(tienda => {
       if (tienda) {
         this.tiendaSelected = tienda;
-      this.tienda_moneda = this.tiendaSelected.moneda
+        this.tienda_moneda = this.tiendaSelected.moneda
       }
     });
   }
@@ -286,6 +290,11 @@ export class ReviewOrderComponent implements OnInit, OnDestroy {
       const uidDirecto = resp.uid || resp.usuario?._id || resp.usuario?.uid || resp.id;
 
       this.guardarPedido(uidDirecto);
+      // SALVAVIDAS: Solo borramos el carrito si la URL de WhatsApp se calculó con éxito
+      if (this.urlWhatsApp && this.urlWhatsApp !== '') {
+        localStorage.removeItem('bandejaItems');
+        this.carritoService.clearCart();
+      }
 
     }, (err) => {
       this.toastr.error('Error', err.error.msg,);
@@ -318,8 +327,8 @@ export class ReviewOrderComponent implements OnInit, OnDestroy {
       next: (resp: any) => {
         this.pedidoGuardado = true;
         this.toastr.success('¡Éxito!', 'Pedido Agregado');
-        this.sendWhatsAppOrder();
-        
+        this.actualizarUrlWhatsApp();
+
       },
       error: (err) => {
         this.toastr.error('Error al guardar', err.error.msg || 'No se pudo registrar el pedido');
@@ -328,72 +337,89 @@ export class ReviewOrderComponent implements OnInit, OnDestroy {
   }
 
 
-// Generate WhatsApp message with order items
-getWhatsAppMessage(): string {
+  // Generate WhatsApp message with order items
+  getWhatsAppMessage(): string {
 
-  // Si no hay sesión o la bandeja está vacía, frena aquí
-  if (!this.identity || !this.bandejaList || this.bandejaList.length === 0) {
-    return '';
-  }
-
-  // SALVAVIDAS: Si expressForm no existe o no tiene datos, usamos datos de la sesión para que NO se rompa
-  const formValues = this.expressForm?.value || {};
-  const nombreCliente = formValues.first_name || this.identity.first_name || 'Cliente';
-  const tipoEntrega = formValues.tipoEntrega || 'No especificado';
-  const telefonoCliente = formValues.telefono || this.identity.telefono || 'No registrado';
-
-  let message = `*Nuevo Pedido desde App Menu #${this.randomNum}*\n\n`;
-  message += `*Cliente:* ${nombreCliente}\n`;
-  message += `*Tipo Entrega:* ${tipoEntrega}\n`;
-  message += `*Teléfono:* ${telefonoCliente}\n\n`;
-  message += `*Detalles del Pedido:*\n`;
-  message += `─────────────────────\n`;
-
-  this.bandejaList.forEach((item: any) => {
-    const itemTotal = (item.precio_ahora * item.cantidad).toFixed(2);
-    message += `• ${item.titulo}\n`;
-    
-    // Evitamos comparar contra propiedades undefined de los items
-    if (item.nombre_selector && item.nombre_selector !== 'unico') {
-      message += `• ${item.nombre_selector}\n`;
+    // Si no hay sesión o la bandeja está vacía, frena aquí
+    if (!this.identity || !this.bandejaList || this.bandejaList.length === 0) {
+      return '';
     }
-    
-    message += `  Cant: ${item.cantidad} x ${item.precio_ahora.toFixed(2)} = ${itemTotal}\n\n`;
-  });
 
-  message += `─────────────────────\n`;
-  message += `*TOTAL:* ${this.tienda_moneda} ${this.total().toFixed(2)}\n\n`;
-  message += `Por favor confirmar disponibilidad y método de pago.`;
+    // SALVAVIDAS: Si expressForm no existe o no tiene datos, usamos datos de la sesión para que NO se rompa
+    const formValues = this.expressForm?.value || {};
+    const nombreCliente = formValues.first_name || this.identity.first_name || 'Cliente';
+    const tipoEntrega = formValues.tipoEntrega || 'No especificado';
+    const telefonoCliente = formValues.telefono || this.identity.telefono || 'No registrado';
 
-  return encodeURIComponent(message);
-}
+    let message = `*Nuevo Pedido desde App Menu #${this.randomNum}*\n\n`;
+    message += `*Cliente:* ${nombreCliente}\n`;
+    message += `*Tipo Entrega:* ${tipoEntrega}\n`;
+    message += `*Teléfono:* ${telefonoCliente}\n\n`;
+    message += `*Detalles del Pedido:*\n`;
+    message += `─────────────────────\n`;
 
-// Tu función original intacta
-sendWhatsAppOrder(): void {
-  this.whatsapp = this.tiendaSelected.telefono;
-  const phone = this.whatsapp.replace(/\D/g, '');
+    this.bandejaList.forEach((item: any) => {
+      const itemTotal = (item.precio_ahora * item.cantidad).toFixed(2);
+      message += `• ${item.titulo}\n`;
 
-  // 1. TRUCO DE MAGIA: Abrimos una pestaña en blanco INMEDIATAMENTE.
-  // Como ocurre al instante del clic, el teléfono NO la bloquea.
-  const nuevaPestana = window.open('about:blank', '_blank');
+      // Evitamos comparar contra propiedades undefined de los items
+      if (item.nombre_selector && item.nombre_selector !== 'unico') {
+        message += `• ${item.nombre_selector}\n`;
+      }
 
-  // 2. Procesamos el mensaje (aquí es donde se tardaba el código)
-  const message = this.getWhatsAppMessage();
+      message += `  Cant: ${item.cantidad} x ${item.precio_ahora.toFixed(2)} = ${itemTotal}\n\n`;
+    });
 
-  if (message && nuevaPestana) {
-    // 3. Si el mensaje se generó bien, le cambiamos la URL a la pestaña que ya abrimos
-    nuevaPestana.location.href = `https://wa.me/${phone}?text=${message}`;
-  } else if (nuevaPestana) {
-    // Si algo falló, cerramos la pestaña silenciosamente para no dejarla colgada
-    nuevaPestana.close();
-    console.warn('No se pudo generar el mensaje.');
-    return;
+    message += `─────────────────────\n`;
+    message += `*TOTAL:* ${this.tienda_moneda} ${this.total().toFixed(2)}\n\n`;
+    message += `Por favor confirmar disponibilidad y método de pago.`;
+
+    return encodeURIComponent(message);
   }
 
-  // 4. Tu lógica de limpieza original intacta
-  localStorage.removeItem('bandejaItems');
-  this.carritoService.clearCart();
-}
+  // Llama a esta función dentro de tu ngOnInit() o cada vez que cambie el carrito/formulario
+  actualizarUrlWhatsApp(): void {
+    if (!this.tiendaSelected?.telefono) return;
+
+    const phone = this.tiendaSelected.telefono.replace(/\D/g, '');
+    const message = this.getWhatsAppMessage();
+
+    if (message && phone) {
+      // CORRECCIÓN CLAVE: Debe llevar obligatoriamente "api." al principio
+      this.urlWhatsApp = `https://api.whatsapp.com/send?phone=${phone}&text=${message}`;
+    } else {
+      this.urlWhatsApp = '';
+    }
+  }
+
+
+
+  // Tu función original intacta
+  // sendWhatsAppOrder(): void {
+  //   this.whatsapp = this.tiendaSelected.telefono;
+  //   const phone = this.whatsapp.replace(/\D/g, '');
+
+  //   // 1. TRUCO DE MAGIA: Abrimos una pestaña en blanco INMEDIATAMENTE.
+  //   // Como ocurre al instante del clic, el teléfono NO la bloquea.
+  //   const nuevaPestana = window.open('about:blank', '_blank');
+
+  //   // 2. Procesamos el mensaje (aquí es donde se tardaba el código)
+  //   const message = this.getWhatsAppMessage();
+
+  //   if (message && nuevaPestana) {
+  //     // 3. Si el mensaje se generó bien, le cambiamos la URL a la pestaña que ya abrimos
+  //     nuevaPestana.location.href = `https://wa.me/${phone}?text=${message}`;
+  //   } else if (nuevaPestana) {
+  //     // Si algo falló, cerramos la pestaña silenciosamente para no dejarla colgada
+  //     nuevaPestana.close();
+  //     console.warn('No se pudo generar el mensaje.');
+  //     return;
+  //   }
+
+  //   // 4. Tu lógica de limpieza original intacta
+  //   localStorage.removeItem('bandejaItems');
+  //   this.carritoService.clearCart();
+  // }
 
 
 
