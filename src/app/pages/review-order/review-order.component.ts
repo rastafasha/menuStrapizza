@@ -351,7 +351,7 @@ export class ReviewOrderComponent implements OnInit, OnDestroy {
     const tipoEntrega = formValues.tipoEntrega || 'No especificado';
     const telefonoCliente = formValues.telefono || this.identity.telefono || 'No registrado';
 
-    let message = `*Nuevo Pedido desde App Menu #${this.randomNum}*\n\n`;
+    let message = `*Nuevo Pedido desde App Zlipmenu #${this.randomNum}*\n\n`;
     message += `*Cliente:* ${nombreCliente}\n`;
     message += `*Tipo Entrega:* ${tipoEntrega}\n`;
     message += `*Teléfono:* ${telefonoCliente}\n\n`;
