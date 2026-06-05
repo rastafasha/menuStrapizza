@@ -1,11 +1,22 @@
-import { Facturacion } from "./facturacion"
-import { User } from "./user"
+import { Usuario } from "./usuario.model";
 
 export class Notificacion {
-    usuario?: User;
+    usuario?: Usuario;
     titulo?: string; 
     mensaje?: string; 
-    tipo?: 'PAGO_APROBADO' | 'PAGO_RECHAZADO' | 'NUEVA_FACTURA' | 'AVISO_MOROSIDAD' | 'COMUNICADO_ADMIN' | 'MENSAJE_DIRECTO';
+   
+    tipo?: 'PAGO_APROBADO'|
+'PAGO_RECHAZADO'|
+'NUEVO_PEDIDO'|
+'PEDIDO_APROBADO'|
+'PEDIDO_RECHAZADO'|
+'PEDIDO_FINALIZADO'|
+'RESERVACION_CONFIRMADA'|
+'RESERVACION_CANCELADA'|
+'RESERVACION_COMPLETADA'|
+'NUEVA_RESERVACION'|
+'NUEVO_MENSAJE'|
+'AVISO_GENERAL';;
     leido?: boolean;
     referenciaId?: string;
     createdAt?: Date;
