@@ -382,7 +382,7 @@ sendWhatsAppOrder(): void {
 
   if (message && nuevaPestana) {
     // 3. Si el mensaje se generó bien, le cambiamos la URL a la pestaña que ya abrimos
-    nuevaPestana.location.href = `https://wa.me${phone}?text=${message}`;
+    nuevaPestana.location.href = `https://wa.me/${phone}?text=${message}`;
   } else if (nuevaPestana) {
     // Si algo falló, cerramos la pestaña silenciosamente para no dejarla colgada
     nuevaPestana.close();
