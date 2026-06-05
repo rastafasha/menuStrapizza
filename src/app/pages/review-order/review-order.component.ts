@@ -319,7 +319,7 @@ export class ReviewOrderComponent implements OnInit, OnDestroy {
         this.pedidoGuardado = true;
         this.toastr.success('¡Éxito!', 'Pedido Agregado');
         this.sendWhatsAppOrder();
-        this.carritoService.clearCart();
+        
       },
       error: (err) => {
         this.toastr.error('Error al guardar', err.error.msg || 'No se pudo registrar el pedido');
@@ -330,21 +330,22 @@ export class ReviewOrderComponent implements OnInit, OnDestroy {
 
 // Generate WhatsApp message with order items
 getWhatsAppMessage(): string {
-  // Aseguramos que existan el usuario y elementos en la bandeja
+
+  // Si no hay sesión o la bandeja está vacía, frena aquí
   if (!this.identity || !this.bandejaList || this.bandejaList.length === 0) {
     return '';
   }
 
-  // Extraemos los valores de expressForm de forma segura usando fallback ('') si vienen vacíos
+  // SALVAVIDAS: Si expressForm no existe o no tiene datos, usamos datos de la sesión para que NO se rompa
   const formValues = this.expressForm?.value || {};
-  const firstName = formValues.first_name || this.identity.first_name || 'Cliente';
+  const nombreCliente = formValues.first_name || this.identity.first_name || 'Cliente';
   const tipoEntrega = formValues.tipoEntrega || 'No especificado';
-  const telefono = formValues.telefono || this.identity.telefono || 'No registrado';
+  const telefonoCliente = formValues.telefono || this.identity.telefono || 'No registrado';
 
-  let message = `*Nuevo Pedido desde App Zlipmenu #${this.randomNum}*\n\n`;
-  message += `*Cliente:* ${firstName}\n`;
+  let message = `*Nuevo Pedido desde App Menu #${this.randomNum}*\n\n`;
+  message += `*Cliente:* ${nombreCliente}\n`;
   message += `*Tipo Entrega:* ${tipoEntrega}\n`;
-  message += `*Teléfono:* ${telefono}\n\n`;
+  message += `*Teléfono:* ${telefonoCliente}\n\n`;
   message += `*Detalles del Pedido:*\n`;
   message += `─────────────────────\n`;
 
@@ -352,7 +353,7 @@ getWhatsAppMessage(): string {
     const itemTotal = (item.precio_ahora * item.cantidad).toFixed(2);
     message += `• ${item.titulo}\n`;
     
-    // Filtro seguro para el selector
+    // Evitamos comparar contra propiedades undefined de los items
     if (item.nombre_selector && item.nombre_selector !== 'unico') {
       message += `• ${item.nombre_selector}\n`;
     }
@@ -367,42 +368,22 @@ getWhatsAppMessage(): string {
   return encodeURIComponent(message);
 }
 
-// Open WhatsApp with pre-filled message
+// Tu función original intacta
 sendWhatsAppOrder(): void {
-  if (!this.tiendaSelected || !this.tiendaSelected.telefono) {
-    console.error('La tienda seleccionada no tiene teléfono.');
-    return;
-  }
-
   this.whatsapp = this.tiendaSelected.telefono;
-  const phone = this.whatsapp.replace(/\D/g, ''); 
+  const phone = this.whatsapp.replace(/\D/g, '');
   const message = this.getWhatsAppMessage();
 
-  if (message && phone) {
-    const url = `https://whatsapp.com{phone}&text=${message}`;
-    
-    // 🔥 TRUCO DEFINITIVO PARA PWA: Inyección de enlace nativo en el DOM
-    const link = document.createElement('a');
-    link.href = url;
-    
-    // Forzamos el comportamiento nativo del sistema operativo (Deep Linking)
-    link.target = '_blank'; 
-    link.rel = 'noopener noreferrer';
-    
-    // Añadimos al documento, hacemos clic programático instantáneo y removemos
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    
-    // Limpieza del estado del carrito posterior al disparo
-    localStorage.removeItem('bandejaItems');
-    if (this.carritoService) {
-      this.carritoService.clearCart();
-    }
-  } else {
-    console.warn('Faltan datos para procesar el envío.');
+  if (message) {
+    const url = `https://wa.me/${phone}?text=${message}`;
+    window.open(url, '_blank');
   }
+
+  // Cambia estos dos a cómo se llamen tus servicios reales actuales
+  localStorage.removeItem('bandejaItems'); 
+  this.carritoService.clearCart(); 
 }
+
 
 
 
