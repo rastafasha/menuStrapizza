@@ -16,21 +16,13 @@
             <div class="order-list" *ngIf="isbandejaList">
                 <div class="order-list-bar"></div>
                 <div class="contenedor-ticket">
-                    <div class="ticket">
+                    <div class="ticket d-flex justify-content-between">
                         <div class="breadcrumb-item">
                         <h3>Confirmar</h3>
+                        <span class="burbleinfo"> {{fechaHoy | date:'dd/MM/YYYY'}}</span>
                     </div>
                     <div class="clear"></div>
-                    <div class="top-item">
-                        <div class="list-item-left">
-                            <!-- <span class="burbleinfo">
-                                Orden No.{{randomNum}}
-                            </span> -->
-                        </div>
-                        <div class="list-item-right">
-                            <span class="burbleinfo"> {{fechaHoy | date:'dd/MM/YYYY'}}</span>
-                        </div>
-                    </div>
+                    
                     <div class="overf">
                         <!-- itemlist -->
                         <div class="list-item" *ngFor="let item of bandejaList; let i = index">
