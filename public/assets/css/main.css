@@ -1,7 +1,8 @@
 /* imports CSS */
 
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Oswald:wght@200..700&display=swap');
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Libre+Barcode+39&family=Oswald:wght@200..700&display=swap');
 
 @import url("./carrousel.css");
 @import url("./header.css");
@@ -25,6 +26,7 @@
   --light-brown: #0e5b04;
   --font-primary: "Inter", sans-serif;
   --font-Title2: "Oswald", sans-serif;
+  --font-barcode:  "Libre Barcode 39", system-ui;
 }
 
 .clear {
@@ -196,6 +198,7 @@ a {
   gap: 10px;
   justify-content: space-between;
   width: 100%;
+  margin-bottom: -30px;
 }
 
 .info_pago {
@@ -204,6 +207,8 @@ a {
   grid-column-gap: 0px;
   grid-row-gap: 0px;
   width: 100%;
+  border-top: 1px dashed #ccc;
+  border-bottom: 1px dashed #ccc;
 }
 
 .info_pago_titulo1 {

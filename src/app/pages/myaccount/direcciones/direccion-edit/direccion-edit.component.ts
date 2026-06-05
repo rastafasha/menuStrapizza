@@ -12,6 +12,7 @@ import { Pais } from '../../../../models/pais.model';
 import { WaGeolocationService } from '@ng-web-apis/geolocation';
 import * as L from 'leaflet';
 import { Subscription } from 'rxjs';
+import { HeaderComponent } from '../../../../shared/header/header.component';
 
 @Component({
   selector: 'app-direccion-edit',
@@ -20,7 +21,8 @@ import { Subscription } from 'rxjs';
     FormsModule,
     ReactiveFormsModule,
     LoadingComponent,
-    RouterModule
+    RouterModule,
+    HeaderComponent
   ],
   providers: [WaGeolocationService],
   templateUrl: './direccion-edit.component.html',

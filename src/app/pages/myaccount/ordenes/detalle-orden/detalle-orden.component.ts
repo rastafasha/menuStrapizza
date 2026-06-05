@@ -11,12 +11,17 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ImagenPipe } from '../../../../pipes/imagen-pipe.pipe';
 import { environment } from '../../../../../environments/environment';
 import { TiendaService } from '../../../../services/tienda.service';
-declare var jQuery:any;
-declare var $:any;
+import { ComentarioService } from '../../../../services/comentario.service';
+import { Venta } from '../../../../models/ventas.model';
+import { ModalCancelarComponent } from '../modal-cancelar/modal-cancelar.component';
+import { ModalComentariosComponent } from '../modalComentarios/modalComentarios.component';
+
+declare var jQuery: any;
+declare var $: any;
 
 @Component({
   selector: 'app-detalle-orden',
-  imports:[
+  imports: [
     HeaderComponent,
     CommonModule,
     AsideCuentaComponent,
@@ -24,6 +29,8 @@ declare var $:any;
     ReactiveFormsModule,
     FormsModule,
     ImagenPipe,
+    ModalCancelarComponent,
+    ModalComentariosComponent
 
   ],
   templateUrl: './detalle-orden.component.html',
@@ -32,63 +39,48 @@ declare var $:any;
 export class DetalleOrdenComponent implements OnInit {
 
   public identity!: Usuario | null;
-  public url!:string;
+  public url!: string;
   public msm_error = false;
   public msm_success = false;
-  public id!:string;
-  public detalle : any = {};
-  public venta : any = {};
+  public id!: string;
+  public detalle: any = {};
+  public venta!: Venta;
 
-  public id_review_producto!:string;
-  public review_comentario='';
-  public review_pros='';
-  public review_cons='';
-  public review_estrellas='';
-  public select_detalle='';
 
-  public msm_error_review='';
-  public data_comentarios : Array<any> = [];
-  public btn_cancelar!:string;
+  public msm_error_review = '';
+  public data_comentarios: Array<any> = [];
+  public btn_cancelar!: string;
 
-  public cancelacion : any = {};
+  public cancelacion: any = {};
   public msm_error_cancelar = '';
-  public data_cancelacion : any = {};
+  public data_cancelacion: any = {};
 
-   public local!: string;
+  public local!: string;
   public tienda_moneda!: any;
+  public itemSeleccionado!: any;
 
   constructor(
-    private _userService: UsuarioService,
-    private _router : Router,
-    private _route :ActivatedRoute,
-    private http: HttpClient,
+    private _router: Router,
+    private _route: ActivatedRoute,
     private _ventaService: VentaService,
     private tiendaService: TiendaService,
   ) {
-     let USER = localStorage.getItem('user');
-    if(USER){
+    let USER = localStorage.getItem('user');
+    if (USER) {
       this.identity = JSON.parse(USER);
     }
   }
 
-  modal_data(idproducto:string,id:string){
-    this.id_review_producto = idproducto;
-    this.select_detalle = id;
-    this.msm_error_review = '';
-    this.review_comentario='';
-    this.review_pros='';
-    this.review_cons='';
-    this.review_estrellas='';
-  }
+ 
 
 
 
   ngOnInit(): void {
     window.scrollTo(0, 0);
-    if(this.identity){
+    if (this.identity) {
       this.url = environment.baseUrl;
       this._route.params.subscribe(
-        params=>{
+        params => {
           this.id = params['id'];
           this.init_data();
           this.get_cancelacion();
@@ -98,19 +90,19 @@ export class DetalleOrdenComponent implements OnInit {
 
       this.cancelacion = {
         mensaje: '',
-        user : this.identity.uid,
-        venta : this.id
+        user: this.identity.uid,
+        venta: this.id
       };
 
-    }else{
+    } else {
       this._router.navigate(['/']);
     }
 
   }
 
-  init_data(){
+  init_data() {
     this._ventaService.detalle(this.id).subscribe(
-      response =>{
+      response => {
         this.detalle = response.detalle;
         this.venta = response.venta;
         this.local = this.venta.local
@@ -118,47 +110,47 @@ export class DetalleOrdenComponent implements OnInit {
         this.evaluar_cancelacion();
         this.getTienda();
       },
-      error=>{
+      error => {
       }
     );
   }
 
-  getTienda(){
-    this.tiendaService.getTiendaById(this.local).subscribe((resp:any)=>{
+  getTienda() {
+    this.tiendaService.getTiendaById(this.local).subscribe((resp: any) => {
       this.tienda_moneda = resp.moneda;
-      
+
     })
   }
 
-  get_cancelacion(){
+  get_cancelacion() {
 
     this._ventaService.listarCancelacionporUser(this.id).subscribe(
-      response =>{
+      response => {
         this.data_cancelacion = response.cancelacion;
       },
-      error =>{
+      error => {
         this.data_cancelacion = null;
 
       }
     );
   }
 
-  evaluar_cancelacion(){
+  evaluar_cancelacion() {
     this._ventaService.evaluar_cancelacion(this.id).subscribe(
-      response =>{
+      response => {
         this.btn_cancelar = response.data;
       },
-      error =>{
+      error => {
 
       }
     );
   }
 
-  finalizar(id:string){
+  finalizar(id: string) {
     this._ventaService.finalizar(id).subscribe(
-      response =>{
+      response => {
         this._ventaService.detalle(this.id).subscribe(
-          response =>{
+          response => {
             this.detalle = response.detalle;
             this.venta = response.venta;
             $('#finalizar').modal('hide');
@@ -166,53 +158,48 @@ export class DetalleOrdenComponent implements OnInit {
             // this.data_reviews();
 
           },
-          error=>{
+          error => {
 
           }
         );
       },
-      error=>{
+      error => {
 
       }
     );
   }
 
-  cancelar(cancelarForm:any){
-    if(cancelarForm.valid){
+  cancelar(cancelarForm: any) {
+    if (cancelarForm.valid) {
       this.msm_error_cancelar = '';
       this.cancelacion.mensaje = cancelarForm.value.mensaje;
 
       this._ventaService.cancelar(this.cancelacion).subscribe(
-        response =>{
+        response => {
           $('#sol_cancelar').modal('hide');
           $('.modal-backdrop').removeClass('show');
           this.evaluar_cancelacion();
           this.init_data();
           this.get_cancelacion();
         },
-        error=>{
+        error => {
           console.log(error);
 
         }
       );
-    }else{
+    } else {
       this.msm_error_cancelar = 'Escribe el motivo de la cancelación.'
     }
   }
 
-  logout(){
 
-    localStorage.removeItem('token');
-    localStorage.removeItem('identity');
-
-    this.identity = null;
-
-    this._router.navigate(['/']);
+ onEditComentario(item: any) {
+    this.itemSeleccionado = item;
+    console.log(item)
   }
 
-  
 
-  close_alert(){
+  close_alert() {
     this.msm_error_review = '';
     this.msm_error_cancelar = '';
   }

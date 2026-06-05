@@ -16,6 +16,17 @@
                     <div class="mb-3">
                         <label class="form-label fw-bold text-secondary mb-1">Fecha</label>
                         <input type="date" formControlName="fecha" class="form-control form-control-lg bg-light">
+                        @if(reservaForm.controls['fecha'].touched){
+
+                        <div class="text-danger">
+                            @if(reservaForm.controls['fecha'].errors?.['required']){
+                            <span>{{'Campo requerido'}}</span>
+                            }
+                            @if(reservaForm.controls['fecha'].errors?.['minlength']){
+                            <span>{{'Seleccione una fecha'}}</span>
+                            }
+                        </div>
+                        }
                     </div>
                     <!-- Campo: Nombre -->
                     <div class="mb-3">

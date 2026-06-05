@@ -8,13 +8,15 @@ import { CarritoService } from '../../services/carrito.service';
 import { ImagenPipe } from '../../pipes/imagen-pipe.pipe';
 import { ColorService } from '../../services/color.service';
 import { ToastrService } from 'ngx-toastr';
+import { RatingStarComponent } from '../ratingStar/ratingStar.component';
 declare var bootstrap: any;
 @Component({
   selector: 'app-product-item',
   imports: [
     CommonModule,
     RouterModule,
-    ImagenPipe
+    ImagenPipe,
+    RatingStarComponent
   ],
   templateUrl: './product-item.component.html',
   styleUrl: './product-item.component.scss'

@@ -13,6 +13,9 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ImagenPipe } from '../../pipes/imagen-pipe.pipe';
 import { ToastrService } from 'ngx-toastr';
 import { FavoritoService } from '../../services/favorito.service';
+import { ComentarioService } from '../../services/comentario.service';
+import { Comentario } from '../../models/comentarios.model';
+import { RatingStarComponent } from '../ratingStar/ratingStar.component';
 
 declare var bootstrap: any;
 
@@ -23,7 +26,8 @@ declare var bootstrap: any;
     RouterModule,
     ReactiveFormsModule,
     FormsModule,
-    ImagenPipe
+    ImagenPipe,
+    RatingStarComponent
   ],
   templateUrl: './modalproduct.component.html',
   styleUrl: './modalproduct.component.scss'
@@ -45,12 +49,16 @@ export class ModalproductComponent implements OnInit, OnDestroy, AfterViewInit {
 
   producto: any;
   favoriteItem: any;
+  comentarios!: Comentario;
+  stars: number = 0;
 
   private tiendaService = inject(TiendaService);
   private carritoService = inject(CarritoService);
   private selectorService = inject(SelectorService);
   private favoritoService = inject(FavoritoService);
   private toastr = inject(ToastrService);
+
+  private comentarioService = inject(ComentarioService);
 
   user!: Usuario;
   bandejaList: any[] = [];
@@ -80,6 +88,7 @@ export class ModalproductComponent implements OnInit, OnDestroy, AfterViewInit {
       this.img = '../assets/images/no-image.jpg';
     }
     this.getSelectorProducto();
+    this.getComentarios();
   }
 
   // 🚀 ESTA FUNCIÓN ES LA MAGIA: Se ejecuta AUTOMÁTICAMENTE cuando el HTML ya existe en el DOM
@@ -198,6 +207,31 @@ export class ModalproductComponent implements OnInit, OnDestroy, AfterViewInit {
       }
     );
   }
+
+  getComentarios(){
+    this.comentarioService.getByProduct(this.product._id).subscribe((resp:any)=>{
+      this.comentarios = resp.comentarios;
+    })
+    this.getStrellasProduct();
+  }
+
+   getStrellasProduct() {
+    this.comentarioService.getByProduct(this.product._id).subscribe((resp: any) => {
+        // 1. Verificamos que existan comentarios en el array
+        if (resp.comentarios && resp.comentarios.length > 0) {
+            
+            // 2. Sumamos todas las estrellas de la lista
+            const sumaTotal = resp.comentarios.reduce((total: number, item: any) => total + item.estrellas, 0);
+            
+            // 3. Sacamos el promedio real redondeado a 1 decimal
+            this.stars = parseFloat((sumaTotal / resp.comentarios.length).toFixed(1));
+            
+        } else {
+            // 4. Si no hay comentarios, el producto arranca con 0 estrellas
+            this.stars = 0;
+        }
+    });
+    }
 
   
 }

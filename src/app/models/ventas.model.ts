@@ -1,3 +1,4 @@
+import { PaymentMethod } from "./paymenthmethod.model";
 
 export class Venta {
   _id!: string;
@@ -7,7 +8,7 @@ export class Venta {
   total_pagado!: number;
   info_cupon!: string;
   idtransaccion!: string;
-  metodo_pago!: string;
+  metodo_pago!: PaymentMethod;
   precio_envio!: string;
   tipo_envio!: string;
   tiempo_estimado!: string;

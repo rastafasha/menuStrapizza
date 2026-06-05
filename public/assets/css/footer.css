@@ -1,7 +1,7 @@
 .footer{
     display: flex;
     padding: 15px;
-    padding-bottom: 60px;
+    padding-bottom: 120px;
 }
 .footer-links{
     list-style: none;

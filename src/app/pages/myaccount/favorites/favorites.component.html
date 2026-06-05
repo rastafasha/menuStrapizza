@@ -17,7 +17,7 @@
                             <div class="product-card">
                                 <!-- 1. Quitamos data-bs de la imagen y agregamos (click) -->
                                 <div class="product-image" (click)="verDetalles(product.producto)">
-                                    <img [src]="product.img | imagenPipe: 'productos'" [alt]="product.titulo">
+                                    <img [src]="product.producto.img | imagenPipe: 'productos'" [alt]="product.producto.titulo">
                                 </div>
                                 <div class="product-content">
                                     <div class="infpr">

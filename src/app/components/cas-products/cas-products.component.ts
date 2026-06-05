@@ -156,7 +156,6 @@ cargarProductosPorTiendaId(localId: any) {
 
   openModal(product: Producto) {
     this.selectedProduct = product;
-    console.log(product)
     setTimeout(() => {
       const element = document.getElementById('modalProduct-' + product._id);
       if (element) {

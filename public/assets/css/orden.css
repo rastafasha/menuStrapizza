@@ -1,10 +1,9 @@
-
 /* Order button styles */
 .order-button-container {
   display: flex;
   justify-content: center;
   margin-bottom: 2.5rem;
-  gap:15px;
+  gap: 15px;
 }
 
 .check-button,
@@ -44,7 +43,7 @@
         animation-range: entry 20% cover 30%; */
 }
 
-.overf{
+.overf {
   width: 100%;
   height: auto;
   max-height: 400px;
@@ -75,32 +74,21 @@
 }
 
 
-.list-box {
+/* 1. CONTENEDOR PADRE: Aquí se aplica la sombra */
+.contenedor-ticket {
   position: relative;
   z-index: 1;
   height: auto;
   min-height: 100px;
   width: 95%;
   margin: 0 auto;
-  padding: 20px;
   margin-top: 15px;
-  background: white;
-  background: linear-gradient(180deg, rgb(238, 237, 237) 0%, rgba(255, 255, 255, 0.99) 52%, rgba(255, 255, 255, 1) 100%);
-  /* box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3); */
-  
-  border-top: 1px solid #676767;
-  /* box-shadow: rgba(50, 50, 93, 0.25) 0px 6px 12px -2px, rgba(0, 0, 0, 0.3) 0px 3px 7px -3px; */
-box-shadow: rgba(50, 50, 93, 0.25) 0px 30px 60px -12px, rgba(0, 0, 0, 0.3) 0px 18px 36px -18px;
-
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: baseline;
-  margin-bottom: 5px;
-
-  /* animation: customAni .5s ease-in 2s  normal none; */
+  /* width: 320px;
+      margin: 40px auto; */
+  /* filter genera la sombra siguiendo la forma del recorte del hijo */
+  filter: drop-shadow(0px 14px 6px rgba(0, 0, 0, 0.15));
   animation-delay: 0s;
-  animation-duration: .5s;
+  animation-duration: .4s;
   animation-fill-mode: forwards;
   animation-iteration-count: 1;
   animation-name: customAni;
@@ -108,26 +96,70 @@ box-shadow: rgba(50, 50, 93, 0.25) 0px 30px 60px -12px, rgba(0, 0, 0, 0.3) 0px 1
   animation-timing-function: ease-in;
 }
 
+/* 2. EL TICKET: Aquí se hace el recorte del borde roto */
+.ticket {
+  background-color: #ffffff;
+  padding: 24px 24px 40px 24px;
+  font-family: Arial, sans-serif;
+  text-align: center;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 5px;
+
+  /* Efecto de borde roto */
+  clip-path: polygon(0% 0%,
+      100% 0%,
+      100% calc(100% - 12px),
+
+      /* Patrón de dientes continuos */
+      95% 100%, 90% calc(100% - 12px),
+      85% 100%, 80% calc(100% - 12px),
+      75% 100%, 70% calc(100% - 12px),
+      65% 100%, 60% calc(100% - 12px),
+      55% 100%, 50% calc(100% - 12px),
+      45% 100%, 40% calc(100% - 12px),
+      35% 100%, 30% calc(100% - 12px),
+      25% 100%, 20% calc(100% - 12px),
+      15% 100%, 10% calc(100% - 12px),
+      5% 100%,
+
+      0% calc(100% - 12px));
+}
+
+
 /* Copy this code after the above code */
 @keyframes customAni {
   0% {
-	transform: scaleY(0.4);
-	transform-origin: 100% 0%;
-  opacity: 0;
+    transform: scaleY(0.4);
+    transform-origin: 100% 0%;
+    opacity: 0;
   }
 
   100% {
     opacity: 1;
-	transform: scaleY(1);
-	transform-origin: 100% 0%;
+    transform: scaleY(1);
+    transform-origin: 100% 0%;
   }
 }
 
-.list-box h3{
+.ticket h3 {
   margin-bottom: 20px;
-    border-bottom: 1px solid #ccc;
-    width: 100%;
-    font-size: 2rem;
+  border-top: 1px dashed #ccc;
+  border-bottom: 1px dashed #ccc;
+  width: 100%;
+  font-size: 2rem;
+  text-align: left;
+}
+
+
+.barcode h1{
+  font-family: var(--font-barcode);
+  font-weight: 400;
+  font-style: normal;
+  border-bottom: 1px dashed #ccc;
 }
 
 .list-item {
@@ -143,31 +175,32 @@ box-shadow: rgba(50, 50, 93, 0.25) 0px 30px 60px -12px, rgba(0, 0, 0, 0.3) 0px 1
   margin: 0;
   width: 100%;
   background-color: #fff;
-    padding: 5px;
-    margin-bottom: 5px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  padding: 5px;
+  margin-bottom: 5px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 
 
 }
 
 .top-item {
   width: 100%;
-  height: 100px;
+  height: 80px;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   grid-template-rows: repeat(1, 1fr);
   grid-column-gap: 0px;
   grid-row-gap: 10px;
   width: 100%;
-  
+
 }
+
 .top-item-flex {
   width: 100%;
-  height:auto;
+  height: auto;
   display: flex;
   width: 100%;
   margin-bottom: 20px;
-  
+
 }
 
 .list-item-left {
@@ -244,10 +277,9 @@ box-shadow: rgba(50, 50, 93, 0.25) 0px 30px 60px -12px, rgba(0, 0, 0, 0.3) 0px 1
 
 }
 
-.total{
+.total {
   padding: 10px;
   font-size: 16px;
   margin-top: 20px;
   font-weight: bold;
 }
-

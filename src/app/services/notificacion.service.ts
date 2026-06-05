@@ -91,6 +91,9 @@ export class NotificacionService {
             case 'PEDIDO_FINALIZADO':
               toast = this.toastr.error(notif.mensaje, '❌ Pedido Finalizado', config);
               break;
+            case 'PEDIDO_ENVIADO':
+              toast = this.toastr.error(notif.mensaje, '❌ Pedido Enviado', config);
+              break;
             case 'RESERVACION_CONFIRMADA':
               toast = this.toastr.success(notif.mensaje, '✅ Reservación Confirmada', config);
               break;

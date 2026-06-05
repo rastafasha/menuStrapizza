@@ -11,6 +11,7 @@ export class Producto {
   precio_antes!: string;
   video_review!: string;
   info_short!: string;
+  comentarios!: string;
   detalle!: string;
   slug!: string;
   stock!: number;

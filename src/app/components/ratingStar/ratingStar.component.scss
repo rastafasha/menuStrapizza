@@ -1,0 +1,30 @@
+.stars {
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    padding-right: 13px;
+
+    ul {
+        display: inline-flex;
+        margin: 0;
+        padding: 0;
+
+        li {
+            list-style: none;
+            color: #ccc; /* Color gris para las estrellas inactivas */
+
+            // CORRECCIÓN: Cuando el li tiene la clase .active, pinta su icono .fa
+            &.active {
+                color: #FFD700; /* Color dorado (gold) */
+                
+                .fa {
+                    color: #FFD700;
+                }
+            }
+        }
+    }
+
+    .fa {
+        font-size: 14px;
+    }
+}

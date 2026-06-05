@@ -1,0 +1,12 @@
+<div class="stars">
+  <ul class="star-rating">
+    <li *ngFor="let num of estrellasArray" [ngClass]="{'active': stars >= num}">
+      <!-- Icono Dinámico: Muestra estrella completa, media estrella o vacía -->
+      <i class="fa" [ngClass]="{
+        'fa-star': stars >= num,
+        'fa-star-half-o': stars >= (num - 0.5) && stars < num,
+        'fa-star-o': stars < (num - 0.5)
+      }"></i>
+    </li>
+  </ul>
+</div>
