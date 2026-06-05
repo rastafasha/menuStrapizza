@@ -24,7 +24,6 @@ declare var bootstrap: any;
      ModalInstruccionesComponent,
     ImagenPipe,
     AsideCuentaComponent,
-    SafePipe
   ],
   templateUrl: './mis-pagos.component.html',
   styleUrl: './mis-pagos.component.scss'
