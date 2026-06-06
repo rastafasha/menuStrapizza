@@ -350,6 +350,7 @@ export class ReviewOrderComponent implements OnInit, OnDestroy {
     const nombreCliente = formValues.first_name || this.identity.first_name || 'Cliente';
     const tipoEntrega = formValues.tipoEntrega || 'No especificado';
     const telefonoCliente = formValues.telefono || this.identity.telefono || 'No registrado';
+    
 
     let message = `*Nuevo Pedido desde App Zlipmenu #${this.randomNum}*\n\n`;
     message += `*Cliente:* ${nombreCliente}\n`;
@@ -364,7 +365,7 @@ export class ReviewOrderComponent implements OnInit, OnDestroy {
 
       // Evitamos comparar contra propiedades undefined de los items
       if (item.nombre_selector && item.nombre_selector !== 'unico') {
-        message += `• ${item.nombre_selector}\n`;
+        message += `• ${item.selector_elegido}\n`;
       }
 
       message += `  Cant: ${item.cantidad} x ${item.precio_ahora.toFixed(2)} = ${itemTotal}\n\n`;
