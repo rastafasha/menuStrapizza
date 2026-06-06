@@ -134,6 +134,17 @@ export class MisNotificacionesComponent implements OnInit {
     }
   }
 
+  cerrarOffcanvas() {
+  const el = document.getElementById('offcanvasNotif');
+  // Obtenemos la instancia existente de Bootstrap en ese elemento
+  const bsOffcanvas = bootstrap.Offcanvas.getInstance(el);
+  
+  // Si la instancia existe, la cerramos
+  if (bsOffcanvas) {
+    bsOffcanvas.hide();
+  }
+}
+
 
 
   irAPagos(tipo: string) {
@@ -144,13 +155,47 @@ export class MisNotificacionesComponent implements OnInit {
     }
   }
 
-  irAFacturas(tipo: string) {
-    if (tipo === 'NUEVA_FACTURA') {
-      this.router.navigate(['/mis-facturas'], {
+  irAReservaciones(tipo: string) {
+    if (tipo === 'RESERVACION_CANCELADA') {
+      this.router.navigate(['/reservaciones'], {
+        queryParams: { estado: 'Cancelada' }
+      });
+    }
+  }
+  irAPedidos(tipo: string) {
+    if (tipo === 'PEDIDO_RECHAZADO') {
+      this.router.navigate(['/my-account/pedidos'], {
         queryParams: { estado: 'PENDIENTE' }
       });
     }
   }
+
+  eliminarIndividual(id: string) {
+    this.notificacionService.borrarNotificacion(id).subscribe(() => {
+      this.toastr.success('Notificación Eliminada');
+      this.cerrarOffcanvas();
+      this.ngOnInit();
+    });
+  }
+
+  // 1. Este botón abre el modal en lugar del confirm feo
+vaciarTodo() {
+  const el = document.getElementById('modalConfirmarVaciar');
+  const modal = new bootstrap.Modal(el);
+  modal.show();
+}
+
+// 2. Esta función se ejecuta solo si le da al botón "Sí, borrar todo"
+confirmarVaciarTodo() {
+  this.notificacionService.limpiarBuzonCompleto().subscribe(() => {
+    this.getNotificaciones(); 
+    
+    // Cerramos el modal de forma limpia
+    const el = document.getElementById('modalConfirmarVaciar');
+    const modal = bootstrap.Modal.getInstance(el);
+    if (modal) modal.hide();
+  });
+}
 
 
 

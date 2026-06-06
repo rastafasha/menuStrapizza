@@ -183,7 +183,7 @@ toggleComentario(event: Event): void {
         } else {
           this.toastr.success('Se guardó la informacion del Reservación', 'Éxito');
           // Close modal programmatically
-          const modalElement = document.getElementById('add_presupuesto');
+          const modalElement = document.getElementById('add_reserva');
           const modal = bootstrap.Modal.getInstance(modalElement);
           if (modal) {
             modal.hide();
@@ -202,7 +202,7 @@ toggleComentario(event: Event): void {
         } else {
           this.toastr.success('Se guardó la informacion del Reservación', 'Éxito');
           // Close modal programmatically
-          const modalElement = document.getElementById('add_presupuesto');
+          const modalElement = document.getElementById('add_reserva');
           const modal = bootstrap.Modal.getInstance(modalElement);
           if (modal) {
             modal.hide();

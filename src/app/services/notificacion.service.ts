@@ -160,4 +160,22 @@ export class NotificacionService {
     if (tipo.startsWith('RESERVACION_')) return `/reservaciones`;
     return '/home';
   }
+
+    /**
+   * 🟢 NUEVO: Eliminar una sola notificación por su ID en el panel del admin
+   */
+  borrarNotificacion(id: string): Observable<any> {
+    return this.http.delete(`${BackendApi}/notificaciones/por_id/${id}`, this.getOptions()).pipe(
+      tap(() => this.cargarContador()) // Recarga el número actual tras la eliminación
+    );
+  }
+
+  /**
+   * 🟢 NUEVO: Vaciar completamente el buzón de notificaciones del admin
+   */
+  limpiarBuzonCompleto(): Observable<any> {
+    return this.http.delete(`${BackendApi}/notificaciones/limpiar/todas`, this.getOptions()).pipe(
+      tap(() => this.unreadCountSub.next(0)) // Resetea inmediatamente en la UI
+    );
+  }
 }
