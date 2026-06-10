@@ -64,7 +64,7 @@
     </div>
      <!-- Botón Flotante para Reportar Nuevo Pago -->
     <button class="btn btn-primary rounded-circle shadow-lg position-fixed"
-      style="bottom: 20px; right: 20px; width: 60px; height: 60px; z-index: 999;" data-bs-target="#add_presupuesto"
+      style="bottom: 20px; right: 20px; width: 60px; height: 60px; z-index: 999;" data-bs-target="#add_reserva"
       data-bs-toggle="offcanvas">
       <i class="fa fa-plus fs-3"></i>
     </button>
@@ -121,7 +121,7 @@
                     <i class="fas fa-receipt me-1"></i> Ver Reserva
                 </button>
                 <button *ngIf="resev.status==='Pendiente'" class="btn btn-sm btn-outline-success rounded-pill px-4 fw-bold" style="font-size: 0.8rem;"
-            (click)="onEditProject(resev)" data-bs-target="#add_presupuesto"
+            (click)="onEditProject(resev)" data-bs-target="#add_reserva"
       data-bs-toggle="offcanvas">
             <i class="fa fa-edit me-1"></i> Editar
           </button>
