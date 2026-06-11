@@ -11,18 +11,20 @@ import { ImagenPipe } from '../../pipes/imagen-pipe.pipe';
 import { AvisoComponent } from '../aviso/aviso.component';
 import { LoadingComponent } from '../loading/loading.component';
 import { NotificacionService } from '../../services/notificacion.service';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-header',
   standalone: true,
   imports: [
-    RouterModule, 
-    CommonModule, 
+    RouterModule,
+    CommonModule,
     ReactiveFormsModule,
-    FormsModule, 
-    ImagenPipe, 
-    AvisoComponent, 
-    LoadingComponent
+    FormsModule,
+    ImagenPipe,
+    AvisoComponent,
+    LoadingComponent,
+    
   ],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss'
@@ -40,7 +42,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   isLoading = false;
 
   year: number = new Date().getFullYear();
-  
+
   // 🌟 SaaS DIGITAL: Eliminamos el uso de variables estáticas del environment
   titleapp: string = 'Zlipmenu';
 
@@ -51,16 +53,20 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   isReloadig = false;
   isAviso: boolean = false;
-  aviso: string = 'Hola desde el header, para refrescar la página';
+  aviso: string = 'Jala desde el header, para refrescar la página';
+  public activeLang = 'es';
+  flag = false;
 
+  
   public unreadCount$!: Observable<number>;
+  private cartSubscription!: Subscription;
+  private tiendaSubscription!: Subscription;
 
   private tiendaService = inject(TiendaService);
   private carritoService = inject(CarritoService);
   private notifService = inject(NotificacionService);
-
-  private cartSubscription!: Subscription;
-  private tiendaSubscription!: Subscription;
+  private translate = inject(TranslateService);
+  
 
   @HostListener('touchstart', ['$event'])
   onTouchStart(event: TouchEvent) {
@@ -84,6 +90,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.unreadCount$ = this.notifService.unreadCount$;
     this.notifService.cargarContador();
+    this.getLangActive()
 
     // Show aviso only once on initial app start
     const avisoShown = localStorage.getItem('avisoShown');
@@ -96,7 +103,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
     } else {
       this.isAviso = false;
     }
-    
+
     let USER = localStorage.getItem("user");
     this.user = USER ? JSON.parse(USER) : null;
 
@@ -105,7 +112,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
       this.bandejaList = items;
       this.totalList = items.length;
     });
-    
+
     // 🌟 CORRECCIÓN SAAS MULTI-TENANT: 
     // Nos suscribimos directamente al canal reactivo del servicio que ya resolvió el subdominio.
     // Ya no le enviamos parámetros estáticos ni deudas técnicas.
@@ -117,6 +124,20 @@ export class HeaderComponent implements OnInit, OnDestroy {
     });
   }
 
+  getLangActive(){
+    const browserLang = this.translate.getBrowserLang(); // Detecta 'en', 'es', etc.
+    const savedLang = localStorage.getItem('lang') || browserLang || 'es';
+    
+    // Validamos que sea un idioma soportado (es o en)
+    this.activeLang = savedLang.match(/es|en/) ? savedLang : 'es';
+
+    // Forzamos a la librería a activar el idioma correcto en el arranque global
+    this.translate.use(this.activeLang);
+    
+    // Sincronizamos la variable flag para que el switch visual se pinte en la posición correcta
+    this.flag = (this.activeLang === 'en');
+  }
+
   ngOnDestroy(): void {
     if (this.cartSubscription) {
       this.cartSubscription.unsubscribe();
@@ -125,7 +146,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
       this.tiendaSubscription.unsubscribe();
     }
   }
-  
+
   getTiendas() {
     this.tiendaService.cargarTiendas().subscribe((resp: Tienda[]) => {
       // Mapeo genérico por si necesitas lógicas internas
@@ -174,4 +195,6 @@ export class HeaderComponent implements OnInit, OnDestroy {
     location.reload();
     this.isReloadig = false;
   }
+
+ 
 }

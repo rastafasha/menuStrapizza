@@ -8,7 +8,7 @@
         <aside class="col-lg-4  pt-lg-0">
             <app-aside-cuenta></app-aside-cuenta>
         </aside>
-        <h3 class="heading-style-3">Orden detalle</h3>
+        <h3 class="heading-style-3">{{'Orden detalle' |translate}}</h3>
         <!-- Content  -->
         <section class="col-lg-8">
 
@@ -38,7 +38,7 @@
                                                     </div>
                                                     <div class="media-body">
                                                         <div class="media-tab-subtitle text-muted font-size-xs mb-1">
-                                                            Metodo</div>
+                                                            {{'Método'|translate}}</div>
                                                         <h6 class="media-tab-title text-nowrap mb-0">
                                                             {{venta.metodo_pago.tipo}}</h6>
                                                     </div>
@@ -51,7 +51,7 @@
                                                     <div class="media-tab-media mr-3"><i class="fa fa-bag"></i></div>
                                                     <div class="media-body">
                                                         <div class="media-tab-subtitle text-muted font-size-xs mb-1">
-                                                            Estatus</div>
+                                                            {{'Estado'|translate}}</div>
                                                         <h6 class="media-tab-title text-nowrap mb-0">{{venta.estado}}
                                                         </h6>
                                                     </div>
@@ -65,7 +65,7 @@
                                                     <div class="media-tab-media mr-3"><i class="fa fa-dollar"></i></div>
                                                     <div class="media-body">
                                                         <div class="media-tab-subtitle text-muted font-size-xs mb-1">
-                                                            Total pagado</div>
+                                                            {{'Total pagado'|translate}}</div>
                                                         <h6 class="media-tab-title text-nowrap mb-0">
                                                             {{venta.total_pagado | currency:tienda_moneda}} </h6>
                                                     </div>
@@ -98,7 +98,7 @@
                                             <button type="button" class="btn btn-success" data-bs-toggle="modal"
                                                 [attr.data-bs-target]="'#finalizar'">
                                                 <i class="fa fa-check mr-2"></i>
-                                                Confirmar entrega
+                                                {{'Confirmar entrega'|translate}}
                                             </button>
 
                                             <div class="modal fade" id="finalizar" tabindex="-1" role="dialog"
@@ -106,20 +106,19 @@
                                                 <div class="modal-dialog modal-dialog-centered" role="document">
                                                     <div class="modal-content">
                                                         <div class="modal-header">
-                                                            <h4 class="modal-title">Confirmación</h4>
+                                                            <h4 class="modal-title">{{'Confirmación'|translate}}</h4>
                                                             <button class="close" type="button" data-bs-dismiss="modal"
                                                                 aria-label="Close"><span
                                                                     aria-hidden="true">×</span></button>
                                                         </div>
                                                         <div class="modal-body">
-                                                            <p class="font-size-sm">Al aceptar estas confimando la
-                                                                recepción de la compra.</p>
+                                                            <p class="font-size-sm">{{'Al aceptar estas confimando la recepción de la compra'|translate}}.</p>
                                                         </div>
                                                         <div class="modal-footer">
                                                             <button class="btn btn-secondary btn-sm" type="button"
-                                                                data-bs-dismiss="modal">Cerrar</button>
+                                                                data-bs-dismiss="modal">{{'Cerrar'|translate}}</button>
                                                             <button class="btn btn-primary btn-shadow btn-sm"
-                                                                type="button" (click)="finalizar(id)">Confirmar</button>
+                                                                type="button" (click)="finalizar(id)">{{'Confirmar'|translate}}</button>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -216,12 +215,12 @@
                                                             {{item.producto.titulo}}
                                                         </h3>
                                                         <div class="font-size-sm"><span
-                                                                class="text-muted mr-2">Cantidad:</span>
+                                                                class="text-muted mr-2">{{'Cantidad'|translate}}:</span>
                                                             {{item.cantidad}}
                                                         </div>
                                                         <div class="font-size-lg text-accent">
-                                                            <span class="font-size-sm text-muted mr-2">Precio
-                                                                unitario:</span><br>
+                                                            <span class="font-size-sm text-muted mr-2">
+                                                                {{'Precio unitario'|translate}}:</span><br>
                                                             {{item.precio |currency: tienda_moneda}}
                                                         </div>
                                                     </div>
@@ -237,7 +236,7 @@
                                                                         {{item.selector}}
                                                                     </div>
                                                                     <div class="font-size-sm">
-                                                                        <span class="text-muted mr-2">Selector:</span>
+                                                                        <span class="text-muted mr-2">{{'Selector'|translate}}:</span>
                                                                         {{item.selector_elegido}}
                                                                     </div>
                                                                     <!-- <div class="font-size-sm"><span
@@ -257,8 +256,8 @@
                                                                         (click)="onEditComentario(item)"
                                                                         data-bs-toggle="modal"
                                                                         data-bs-target="#editCommentModal">
-                                                                        <i style="color: gold;" class="fa fa-star mr-2"></i> Emitir
-                                                                            comentario
+                                                                        <i style="color: gold;" class="fa fa-star mr-2"></i> 
+                                                                        {{'Emitir comentario'|translate}}
                                                                     </button>
                                                                     </ng-container>
 

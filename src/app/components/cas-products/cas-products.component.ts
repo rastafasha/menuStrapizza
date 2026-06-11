@@ -12,12 +12,13 @@ import { ProductoService } from '../../services/product.service';
 import { environment } from '../../../environments/environment';
 import { Categoria } from '../../models/categoria.model';
 import { CategoriasPipePipe } from '../../pipes/categorias-pipe.pipe';
+import { TranslatePipe } from '@ngx-translate/core';
 declare var bootstrap: any;
 @Component({
   selector: 'app-cas-products',
   imports: [CommonModule, LoadingComponent,
     ProductItemComponent, ModalproductComponent,
-    CategoriasPipePipe
+    CategoriasPipePipe, TranslatePipe
   ],
   templateUrl: './cas-products.component.html',
   styleUrl: './cas-products.component.scss'

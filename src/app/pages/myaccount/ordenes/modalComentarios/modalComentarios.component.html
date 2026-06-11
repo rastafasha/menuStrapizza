@@ -6,7 +6,7 @@
 
             <div class="modal-header">
                 <h4 class="modal-title">
-                    Enviar comentario
+                    {{'Enviar comentario'|translate}}
                 </h4>
                 <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
@@ -24,25 +24,25 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="review-rating">Calificación<span class="text-danger">*</span></label>
+                        <label for="review-rating">{{'Calificación'|translate}}<span class="text-danger">*</span></label>
                         <select class="custom-select form-control" required="" formControlName="estrellas">
                             <option value="" selected disabled>
-                                Selecciona</option>
+                                {{'Selecciona'|translate}}</option>
                             <option value="5">5
-                                estrellas</option>
+                                {{'estrellas'|translate}}</option>
                             <option value="4">4
-                                estrellas</option>
+                                {{'estrellas'|translate}}</option>
                             <option value="3">3
-                                estrellas</option>
+                                {{'estrellas'|translate}}</option>
                             <option value="2">2
-                                estrellas</option>
+                                {{'estrellas'|translate}}</option>
                             <option value="1">1
-                                estrella</option>
+                                {{'estrella'|translate}}</option>
                         </select>
 
                     </div>
                     <div class="form-group">
-                        <label for="review-text">Reseña<span class="text-danger">*</span></label>
+                        <label for="review-text">{{'Reseña'|translate}}<span class="text-danger">*</span></label>
                         <textarea class="form-control" rows="5" required="" formControlName="comentario"
                             placeholder="Escribe que tal te parecio el producto."></textarea>
                         @if(reviewForm.controls['comentario'].touched){
@@ -59,7 +59,7 @@
 
                     </div>
                     <div class="form-group">
-                        <label for="review-pros">Pros<span class="text-danger">*</span></label>
+                        <label for="review-pros">{{'Pros'|translate}}<span class="text-danger">*</span></label>
                         <textarea class="form-control" rows="2" placeholder="Lo bueno"
                             formControlName="pros"></textarea>
                         @if(reviewForm.controls['pros'].touched){
@@ -75,7 +75,7 @@
                         }
                     </div>
                     <div class="form-group mb-4">
-                        <label for="review-cons">Cons<span class="text-danger">*</span></label>
+                        <label for="review-cons">{{'Cons'|translate}}<span class="text-danger">*</span></label>
                         <textarea class="form-control" rows="2" placeholder="Lo malo" formControlName="cons"></textarea>
                         @if(reviewForm.controls['cons'].touched){
 
@@ -90,14 +90,14 @@
                         }
                     </div>
                     <button class="btn btn-primary btn-shadow btn-block" type="button" (click)="saveComent()">
-                        Enviar reseña</button>
+                        {{'Enviar reseña'|translate}}</button>
                 </form>
             </div>
 
             <!-- Botones de Acción Únicos -->
             <div class="modal-footer">
                 <button class="btn btn-secondary btn-sm" type="button" data-bs-dismiss="modal"
-                    (click)="onClose()">Cerrar</button>
+                    (click)="onClose()">{{'Cerrar'|translate}}</button>
 
             </div>
 

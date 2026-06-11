@@ -7,6 +7,7 @@ import { TiendaService } from '../../../../services/tienda.service';
 import { UsuarioService } from '../../../../services/usuario.service';
 import { Tienda } from '../../../../models/tienda.model';
 import { ToastrService } from 'ngx-toastr';
+import { TranslatePipe } from '@ngx-translate/core';
 declare var $: any;
 declare var bootstrap: any;
 @Component({
@@ -14,7 +15,8 @@ declare var bootstrap: any;
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    FormsModule
+    FormsModule,
+    TranslatePipe
   ],
   templateUrl: './modalComentarios.component.html',
   styleUrls: ['./modalComentarios.component.css']

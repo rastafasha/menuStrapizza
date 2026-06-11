@@ -5,10 +5,11 @@ import { Subscription } from 'rxjs';
 import { Tienda } from '../../models/tienda.model';
 import { TiendaService } from '../../services/tienda.service';
 import { ReservaCrearComponent } from '../../pages/myaccount/reserva/reserva-crear/reserva-crear.component';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-hero',
-  imports: [RouterModule, CommonModule, NgStyle, ReservaCrearComponent],
+  imports: [RouterModule, CommonModule, NgStyle, ReservaCrearComponent, TranslatePipe],
   templateUrl: './hero.component.html',
   styleUrl: './hero.component.scss'
 })

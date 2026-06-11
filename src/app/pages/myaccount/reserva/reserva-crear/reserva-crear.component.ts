@@ -7,6 +7,7 @@ import { Reservacion } from '../../../../models/reservacion.model';
 import { AuthService } from '../../../../services/auth.service';
 import { ReservacionService } from '../../../../services/reservacion.service';
 import { LoadingComponent } from '../../../../shared/loading/loading.component';
+import { TranslatePipe } from '@ngx-translate/core';
 declare var bootstrap: any;
 @Component({
   selector: 'app-reserva-crear',
@@ -14,6 +15,7 @@ declare var bootstrap: any;
     CommonModule,
     ReactiveFormsModule,
     FormsModule,
+    TranslatePipe
   ],
   templateUrl: './reserva-crear.component.html',
   styleUrl: './reserva-crear.component.scss'
@@ -43,19 +45,7 @@ export class ReservaCrearComponent {
   cliente: any;
   mostrarComentario: boolean = false;
 
-  info_crear_presupuesto = `
-  <p>En esta sección :</p>
-          <ul>
-            <li>Podrás crear y editar el presupuesto para cada uno de tus pacientes</li>
-            <li>Encuentra el paciente por número de cédula, si existe se llenarán los campos </li>
-            <li>Con el botón Reset, puedes borrar la info que trae el botón de filtro y los campos y rehacer una busqueda</li>
-            <li>Tienes el campo descripción o motivo del presupuesto</li>
-            <li>El Diagnostico u observación </li>
-            <li>En los campos: Item, Cantidad y Precio, podras colocar los costos de cada valor para sumarlos a la lista</li>
-            <li>El sistema te mostrará una tabla con la información recibida costos y cantidades</li>
-            <li>El sistema se encargará de hacer la suma total</li>
-            <li>Al Pulsar Guardar se compartirá esta información en la App Versión Paciente, así tendran un archivo para poder consultarlo a futuro</li>
-          </ul>`;
+
 
   constructor(
     public reservacionService: ReservacionService,
@@ -83,7 +73,7 @@ export class ReservaCrearComponent {
       changes['reservacionSeleccionado'] &&
       changes['reservacionSeleccionado'].currentValue
     ) {
-      this.pageTitle = 'Editando Reservacion';
+      this.pageTitle = 'Editando Reservación';
       const presupuesto = changes['reservacionSeleccionado'].currentValue;
       
       this.reservaForm.patchValue({
@@ -104,10 +94,10 @@ export class ReservaCrearComponent {
       });
       this.reservacionSeleccionado = presupuesto;
       this.isEditing = true;
-      this.pageTitle = 'Editando Reservacion';
+      this.pageTitle = 'Editando Reservación';
     } else {
       this.isEditing = false;
-      this.pageTitle = 'Creando Reservacion';
+      this.pageTitle = 'Creando Reservación';
     }
     this.isLoading = false;
   }
@@ -116,7 +106,7 @@ export class ReservaCrearComponent {
   onClose() {
     this.reservacionSeleccionado = null;
     this.reservaForm.reset();
-    this.pageTitle = 'Creando Presupuesto';
+    this.pageTitle = 'Creando Reservación';
     // Also reset default values if needed
     this.reservaForm.patchValue({
       id: null,

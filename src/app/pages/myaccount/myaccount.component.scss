@@ -101,6 +101,7 @@
     padding: 16px;
     background: white;
     border-bottom: 1px solid #eee;
+    width: 80vw;
 
     .setting-info {
         display: flex;
@@ -124,6 +125,7 @@
         }
     }
 }
+
 .switch {
     position: relative;
     display: inline-block;

@@ -1,71 +1,95 @@
 <div class="container mt-3 mb-3">
   <details>
-  <summary class="">Menú Navegación</summary>
-  <div class="row">
-  <div class="cz-sidebar-static ">
-    <ul class="listainterna ">
-      <li>
-        <a class="nav-links shadow-sm" [routerLink]="['/my-account/perfil/', identity.uid]" routerLinkActive="active"
-          [routerLinkActiveOptions]="{exact: true}">
-          <i class="fa fa-user opacity-60 mr-2"></i>Mis Datos
-        </a>
-      </li>
-      <li *ngIf="identity.telefono">
-        <a class="nav-links shadow-sm" [routerLink]="['/my-account/direcciones']" routerLinkActive="active"
-          [routerLinkActiveOptions]="{exact: true}">
-          <i class="fa fa-book opacity-60 mr-2"></i>Direcciones</a>
-      </li>
+    <summary class="">{{ 'Menú Navegación' | translate }}</summary>
+    <div class="row">
+      <div class="cz-sidebar-static ">
+        <ul class="listainterna ">
+          <li>
+            <a class="nav-links shadow-sm" [routerLink]="['/my-account/perfil/', identity.uid]"
+              routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+              <i class="fa fa-user opacity-60 mr-2"></i>
+              {{ 'Mis Datos' | translate }}
+            </a>
+          </li>
+          <li *ngIf="identity.telefono">
+            <a class="nav-links shadow-sm" [routerLink]="['/my-account/direcciones']" routerLinkActive="active"
+              [routerLinkActiveOptions]="{exact: true}">
+              <i class="fa fa-book opacity-60 mr-2"></i>
+              {{ 'Direcciones' | translate }}
+            </a>
+          </li>
 
-      <li *ngIf="identity.telefono">
-        <a class="nav-links shadow-sm" [routerLink]="['/review']" routerLinkActive="active"
-          [routerLinkActiveOptions]="{exact: true}">
-          <i class="fa fa-shopping-cart opacity-60 mr-2"></i>Carrito</a>
-      </li>
-      <li *ngIf="identity.telefono">
-        <a class="nav-links shadow-sm" [routerLink]="['/my-account/pedidos']" routerLinkActive="active"
-          [routerLinkActiveOptions]="{exact: true}">
-          <i class="fa fa-bag-shopping opacity-60 mr-2"></i>Pedidos</a>
-      </li>
-      <li *ngIf="identity.telefono">
-        <a class="nav-links shadow-sm" [routerLink]="['/my-account/ordenes']" routerLinkActive="active"
-          [routerLinkActiveOptions]="{exact: true}">
-          <i class="fa fa-ticket-alt opacity-60 mr-2"></i>Ordenes</a>
-      </li>
-      <li *ngIf="identity.telefono">
-        <a class="nav-links shadow-sm" [routerLink]="['/mis-pagos']" routerLinkActive="active"
-          [routerLinkActiveOptions]="{exact: true}">
-          <i class="fa fa-wallet"></i>
-          Mis Pagos
-        </a>
-      </li>
-      <li *ngIf="identity.telefono">
-        <a class="nav-links shadow-sm" [routerLink]="['/favoritos']" routerLinkActive="active"
-          [routerLinkActiveOptions]="{exact: true}">
-          <i class="fa fa-heart"></i>
-          Mis Favoritos
-        </a>
-      </li>
-      <li *ngIf="identity.telefono">
-        <a class="nav-links shadow-sm" [routerLink]="['/reservaciones']" routerLinkActive="active"
-          [routerLinkActiveOptions]="{exact: true}">
-          <i class="fa fa-receipt"></i>
-          Reservaciones
-        </a>
-      </li>
-    </ul>
-  </div>
-  <div class="setting-row shadow-sm">
-    <a [routerLink]="['/my-account']">
-      <div class="setting-info ">
-        <i class="fa fa-user-circle"></i>
-        <div class="text-container">
-          <strong>Inicio Cuenta</strong>
-        </div>
+          <li *ngIf="identity.telefono">
+            <a class="nav-links shadow-sm" [routerLink]="['/review']" routerLinkActive="active"
+              [routerLinkActiveOptions]="{exact: true}">
+              <i class="fa fa-shopping-cart opacity-60 mr-2"></i>
+              {{ 'Carrito' | translate }}
+            </a>
+          </li>
+          <li *ngIf="identity.telefono">
+            <a class="nav-links shadow-sm" [routerLink]="['/my-account/pedidos']" routerLinkActive="active"
+              [routerLinkActiveOptions]="{exact: true}">
+              <i class="fa fa-bag-shopping opacity-60 mr-2"></i>
+              {{ 'Pedidos' | translate }}
+            </a>
+          </li>
+          <li *ngIf="identity.telefono">
+            <a class="nav-links shadow-sm" [routerLink]="['/my-account/ordenes']" routerLinkActive="active"
+              [routerLinkActiveOptions]="{exact: true}">
+              <i class="fa fa-ticket-alt opacity-60 mr-2"></i>
+              {{ 'Compras' | translate }}
+            </a>
+          </li>
+          <li *ngIf="identity.telefono">
+            <a class="nav-links shadow-sm" [routerLink]="['/mis-pagos']" routerLinkActive="active"
+              [routerLinkActiveOptions]="{exact: true}">
+              <i class="fa fa-wallet"></i>
+              {{ 'Pagos' | translate }}
+            </a>
+          </li>
+          <li *ngIf="identity.telefono">
+            <a class="nav-links shadow-sm" [routerLink]="['/favoritos']" routerLinkActive="active"
+              [routerLinkActiveOptions]="{exact: true}">
+              <i class="fa fa-heart"></i>
+              {{ 'Favoritos' | translate }}
+            </a>
+          </li>
+          <li *ngIf="identity.telefono">
+            <a class="nav-links shadow-sm" [routerLink]="['/reservaciones']" routerLinkActive="active"
+              [routerLinkActiveOptions]="{exact: true}">
+              <i class="fa fa-receipt"></i>
+              {{ 'Reservaciones' | translate }}
+            </a>
+          </li>
+          <li *ngIf="identity.telefono">
+            <!-- Idioma Switch -->
+            <div class="nav-links shadow-sm">
+              <label class="switch">
+                <!-- El switch se marca si activeLang es 'en' -->
+                <input type="checkbox" [checked]="activeLang === 'en'" (change)="toggleLanguageSwitch($event)">
+                <span class="slider round"></span>
+              </label>
+
+              <!-- Muestra el texto dinámico o la bandera actual junto al interruptor -->
+              <p>
+                <i class="flag-icon" [ngClass]="activeLang === 'en' ? 'flag-icon-us' : 'flag-icon-es'"></i>
+                {{ 'Idioma' | translate }}
+              </p>
+            </div>
+            <!-- Idioma Switch -->
+          </li>
+        </ul>
       </div>
-    </a>
-  </div>
+      <div class="setting-row shadow-sm">
+        <a [routerLink]="['/my-account']">
+          <div class="setting-info ">
+            <i class="fa fa-user-circle"></i>
+            <div class="text-container">
+              <strong> {{ 'Inicio Cuenta' | translate }}</strong>
+            </div>
+          </div>
+        </a>
+      </div>
+    </div>
+  </details>
 </div>
-</details>
-</div>
-
-

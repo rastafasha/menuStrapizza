@@ -26,8 +26,7 @@
                                 <span class="input-group-text bg-white border-end-0">
                                     <i class="fa fa-search text-muted"></i>
                                 </span>
-                                <input type="text" class="form-control border-start-0"
-                                    placeholder="Buscar por referencia, banco o monto..." [(ngModel)]="query"
+                                <input type="text" class="form-control border-start-0" [(ngModel)]="query"
                                     (keyup.enter)="search()">
                             </div>
                         </div>
@@ -35,11 +34,11 @@
                         <!-- SELECT DE ESTATUS -->
                         <div class="col-md-4">
                             <select class="form-select" [(ngModel)]="status" (change)="search()">
-                                <option value="">Todos los Estatus</option>
-                                <option value="Pendiente">Pendiente</option>
-                                <option value="Confirmada">Confirmada</option>
-                                <option value="Cancelada">Cancelada</option>
-                                <option value="Completada">Completada</option>
+                                <option value="">{{'Todos los Estatus'|translate}}</option>
+                                <option value="Pendiente">{{'Pendiente'|translate}}</option>
+                                <option value="Confirmada">{{'Confirmada'|translate}}</option>
+                                <option value="Cancelada">{{'Cancelada'|translate}}</option>
+                                <option value="Completada">{{'Completada'|translate}}</option>
                             </select>
                         </div>
 
@@ -48,11 +47,11 @@
                         <div class="col-md-2 d-grid">
                             @if (query || status) {
                             <button class="btn btn-outline-danger animate fadeIn" (click)="clearFilters()">
-                                <i class="fa fa-times me-1"></i> Limpiar
+                                <i class="fa fa-times me-1"></i> {{'Limpiar'|translate}}
                             </button>
                             } @else {
                             <button class="btn btn-primary" (click)="search()">
-                                Filtrar
+                                {{'Filtrar'|translate}}
                             </button>
                             }
                         </div>
@@ -87,20 +86,20 @@
                 <!-- Badge más estilizado -->
                 @if (resev.status === 'Pendiente') {
                 <span
-                    class="badge rounded-pill bg-primary-subtle text-primary border border-primary-subtle px-3">Pendiente</span>
+                    class="badge rounded-pill bg-primary-subtle text-primary border border-primary-subtle px-3">{{'Pendiente'|translate}}</span>
                 }
                 @if (resev.status === 'Confirmada') {
                 <span
-                    class="badge rounded-pill bg-success-subtle text-success border border-success-subtle px-3">Confirmada</span>
+                    class="badge rounded-pill bg-success-subtle text-success border border-success-subtle px-3">{{'Confirmada'|translate}}</span>
                 }
                 @if (resev.status === 'Cancelada') {
                 <span
-                    class="badge rounded-pill bg-danger-subtle text-danger border border-danger-subtle px-3">Cancelada</span>
+                    class="badge rounded-pill bg-danger-subtle text-danger border border-danger-subtle px-3">{{'Cancelada'|translate}}</span>
 
                 }
                 @if (resev.status === 'Completada') {
                 <span
-                    class="badge rounded-pill bg-warning-subtle text-warning border border-warning-subtle px-3">Completada</span>
+                    class="badge rounded-pill bg-warning-subtle text-warning border border-warning-subtle px-3">{{'Completada'|translate}}</span>
 
                 }
 
@@ -111,25 +110,25 @@
                 <p class="mb-0 h4 fw-bold text-dark">
                     {{resev.fecha | date}}
                 </p>
-                <small class="text-muted d-block">Hora: {{resev.hora}}</small>
+                <small class="text-muted d-block">{{'Hora'|translate}}: {{resev.hora}}</small>
             </div>
 
             <!-- Fila Inferior: Botón de Acción -->
             <div class="d-flex justify-content-end  border-top border-light gap-3">
                 <button class="btn btn-sm btn-outline-primary rounded-pill px-4 fw-bold" style="font-size: 0.8rem;"
                     (click)="verDetallePago(resev)">
-                    <i class="fas fa-receipt me-1"></i> Ver Reserva
+                    <i class="fas fa-receipt me-1"></i> {{'Ver Reserva'|translate}}
                 </button>
                 <button *ngIf="resev.status==='Pendiente'" class="btn btn-sm btn-outline-success rounded-pill px-4 fw-bold" style="font-size: 0.8rem;"
             (click)="onEditProject(resev)" data-bs-target="#add_reserva"
       data-bs-toggle="offcanvas">
-            <i class="fa fa-edit me-1"></i> Editar
+            <i class="fa fa-edit me-1"></i> {{'Editar'|translate}}
           </button>
             </div>
         </div>
     </div>
     } @empty {
-    <p class="text-center text-muted">No hay Reservaciones registrados.</p>
+    <p class="text-center text-muted">{{'No hay Reservaciones registrados'|translate}}.</p>
     }
 
     <!-- Spinner estilo Instagram usando la señal loading -->
@@ -139,7 +138,7 @@
     @if (!hasMore() && !isFiltering() && reservaciones().length > 0) {
     <div class="text-center my-4 animate fadeIn">
         <p class="text-muted small">
-            <i class="fas fa-check-circle me-1"></i> Has llegado al final del historial
+            <i class="fas fa-check-circle me-1"></i> {{'Has llegado al final del historial'|translate}}
         </p>
     </div>
     }
@@ -155,7 +154,7 @@
     <!-- Mostrar mensaje de fin de resultados si estamos filtrando -->
     @if ((query || status) && !loading()) {
     <div class="text-center my-4 text-muted small animate fadeIn">
-        <i class="fas fa-info-circle me-1"></i> Fin de resultados filtrados
+        <i class="fas fa-info-circle me-1"></i> {{'Fin de resultados filtrados'|translate}}
     </div>
     }
 
@@ -188,7 +187,7 @@
                 {{ reservacionSeleccionado().status }}
             </span>
             <h2 class="display-6 fw-bold mb-0">{{ reservacionSeleccionado().fecha | date }}</h2>
-            <p class="text-muted small">Hora: {{ reservacionSeleccionado().hora }}</p>
+            <p class="text-muted small">{{'Hora'|translate}}: {{ reservacionSeleccionado().hora }}</p>
             @if (reservacionSeleccionado().status === 'Cancelada') {
             <p>Motivo: {{reservacionSeleccionado().observaciones}}</p>
             }
@@ -197,12 +196,12 @@
         <!-- Datos de la Transacción -->
         <div class="bg-light rounded-4 p-3 mb-4" style="border-radius: 15px;">
             <div class="d-flex justify-content-between mb-3 border-bottom pb-2">
-                <span class="text-muted small">Comensales</span>
+                <span class="text-muted small">{{'Comensales'|translate}}</span>
                 <span class="fw-bold small">{{ reservacionSeleccionado().personas }}</span>
             </div>
             @if (reservacionSeleccionado().listaespera === true) {
             <div class="d-flex justify-content-between mb-3 border-bottom pb-2">
-                <span class="text-muted small">Lista de espera?</span>
+                <span class="text-muted small">{{'Lista de espera?'|translate}}</span>
                 <span class="badge rounded-pill px-3 py-2 mb-2" [ngClass]="{
                 'bg-primary-subtle text-primary': reservacionSeleccionado().listaespera === false,
                 'bg-success-subtle text-success': reservacionSeleccionado().listaespera === true
@@ -215,7 +214,7 @@
             @if (reservacionSeleccionado().comensal_alergia === 'Si') {
             <div class="d-flex justify-content-between flex-column mb-3 border-bottom pb-2">
                 <div class="d-flex flex-row justify-content-between">
-                    <span class="text-muted small">Comensal con alergia?</span>
+                    <span class="text-muted small">{{'Comensal con alergia?'|translate}}</span>
                     <span class="badge rounded-pill px-3 py-2 mb-2" [ngClass]="{
                 'bg-primary-subtle text-primary': reservacionSeleccionado().comensal_alergia === 'Si',
                 'bg-danger-subtle text-danger': reservacionSeleccionado().comensal_alergia === 'No'
@@ -224,7 +223,7 @@
                 </span>
                 </div>
                 <div class="d-flex flex-column">
-                    <span class="text-muted small">Comentarios Alergia</span>
+                    <span class="text-muted small">{{'Comentarios Alergia'|translate}}</span>
                 <p [innerHTML]="reservacionSeleccionado().comentarios_alergia"></p>
                 </div>
                 
@@ -232,17 +231,17 @@
             }
             @if (reservacionSeleccionado().comentarios) {
             <div class="d-flex justify-content-between flex-column mb-3 border-bottom pb-2">
-                <span class="text-muted small">Comentarios</span>
+                <span class="text-muted small">{{'Comentarios'|translate}}</span>
                 <p [innerHTML]="reservacionSeleccionado().comentarios"></p>
             </div>
             }
             <div class="d-flex justify-content-between mb-3 border-bottom pb-2">
-                <span class="text-muted small">Creado</span>
+                <span class="text-muted small">{{'Creado'|translate}}</span>
                 <span class="fw-bold small">{{ reservacionSeleccionado().createdAt | date:'dd/MM/yyyy' }}</span>
             </div>
             @if (reservacionSeleccionado().updatedAt) {
             <div class="d-flex justify-content-between mb-3 border-bottom pb-2">
-                <span class="text-muted small">Actualizado</span>
+                <span class="text-muted small">{{'Actualizado'|translate}}</span>
                 <span class="fw-bold small">{{ reservacionSeleccionado().updatedAt | date:'dd/MM/yyyy' }}</span>
             </div>
             }
@@ -251,7 +250,7 @@
 
 
         <button class="btn btn-dark w-100 py-3 rounded-pill fw-bold" data-bs-dismiss="offcanvas">
-            ENTENDIDO
+            {{'Entendido'|translate}}
         </button>
     </div>
     }
@@ -269,12 +268,12 @@
         </div>
 
         <div class="flex-grow-1">
-            <p class="mb-0 small fw-bold text-white">Filtros limpiados</p>
-            <p class="mb-0 text-white-50" style="font-size: 0.7rem;">Historial actualizado</p>
+            <p class="mb-0 small fw-bold text-white">{{'Filtros limpiados'|translate}}</p>
+            <p class="mb-0 text-white-50" style="font-size: 0.7rem;">{{'Historial actualizado'|translate}}</p>
         </div>
 
     </div>
 </div>
 }
 <app-reserva-crear #presupuestoEditModal (reloadList)="getReservacionUsuario()" [reservacionSeleccionado]="reservacionSeleccionado()" [tiendaSelected]="tiendaSelected"></app-reserva-crear>
-<app-modal-instrucciones [info]="info" sectionId="Reservaciones" #instruccionesModal></app-modal-instrucciones>
+<app-modal-instrucciones [info]="info" [sectionId]="'Reservaciones' |translate" #instruccionesModal></app-modal-instrucciones>

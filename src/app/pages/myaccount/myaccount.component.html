@@ -10,81 +10,102 @@
                     <!-- <app-aside-cuenta></app-aside-cuenta> -->
                 </div>
                 <div class="col-md-8">
-                    <h1>Hola, {{identity.first_name}}!</h1>
-                    <h2 *ngIf="!identity.telefono">Gracias por Registrarte</h2>
-                    <p *ngIf="identity.telefono">Ten un Excelente día!</p>
+                    <h1>{{ 'Hola' | translate }}, {{identity.first_name}}!</h1>
+                    <h2 *ngIf="!identity.telefono"> {{ 'Gracias por Registrarte' | translate }}!</h2>
+                    <p *ngIf="identity.telefono">{{ 'Ten un Excelente día' | translate }}!</p>
                 </div>
 
             </div>
 
             <div *ngIf="!identity.telefono">
-                <h5>Por favor, llena tus datos para continuar con la experiencia</h5>
+                <h5> {{ 'Por favor, llena tus datos para continuar con la experiencia' | translate }}</h5>
             </div>
             <div class="row ">
                 <div class="opciones">
                     <div class="iconop shadow-sm">
                         <a [routerLink]="['/my-account/perfil', identity.uid]">
                             <i class="fa fa-user"></i>
-                            <p>Mis Datos</p>
+                            <p>{{ 'Mis Datos' | translate }}</p>
                         </a>
                     </div>
                     <div class="iconop shadow-sm" *ngIf="identity.telefono">
                         <a [routerLink]="['/my-account/direcciones']">
                             <i class="fa fa-book"></i>
-                            <p>Direcciones</p>
+                            <p>{{ 'Direcciones' | translate }}</p>
 
                         </a>
                     </div>
                     <div class="iconop shadow-sm" *ngIf="identity.telefono">
                         <a [routerLink]="['/review']">
                             <i class="fa fa-shopping-cart"></i>
-                            <p>Mi Carrito</p>
+                            <p>{{ 'Carrito' | translate }}</p>
 
                         </a>
                     </div>
                     <div class="iconop shadow-sm" *ngIf="identity.telefono">
                         <a [routerLink]="['/my-account/pedidos']">
                             <i class="fa fa-bag-shopping"></i>
-                            <p>Pedidos</p>
+                            <p>{{ 'Pedidos' | translate }}</p>
 
                         </a>
                     </div>
                     <div class="iconop shadow-sm" *ngIf="identity.telefono">
                         <a [routerLink]="['/my-account/ordenes']">
                             <i class="fa fa-ticket-alt"></i>
-                            <p>Ordenes</p>
+                            <p>{{ 'Compras' | translate }}</p>
 
                         </a>
                     </div>
                     <div class="iconop shadow-sm" *ngIf="identity.telefono">
                         <a [routerLink]="['/mis-pagos']">
                             <i class="fa fa-wallet"></i>
-                            <p>Mis Pagos</p>
+                            <p>{{ 'Pagos' | translate }}</p>
                         </a>
                     </div>
                     <div class="iconop shadow-sm" *ngIf="identity.telefono">
                         <a [routerLink]="['/favoritos']">
                             <i class="fa fa-heart"></i>
-                            <p>Mis Favoritos</p>
+                            <p>{{ 'Favoritos' | translate }}</p>
                         </a>
                     </div>
                     <div class="iconop shadow-sm" *ngIf="identity.telefono">
                         <a [routerLink]="['/reservaciones']">
                             <i class="fa fa-receipt"></i>
-                            <p>Reservaciones</p>
+                            <p>{{ 'Reservaciones' | translate }}</p>
                         </a>
                     </div>
 
+                    <div class="iconop shadow-sm">
+                        <!-- Idioma Switch -->
+                        <div class="lang-switch-container">
+                            <label class="switch">
+                                <!-- El switch se marca si activeLang es 'en' -->
+                                <input type="checkbox" [checked]="activeLang === 'en'"
+                                    (change)="toggleLanguageSwitch($event)">
+                                <span class="slider round"></span>
+                            </label>
+
+                            <!-- Muestra el texto dinámico o la bandera actual junto al interruptor -->
+                            <p>
+                                <i class="flag-icon"
+                                    [ngClass]="activeLang === 'en' ? 'flag-icon-us' : 'flag-icon-es'"></i>
+                                {{ 'Idioma' | translate }}
+                            </p>
+                        </div>
+                        <!-- Idioma Switch -->
+                    </div>
+
+
 
                 </div>
-                <div class="d-flex flex-column mb-5">
+                <div class="d-flex flex-column " style="margin-bottom: 100px;">
                     <!-- configurar notificaciones push -->
                     <div class="setting-row" *ngIf="!isLoading" [class.loading]="pushService.isProcessing$ | async">
                         <div class="setting-info">
                             <i class="fa fa-bell"></i>
                             <div class="text-container">
-                                <strong>Notificaciones Push</strong>
-                                <span>Avisos importantes</span>
+                                <strong> {{ 'Notificaciones Push' | translate }}</strong>
+                                <span> {{ 'Avisos importantes' | translate }}</span>
                             </div>
                         </div>
 
@@ -105,7 +126,7 @@
                             <div class="setting-info ">
                                 <i class="fa fa-power-off"></i>
                                 <div class="text-container">
-                                    <strong>Cerrar Sesión</strong>
+                                    <strong>{{ 'Cerrar Sesión ' | translate }}</strong>
                                 </div>
                             </div>
                         </a>

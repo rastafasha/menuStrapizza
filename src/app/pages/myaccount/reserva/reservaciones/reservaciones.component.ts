@@ -12,6 +12,8 @@ import { AsideCuentaComponent } from '../../aside-cuenta/aside-cuenta.component'
 import { ReservaCrearComponent } from '../reserva-crear/reserva-crear.component';
 import { Reservacion } from '../../../../models/reservacion.model';
 import { ModalInstruccionesComponent } from '../../../../components/modal-instrucciones/modal-instrucciones.component';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { Subscription } from 'rxjs';
 declare var bootstrap: any;
 
 @Component({
@@ -24,6 +26,7 @@ declare var bootstrap: any;
      ModalInstruccionesComponent,
     AsideCuentaComponent,
     ReservaCrearComponent,
+    TranslatePipe
 ],
   templateUrl: './reservaciones.component.html',
   styleUrl: './reservaciones.component.scss'
@@ -48,16 +51,10 @@ export class ReservacionesComponent {
   tiendaSelected!: any;
 
   presupuestoSeleccionado = signal<any>(null);
+private translate = inject(TranslateService);
+  private langSubscription!: Subscription;
 
-  info = `
-  <h2>Sección: Mis Reservaciones</h2>
-  <p>En este apartado podrás:</p>
-  <ul>
-    <li><strong>Consultar el historial</strong> de tus reservaciones, identificadas con colores según su estatus (Pendiente, Aprobada o Rechazada).</li>
-    <li><strong>Localizar transacciones</strong> rápidamente buscando por fecha, número de referencia o monto.</li>
-    <li><strong>Filtrar la lista</strong> para ver solo los pagos que te interesen según su estado actual.</li>
-    <li><strong>Acceder al detalle</strong> completo de cada operación utilizando el botón "Ver Ticket".</li>
-  </ul>`;
+  public info: string = '';
 
 
 
@@ -89,6 +86,44 @@ export class ReservacionesComponent {
       this.getReservacionUsuario();
       this.escucharTiendaActiva();
     });
+
+    // 1. Cargar el texto en el idioma activo actual al entrar a la vista
+    this.actualizarInstrucciones();
+
+    // 2. 🧲 Suscripción Reactiva: Si el usuario mueve el switch en el Header,
+    // este bloque reescribe la variable 'info' en milisegundos
+    this.langSubscription = this.translate.onLangChange.subscribe(() => {
+      this.actualizarInstrucciones();
+    });
+  }
+
+  private actualizarInstrucciones() {
+    // Obtenemos los textos traducidos desde los archivos JSON
+    const title = this.translate.instant('MY_RESERVATIONS.TITLE');
+    const subtitle = this.translate.instant('MY_RESERVATIONS.SUBTITLE');
+    const item1 = this.translate.instant('MY_RESERVATIONS.ITEM_1');
+    const item2 = this.translate.instant('MY_RESERVATIONS.ITEM_2');
+    const item3 = this.translate.instant('MY_RESERVATIONS.ITEM_3');
+    const item4 = this.translate.instant('MY_RESERVATIONS.ITEM_4');
+
+    // 🚀 Armamos el HTML dinámico estable en memoria con las traducciones limpias
+    this.info = `
+      <h2>${title}</h2>
+      <p>${subtitle}</p>
+      <ul>
+        <li>${item1}</li>
+        <li>${item2}</li>
+        <li>${item3}</li>
+        <li>${item4}</li>
+      </ul>
+    `;
+  }
+
+  ngOnDestroy() {
+    // Evitamos fugas de memoria al destruir el componente
+    if (this.langSubscription) {
+      this.langSubscription.unsubscribe();
+    }
   }
 
   

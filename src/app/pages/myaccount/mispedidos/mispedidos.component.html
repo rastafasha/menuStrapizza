@@ -10,16 +10,17 @@
         <!-- Content  -->
         <app-loading *ngIf="isLoading"></app-loading>
         <div *ngIf="!isLoading && pedidos?.length == 0">
-            <h4 class="text-center mt-3">No posees Pedidos</h4>
+            <h4 class="text-center mt-3">{{'No posees Pedidos'|translate}}</h4>
          </div>
         <section class="col-lg-8"*ngIf="!isLoading">
             <div *ngFor="let item_pedido of pedidos ">
                 <div class="card mb-4">
                     <div class="card-header">
-                        <p class="product-title font-size-base" style="margin-bottom: 0px;"><a>Pedido:
-                                N°-{{item_pedido._id.toUpperCase()}}</a></p>
                         <p class="product-title font-size-base" style="margin-bottom: 0px;">
-                            <a>Status:{{item_pedido.status}}</a></p>
+                            {{'Pedido'|translate}}: N°-{{item_pedido._id.toUpperCase()}}
+                        </p>
+                        <p class="product-title font-size-base" style="margin-bottom: 0px;">
+                            <a>{{'Status'|translate}}:{{item_pedido.status}}</a></p>
 
                         <a *ngIf="item_pedido.status ==='ONDEVICE'"  class="nav-link-style text-danger btn-sm btn"
                             (click)="abrirModal(item_pedido._id)" style="cursor:pointer">
@@ -27,7 +28,7 @@
                         </a>
                         <button type="button" *ngIf="item_pedido.status ==='INPROCESS'"  class="nav-link-style btn-outline-success btn-sm btn mt-2"
                             [routerLink]="['/pay', item_pedido._id ]" style="cursor:pointer">
-                            Completar mi compra
+                            {{'Completar mi compra'|translate}}
                         </button>
                         <!-- Modal backdrop -->
                         <div *ngIf="modalAbierto === item_pedido._id" 
@@ -42,19 +43,20 @@
                             <div class="modal-dialog modal-dialog-centered" role="document">
                                 <div class="modal-content">
                                     <div class="modal-header">
-                                        <h4 class="modal-title">Confirmación</h4>
+                                        <h4 class="modal-title">{{'Confirmación'|translate}}</h4>
                                         <button class="close" type="button" (click)="cerrarModal()"
-                                            aria-label="Close"><span aria-hidden="true">×</span></button>
+                                            aria-label="Close">
+                                            <span aria-hidden="true">×</span>
+                                        </button>
                                     </div>
                                     <div class="modal-body">
-                                        <p class="font-size-sm">¿Desea eliminar
-                                            definitivamente el regsitro?</p>
+                                        <p class="font-size-sm">{{'¿Desea eliminar definitivamente el regsitro?'|translate}}</p>
                                     </div>
                                     <div class="modal-footer">
                                         <button class="btn btn-secondary btn-sm" type="button"
-                                            (click)="cerrarModal()">Cancelar</button>
+                                            (click)="cerrarModal()">{{'Cancelar'|translate}}</button>
                                         <button class="btn btn-primary btn-shadow btn-sm" type="button"
-                                            (click)="eliminar(item_pedido._id)">Suprimir</button>
+                                            (click)="eliminar(item_pedido._id)">{{'Suprimir'|translate}}</button>
                                     </div>
                                 </div>
                             </div>
@@ -65,7 +67,7 @@
                         <div class="row">
                             <div class="col-lg-5">
                                 <div class="font-size-sm">
-                                    <span class="text-muted mr-2">Fecha:</span>
+                                    <span class="text-muted mr-2">{{'Fecha'|translate}}:</span>
                                     {{ item_pedido.createdAt | date:'MMM d, y, h:mm:ss a' }}
                                 </div>
                                 
@@ -77,7 +79,7 @@
                                                 <p class="small">{{item_pedido.selector_elegido | slice:0:8}}...</p>
                                             </div>
                                             <div class="preciocantidad">
-                                                <p>Cant:&nbsp;{{ item_pedido.cantidad }}</p>
+                                                <p>{{'Cant'|translate}}:&nbsp;{{ item_pedido.cantidad }}</p>
                                             <p>{{item_pedido.precio_ahora|currency}}</p>
                                             </div>
                                         </div>

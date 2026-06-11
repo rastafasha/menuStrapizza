@@ -14,6 +14,7 @@ import { TiendaService } from '../../../services/tienda.service';
 import { ModalinfoPedidosComponent } from "../../../components/modalinfo-pedidos/modalinfo-pedidos.component";
 import { LoadingComponent } from '../../../shared/loading/loading.component';
 import { AuthService } from '../../../services/auth.service';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-mispedidos',
@@ -25,7 +26,8 @@ import { AuthService } from '../../../services/auth.service';
     ReactiveFormsModule,
     FormsModule,
     ModalinfoPedidosComponent,
-    LoadingComponent
+    LoadingComponent,
+    TranslatePipe
   ],
   templateUrl: './mispedidos.component.html',
   styleUrl: './mispedidos.component.scss'

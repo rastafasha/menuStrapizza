@@ -12,6 +12,7 @@ import { environment } from '../../../../../environments/environment';
 import { TiendaService } from '../../../../services/tienda.service';
 import { ModalinfoComentarioAppComponent } from "../../../../components/modalinfo-comentario-app/modalinfo-comentario-app.component";
 import { LoadingComponent } from '../../../../shared/loading/loading.component';
+import { TranslatePipe } from '@ngx-translate/core';
 
 declare var jQuery:any;
 declare var $:any;
@@ -26,7 +27,8 @@ declare var $:any;
     ReactiveFormsModule,
     FormsModule,
     ModalinfoComentarioAppComponent,
-    LoadingComponent
+    LoadingComponent,
+    TranslatePipe
 ],
   templateUrl: './index-ordenes.component.html',
   styleUrls: ['./index-ordenes.component.css']

@@ -12,6 +12,8 @@ import { TransferenciasService } from '../../../services/transferencias.service'
 import { TiendaService } from '../../../services/tienda.service';
 import { SafePipe } from '../../../pipes/safe.pipe';
 import { ModalInstruccionesComponent } from '../../../components/modal-instrucciones/modal-instrucciones.component';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { Subscription } from 'rxjs';
 
 declare var bootstrap: any;
 @Component({
@@ -24,6 +26,7 @@ declare var bootstrap: any;
      ModalInstruccionesComponent,
     ImagenPipe,
     AsideCuentaComponent,
+    TranslatePipe
   ],
   templateUrl: './mis-pagos.component.html',
   styleUrl: './mis-pagos.component.scss'
@@ -47,24 +50,17 @@ export class MisPagosComponent implements OnInit {
   tienda_moneda: string = '';
   tiendaSelected!: any;
 
-  info = `
-  <h2>Sección: Mis Pagos</h2>
-  <p>En este apartado podrás:</p>
-  <ul>
-    <li><strong>Consultar el historial</strong> de tus pagos, identificados con colores según su estatus (Pendiente, Aprobado o Rechazado).</li>
-    <li><strong>Localizar transacciones</strong> rápidamente buscando por fecha, número de referencia o monto.</li>
-    <li><strong>Filtrar la lista</strong> para ver solo los pagos que te interesen según su estado actual.</li>
-    <li><strong>Acceder al detalle</strong> completo de cada operación utilizando el botón "Ver Ticket".</li>
-  </ul>`;
+  public info: string = '';
 
 
-
+  private langSubscription!: Subscription;
   private router = inject(Router);
   private busquedasService = inject(BusquedasService);
   private usuarioService = inject(UsuarioService);
   private route = inject(ActivatedRoute);
   private transferenciasService = inject(TransferenciasService);
   private tiendaService = inject(TiendaService);
+  private translate = inject(TranslateService);
 
   ngOnInit() {
     window.scrollTo(0, 0);
@@ -87,6 +83,44 @@ export class MisPagosComponent implements OnInit {
       this.getPagosUsuario();
       this.escucharTiendaActiva();
     });
+
+     // 1. Cargar el texto en el idioma activo actual al entrar a la vista
+    this.actualizarInstruccionesPagos();
+
+    // 2. 🧲 Suscripción Reactiva: Si el usuario mueve el switch en el Header,
+    // este bloque reescribe la variable 'info' en milisegundos
+    this.langSubscription = this.translate.onLangChange.subscribe(() => {
+      this.actualizarInstruccionesPagos();
+    });
+  }
+
+  private actualizarInstruccionesPagos() {
+  // Jalamos los textos traducidos desde el JSON en milisegundos
+  const title = this.translate.instant('MY_PAYMENTS.TITLE');
+  const subtitle = this.translate.instant('MY_PAYMENTS.SUBTITLE');
+  const item1 = this.translate.instant('MY_PAYMENTS.ITEM_1');
+  const item2 = this.translate.instant('MY_PAYMENTS.ITEM_2');
+  const item3 = this.translate.instant('MY_PAYMENTS.ITEM_3');
+  const item4 = this.translate.instant('MY_PAYMENTS.ITEM_4');
+
+  // Inyectamos el bloque HTML bilingüe estable en la propiedad
+  this.info = `
+    <h2>${title}</h2>
+    <p>${subtitle}</p>
+    <ul>
+      <li>${item1}</li>
+      <li>${item2}</li>
+      <li>${item3}</li>
+      <li>${item4}</li>
+    </ul>
+  `;
+}
+
+ngOnDestroy() {
+    // Evitamos fugas de memoria al destruir el componente
+    if (this.langSubscription) {
+      this.langSubscription.unsubscribe();
+    }
   }
 
   

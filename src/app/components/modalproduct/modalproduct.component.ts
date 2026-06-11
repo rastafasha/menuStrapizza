@@ -16,6 +16,7 @@ import { FavoritoService } from '../../services/favorito.service';
 import { ComentarioService } from '../../services/comentario.service';
 import { Comentario } from '../../models/comentarios.model';
 import { RatingStarComponent } from '../ratingStar/ratingStar.component';
+import { TranslatePipe } from '@ngx-translate/core';
 
 declare var bootstrap: any;
 
@@ -27,7 +28,8 @@ declare var bootstrap: any;
     ReactiveFormsModule,
     FormsModule,
     ImagenPipe,
-    RatingStarComponent
+    RatingStarComponent,
+    TranslatePipe
   ],
   templateUrl: './modalproduct.component.html',
   styleUrl: './modalproduct.component.scss'

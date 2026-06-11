@@ -2,14 +2,13 @@
 
 <main class="container">
   <div class="title-top">
-    <h1>Pagar</h1>
   </div>
   <app-loading *ngIf="loading"></app-loading>
   <div class="order-list" *ngIf="!loading">
     <div class="order-list-bar"></div>
     <div class="list-box">
       <div class="breadcrumb-item">
-        <h3>Pagar</h3>
+        <h3>{{'Pagar'|translate}}</h3>
       </div>
       <div class="clear"></div>
 
@@ -36,7 +35,7 @@
       </div>
       <!-- Total a Pagar -->
       <div class="info_pago total text-success mb-3">
-        <div class="info_pago_titulo1"><span>Total a Pagar</span> </div>
+        <div class="info_pago_titulo1"><span>{{'Total a Pagar'|translate}}</span> </div>
         <div class="info_pagod_data3 "><span>{{totalAmount |number:'1.2-2'| currency:tienda_moneda}}</span> </div>
       </div>
 
@@ -88,13 +87,13 @@
         <div class="col-12 col-sm-6" *ngIf="tienda_moneda === 'USD' || tienda_moneda === 'EUR'">
           <div class="d-flex justify-content-between align-items-center mb-2">
             <label class="form-label fw-semibold text-secondary small text-uppercase tracking-wider mb-0">
-              Equivalente Bs.
+              {{'Equivalente'|translate}} Bs.
             </label>
 
             <!-- Tasa del Día dinámica según la divisa -->
             <span class="badge bg-secondary-subtle text-secondary rounded-2 px-2 py-1 fw-bold"
               style="font-size: 0.75rem;">
-              <i class="fas fa-money-bill-trend-up me-1"></i> Tasa:
+              <i class="fas fa-money-bill-trend-up me-1"></i> {{'Tasa'|translate}}:
               @if (tienda_moneda === 'USD') {
               {{ (tasadollar() || 0) | number:'1.2-2' }}
               } @else {
@@ -125,14 +124,14 @@
 
             <!-- Selector Principal -->
             <div class="mb-4">
-              <label for="paymentMethod" class="form-label fw-semibold text-secondary mb-2">Seleccione el método de
-                pago</label>
+              <label for="paymentMethod" class="form-label fw-semibold text-secondary mb-2">
+                {{'Seleccione el método depago'|translate}}</label>
               <select id="paymentMethod" class="form-select form-select-lg rounded-3"
                 (change)="onPaymentMethodChange($event)" [(ngModel)]="selectedMethod">
-                <option value=" ">Selecciona un método de pago</option>
+                <option value=" ">{{'Selecciona un método de pago'|translate}}</option>
                 <option value="paypal" *ngIf="paypalinfo">Paypal</option>
-                <option value="card" *ngIf="paypalinfo">Tarjeta de Crédito/Débito</option>
-                <option value="transferencia">Transferencia Bancaria</option>
+                <option value="card" *ngIf="paypalinfo">{{'Tarjeta de Crédito/Débito'|translate}}</option>
+                <option value="transferencia">{{'Transferencia Bancaria'|translate}}</option>
                 <!-- <option value="efectivo">Efectivo</option> -->
               </select>
             </div>
@@ -143,8 +142,8 @@
               class="p-4 bg-light rounded-3 text-center mb-3 border border-light-subtle shadow-sm">
               <div class="mb-3">
                 <i class="fab fa-paypal fs-2 text-primary me-2"></i>
-                <span class="fw-semibold text-secondary">Pago rápido con tu cuenta PayPal</span>
-                <p class="small text-muted mt-1 mb-0">Inicia sesión en tu cuenta para procesar el monto de forma segura.
+                <span class="fw-semibold text-secondary">{{'Pago rápido con tu cuenta PayPal'|translate}}</span>
+                <p class="small text-muted mt-1 mb-0">{{'Inicia sesión en tu cuenta para procesar el monto de forma segura'|translate}}.
                 </p>
               </div>
 
@@ -159,9 +158,9 @@
               <div class="mb-3 text-start">
                 <div class="d-flex align-items-center gap-2 mb-1">
                   <i class="fas fa-credit-card fs-4 text-secondary"></i>
-                  <span class="fw-semibold text-dark">Pago Seguro con Tarjeta</span>
+                  <span class="fw-semibold text-dark">{{'Pago Seguro con Tarjeta'|translate}}</span>
                 </div>
-                <p class="small text-muted mb-0">Procesado de forma cifrada a través de la pasarela de PayPal.</p>
+                <p class="small text-muted mb-0">{{'Procesado de forma cifrada a través de la pasarela de PayPal'|translate}}.</p>
               </div>
 
               <div class="p-2 bg-white rounded-2 border border-secondary-subtle">
@@ -175,11 +174,10 @@
 
                 <!-- Tipo de Transferencia -->
                 <div class="mb-4">
-                  <label for="metodo_pago" class="form-label fw-semibold text-secondary mb-2">Tipo de
-                    Transferencia</label>
+                  <label for="metodo_pago" class="form-label fw-semibold text-secondary mb-2">{{'Tipo de Transferencia'|translate}}</label>
                   <select formControlName="metodo_pago" class="form-select rounded-3" (change)="onChangePayment($event)"
                     name="metodo_pago" id="metodo_pago">
-                    <option value=" ">Seleccione Tipo de Transferencia</option>
+                    <option value=" ">{{'Seleccione Tipo de Transferencia'|translate}}</option>
                     <option [value]="metodo_pago._id" *ngFor="let metodo_pago of paymentMethods | pagosFilter">
                       {{metodo_pago.tipo}}
                     </option>
@@ -190,84 +188,84 @@
                 <div class="alert alert-warning border-0 shadow-sm rounded-3 p-3 mb-4" *ngIf="paymentSelected">
                   <div class="d-flex gap-2 align-items-center mb-2">
                     <i class="fas fa-info-circle text-warning fs-5"></i>
-                    <h6 class="alert-heading mb-0 fw-bold text-dark">Instrucciones de Pago</h6>
+                    <h6 class="alert-heading mb-0 fw-bold text-dark">{{'Instrucciones de Pago'|translate}}</h6>
                   </div>
-                  <p class="small text-muted mb-3">Entre a su Aplicación Bancaria y realice el pago con la siguiente
-                    información:</p>
+                  <p class="small text-muted mb-3">
+                    {{'Entre a su Aplicación Bancaria y realice el pago con la siguiente información'|translate}}:</p>
 
                   <div class="row g-2 text-dark small bg-white bg-opacity-50 p-2 rounded-2">
-                    <div class="col-12 col-md-6" *ngIf="paymentSelected.bankName"><strong>Banco:</strong>
+                    <div class="col-12 col-md-6" *ngIf="paymentSelected.bankName"><strong>{{'Banco'|translate}}:</strong>
                       {{paymentSelected.bankName}}</div>
-                    <div class="col-12 col-md-6" *ngIf="paymentSelected.username"><strong>A nombre de:</strong>
+                    <div class="col-12 col-md-6" *ngIf="paymentSelected.username"><strong>{{'Nombre Titular'|translate}}:</strong>
                       {{paymentSelected.username}}</div>
-                    <div class="col-12 col-md-6" *ngIf="paymentSelected.bankAccount"><strong>Nº Cuenta:</strong>
+                    <div class="col-12 col-md-6" *ngIf="paymentSelected.bankAccount"><strong>{{'Nº Cuenta'|translate}}:</strong>
                       {{paymentSelected.bankAccount}}</div>
-                    <div class="col-12 col-md-6" *ngIf="paymentSelected.phone"><strong>Teléfono:</strong>
+                    <div class="col-12 col-md-6" *ngIf="paymentSelected.phone"><strong>{{'Teléfono'|translate}}:</strong>
                       {{paymentSelected.phone}}</div>
-                    <div class="col-12 col-md-6" *ngIf="paymentSelected.email"><strong>Email:</strong>
+                    <div class="col-12 col-md-6" *ngIf="paymentSelected.email"><strong>{{'Email'|translate}}:</strong>
                       {{paymentSelected.email}}</div>
-                    <div class="col-12 col-md-6" *ngIf="paymentSelected?.ciorif"><strong>CI / RIF:</strong>
+                    <div class="col-12 col-md-6" *ngIf="paymentSelected.ciorif"><strong>{{'CI / RIF'|translate}}:</strong>
                       {{paymentSelected.ciorif}}</div>
                   </div>
                 </div>
 
                 <!-- Formularios Dólares / Euros / Bolívares -->
                 <div class="row g-3 mb-3"
-                  *ngIf="paymentSelected && (paymentSelected?.tipo === 'Transferencia Dólares' || paymentSelected?.tipo === 'Transferencia Bolivares' || paymentSelected?.tipo === 'Transferencia Euro')">
+                  *ngIf="paymentSelected && (paymentSelected.tipo === 'Transferencia Dólares' || paymentSelected.tipo === 'Transferencia Bolivares' || paymentSelected.tipo === 'Transferencia Euro')">
 
 
                   <!-- Numero de referencia -->
                   <div class="col-12 col-sm-6">
-                    <label for="referencia" class="form-label fw-medium text-secondary">Núm. de Referencia</label>
+                    <label for="referencia" class="form-label fw-medium text-secondary">{{'Núm. de Referencia'|translate}}</label>
                     <input type="text" formControlName="referencia" class="form-control rounded-3"
                       [ngClass]="{'is-invalid': formTransferencia.get('referencia')?.touched && formTransferencia.get('referencia')?.invalid}"
                       name="referencia" id="referencia" placeholder="Ej: 123456">
                     <div
                       *ngIf="formTransferencia.get('referencia')?.touched && formTransferencia.get('referencia')?.invalid"
                       class="invalid-feedback">
-                      El número de referencia es requerido (mínimo 4 caracteres).
+                      {{'El número de referencia es requerido (mínimo 4 caracteres)'|translate}}.
                     </div>
                   </div>
                 </div>
 
                 <!-- Formularios Pago Móvil -->
-                <div class="row g-3 mb-3" *ngIf="paymentSelected && paymentSelected?.tipo === 'pagomovil'">
+                <div class="row g-3 mb-3" *ngIf="paymentSelected && paymentSelected.tipo === 'pagomovil'">
                   <!-- Numero de referencia -->
                   <div class="col-12 col-sm-6 order-sm-2">
-                    <label for="referencia_pm" class="form-label fw-medium text-secondary">Núm. de Referencia</label>
+                    <label for="referencia_pm" class="form-label fw-medium text-secondary">{{'Núm. de Referencia'|translate}}</label>
                     <input type="text" formControlName="referencia" class="form-control rounded-3"
                       [ngClass]="{'is-invalid': formTransferencia.get('referencia')?.touched && formTransferencia.get('referencia')?.invalid}"
                       name="referencia" id="referencia_pm" placeholder="Ej: 1234">
                     <div
                       *ngIf="formTransferencia.get('referencia')?.touched && formTransferencia.get('referencia')?.invalid"
                       class="invalid-feedback">
-                      El número de referencia es requerido (mínimo 4 caracteres).
+                      {{'El número de referencia es requerido (mínimo 4 caracteres)'|translate}}.
                     </div>
                   </div>
                 </div>
 
                 <!-- Formularios Zelle -->
-                <div class="row g-3 mb-3" *ngIf="paymentSelected && paymentSelected?.tipo === 'zelle'">
+                <div class="row g-3 mb-3" *ngIf="paymentSelected && paymentSelected.tipo === 'zelle'">
                   <!-- Numero de referencia -->
                   <div class="col-12 col-sm-6">
-                    <label for="referencia_z" class="form-label fw-medium text-secondary">Núm. de Referencia / Nombre
-                      Titular</label>
+                    <label for="referencia_z" class="form-label fw-medium text-secondary">
+                      {{'Núm. de Referencia / Nombre Titular'|translate}}</label>
                     <input type="text" formControlName="referencia" class="form-control rounded-3"
                       [ngClass]="{'is-invalid': formTransferencia.get('referencia')?.touched && formTransferencia.get('referencia')?.invalid}"
                       name="referencia" id="referencia_z" placeholder="Ej: Confirmación Zelle">
                     <div
                       *ngIf="formTransferencia.get('referencia')?.touched && formTransferencia.get('referencia')?.invalid"
                       class="invalid-feedback">
-                      El número de referencia es requerido (mínimo 4 caracteres).
+                      {{'El número de referencia es requerido (mínimo 4 caracteres)'|translate}}.
                     </div>
                   </div>
                 </div>
 
                 <!-- Subida de Captura (Zona de Arrastre/Click Optimizada) -->
                 <div class="col-12 mt-4"
-                  *ngIf="paymentSelected && (paymentSelected?.tipo === 'pagomovil' || paymentSelected?.tipo === 'zelle' || paymentSelected?.tipo === 'Transferencia Dólares' || paymentSelected?.tipo === 'Transferencia Bolivares' || paymentSelected?.tipo === 'Transferencia Euro')">
-                  <label class="form-label text-secondary small fw-bold tracking-wider text-uppercase">Comprobante de
-                    Pago (Capture)</label>
+                  *ngIf="paymentSelected && (paymentSelected.tipo === 'pagomovil' || paymentSelected.tipo === 'zelle' || paymentSelected.tipo === 'Transferencia Dólares' || paymentSelected.tipo === 'Transferencia Bolivares' || paymentSelected.tipo === 'Transferencia Euro')">
+                  <label class="form-label text-secondary small fw-bold tracking-wider text-uppercase">
+                    {{'Comprobante de Pago (Capture)'|translate}}</label>
 
                   <div
                     class="upload-area border border-2 border-dashed rounded-3 p-4 text-center cursor-pointer transition-all"
@@ -279,9 +277,9 @@
 
                     <div *ngIf="!imagePreview()">
                       <i class="fas fa-cloud-arrow-up fs-2 text-primary mb-2 animate-bounce"></i>
-                      <p class="mb-0 small text-dark fw-medium">Toca para subir o tomar foto del comprobante</p>
-                      <span class="text-muted text-xs block mt-1" style="font-size: 0.75rem;">Formatos aceptados: JPG,
-                        PNG</span>
+                      <p class="mb-0 small text-dark fw-medium">{{'Toca para subir o tomar foto del comprobante'|translate}}</p>
+                      <span class="text-muted text-xs block mt-1" style="font-size: 0.75rem;">
+                        {{'Formatos aceptados'|translate}}: JPG,  PNG</span>
                     </div>
 
                     <div *ngIf="imagePreview()" class="position-relative d-inline-block">
@@ -289,7 +287,7 @@
                         style="max-height: 160px; object-fit: contain;">
                       <div
                         class="d-flex align-items-center justify-content-center gap-1 text-success small fw-semibold">
-                        <i class="fas fa-check-circle"></i> Cambiar imagen cargada
+                        <i class="fas fa-check-circle"></i> {{'Cambiar imagen cargada'|translate}}
                       </div>
                     </div>
                   </div>
@@ -298,7 +296,7 @@
                   <div *ngIf="formTransferencia.get('img')?.touched && formTransferencia.get('img')?.invalid"
                     class="text-danger small mt-2 d-flex align-items-center gap-1">
                     <i class="fas fa-exclamation-triangle"></i>
-                    <span>Es requerida la imagen del comprobante de pago.</span>
+                    <span>{{'Es requerida la imagen del comprobante de pago'|translate}}.</span>
                   </div>
                 </div>
 
@@ -306,7 +304,7 @@
                 <div class="d-flex justify-content-center gap-2 mt-3">
                   <button class="check-button " type="submit">
                     <i class="fa fa-money-check"></i>
-                    Procesar
+                    {{'Procesar'|translate}}
                   </button>
                 </div>
 
@@ -324,7 +322,7 @@
   <div class="order-button-container">
     <button class="check-button" routerLink="/review">
       <i class="fa fa-chevron-left icon-small"></i>
-      Volver
+      {{'Volver'|translate}}
     </button>
   </div>
 

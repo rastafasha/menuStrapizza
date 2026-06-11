@@ -6,7 +6,7 @@
       <div class="modal-header bg-success text-white border-0">
         <h5 class="modal-title d-flex align-items-center" id="infoModalLabel">
           <i class="fas fa-info-circle me-2"></i> 
-          <span>Guía de Sección: {{ sectionId | titlecase }}</span>
+          <span>{{'Guía de Sección'|translate}}: {{ sectionId | titlecase }}</span>
         </h5>
         <button type="button" class="btn-close btn-close-white" (click)="onClose()" aria-label="Close"></button>
       </div>
@@ -19,11 +19,11 @@
       <div class="modal-footer border-0 bg-light d-flex justify-content-between">
         <!-- Botón para no volver a mostrar (Usa el ID único de sección internamente) -->
         <button type="button" class="btn btn-sm btn-outline-secondary" (click)="onNoShowMore()">
-          No mostrar más en esta sección
+          {{'No mostrar más en esta sección'|translate}}
         </button>
         
         <button type="button" class="btn btn-success px-4" (click)="onClose()">
-          Entendido
+          {{'Entendido' |translate}}
         </button>
       </div>
     </div>

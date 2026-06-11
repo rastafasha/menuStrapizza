@@ -32,11 +32,11 @@
                     </ng-container>
 
                     <!-- Botón estático para ver TODO el menú principal -->
-                    <li [class.active]="activeCategory === 'all'"
+                    <li [class.active]="activeCategory === 'all' "
                         [ngStyle]="{'color': tiendaSelected?.color_primario }">
                         <a href="#" onclick="return false;" [ngClass]="{'active': activeCategory === 'all'}"
                             (click)="selectCategory('all')">
-                            Todo
+                            {{'Todo'| translate}}
                         </a>
                     </li>
                 </ul>

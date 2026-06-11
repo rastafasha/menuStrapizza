@@ -10,6 +10,7 @@ import { CommonModule, NgIf } from '@angular/common';
 import { MenuFooterComponent } from "../../shared/menu-footer/menu-footer.component";
 import { PushNotificationService } from '../../services/push-notification.service';
 import { ToastrService } from 'ngx-toastr';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-myaccount',
@@ -18,7 +19,8 @@ import { ToastrService } from 'ngx-toastr';
     NgIf,
     HeaderComponent,
     MenuFooterComponent,
-    CommonModule
+    CommonModule,
+    TranslatePipe
 ],
   templateUrl: './myaccount.component.html',
   styleUrls: ['./myaccount.component.scss'],
@@ -29,6 +31,11 @@ export class MyaccountComponent implements OnInit {
   imagenSerUrl = environment.mediaUrl;
   public isLoading:boolean = false;
   user_id:any;
+  
+  public activeLang = 'es';
+    flag = false;
+    is_visible: boolean = false;
+    langs: string[] = [];
 
   constructor(
     public router: Router,
@@ -37,9 +44,20 @@ export class MyaccountComponent implements OnInit {
     public activatedRoute: ActivatedRoute,
     public pushService: PushNotificationService,
     public toastr: ToastrService,
+    private translate: TranslateService,
     handler: HttpBackend
   ) {
     this.http = new HttpClient(handler);
+
+     // 1. Detectar idioma: Primero localStorage, si no, el navegador, y si no, 'es'
+    const browserLang = this.translate.getBrowserLang(); // Jala 'en', 'es', etc.
+    const savedLang = localStorage.getItem('lang') || browserLang || 'es';
+
+    // Nos aseguramos de soportar solo los idiomas que tienes listos (ej: es y en)
+    this.activeLang = savedLang.match(/es|en/) ? savedLang : 'es';
+
+    // 2. Activar el idioma correspondiente (Ya no se usa setDefaultLang aquí)
+    this.translate.use(this.activeLang);
   }
 
   ngOnInit(): void {
@@ -89,6 +107,26 @@ export class MyaccountComponent implements OnInit {
       this.pushService.isProcessing$.next(false); // Desactiva el cargando
     }
   }
+
+  
+
+  // 🌐 Función para alternar el idioma con el Switch
+toggleLanguageSwitch(event: Event) {
+  const input = event.target as HTMLInputElement;
+  
+  // Si está marcado (true) cambiamos a inglés ('en'), si no, a español ('es')
+  this.activeLang = input.checked ? 'en' : 'es';
+  
+  // Actualizamos el flag por si lo usas en otra parte de la vista
+  this.flag = input.checked; 
+
+  // Ejecutamos el cambio en la librería ngx-translate
+  this.translate.use(this.activeLang);
+  
+  // Guardamos la preferencia en el almacenamiento local
+  localStorage.setItem('lang', this.activeLang);
+}
+
 
 
 

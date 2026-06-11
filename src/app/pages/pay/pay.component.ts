@@ -7,14 +7,10 @@ import { TiposdepagoService } from '../../services/tiposdepago.service';
 import { PaymentMethod } from '../../models/paymenthmethod.model';
 import { TransferenciasService } from '../../services/transferencias.service';
 import { CarritoService } from '../../services/carrito.service';
-import Swal from 'sweetalert2';
-// import io from "socket.io-client";
 import { TiendaService } from '../../services/tienda.service';
 import { VentaService } from '../../services/venta.service';
 import { ProductoService } from '../../services/product.service';
 import { Tienda } from '../../models/tienda.model';
-import { CartItemModel } from '../../models/cart-item-model';
-import { environment } from '../../../environments/environment';
 import { Producto } from '../../models/producto.model';
 import { Usuario } from '../../models/usuario.model';
 import { ImagenPipe } from '../../pipes/imagen-pipe.pipe';
@@ -33,8 +29,8 @@ import { TasaeurobcvService } from '../../services/tasaeurobcv.service';
 import { PagosFilterPipe } from '../../pipes/pagos-filter.pipe';
 import { AuthService } from '../../services/auth.service';
 import { LoadingComponent } from '../../shared/loading/loading.component';
+import { TranslatePipe } from '@ngx-translate/core';
 declare var $: any;
-// declare var paypal;
 
 @Component({
   selector: 'app-pay',
@@ -46,7 +42,8 @@ declare var $: any;
     ImagenPipe,
     NgxPayPalModule,
     PagosFilterPipe, 
-    LoadingComponent
+    LoadingComponent,
+    TranslatePipe
   ],
   templateUrl: './pay.component.html',
   styleUrl: './pay.component.scss'

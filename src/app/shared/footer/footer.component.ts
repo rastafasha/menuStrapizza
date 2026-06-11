@@ -4,11 +4,12 @@ import { RedesSociales, Tienda } from '../../models/tienda.model';
 import { TiendaService } from '../../services/tienda.service';
 import { Subscription } from 'rxjs';
 import { NgFor, NgIf, NgStyle } from '@angular/common';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-footer',
   standalone: true,
-  imports: [RouterModule, NgFor, NgIf, NgStyle],
+  imports: [RouterModule, NgFor, NgIf, NgStyle, TranslatePipe],
   templateUrl: './footer.component.html',
   styleUrl: './footer.component.scss'
 })

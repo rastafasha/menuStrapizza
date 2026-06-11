@@ -18,13 +18,13 @@
             <p class="hero-subtitle">
                 {{ tiendaSelected?.descripcion_hero || 'Descubre el verdadero sabor con nuestros ingredientes frescos y recetas tradicionales transmitidas por generaciones.' }}
                 <br><br>
-                Comienza a agregar productos!
+                {{'Comienza a agregar productos' | translate}} !
             </p>
             
             <div class="botns" *ngIf="tiendaSelected?.has_reservacion === true">
                 <button  class="btn btn-primary rounded-rounded " 
                 data-bs-target="#add_reserva" data-bs-toggle="offcanvas">
-                Reservación
+                {{'Reservar' | translate}}
                 </button>
             </div>
             <!-- <div class="botns">

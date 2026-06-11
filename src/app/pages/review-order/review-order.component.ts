@@ -8,14 +8,13 @@ import { Tienda } from '../../models/tienda.model';
 import { TiendaService } from '../../services/tienda.service';
 import { CarritoService } from '../../services/carrito.service';
 import { Subscription } from 'rxjs';
-import { environment } from '../../../environments/environment';
 import { PedidomenuService } from '../../services/pedidomenu.service';
-import { FormBuilder, FormControl, FormGroup, FormsModule, NgForm, ReactiveFormsModule, Validators } from '@angular/forms';
-import { DireccionService } from '../../services/direccion.service';
+import { FormBuilder,  FormGroup, FormsModule, NgForm, ReactiveFormsModule, Validators } from '@angular/forms';
+
 import { UsuarioService } from '../../services/usuario.service';
-import { WaGeolocationService } from '@ng-web-apis/geolocation';
 import * as L from 'leaflet';
 import { ToastrService } from 'ngx-toastr';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-review-order',
@@ -25,7 +24,8 @@ import { ToastrService } from 'ngx-toastr';
     RouterModule,
     ImagenPipe,
     ReactiveFormsModule,
-    FormsModule
+    FormsModule,
+    TranslatePipe
   ],
   templateUrl: './review-order.component.html',
   styleUrl: './review-order.component.scss'
@@ -67,6 +67,8 @@ export class ReviewOrderComponent implements OnInit, OnDestroy {
   public data_detalle: Array<any> = [];
   public subtotal: any = 0;
   public urlWhatsApp: string = '';
+
+  public activeLang = 'es';
 
   private tiendaService = inject(TiendaService);
   private carritoService = inject(CarritoService);
@@ -350,13 +352,15 @@ export class ReviewOrderComponent implements OnInit, OnDestroy {
     const nombreCliente = formValues.first_name || this.identity.first_name || 'Cliente';
     const tipoEntrega = formValues.tipoEntrega || 'No especificado';
     const telefonoCliente = formValues.telefono || this.identity.telefono || 'No registrado';
+
+    const isEn = this.activeLang === 'en';
     
 
-    let message = `*Nuevo Pedido desde App Zlipmenu #${this.randomNum}*\n\n`;
-    message += `*Cliente:* ${nombreCliente}\n`;
-    message += `*Tipo Entrega:* ${tipoEntrega}\n`;
-    message += `*Teléfono:* ${telefonoCliente}\n\n`;
-    message += `*Detalles del Pedido:*\n`;
+    let message = `*${isEn ? 'New Order from Zlipmenu App' : 'Nuevo Pedido desde App Zlipmenu'} #${this.randomNum}*\n\n`;
+    message += `*${isEn ? 'Customer' : 'Cliente'}:* ${nombreCliente}\n`;
+    message += `*${isEn ? 'Delivery Type' : 'Tipo Entrega'}:* ${tipoEntrega}\n`;
+    message += `*${isEn ? 'Phone' : 'Teléfono'}:* ${telefonoCliente}\n\n`;
+    message += `*${isEn ? 'Order Details' : 'Detalles del Pedido'}:*\n`;
     message += `─────────────────────\n`;
 
     this.bandejaList.forEach((item: any) => {
@@ -368,12 +372,12 @@ export class ReviewOrderComponent implements OnInit, OnDestroy {
         message += `• ${item.selector_elegido}\n`;
       }
 
-      message += `  Cant: ${item.cantidad} x ${item.precio_ahora.toFixed(2)} = ${itemTotal}\n\n`;
+      message += `*${isEn ? 'Quant' : 'Cant'}:* ${item.cantidad} x ${item.precio_ahora.toFixed(2)} = ${itemTotal}\n\n`;
     });
 
     message += `─────────────────────\n`;
     message += `*TOTAL:* ${this.tienda_moneda} ${this.total().toFixed(2)}\n\n`;
-    message += `Por favor confirmar disponibilidad y método de pago.`;
+    message += `*${isEn ? 'Please confirm availability and payment method' : 'Por favor confirmar disponibilidad y método de pago'}:*`;
 
     return encodeURIComponent(message);
   }

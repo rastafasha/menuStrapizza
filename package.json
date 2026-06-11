@@ -27,6 +27,8 @@
     "@angular/service-worker": "^19.0.0",
     "@ng-web-apis/common": "^5.0.3",
     "@ng-web-apis/geolocation": "^5.0.3",
+    "@ngx-translate/core": "^18.0.0",
+    "@ngx-translate/http-loader": "^18.0.0",
     "leaflet": "^1.9.4",
     "lite-server": "^2.6.1",
     "ngx-infinite-scroll": "^19.0.0",

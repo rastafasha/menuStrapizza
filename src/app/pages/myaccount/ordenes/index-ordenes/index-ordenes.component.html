@@ -9,22 +9,30 @@
         <!-- Content  -->
          <app-loading *ngIf="isLoading"></app-loading>
          <div *ngIf="!isLoading && ventas?.length == 0">
-            <h4 class="text-center mt-3">No posees Compras</h4>
+            <h4 class="text-center mt-3">{{'No posees Compras'|translate}}</h4>
          </div>
         <section class="col-lg-8" *ngIf="!isLoading">
             <!-- <div *ngFor="let item_venta of ventas |  paginate: { itemsPerPage: count, currentPage: p }"> -->
             <div *ngFor="let item_venta of ventas  ">
                 <div class="card mb-4">
                     <div class="card-header">
-                        <h3 class="product-title font-size-base" style="margin-bottom: 0px;"><a>Compra: N°-{{item_venta._id.toUpperCase()}}</a></h3>
+                        <h3 class="product-title font-size-base" style="margin-bottom: 0px;">
+                            {{'Compra'|translate}}: N°-{{item_venta._id.toUpperCase()}}
+                        </h3>
                     </div>
                     <div class="card-body">
                         <div class="row">
                             <div class="col-lg-5">
-                                <div class="font-size-sm"><span class="text-muted mr-2">Fecha:</span>{{ item_venta.createdAt | date:'MMM d, y, h:mm:ss a' }}</div>
-                                <div class="font-size-sm"><span class="text-muted mr-2">Entrega:</span>{{ item_venta.tiempo_estimado }}</div>
                                 <div class="font-size-sm">
-                                    <span class="text-muted mr-2">Estado:</span>
+                                    <span class="text-muted mr-2">{{'Fecha'|translate}}:</span>
+                                    {{ item_venta.createdAt | date:'MMM d, y, h:mm:ss a' }}
+                                </div>
+                                <div class="font-size-sm">
+                                    <span class="text-muted mr-2">{{'Entrega'|translate}}:</span>
+                                    {{ item_venta.tiempo_estimado }}
+                                </div>
+                                <div class="font-size-sm">
+                                    <span class="text-muted mr-2">{{'Estado'|translate}}:</span>
                                     <span class="text-accent" *ngIf="item_venta.estado == 'Venta en proceso'">{{item_venta.estado}}</span>
                                     <span class="text-success" *ngIf="item_venta.estado == 'Enviado'">{{item_venta.estado}}</span>
                                     <span class="text-info" *ngIf="item_venta.estado == 'Finalizado'">{{item_venta.estado}}</span>
@@ -32,10 +40,15 @@
                                     <span *ngIf="item_venta.estado == 'Reembolsado'" style="color: #ff0000">{{item_venta.estado}}</span>
                                 </div>
                                 <div class="font-size-sm"><span class="text-muted mr-2">Tracking:</span>
-                                    <span *ngIf="item_venta.tracking_number">{{item_venta.tracking_number}}</span>
-                                    <span *ngIf="!item_venta.tracking_number" class="badge badge-dark">No disponible</span>
+                                    <span *ngIf="item_venta.tracking_number">
+                                        {{item_venta.tracking_number}}
+                                    </span>
+                                    <span *ngIf="!item_venta.tracking_number" class="badge badge-dark">
+                                        {{'No disponible'|translate}}
+                                    </span>
                                 </div>
-                                <div class="font-size-lg text-accent pt-2"><span class="text-muted mr-2">Total pagado:</span>{{item_venta.total_pagado | currency:tienda_moneda}}</div>
+                                <div class="font-size-lg text-accent pt-2">
+                                    <span class="text-muted mr-2">{{'Total pagado'|translate}}:</span>{{item_venta.total_pagado | currency:tienda_moneda}}</div>
                                 
                                 <div *ngIf="item_venta.estado !== 'Cancelado' && item_venta.estado !== 'Reembolsado'">
                                     <div class="btn-group btn-group mt-4" role="group" aria-label="Small group">
@@ -44,17 +57,19 @@
                                                 <a class="btn btn-accent" [routerLink]="['/my-account/ordenes/tracking/',item_venta._id]"><span class="czi-plane"></span> Track</a>
                                             </div> -->
                                             <div *ngIf="!item_venta.tracking_number">
-                                                <button class="btn btn-accent" style="color:white !important" disabled><span class="czi-plane" style="color:white !important"></span> Sin seguimiento</button>
+                                                <button class="btn btn-accent" style="color:white !important" disabled>
+                                                    <span class="czi-plane" style="color:white !important"></span>
+                                                     {{'Sin seguimiento'|translate}}
+                                                    </button>
                                             </div>
                                         </div>
                                         <!-- <div *ngIf="item_venta.estado == 'Venta en proceso' || item_venta.estado == 'Finalizado'">
                                             <button disabled class="btn btn-accent"><span class="czi-plane"></span> Track</button>
                                         </div> -->
 
-                                        <a class="btn btn-dark" [routerLink]="['/my-account/ordenes/detalles/',item_venta._id]"><span class="czi-package"></span> Detalles</a>
-
-
-
+                                        <a class="btn btn-dark" [routerLink]="['/my-account/ordenes/detalles/',item_venta._id]">
+                                            <span class="czi-package"></span> {{'Detalles'|translate}}
+                                        </a>
                                     </div>
                                 </div>
                             </div>

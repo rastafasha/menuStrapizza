@@ -15,6 +15,7 @@ import { Subscription } from 'rxjs';
 import { Title } from '@angular/platform-browser';
 import { CatAdicionalesComponent } from '../../components/cat-adicionales/cat-adicionales.component';
 import { AuthService } from '../../services/auth.service';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-home',
@@ -26,7 +27,8 @@ import { AuthService } from '../../services/auth.service';
     LoadingComponent,
     PwaNotifInstallerComponent,
     ModalInicialComponent,
-    CatAdicionalesComponent
+    CatAdicionalesComponent,
+    TranslatePipe
   ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'

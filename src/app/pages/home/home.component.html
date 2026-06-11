@@ -11,7 +11,7 @@
     *ngIf="!isLoading" 
     [activeCategory]="categoriaActiva" 
     [isVisible]="true" 
-    [title]="'Menú'"  
+    [title]="'Menú' | translate"  
     (msm_success)="onMsmSuccess($event)" 
     [refreshCasProducts]="refreshCasProducts">
 </app-cas-products>
@@ -22,26 +22,26 @@
     <!-- Subcategorías adicionales con Lazy Loading (Se cargan al hacer scroll) -->
     <!-- Lazy loaded secondary sections -->
 @defer (on viewport) {
-    <app-cat-adicionales *ngIf="!isLoading && categoriaActiva" [activeCategory]="'Entradas'" [title]="'Entradas'"></app-cat-adicionales>
+    <app-cat-adicionales *ngIf="!isLoading && categoriaActiva" [activeCategory]="'Entradas' " [title]="'Entradas' | translate"></app-cat-adicionales>
 } @placeholder {
-    <div class="loading-placeholder" style="text-align: center; padding: 20px;">Cargando Entradas...</div>
+    <div class="loading-placeholder" style="text-align: center; padding: 20px;">...</div>
 }
 @defer (on viewport) {
-    <app-cat-adicionales *ngIf="!isLoading && categoriaActiva" [activeCategory]="'Combos'" [title]="'Combos'"></app-cat-adicionales>
+    <app-cat-adicionales *ngIf="!isLoading && categoriaActiva" [activeCategory]="'Combos' " [title]="'Combos' | translate"></app-cat-adicionales>
 } @placeholder {
-    <div class="loading-placeholder" style="text-align: center; padding: 20px;">Cargando Combos...</div>
-}
-
-@defer (on viewport) {
-    <app-cat-adicionales *ngIf="!isLoading && categoriaActiva" [activeCategory]="'Bebidas'" [title]="'Bebidas'"></app-cat-adicionales>
-} @placeholder {
-    <div class="loading-placeholder" style="text-align: center; padding: 20px;">Cargando Bebidas...</div>
+    <div class="loading-placeholder" style="text-align: center; padding: 20px;">...</div>
 }
 
 @defer (on viewport) {
-    <app-cat-adicionales *ngIf="!isLoading && categoriaActiva" [activeCategory]="'Postres'" [title]="'Postres'"></app-cat-adicionales>
+    <app-cat-adicionales *ngIf="!isLoading && categoriaActiva" [activeCategory]="'Bebidas'" [title]="'Bebidas' | translate"></app-cat-adicionales>
 } @placeholder {
-    <div class="loading-placeholder" style="text-align: center; padding: 20px;">Cargando Postres...</div>
+    <div class="loading-placeholder" style="text-align: center; padding: 20px;">...</div>
+}
+
+@defer (on viewport) {
+    <app-cat-adicionales *ngIf="!isLoading && categoriaActiva" [activeCategory]="'Postres' " [title]="'Postres' | translate"></app-cat-adicionales>
+} @placeholder {
+    <div class="loading-placeholder" style="text-align: center; padding: 20px;">...</div>
 }
 <!-- @defer (on viewport) {
     <app-cat-adicionales *ngIf="!isLoading && categoriaActiva" [activeCategory]="'Caja Salada'" [title]="'Caja Salada'"></app-cat-adicionales>

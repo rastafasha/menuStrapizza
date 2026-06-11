@@ -1,9 +1,10 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-modal-instrucciones',
-  imports: [CommonModule],
+  imports: [CommonModule, TranslatePipe],
   templateUrl: './modal-instrucciones.component.html',
   styleUrl: './modal-instrucciones.component.scss'
 })

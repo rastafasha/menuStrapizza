@@ -27,18 +27,17 @@
                   <span class="input-group-text bg-white border-end-0">
                     <i class="fa fa-search text-muted"></i>
                   </span>
-                  <input type="text" class="form-control border-start-0"
-                    placeholder="Buscar por referencia, banco o monto..." [(ngModel)]="query" (keyup.enter)="search()">
+                  <input type="text" class="form-control border-start-0" [(ngModel)]="query" (keyup.enter)="search()">
                 </div>
               </div>
 
               <!-- SELECT DE ESTATUS -->
               <div class="col-md-4">
                 <select class="form-select" [(ngModel)]="status" (change)="search()">
-                  <option value="">Todos los Estatus</option>
-                  <option value="pending">Pendientes</option>
-                  <option value="ok">Aprobados</option>
-                  <option value="no">Rechazados</option>
+                  <option value="">{{'Todos los Estatus'|translate}}</option>
+                  <option value="pending">{{'Pendiente'|translate}}</option>
+                  <option value="ok">{{'Aprobados'|translate}}</option>
+                  <option value="no">{{'Rechazados'|translate}}</option>
                 </select>
               </div>
 
@@ -47,11 +46,11 @@
               <div class="col-md-2 d-grid">
                 @if (query || status) {
                 <button class="btn btn-outline-danger animate fadeIn" (click)="clearFilters()">
-                  <i class="fa fa-times me-1"></i> Limpiar
+                  <i class="fa fa-times me-1"></i> {{'Limpiar'|translate}}
                 </button>
                 } @else {
                 <button class="btn btn-primary" (click)="search()">
-                  Filtrar
+                  {{'Filtrar'|translate}}
                 </button>
                 }
               </div>
@@ -80,15 +79,15 @@
           <!-- Badge más estilizado -->
           @if (payment.status === 'ok') {
           <span
-            class="badge rounded-pill bg-success-subtle text-success border border-success-subtle px-3">Aprobado</span>
+            class="badge rounded-pill bg-success-subtle text-success border border-success-subtle px-3">{{'Aprobado'|translate}}</span>
           }
           @if (payment.status === 'pending') {
           <span
-            class="badge rounded-pill bg-warning-subtle text-warning border border-warning-subtle px-3">Pendiente</span>
+            class="badge rounded-pill bg-warning-subtle text-warning border border-warning-subtle px-3">{{'Pendiente'|translate}}</span>
           }
           @if (payment.status === 'no') {
           <span
-            class="badge rounded-pill bg-danger-subtle text-danger border border-danger-subtle px-3">Rechazado</span>
+            class="badge rounded-pill bg-danger-subtle text-danger border border-danger-subtle px-3">{{'Rechazado'|translate}}</span>
 
           }
 
@@ -106,7 +105,7 @@
         <div class="d-flex justify-content-end  border-top border-light">
           <button class="btn btn-sm btn-outline-primary rounded-pill px-4 fw-bold" style="font-size: 0.8rem;"
             (click)="verDetallePago(payment)">
-            <i class="fas fa-receipt me-1"></i> Ver Pago
+            <i class="fas fa-receipt me-1"></i> {{'Ver Pago'|translate}}
           </button>
         </div>
       </div>
@@ -117,7 +116,7 @@
     <i class="fas fa-plus fs-3"></i>
   </button> -->
     } @empty {
-    <p class="text-center text-muted">No hay pagos registrados.</p>
+    <p class="text-center text-muted">{{'No hay pagos registrados'|translate}}.</p>
     }
 
     <!-- Spinner estilo Instagram usando la señal loading -->
@@ -127,7 +126,7 @@
     @if (!hasMore() && !isFiltering() && transferencias().length > 0) {
     <div class="text-center my-4 animate fadeIn">
       <p class="text-muted small">
-        <i class="fas fa-check-circle me-1"></i> Has llegado al final del historial
+        <i class="fas fa-check-circle me-1"></i> {{'Has llegado al final del historial'|translate}}
       </p>
     </div>
     }
@@ -143,7 +142,7 @@
     <!-- Mostrar mensaje de fin de resultados si estamos filtrando -->
     @if ((query || status) && !loading()) {
     <div class="text-center my-4 text-muted small animate fadeIn">
-      <i class="fas fa-info-circle me-1"></i> Fin de resultados filtrados
+      <i class="fas fa-info-circle me-1"></i> {{'Fin de resultados filtrados'|translate}}
     </div>
     }
 
@@ -184,21 +183,21 @@
     <!-- Datos de la Transacción -->
     <div class="bg-light rounded-4 p-3 mb-4" style="border-radius: 15px;">
       <div class="d-flex justify-content-between mb-3 border-bottom pb-2">
-        <span class="text-muted small">Método</span>
+        <span class="text-muted small">{{'Método'|translate}}</span>
         <span class="fw-bold small">{{ pagoSeleccionado().metodo_pago.tipo }}</span>
       </div>
       <div class="d-flex justify-content-between mb-3 border-bottom pb-2">
-        <span class="text-muted small">Banco Destino</span>
+        <span class="text-muted small">{{'Banco Destino'|translate}}</span>
         <span class="fw-bold small">{{ pagoSeleccionado().metodo_pago.bankName }}</span>
       </div>
       <div class="d-flex justify-content-between mb-3 border-bottom pb-2">
-        <span class="text-muted small">Fecha</span>
+        <span class="text-muted small">{{'Fecha'|translate}}</span>
         <span class="fw-bold small">{{ pagoSeleccionado().createdAt | date:'dd/MM/yyyy' }}</span>
       </div>
 
       @if (pagoSeleccionado().tasa) {
         <div class="d-flex justify-content-between" >
-        <span class="text-muted small">Tasa Aplicada</span>
+        <span class="text-muted small">{{'Tasa Aplicada'|translate}}</span>
         <span class="fw-bold small">{{ pagoSeleccionado().tasa }} Bs.</span>
       </div>
       }
@@ -247,21 +246,21 @@
     </div>
     } @empty {
     <div class="text-center p-4 text-muted">
-      <p class="small mb-0">No hay artículos registrados en esta compra.</p>
+      <p class="small mb-0">{{'No hay artículos registrados en esta compra'|translate}}.</p>
     </div>
     }
 
     <!-- Imagen del Soporte (Si existe) -->
     @if (pagoSeleccionado().img) {
     <div class="mb-4">
-      <p class="text-muted small mb-2">Comprobante adjunto:</p>
+      <p class="text-muted small mb-2">{{'Comprobante adjunto'|translate}}:</p>
       <img [src]="pagoSeleccionado().img | imagenPipe:'transferencias'" class="img-fluid rounded-3 shadow-sm border w-100"
         style="max-height: 200px; object-fit: cover;">
     </div>
     }
 
     <button class="btn btn-dark w-100 py-3 rounded-pill fw-bold" data-bs-dismiss="offcanvas">
-      ENTENDIDO
+      {{'Entendido'|translate}}
     </button>
   </div>
   }
@@ -280,12 +279,12 @@
     </div>
 
     <div class="flex-grow-1">
-      <p class="mb-0 small fw-bold text-white">Filtros limpiados</p>
-      <p class="mb-0 text-white-50" style="font-size: 0.7rem;">Historial actualizado</p>
+      <p class="mb-0 small fw-bold text-white">{{'Filtros limpiados'|translate}}</p>
+      <p class="mb-0 text-white-50" style="font-size: 0.7rem;">{{'Historial actualizado'|translate}}</p>
     </div>
 
   </div>
 </div>
 }
 
-<app-modal-instrucciones [info]="info" sectionId="mispagos" #instruccionesModal></app-modal-instrucciones>
+<app-modal-instrucciones [info]="info" [sectionId]="'mispagos' |translate" #instruccionesModal></app-modal-instrucciones>

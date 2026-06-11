@@ -5,7 +5,7 @@
     <app-loading *ngIf="isLoading"></app-loading>
     <div class="container-fluid cuadro-modal animated fadeInUp" *ngIf="!isLoading">
         <div class="titlePage animated fadeIn">
-            <h3>Mis Favoritos</h3>
+            <h3>{{ 'Favoritos' | translate }}</h3>
         </div>
         <div class="lineamedio"></div>
         <!----info-->
@@ -99,10 +99,10 @@
 
                 <!-- selectores -->
                 <div *ngIf="selectedProduct.nombre_selector !== 'unico'" class="mb-3">
-                    <p class="small">Selecciona alguna opción por favor.</p>
+                    <p class="small">{{ 'Selecciona alguna opción por favor' | translate }}</p>
                     <select class="form-select" id="product-size" name="selector_to_cart" [(ngModel)]="selector_to_cart"
                         (change)="selector_error = false">
-                        <option value=" " selected disabled>Selecciona</option>
+                        <option value=" " selected disabled>{{ 'Selecciona' | translate }}</option>
                         <option value="{{selector.titulo}}" *ngFor="let selector of selectores">
                             {{selector.titulo}}
                         </option>
@@ -111,14 +111,14 @@
 
                 <div class="d-grid gap-2">
                     <button class="btn btn-outline-success w-100 py-3 rounded-pill" (click)="addItem(selectedProduct)">
-                        <i class="fa fa-shopping-bag"></i> Agregar al Pedido
+                        <i class="fa fa-shopping-bag"></i>  {{ 'Agregar al Pedido' | translate }}
                     </button>
                 </div>
 
                 <!-- mensajes de alerta -->
                 <div *ngIf="selector_error" class="alert alert-warning mt-3">
                     <i class="fa fa-close float-end" (click)="closeAviso()" style="cursor:pointer"></i>
-                    <p class="mb-0">Selecciona alguna opción por favor</p>
+                    <p class="mb-0"> {{ 'Selecciona alguna opción por favor' | translate }}</p>
                 </div>
 
             </div>

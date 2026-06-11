@@ -14,6 +14,7 @@ import { ToastrService } from 'ngx-toastr';
 import { SelectorService } from '../../../services/selector.service';
 import { CarritoService } from '../../../services/carrito.service';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { TranslatePipe } from '@ngx-translate/core';
 declare var bootstrap: any;
 
 @Component({
@@ -21,7 +22,7 @@ declare var bootstrap: any;
   imports: [CommonModule, RouterModule, LoadingComponent,
     ImagenPipe, MenuFooterComponent, HeaderComponent,
     ReactiveFormsModule,
-    FormsModule,
+    FormsModule, TranslatePipe
   ],
   templateUrl: './favorites.component.html',
   styleUrls: ['./favorites.component.css']

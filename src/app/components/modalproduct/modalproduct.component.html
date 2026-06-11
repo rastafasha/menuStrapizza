@@ -56,10 +56,10 @@
 
                 <!-- selectores -->
                 <div *ngIf="product.nombre_selector !== 'unico'" class="mb-3">
-                    <p class="small">Selecciona alguna opción por favor.</p>
+                    <p class="small">{{ 'Selecciona alguna opción por favor' | translate }}.</p>
                     <select class="form-select" id="product-size" name="selector_to_cart" [(ngModel)]="selector_to_cart"
                         (change)="selector_error = false">
-                        <option value=" " selected disabled>Selecciona</option>
+                        <option value=" " selected disabled>{{ 'Selecciona' | translate }}</option>
                         <option value="{{selector.titulo}}" *ngFor="let selector of selectores">
                             {{selector.titulo}}
                         </option>
@@ -68,18 +68,18 @@
 
                 <div class="d-grid gap-2 mt-3">
                     <button class="btn btn-outline-success w-100 py-3 rounded-pill" (click)="addItem(product)">
-                        <i class="fa fa-shopping-bag"></i> Agregar al Pedido
+                        <i class="fa fa-shopping-bag"></i> {{ 'Agregar al Pedido' | translate }}
                     </button>
                     <button class="btn btn-outline-danger w-100 py-3 rounded-pill" *ngIf="user"
                         (click)="addToFavorites(product)" type="button">
-                        <i class="fa fa-heart"></i> agregar a favoritos
+                        <i class="fa fa-heart"></i> {{ 'Agregar a favoritos' | translate }}
                     </button>
                 </div>
 
                 <!-- mensajes de alerta -->
                 <div *ngIf="selector_error" class="alert alert-warning mt-3">
                     <i class="fa fa-close float-end" (click)="closeAviso()" style="cursor:pointer"></i>
-                    <p class="mb-0">Selecciona alguna opción por favor</p>
+                    <p class="mb-0">{{ 'Selecciona alguna opción por favor' | translate }}</p>
                 </div>
 
 
@@ -88,31 +88,31 @@
         </div>
 
         <!-- Datos del pedido-->
-        <span class="text-muted small mt-3">Comentarios</span>
+        <span class="text-muted small mt-3"> {{ 'Comentarios' | translate }}</span>
         @for (item of comentarios || []; track $index) {
         <div class="bg-light rounded-4 p-3 mb-4 " style="border-radius: 15px;">
 
 
             <div class="d-flex justify-content-between mb-3 border-bottom pb-2 flex-column">
-                <span class="text-muted small">Comentario</span>
+                <span class="text-muted small"> {{ 'Comentario' | translate }}</span>
                 <div class="d-flex flex-column ">
                     <span class="fw-bold small">{{ item.comentario }}</span>
                 </div>
             </div>
             <div class="d-flex justify-content-between mb-3 border-bottom pb-2 flex-column">
-                <span class="text-muted small">Comentario</span>
+                <span class="text-muted small"> {{ 'Pros' | translate }}</span>
                 <div class="d-flex flex-column ">
                     <span class="fw-bold small">{{ item.pros }}</span>
                 </div>
             </div>
             <div class="d-flex justify-content-between mb-3 border-bottom pb-2 flex-column">
-                <span class="text-muted small">Comentario</span>
+                <span class="text-muted small"> {{ 'Contra' | translate }}</span>
                 <div class="d-flex flex-column ">
                     <span class="fw-bold small">{{ item.cons }}</span>
                 </div>
             </div>
             <div class="d-flex justify-content-between mb-3 border-bottom pb-2 flex-column">
-                <span class="text-muted small">usuario</span>
+                <span class="text-muted small"> {{ 'usuario' | translate }}</span>
                 <div class="d-flex flex-column ">
                     <span class="fw-bold small">{{ item.user.first_name }}</span>
                 </div>
@@ -121,7 +121,7 @@
         </div>
         } @empty {
         <div class="text-center p-4 text-muted">
-            <p class="small mb-0">No hay Comentarios registrados en este Producto.</p>
+            <p class="small mb-0">{{ 'No hay Comentarios registrados en este Producto' | translate }}.</p>
         </div>
         }
     </div>

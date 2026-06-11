@@ -15,6 +15,7 @@ import { ComentarioService } from '../../../../services/comentario.service';
 import { Venta } from '../../../../models/ventas.model';
 import { ModalCancelarComponent } from '../modal-cancelar/modal-cancelar.component';
 import { ModalComentariosComponent } from '../modalComentarios/modalComentarios.component';
+import { TranslatePipe } from '@ngx-translate/core';
 
 declare var jQuery: any;
 declare var $: any;
@@ -30,7 +31,8 @@ declare var $: any;
     FormsModule,
     ImagenPipe,
     ModalCancelarComponent,
-    ModalComentariosComponent
+    ModalComentariosComponent,
+    TranslatePipe
 
   ],
   templateUrl: './detalle-orden.component.html',
