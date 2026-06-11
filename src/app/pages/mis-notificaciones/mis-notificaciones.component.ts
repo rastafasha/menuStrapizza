@@ -4,9 +4,8 @@ import { Router } from '@angular/router';
 import { NotificacionService } from '../../services/notificacion.service';
 import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 import { ToastrService } from 'ngx-toastr';
-// import { ModalInstruccionesComponent } from '../../components/modal-instrucciones/modal-instrucciones.component';
 import { MenuFooterComponent } from '../../shared/menu-footer/menu-footer.component';
-// import { BackButtnComponent } from '../../shared/backButtn/backButtn.component';
+import { TranslatePipe } from '@ngx-translate/core';
 
 
 declare var bootstrap: any;
@@ -16,9 +15,8 @@ declare var bootstrap: any;
   imports: [
     CommonModule,
     InfiniteScrollModule,
-    // ModalInstruccionesComponent,
     MenuFooterComponent,
-    // BackButtnComponent
+    TranslatePipe
   ],
   templateUrl: './mis-notificaciones.component.html',
   styleUrl: './mis-notificaciones.component.scss'

@@ -1,7 +1,7 @@
 <div class="container mt-3 animate fadeIn">
     <!-- <app-back-button [title]="title"></app-back-button> -->
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h4>🔔&nbsp; Mis Notificaciones</h4>
+        <h4>🔔&nbsp; {{'Mis Notificaciones'|translate}}</h4>
         <!-- <app-backButtn [pageTitle]='"🔔&nbsp; Mis Notificaciones"'></app-backButtn> -->
         <!-- <button class="btn btn-outline-primary btn-sm rounded-circle shadow-sm" (click)="instruccionesModal.open()"
             title="Ayuda de la sección">
@@ -9,25 +9,28 @@
         </button> -->
     </div>
     <div class="modal fade" id="modalConfirmarVaciar" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered modal-sm">
-    <div class="modal-content text-center p-3">
-      <h5>¿Vaciar historial?</h5>
-      <p class="text-muted small">Esta acción no se puede deshacer.</p>
-      <div class="d-flex justify-content-center gap-2">
-        <button type="button" class="btn btn-sm btn-light" data-bs-dismiss="modal">Cancelar</button>
-        <button type="button" class="btn btn-sm btn-danger" (click)="confirmarVaciarTodo()">Sí, borrar todo</button>
-      </div>
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content text-center p-3">
+                <h5>{{'¿Vaciar historial?'|translate}}</h5>
+                <p class="text-muted small">{{'Esta acción no se puede deshacer'|translate}}.</p>
+                <div class="d-flex justify-content-center gap-2">
+                    <button type="button" class="btn btn-sm btn-light"
+                        data-bs-dismiss="modal">{{'Cancelar'|translate}}</button>
+                    <button type="button" class="btn btn-sm btn-danger" 
+                    (click)="confirmarVaciarTodo()">{{'Sí, borrar todo'|translate}}
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
-</div>
     <div class="d-flex justify-content-between align-items-center mb-4">
         <button (click)="limpiarCampana()" class="btn btn-outline-primary btn-sm">
-            <i class="fa fa-check-double"></i> Marcar todas como leídas
+            <i class="fa fa-check-double"></i> {{'Marcar todas como leídas'|translate}}
         </button>
-        <button *ngIf="notificaciones() && notificaciones().length > 0"
-                    class="btn btn-outline-danger btn-sm" (click)="vaciarTodo()">
-                    <i class="fa fa-trash-o me-1"></i> Vaciar Buzón
-                </button>
+        <button *ngIf="notificaciones() && notificaciones().length > 0" class="btn btn-outline-danger btn-sm"
+            (click)="vaciarTodo()">
+            <i class="fa fa-trash-o me-1"></i> {{'Vaciar Buzón'|translate}}
+        </button>
     </div>
 
 
@@ -47,23 +50,17 @@
                 <div class="card-body py-2">
                     <div class="d-flex justify-content-between">
                         <h6 class="card-title mb-1">
-                            <span *ngIf="!n.leido" class="badge bg-primary me-2">NUEVO</span>
+                            <span *ngIf="!n.leido" class="badge bg-primary me-2">{{'NUEVO'|translate}}</span>
                             {{ n.titulo }}
                         </h6>
                         <small class="text-muted">{{ n.createdAt | date:'short' }}</small>
-                        <!-- <div class="ms-3">
-                            <button type="button" class="btn btn-sm btn-light border"
-                                (click)="eliminarIndividual(n._id)" title="Eliminar Alerta">
-                                <i class="fa fa-times text-danger"></i>
-                            </button>
-                        </div> -->
                     </div>
                     <p class="card-text small mb-0">{{ n.mensaje | slice:0:45 }}...</p>
-                    
+
                 </div>
             </div>
             } @empty {
-            <div class="alert alert-info">No tienes notificaciones.</div>
+            <div class="alert alert-info">{{'No tienes notificaciones'|translate}}.</div>
             }
 
         </div>
@@ -73,7 +70,7 @@
         @if (hasMoreNotif() && loading()) {
         <div class="text-center py-4">
             <div class="spinner-border text-primary" role="status"></div>
-            <p class="text-muted small mt-2">Buscando más notificaciones...</p>
+            <p class="text-muted small mt-2">{{'Buscando más notificaciones'|translate}}...</p>
         </div>
         }
 
@@ -82,7 +79,7 @@
         <div class="text-center my-4 animate fadeIn">
             <p class="text-muted small">
                 <i class="fas fa-check-circle text-success me-1"></i>
-                Has visto todas tus notificaciones
+                {{'Has visto todas tus notificaciones'|translate}}
             </p>
         </div>
         }
@@ -95,13 +92,14 @@
 <div class="offcanvas offcanvas-bottom rounded-top-5 h-75" tabindex="-1" id="offcanvasNotif"
     style="height: auto; max-height: 85vh; border-radius: 25px 25px 0 0;">
     <div class="offcanvas-header border-bottom py-3">
-        <h5 class="offcanvas-title fw-bold text-primary">Detalle de Notificación</h5>
+        <h5 class="offcanvas-title fw-bold text-primary">{{'Detalle de Notificación'|translate}}</h5>
         <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
     </div>
 
     <div class="offcanvas-body p-4" *ngIf="notifSeleccionada">
         <div class="d-flex justify-content-between align-items-center mb-4 flex-column">
-            <span class="badge rounded-pill px-3 py-2" [ngClass]="{'bg-success-soft text-success': notifSeleccionada.tipo === 'PAGO_APROBADO', 
+            <span class="badge rounded-pill px-3 py-2" [ngClass]="{
+                            'bg-success-soft text-success': notifSeleccionada.tipo === 'PAGO_APROBADO', 
                           'bg-danger-soft text-danger': notifSeleccionada.tipo === 'PAGO_RECHAZADO',
                           'bg-warning-soft text-warning': notifSeleccionada.tipo === 'COMUNICADO_ADMIN',
                           'bg-info-soft text-info': notifSeleccionada.tipo === 'NUEVA_FACTURA',
@@ -118,27 +116,27 @@
         <div class="mt-5" *ngIf="notifSeleccionada.tipo === 'PAGO_RECHAZADO'">
             <button class="btn btn-primary w-100 py-3 rounded-4 fw-bold" (click)="irAPagos(notifSeleccionada.tipo)"
                 data-bs-dismiss="offcanvas">
-                Revisar mis Pagos
+                {{'Revisar mis Pagos'|translate}}
             </button>
         </div>
 
         <!-- Botón de acción Facturas-->
         <div class="mt-5" *ngIf="notifSeleccionada.tipo === 'RESERVACION_CANCELADA'">
-            <button class="btn btn-primary w-100 py-3 rounded-4 fw-bold" (click)="irAReservaciones(notifSeleccionada.tipo)"
-                data-bs-dismiss="offcanvas">
-                Revisar mis Reservaciones
+            <button class="btn btn-primary w-100 py-3 rounded-4 fw-bold"
+                (click)="irAReservaciones(notifSeleccionada.tipo)" data-bs-dismiss="offcanvas">
+                {{'Revisar mis Reservaciones'|translate}}
             </button>
         </div>
         <div class="mt-5" *ngIf="notifSeleccionada.tipo === 'PEDIDO_RECHAZADO'">
             <button class="btn btn-primary w-100 py-3 rounded-4 fw-bold" (click)="irAPedidos(notifSeleccionada.tipo)"
                 data-bs-dismiss="offcanvas">
-                Revisar mis Pedidos
+                {{'Revisar mis Pedidos'|translate}}
             </button>
         </div>
-        <div class="mt-5" >
-            <button class="btn btn-outline-danger w-100 py-3 rounded-4 fw-bold" (click)="eliminarIndividual(notifSeleccionada._id)"
-                data-bs-dismiss="offcanvas">
-                Eliminar notificación
+        <div class="mt-5">
+            <button class="btn btn-outline-danger w-100 py-3 rounded-4 fw-bold"
+                (click)="eliminarIndividual(notifSeleccionada._id)" data-bs-dismiss="offcanvas">
+                {{'Eliminar notificación'|translate}}
             </button>
         </div>
     </div>

@@ -12,6 +12,7 @@ import { LoadingComponent } from "../../../shared/loading/loading.component";
 import { AvisoComponent } from "../../../shared/aviso/aviso.component";
 import { HeaderComponent } from "../../../shared/header/header.component";
 import { AsideCuentaComponent } from "../aside-cuenta/aside-cuenta.component";
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-direcciones',
@@ -22,7 +23,9 @@ import { AsideCuentaComponent } from "../aside-cuenta/aside-cuenta.component";
     RouterModule,
     AvisoComponent, 
     HeaderComponent, 
-    AsideCuentaComponent],
+    AsideCuentaComponent,
+    TranslatePipe
+  ],
     styleUrls: ['./direcciones.component.scss']
 })
 export class DireccionesComponent implements OnInit {

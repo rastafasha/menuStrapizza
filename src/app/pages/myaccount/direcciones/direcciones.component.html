@@ -5,112 +5,96 @@
 </aside>
 <section>
     <app-loading *ngIf="isLoading"></app-loading>
-    <div *ngIf="!isLoading && direcciones && direcciones.length < 1" style="margin-bottom: 20px;">
-        <app-aviso [aviso]="'Agrega una Dirección para solicitar el delivery '"></app-aviso>
+    <div class="container" *ngIf="!isLoading && direcciones && direcciones.length < 1" style="margin-bottom: 20px;">
+        <app-aviso [aviso]="'Agrega una Dirección para solicitar el delivery'|translate"></app-aviso>
 
         <button class="check-button mt-3" routerLink="/my-account/direccion/create">
             <i class="fa fa-plus-circle icon-small"></i>
-            Agregar Dirección
+            {{'Agregar Dirección'|translate}}
         </button>
     </div>
 
     <!--cuadromodal-->
-    <div class="container-fluid cuadro-modal animated fadeInUp" *ngIf="!isLoading && direcciones?.length">
+    <div class="container animated fadeInUp" *ngIf="!isLoading && direcciones.length > 0">
         <div class="row">
-            <div class="areablanc areablanc-interna animated fadeInUp">
-                <div class="div-responsive1">
-                    <div class="container pb-5 mb-2 mb-md-3">
-                        <div class="row">
-                            <!-- Content  -->
-                            <section class="col-lg-8">
-                                <!-- Toolbar-->
-                                <div
-                                    class="d-none d-lg-flex justify-content-between align-items-center pt-lg-3 pb-4 pb-lg-5 mb-lg-4">
-                                    <h6 class="font-size-base text-light mb-0">Listado de direcciones registradas:</h6>
-                                </div>
-                                <!-- Addresses list-->
-                                <div class="text-sm-right">
-                                    <button class="check-button" routerLink="/my-account/direccion/create">
-                                        <i class="fa fa-plus-circle icon-small"></i>
-                                        Agregar Dirección
-                                    </button>
-                                </div>
-                                <br>
-                                <div class="table-responsive font-size-md">
-                                    <table class="table table-bordered">
-                                        <thead>
-                                            <tr>
-                                                <th>Nombres</th>
-                                                <th>Dirección</th>
-                                                <th>Acciones</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <ng-container *ngIf="!direcciones?.length">
-                                                <tr>
-                                                    <td colspan="3" class="text-center">No tienes ninguna dirección
-                                                        registrada.</td>
-                                                </tr>
-                                            </ng-container>
-                                            <tr *ngFor="let item of direcciones; let indice = index">
-                                                <td>
-                                                    {{item.nombres_completos}}
-                                                </td>
-                                                <td>
-                                                    {{item.direccion}}
-                                                </td>
-                                                <td>
-                                                    &nbsp;
-                                                    <a class="nav-link-style mr-2 text-success btn-sm"
-                                                        [routerLink]="['/my-account/direccion/edit/',item._id]"
-                                                        style="cursor:pointer">
-                                                        <i class="fa fa-pen-alt"></i>
-                                                    </a>
-                                                    &nbsp; &nbsp;
-                                                    <a class="nav-link-style text-danger btn-sm"
-                                                        (click)="abrirModal(item._id)" style="cursor:pointer">
-                                                        <div class="fa fa-trash"></div>
-                                                    </a>
-                                                    <!-- modal eliminar -->
-                                                    <div class="modal fade" [class.show]="modalAbierto === item._id"
-                                                        [style.display]="modalAbierto === item._id ? 'block' : 'none'"
-                                                        tabindex="-1" role="dialog" aria-hidden="true">
-                                                        <div class="modal-dialog modal-dialog-centered" role="document">
-                                                            <div class="modal-content">
-                                                                <div class="modal-header">
-                                                                    <h4 class="modal-title">Confirmación</h4>
-                                                                    <button class="close" type="button"
-                                                                        (click)="cerrarModal()" aria-label="Close"><span
-                                                                            aria-hidden="true">×</span></button>
-                                                                </div>
-                                                                <div class="modal-body">
-                                                                    <p class="font-size-sm">¿Desea eliminar
-                                                                        definitivamente el regsitro?</p>
-                                                                </div>
-                                                                <div class="modal-footer">
-                                                                    <button class="btn btn-secondary btn-sm"
-                                                                        type="button"
-                                                                        (click)="cerrarModal()">Cancelar</button>
-                                                                    <button class="btn btn-primary btn-shadow btn-sm"
-                                                                        type="button"
-                                                                        (click)="eliminar(item._id)">Suprimir</button>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <!-- modal eliminar -->
-
-                                                </td>
-                                            </tr>
-
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </section>
-                        </div>
-                    </div>
+           <!-- Toolbar-->
+                <div class="d-none d-lg-flex justify-content-between align-items-center pt-lg-3 pb-4 pb-lg-5 mb-lg-4">
+                    <h6 class="font-size-base text-light mb-0">{{'Listado de direcciones registradas'|translate}}:</h6>
                 </div>
-            </div>
+                <!-- Addresses list-->
+                <div class="text-sm-right">
+                    <button class="check-button" routerLink="/my-account/direccion/create">
+                        <i class="fa fa-plus-circle icon-small"></i>
+                        {{'Agregar Dirección'|translate}}
+                    </button>
+                </div>
+                <br>
+                <div class="table-responsive font-size-md">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>{{'Nombre'|translate}}</th>
+                                <th>{{'Dirección'|translate}}</th>
+                                <th>{{'Acciones'|translate}}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <ng-container *ngIf="!direcciones?.length">
+                                <tr>
+                                    <td colspan="3" class="text-center">
+                                        {{'No tienes ninguna dirección registrada'|translate}}.</td>
+                                </tr>
+                            </ng-container>
+                            <tr *ngFor="let item of direcciones; let indice = index">
+                                <td>
+                                    {{item.nombres_completos}}
+                                </td>
+                                <td>
+                                    {{item.direccion}}
+                                </td>
+                                <td>
+                                    &nbsp;
+                                    <a class="nav-link-style mr-2 text-success btn-sm"
+                                        [routerLink]="['/my-account/direccion/edit/',item._id]" style="cursor:pointer">
+                                        <i class="fa fa-pen-alt"></i>
+                                    </a>
+                                    &nbsp; &nbsp;
+                                    <a class="nav-link-style text-danger btn-sm" (click)="abrirModal(item._id)"
+                                        style="cursor:pointer">
+                                        <div class="fa fa-trash"></div>
+                                    </a>
+                                    <!-- modal eliminar -->
+                                    <div class="modal fade" [class.show]="modalAbierto === item._id"
+                                        [style.display]="modalAbierto === item._id ? 'block' : 'none'" tabindex="-1"
+                                        role="dialog" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered" role="document">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h4 class="modal-title">{{'Confirmación'|translate}}</h4>
+                                                    <button class="close" type="button" (click)="cerrarModal()"
+                                                        aria-label="Close"><span aria-hidden="true">×</span></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <p class="font-size-sm">
+                                                        {{'¿Desea eliminar definitivamente el regsitro?'|translate}}</p>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button class="btn btn-secondary btn-sm" type="button"
+                                                        (click)="cerrarModal()">{{'Cancelar'|translate}}</button>
+                                                    <button class="btn btn-primary btn-shadow btn-sm" type="button"
+                                                        (click)="eliminar(item._id)">{{'Suprimir'|translate}}</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- modal eliminar -->
+
+                                </td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+                </div>
         </div>
     </div>
 

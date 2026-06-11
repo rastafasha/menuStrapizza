@@ -13,6 +13,7 @@ import { WaGeolocationService } from '@ng-web-apis/geolocation';
 import * as L from 'leaflet';
 import { Subscription } from 'rxjs';
 import { HeaderComponent } from '../../../../shared/header/header.component';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-direccion-edit',
@@ -22,11 +23,12 @@ import { HeaderComponent } from '../../../../shared/header/header.component';
     ReactiveFormsModule,
     LoadingComponent,
     RouterModule,
-    HeaderComponent
+    HeaderComponent,
+    TranslatePipe
   ],
   providers: [WaGeolocationService],
   templateUrl: './direccion-edit.component.html',
-  styleUrls: ['./direccion-edit.component.css']
+  styleUrls: ['./direccion-edit.component.scss']
 })
 export class DireccionEditComponent implements OnInit, AfterViewInit, OnDestroy {
 

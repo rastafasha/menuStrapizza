@@ -13,18 +13,19 @@ import { ImagenPipe } from '../../../pipes/imagen-pipe.pipe';
 import { PaisService } from '../../../services/pais.service';
 import { Pais } from '../../../models/pais.model';
 import { environment } from '../../../../environments/environment';
-import { LoadingComponent } from '../../../shared/loading/loading.component';
+import { TranslatePipe } from '@ngx-translate/core';
+import { ToastrService } from 'ngx-toastr';
 
-declare var jQuery:any;
-declare var $:any;
+declare var jQuery: any;
+declare var $: any;
 
-interface HtmlInputEvent extends Event{
-  target : HTMLInputElement & EventTarget;
+interface HtmlInputEvent extends Event {
+  target: HTMLInputElement & EventTarget;
 }
 
 @Component({
   selector: 'app-perfil',
-  imports:[
+  imports: [
     CommonModule,
     HeaderComponent,
     AsideCuentaComponent,
@@ -32,6 +33,7 @@ interface HtmlInputEvent extends Event{
     ReactiveFormsModule,
     FormsModule,
     ImagenPipe,
+    TranslatePipe
 
   ],
   templateUrl: './perfil.component.html',
@@ -40,20 +42,18 @@ interface HtmlInputEvent extends Event{
 export class PerfilComponent implements OnInit {
 
   public url;
-  public paises:any;
+  public paises: any;
   // public file !:File; // unused
   // public imgSelect !: String | ArrayBuffer; // unused
-  public data_paises : any = [];
-  public msm_error = false;
-  public msm_success = false;
+  public data_paises: any = [];
   public pass_error = false;
-  
+
   public user!: Usuario;
   public identity!: Usuario;
   public user_id: any;
 
   public isLoading = false;
-  
+
 
   public pais!: Pais;
 
@@ -74,13 +74,14 @@ export class PerfilComponent implements OnInit {
     private fb: FormBuilder,
     private usuarioService: UsuarioService,
     private paisService: PaisService,
-    private _router : Router,
-    private _route :ActivatedRoute,
+    private _router: Router,
+    private _route: ActivatedRoute,
     private http: HttpClient,
-    private fileUploadService: FileUploadService
+    private fileUploadService: FileUploadService,
+    private toastr: ToastrService
   ) {
     // this.usuario = usuarioService.usuario;
-    
+
     this.url = environment.baseUrl;
 
     // Initialize empty FormGroup to prevent template binding errors
@@ -100,156 +101,154 @@ export class PerfilComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    window.scrollTo(0,0);
+    window.scrollTo(0, 0);
 
-     let USER = localStorage.getItem('user');
-    if(USER){
+    let USER = localStorage.getItem('user');
+    if (USER) {
       this.user = JSON.parse(USER);
       this.user_id = this.user.uid
       // console.log(this.user);
-      this. getUser();
+      this.getUser();
     }
-   
+
   }
 
-  getUser(){
+  getUser() {
     this.isLoading = true;
-    this.usuarioService.get_user(this.user_id).subscribe((resp:any)=>{
+    this.usuarioService.get_user(this.user_id).subscribe((resp: any) => {
       this.usuarioSeleccionado = resp.usuario;
       // console.log(this.identity)
-      if(!this.usuarioSeleccionado){
+      if (!this.usuarioSeleccionado) {
         this._router.navigate(['/']);
       }
-       // First initialize the form
-        this.iniciarFormulario();
-         this.getPaises();
-        // Then set the values
-        this.perfilForm.setValue({
-          uid: this.usuarioSeleccionado.uid,
-          email: this.usuarioSeleccionado.email,
-          first_name: this.usuarioSeleccionado.first_name,
-          last_name: this.usuarioSeleccionado.last_name,
-          numdoc: this.usuarioSeleccionado.numdoc || null,
-          telefono: this.usuarioSeleccionado.telefono || null,
-          pais: this.usuarioSeleccionado.pais || null,
-          google: this.usuarioSeleccionado.google || null,
-          role: this.usuarioSeleccionado.role,
-          password: '',
-          img: this.usuarioSeleccionado.img || null,
-        });
-         this.isLoading = false;
-        
+      // First initialize the form
+      this.iniciarFormulario();
+      this.getPaises();
+      // Then set the values
+      this.perfilForm.setValue({
+        uid: this.usuarioSeleccionado.uid,
+        email: this.usuarioSeleccionado.email,
+        first_name: this.usuarioSeleccionado.first_name,
+        last_name: this.usuarioSeleccionado.last_name,
+        numdoc: this.usuarioSeleccionado.numdoc || null,
+        telefono: this.usuarioSeleccionado.telefono || null,
+        pais: this.usuarioSeleccionado.pais || null,
+        google: this.usuarioSeleccionado.google || null,
+        role: this.usuarioSeleccionado.role,
+        password: '',
+        img: this.usuarioSeleccionado.img || null,
+      });
+      this.isLoading = false;
+
     })
   }
 
-   iniciarFormulario(){
+  iniciarFormulario() {
     this.perfilForm = this.fb.group({
-      uid: [ '',  Validators.required ],
+      uid: ['', Validators.required],
       email: [''],
-      first_name: [ '', Validators.required ],
-      last_name: [ '', Validators.required ],
-      numdoc: ['' ],
-      telefono: [ ''],
-      pais: [ ''],
-      google: [ ''],
-      role: [ ''],
-      password: [ ''],
-      img: [ ''],
+      first_name: ['', Validators.required],
+      last_name: ['', Validators.required],
+      numdoc: [''],
+      telefono: [''],
+      pais: [''],
+      google: [''],
+      role: [''],
+      password: [''],
+      img: [''],
     });
-    
+
   }
 
 
   getPaises() {
     this.paisService.getPaises().subscribe(
-      (resp:any) => {
+      (resp: any) => {
         this.paises = resp;
 
       }
     )
   }
 
-  close_alert(){
-    this.msm_success = false;
-    this.msm_error = false;
-  }
+  
 
-  view_password(){
+  view_password() {
     let type = $('#password').attr('type');
 
-    if(type == 'text'){
-      $('#password').attr('type','password');
+    if (type == 'text') {
+      $('#password').attr('type', 'password');
 
-    }else if(type == 'password'){
-      $('#password').attr('type','text');
+    } else if (type == 'password') {
+      $('#password').attr('type', 'text');
     }
   }
 
-  view_password2(){
+  view_password2() {
     let type = $('#password_dos').attr('type');
 
-    if(type == 'text'){
-      $('#password_dos').attr('type','password');
+    if (type == 'text') {
+      $('#password_dos').attr('type', 'password');
 
-    }else if(type == 'password'){
-      $('#password_dos').attr('type','text');
+    } else if (type == 'password') {
+      $('#password_dos').attr('type', 'text');
     }
   }
 
-  actualizarPerfil(){
+  actualizarPerfil() {
     this.isLoading = true;
-    const {first_name, last_name, telefono, pais,  numdoc, email, role, uid} = this.perfilForm.value;
+    const { first_name, last_name, telefono, pais, numdoc, email, role, uid } = this.perfilForm.value;
     this.usuarioService.actualizarP(this.perfilForm.value)
-    .subscribe((resp:any) => {
-      this.isLoading = false;
-      Swal.fire('Guardado', 'Los cambios fueron actualizados', 'success');
-    }, (err)=>{
-      this.isLoading = false;
-      Swal.fire('Error', err.error.msg, 'error');
+      .subscribe((resp: any) => {
+        this.isLoading = false;
+        this.toastr.success('Guardado', 'Los cambios fueron actualizados')
+      }, (err) => {
+        this.isLoading = false;
+        this.toastr.error('Error', err.error.msg);
 
-    })
+      })
   }
-cambiarImagen(event: Event) {
-  const input = event.target as HTMLInputElement;
-  if (!input.files || input.files.length === 0) {
-    return;
-  }
-  
-  const file = input.files[0];
-  this.imagenSubir = file;
-  this.FILE_AVATAR = input;
-  
-  const reader = new FileReader();
-  reader.readAsDataURL(file);
-  reader.onloadend = () => {
-    this.IMAGE_PREVISUALIZA = reader.result as string;
-    this.imgTemp = reader.result;
-  };
-}
-
-
-  subirImagen(){
-    this.isLoading = true;
-    if (!this.imagenSubir) {
-      Swal.fire('Error', 'No hay imagen seleccionada', 'warning');
+  cambiarImagen(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (!input.files || input.files.length === 0) {
       return;
     }
-    
+
+    const file = input.files[0];
+    this.imagenSubir = file;
+    this.FILE_AVATAR = input;
+
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onloadend = () => {
+      this.IMAGE_PREVISUALIZA = reader.result as string;
+      this.imgTemp = reader.result;
+    };
+  }
+
+
+  subirImagen() {
+    this.isLoading = true;
+    if (!this.imagenSubir) {
+      this.toastr.error('Error', 'No hay imagen seleccionada');
+      return;
+    }
+
     this.fileUploadService
-    .actualizarFoto(this.imagenSubir, 'usuarios', this.usuarioSeleccionado.uid || '')
-    .then(img => { 
-      this.usuarioSeleccionado.img = img;
-      // Update localStorage
-      localStorage.setItem('user', JSON.stringify(this.usuarioSeleccionado));
-      // Reset preview
-      this.isLoading = false;
-      this.IMAGE_PREVISUALIZA = img ? `${environment.baseUrl}/uploads/usuarios/${img}` : 'assets/images/no-image.png';
-      Swal.fire('Guardado', 'La imagen fue actualizada', 'success');
-    }).catch(err =>{
-      this.isLoading = false;
-      console.error(err);
-      Swal.fire('Error', 'No se pudo subir la imagen', 'error');
-    })
+      .actualizarFoto(this.imagenSubir, 'usuarios', this.usuarioSeleccionado.uid || '')
+      .then(img => {
+        this.usuarioSeleccionado.img = img;
+        // Update localStorage
+        localStorage.setItem('user', JSON.stringify(this.usuarioSeleccionado));
+        // Reset preview
+        this.isLoading = false;
+        this.IMAGE_PREVISUALIZA = img ? `${environment.baseUrl}/uploads/usuarios/${img}` : 'assets/images/no-image.png';
+        
+        this.toastr.success('Guardado', 'La imagen fue actualizada')
+      }).catch(err => {
+        this.isLoading = false;
+        console.error(err);
+        this.toastr.error('Error', 'No se pudo subir la imagen')
+      })
   }
 
 

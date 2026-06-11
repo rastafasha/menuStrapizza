@@ -3,24 +3,24 @@
 
 <!-- Page Content-->
 <div class="container " style="margin-top: 100px;" *ngIf="!isLoading">
-    <div class="back-title">
-
+    <div class="d-flex justify-content-between mb-3">
         <a [routerLink]="['/my-account/direcciones']">
-            <button class="boton_azul_borde">Volver</button>
+            <button class="check-button">{{'Volver'|translate}}</button>
         </a>
 
-        <a href="javascript:;" (click)="PageSize()" class="btn btn-primary doctor-refresh ms-2 "><i
-                class="fa fa-refresh"></i></a>
+        <button (click)="PageSize()" class="btn btn-outline-primary">
+            <i class="fas fa-refresh"></i>
+        </button>
     </div>
 
-    <div class="num_tracking">
+    <div class="num_tracking mb-5" >
         <!-- Content  -->
         <section class="col-lg-12">
 
             <!-- Sección del Mapa -->
             <div class="map-section">
-                <h4><i class="fa fa-map-marker"></i> Seleccionar Ubicación</h4>
-                <p class="text-muted">Haz clic en el mapa para seleccionar la ubicación de tu dirección</p>
+                <h4><i class="fa fa-map-marker"></i> {{'Seleccionar Ubicación'|translate}}</h4>
+                <p class="text-muted">{{'Haz clic en el mapa para seleccionar la ubicación de tu dirección'|translate}}</p>
 
                 <!-- Contenedor del mapa -->
                 <div #mapContainer class="map-container"></div>
@@ -28,7 +28,7 @@
                 <!-- Loading del mapa -->
                 <div class="map-loading" *ngIf="mapLoading">
                     <div class="spinner"></div>
-                    <p>Obteniendo ubicación...</p>
+                    <p>{{'Obteniendo ubicación'|translate}}...</p>
                 </div>
 
                 <!-- Error del mapa -->
@@ -38,12 +38,12 @@
 
                 <!-- Botón ubicación actual -->
                 <button class="btn btn-primary btn-block location-btn" (click)="useCurrentLocation()">
-                    <i class="fa fa-crosshairs"></i> Usar mi ubicación actual
+                    <i class="fa fa-crosshairs"></i> {{'Usar mi ubicación actual'|translate}}
                 </button>
 
                 <!-- Coordenadas seleccionadas -->
                 <div class="coords-display" *ngIf="selectedCoords">
-                    <span class="label">📍 Ubicación seleccionada:</span>
+                    <span class="label">📍 {{'Ubicación seleccionada'|translate}}:</span>
                     <span class="value">{{ selectedCoords.lat.toFixed(6) }}, {{ selectedCoords.lng.toFixed(6) }}</span>
                 </div>
             </div>
@@ -57,8 +57,7 @@
                     <div class="form-group">
                         <small class="text-muted">
                             <i class="fa fa-info-circle"></i>
-                            Seleccione la ubicación haciendo clic en el mapa. Las coordenadas se guardarán
-                            automáticamente.
+                            {{'Seleccione la ubicación haciendo clic en el mapa. Las coordenadas se guardarán automáticamente'|translate}}.
                         </small>
                     </div>
                 </div>
@@ -66,13 +65,13 @@
                 <div class="row">
                     <div class="col-sm-6">
                         <div class="form-group">
-                            <label>Nombre direccíón (casa, oficina):</label>
+                            <label>{{'Nombre direccíón (casa, oficina)'|translate}}:</label>
                             <input class="form-control" type="text" required placeholder="Nombre para identificar"
                                 formControlName="nombres_completos">
 
                         </div>
                     </div>
-                    <div class="col-sm-6">
+                    <!-- <div class="col-sm-6">
                         <div class="form-group">
                             <label>País</label>
                             <div class="input-group form-label labelgoogle">
@@ -84,45 +83,43 @@
                                 </select>
                             </div>
                         </div>
+                    </div> -->
+                </div>
+                <div class="col-sm-12">
+                    <div class="form-group">
+                        <label>{{'Dirección'|translate}}</label>
+                        <textarea class="form-control" required formControlName="direccion"></textarea>
                     </div>
                 </div>
                 <div class="col-sm-12">
                     <div class="form-group">
-                        <label>Dirección</label>
-                        <textarea class="form-control" placeholder="Ingrese la dirección" required
-                            formControlName="direccion"></textarea>
-                    </div>
-                </div>
-                <div class="col-sm-12">
-                    <div class="form-group">
-                        <label>Referencia </label>
-                        <textarea class="form-control" placeholder="Seleccione la ubicación en el mapa" required
-                            formControlName="referencia"></textarea>
+                        <label>{{'Referencia'|translate}} </label>
+                        <textarea class="form-control" required formControlName="referencia"></textarea>
 
                     </div>
                 </div>
 
 
                 <div class="row">
-                    <div class="col-sm-6">
+                    <!-- <div class="col-sm-6">
                         <div class="form-group">
                             <label>Ciudad</label>
                             <input class="form-control" type="text" id="address-fn" required placeholder="Ciudad"
                                 formControlName="ciudad">
                         </div>
-                    </div>
-                    <div class="col-sm-6">
+                    </div> -->
+                    <!-- <div class="col-sm-6">
                         <div class="form-group">
                             <label>ZIP</label>
                             <input class="form-control" type="text" id="address-fn" required placeholder="Código Postal"
                                 formControlName="zip">
                         </div>
-                    </div>
+                    </div> -->
                 </div>
 
                 <button type="submit" [disabled]="direccionForm.invalid"
-                    class="btn btn-success waves-effect waves-light m-r-10 btn-block">
-                    <i class="fa fa-save"></i> Guardar cambios
+                    class="btn btn-outline-success w-100 py-3 rounded-pill fw-bold">
+                    <i class="fa fa-save"></i> {{'Guardar'|translate}}
                 </button>
             </form>
 
