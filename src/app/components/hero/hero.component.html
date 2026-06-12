@@ -1,40 +1,36 @@
 <section class="hero" id="inicio" [ngStyle]="{'background': tiendaSelected?.color_primario }">
     <div class="hero-container">
         <div class="hero-content">
-            
+
             <!-- CONTENEDOR ÚNICO Y DINÁMICO (Reemplaza a los 3 bloques anteriores) -->
             <div>
                 <h1 class="hero-title">
-                    {{ obtenerTextoPrevio() }} <span>{{ obtenerTextoDestacado() }}</span><br>{{ obtenerTextoPost() }}
+                    {{ obtenerTextoPrevio() || ('Las Mejores'| translate) }}
+                    <span>{{ obtenerTextoDestacado()  || 'Pizzas'}}</span><br>
+                    {{ obtenerTextoPost() || ('de la Ciudad'| translate) }}
                 </h1>
-                
+
                 <div class="hero-image">
                     <!-- Si el restaurante subió su propia foto en 'img_hero' se usa, si no, carga la de la subcategoría por defecto -->
-                    <img [src]="tiendaSelected?.img_hero || obtenerImagenPorDefecto()" 
-                         [alt]="tiendaSelected?.nombre || 'Plato Principal'">
+                    <img [src]="tiendaSelected?.img_hero || obtenerImagenPorDefecto()"
+                        [alt]="tiendaSelected?.nombre || 'Plato Principal'">
                 </div>
             </div>
-           
+
             <p class="hero-subtitle">
-                {{ tiendaSelected?.descripcion_hero || 'Descubre el verdadero sabor con nuestros ingredientes frescos y recetas tradicionales transmitidas por generaciones.' }}
+                {{ (translate.currentLang() === 'en' ? tiendaSelected?.descripcion_hero?.en :
+                tiendaSelected?.descripcion_hero?.es) || ('Descubre el verdadero sabor con nuestros ingredientes frescos
+                y recetas tradicionales transmitidas por generaciones.' | translate) }}
                 <br><br>
                 {{'Comienza a agregar productos' | translate}} !
             </p>
-            
+
             <div class="botns" *ngIf="tiendaSelected?.has_reservacion === true">
-                <button  class="btn btn-primary rounded-rounded " 
-                data-bs-target="#add_reserva" data-bs-toggle="offcanvas">
-                {{'Reservar' | translate}}
+                <button class="btn btn-primary rounded-rounded " data-bs-target="#add_reserva"
+                    data-bs-toggle="offcanvas">
+                    {{'Reservar' | translate}}
                 </button>
             </div>
-            <!-- <div class="botns">
-                <a routerLink="registro" class="btn-primary" *ngIf="!isLogued">
-                    <i class="fas fa-pizza-slice"></i> Registrarme
-                </a>
-                <a routerLink="my-account" class="btn-primary">
-                    <i class="fas fa-user"></i> Ingresar a mi Cuenta
-                </a>
-            </div> -->
         </div>
     </div>
 </section>

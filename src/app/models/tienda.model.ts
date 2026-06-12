@@ -12,10 +12,12 @@ export class Tienda{
     public local: string,
     public img: string,
     public img_hero: string,
-    public descripcion_hero: string,
-    public texto_hero_uno: string,
-    public texto_hero_destacado: string,
-    public texto_hero_dos: string,
+
+    public descripcion_hero: { es: string; en: string },
+    public texto_hero_uno: { es: string; en: string },
+    public texto_hero_destacado: { es: string; en: string },
+    public texto_hero_dos: { es: string; en: string },
+
     public color_fondo: string,
     public color_primario: string,
     public theme: string,
