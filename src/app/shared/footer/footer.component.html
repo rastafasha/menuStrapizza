@@ -5,7 +5,7 @@
             <div class="footer-section">
                 <h4 [ngStyle]="{'color': tiendaSelected?.color_primario }">{{tiendaSelected?.nombre}}</h4>
                 <p>{{tiendaSelected?.ciudad}}, {{tiendaSelected?.pais}}</p>
-                <div [innerHtml]="tiendaSelected?.direccion " class="directinonfo" ></div>
+                <div class="col-xs-12" [innerHtml]="tiendaSelected?.direccion " class="directinonfo" ></div>
             </div>
                 <br>
             <div class="footer-section">
@@ -21,7 +21,8 @@
                 <ul class="footer-links social">
                     <li *ngFor="let red of redssociales">
                         <a [href]="'https://' +red.name_red +'.com/'+red.usuario_red" target="_blank">
-                            <i [class]="red.icono"></i>
+                            
+                            <i class="fab {{red.icono}}"></i>
                             <!-- {{red.name_red}} -->
                         </a>
                     </li>
