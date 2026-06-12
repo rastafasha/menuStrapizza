@@ -4,7 +4,7 @@
     <!-- Pure Bootstrap 5 Offcanvas with backdrop fix -->
 
     <div class="offcanvas-header p-4" *ngIf="product">
-        <h5 class="offcanvas-title" [id]="'modalProductLabel-' + product._id">{{product.titulo}}</h5>
+        <h5 class="offcanvas-title" [id]="'modalProductLabel-' + product._id">{{product.titulo?.es}}</h5>
         <!-- El atributo data-bs-dismiss ahora debe ser "offcanvas" -->
         <button type="button" class="btn-close" data-bs-dismiss="offcanvas" (click)="onModalHidden()"
             aria-label="Close"></button>
@@ -17,7 +17,7 @@
                     <img [src]="product.img | imagenPipe: 'productos'" [alt]="product.titulo" class="img-fluid mb-5" />
                 </div>
                 <div class="infoinicial">
-                    <h2 class="recipe-title">{{product.titulo}}</h2>
+                    <h2 class="recipe-title">{{ translate.currentLang() === 'en' ? product.titulo.en : product.titulo.es}}</h2>
                     <ul class="recipe-details list-unstyled">
                         <li class="recipe-details-item servings">
                             <span class="value text-muted me-2" style="text-decoration: line-through;"
@@ -31,40 +31,27 @@
                     </ul>
                     <app-ratingStar [product]="product"></app-ratingStar>
                 </div>
-                
+
             </div>
 
             <div class="ft-recipe__content mt-3">
-                <!-- <header class="content__header">
-                    <div class="row-wrapper">
-                        <h2 class="recipe-title">{{product.titulo}}</h2>
-                    </div>
-                    <ul class="recipe-details list-unstyled">
-                        <li class="recipe-details-item servings">
-                            <span class="value text-muted me-2" style="text-decoration: line-through;"
-                                *ngIf="+product.precio_antes > +product.precio_ahora">
-                                {{product.precio_antes | number:'1.2-2' | currency:tienda_moneda}}
-                            </span>
-                            <span class="value fw-bold">
-                                {{product.precio_ahora | number:'1.2-2' | currency:tienda_moneda}}
-                            </span>
-                        </li>
-                    </ul>
-                </header> -->
 
-                <p class="description" [innerHTML]="product.detalle"></p>
+                <p class="description" [innerHTML]="translate.currentLang() === 'en' ? product.detalle?.en : product.detalle?.es"></p>
+
 
                 <!-- selectores -->
-                <div *ngIf="product.nombre_selector !== 'unico'" class="mb-3">
-                    <p class="small">{{ 'Selecciona alguna opción por favor' | translate }}.</p>
-                    <select class="form-select" id="product-size" name="selector_to_cart" [(ngModel)]="selector_to_cart"
-                        (change)="selector_error = false">
-                        <option value=" " selected disabled>{{ 'Selecciona' | translate }}</option>
-                        <option value="{{selector.titulo}}" *ngFor="let selector of selectores">
-                            {{selector.titulo}}
-                        </option>
-                    </select>
-                </div>
+               <div *ngIf="product.nombre_selector !== 'unico'" class="mb-3">
+                <p class="small">{{ 'Selecciona alguna opción por favor' | translate }}.</p>
+                <select class="form-select" id="product-size" name="selector_to_cart" [(ngModel)]="selector_to_cart"
+                    (change)="selector_error = false">
+                    <option value=" " selected disabled>{{ 'Selecciona' | translate }}</option>
+                    
+                    <!-- 💡 Ejecutamos el Signal añadiendo () -->
+                    <option [value]="translate.currentLang() === 'en' ? selector.titulo.en : selector.titulo.es" *ngFor="let selector of selectores">
+                        {{ translate.currentLang() === 'en' ? selector.titulo.en : selector.titulo.es }}
+                    </option>
+                </select>
+            </div>
 
                 <div class="d-grid gap-2 mt-3">
                     <button class="btn btn-outline-success w-100 py-3 rounded-pill" (click)="addItem(product)">

@@ -16,7 +16,7 @@ import { FavoritoService } from '../../services/favorito.service';
 import { ComentarioService } from '../../services/comentario.service';
 import { Comentario } from '../../models/comentarios.model';
 import { RatingStarComponent } from '../ratingStar/ratingStar.component';
-import { TranslatePipe } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 declare var bootstrap: any;
 
@@ -61,6 +61,10 @@ export class ModalproductComponent implements OnInit, OnDestroy, AfterViewInit {
   private toastr = inject(ToastrService);
 
   private comentarioService = inject(ComentarioService);
+  constructor(
+  // Debe ser public para que el HTML pueda leer "translate.currentLang"
+  public translate: TranslateService 
+) {}
 
   user!: Usuario;
   bandejaList: any[] = [];

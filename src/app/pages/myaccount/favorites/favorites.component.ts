@@ -35,7 +35,7 @@ export class FavoritesComponent implements OnInit {
   public isLoading = false;
   public msm_success_fav = false;
   tienda_moneda!: string;
-  selectedProduct!: Producto;
+  selectedProduct!: any;
 
   public msm_error = false;
   public msm_success = false;
@@ -95,20 +95,21 @@ export class FavoritesComponent implements OnInit {
    addItem(producto: Producto) {
     this.selector_error = false;
 
-    if (producto.subcategoria === 'Pastas') {
-      // Validar que se haya seleccionado un selector
-      if (!this.selector_to_cart || this.selector_to_cart === ' ') {
+    if (producto.nombre_selector && producto.nombre_selector.toLowerCase() !== 'unico') {
+      
+      // Validar de forma segura que no venga vacío o con puros espacios
+      if (!this.selector_to_cart || this.selector_to_cart.trim() === '') {
         this.selector_error = true;
         setTimeout(() => {
           this.selector_error = false;
-        }, 3000)
+        }, 3000);
         return;
       }
-
       // Agregamos el selector al producto
       producto.nombre_selector = this.selector_to_cart;
-
     }
+
+   
 
     this.carritoService.addItem(producto);
     // Reset selector after adding

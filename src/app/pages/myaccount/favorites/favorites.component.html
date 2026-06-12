@@ -21,7 +21,7 @@
                                 </div>
                                 <div class="product-content">
                                     <div class="infpr">
-                                        <h4>{{product.producto.titulo}}</h4>
+                                        <h4>{{product.producto.titulo?.es}}</h4>
                                         <div class="product-price text-danger" style="text-decoration: line-through;"
                                             *ngIf="product.producto.precio_antes > product.producto.precio_ahora">
                                             {{product.producto.precio_antes|number:'1.2-2'| currency:tienda_moneda}}
@@ -61,7 +61,7 @@
     <!-- Pure Bootstrap 5 Offcanvas with backdrop fix -->
 
     <div class="offcanvas-header p-3" *ngIf="selectedProduct">
-        <h5 class="offcanvas-title" [id]="'modalProductLabel-' + selectedProduct._id">{{selectedProduct.titulo}}</h5>
+        <h5 class="offcanvas-title" [id]="'modalProductLabel-' + selectedProduct._id">{{selectedProduct.titulo?.es}}</h5>
         <!-- El atributo data-bs-dismiss ahora debe ser "offcanvas" -->
         <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>
@@ -76,7 +76,7 @@
 
                 </div>
                 <div class="infoinicial">
-                    <h2 class="recipe-title">{{selectedProduct.titulo}}</h2>
+                    <h2 class="recipe-title">{{selectedProduct.titulo?.es}}</h2>
                     <ul class="recipe-details list-unstyled">
                         <li class="recipe-details-item servings">
                             <span class="value text-muted me-2" style="text-decoration: line-through;"
@@ -95,7 +95,7 @@
             <div class="ft-recipe__content mt-3">
 
 
-                <p class="description" [innerHTML]="selectedProduct.detalle"></p>
+                <p class="description" [innerHTML]="selectedProduct.detalle?.es"></p>
 
                 <!-- selectores -->
                 <div *ngIf="selectedProduct.nombre_selector !== 'unico'" class="mb-3">
@@ -104,7 +104,7 @@
                         (change)="selector_error = false">
                         <option value=" " selected disabled>{{ 'Selecciona' | translate }}</option>
                         <option value="{{selector.titulo}}" *ngFor="let selector of selectores">
-                            {{selector.titulo}}
+                            {{selector.titulo?.es}}
                         </option>
                     </select>
                 </div>

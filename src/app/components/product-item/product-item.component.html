@@ -2,11 +2,11 @@
     <div class="product-card">
         <!-- 1. Quitamos data-bs de la imagen y agregamos (click) -->
         <div class="product-image" (click)="verDetalles()">
-            <img [src]="product.img | imagenPipe: 'productos'" [alt]="product.titulo">
+            <img [src]="product.img | imagenPipe: 'productos'" [alt]="product.titulo?.es">
         </div>
         <div class="product-content">
             <div class="infpr">
-                <h4>{{product.titulo}}</h4>
+                <h4>{{ translate.currentLang() === 'en' ? product.titulo.en : product.titulo.es}}</h4>
                 <div class="product-price text-danger" style="text-decoration: line-through;"
                     *ngIf="product.precio_antes > product.precio_ahora">
                     {{product.precio_antes|number:'1.2-2'| currency:tienda_moneda}}</div>

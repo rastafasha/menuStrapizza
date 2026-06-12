@@ -67,42 +67,63 @@ export class CatAdicionalesComponent implements OnInit, OnDestroy, OnChanges {
     this.isLoading = true;
     const localId = this.tiendaSelected._id;
 
-    // console.log(`📡 Filtrando adicionales locales de ${this.tiendaSelected.nombre} para: ${this.activeCategory}`);
-
-    // Usamos tu servicio nativo que trae los productos exclusivos de esta tienda
     this.productoService.find_by_storeIdActive(localId).subscribe({
       next: (productos: any[]) => {
         
-        // 1. Filtramos en caliente para que SOLO pasen los productos que correspondan a la categoría activa (Bebidas, Cajas, etc.)
-        // Comparamos contra el slug o el nombre de forma limpia
+        // 1. Filtrar los productos por la categoría activa utilizando la clave estable (.es)
         this.products = (productos || []).filter((prod: any) => {
-          if (!prod.categoria) return false;
-          const catNombre = prod.categoria.nombre ? prod.categoria.nombre.toLowerCase().trim() : '';
-          return catNombre === this.activeCategory.toLowerCase().trim();
+          if (!prod.categoria || !prod.categoria.nombre) return false;
+          
+          // Soporte híbrido para el nombre de la categoría
+          const catNombreEs = typeof prod.categoria.nombre === 'object' 
+            ? prod.categoria.nombre.es 
+            : prod.categoria.nombre;
+
+          return catNombreEs ? catNombreEs.trim().toLowerCase() === this.activeCategory.trim().toLowerCase() : false;
         });
 
-        // 2. Extraemos las subcategorías internas si el bloque tuviera subdivisiones
-        const subcats = this.products.map((producto: any) => {
-          return producto.subcategoria ? producto.subcategoria.trim() : null;
+        // 2. Extraer las subcategorías en español de los productos filtrados para agrupar
+        const subcatsEspanol = this.products.map((producto: any) => {
+          if (producto.subcategoria && typeof producto.subcategoria === 'object') {
+            return producto.subcategoria.es ? producto.subcategoria.es.trim() : null;
+          }
+          return typeof producto.subcategoria === 'string' ? producto.subcategoria.trim() : null;
         });
-        const subcategoriasUnicas = [...new Set(subcats.filter((sub: any) => !!sub))];
+        
+        // Eliminar duplicados de control
+        const subcategoriasUnicasEs = [...new Set(subcatsEspanol.filter((sub: any) => !!sub))];
 
-        this.subcategories = subcategoriasUnicas.map((subcategoriaName: string) => ({
-          nombre: subcategoriaName,
-          products: this.products.filter((product: any) => product.subcategoria?.trim() === subcategoriaName),
-        }));
+        // Reconstruir el arreglo mapeando el objeto bilingüe completo { es, en } en 'nombre'
+        this.subcategories = subcategoriasUnicasEs.map((subcatEs: string) => {
+          
+          // Buscamos el objeto original en los productos para preservar las traducciones
+          const productoConSubcat = this.products.find((p: any) => p.subcategoria?.es?.trim() === subcatEs || p.subcategoria === subcatEs);
+          
+          return {
+            // Pasamos el objeto completo para que lo consuma el HTML y el Pipe bilingüe
+            nombre: productoConSubcat && typeof productoConSubcat.subcategoria === 'object' 
+              ? productoConSubcat.subcategoria 
+              : { es: subcatEs, en: '' },
+            
+            // Filtramos el grupo comparando contra la clave en español
+            products: this.products.filter((product: any) => {
+              const currentSubcatEs = typeof product.subcategoria === 'object' ? product.subcategoria?.es : product.subcategoria;
+              return currentSubcatEs ? currentSubcatEs.trim() === subcatEs : false;
+            }),
+          };
+        });
 
-        // 3. Cargamos la grilla directo con los productos del local correspondientes a esa sección
+        // 3. Cargamos la grilla directo con los productos correspondientes
         this.todo = this.products.slice();
         this.isLoading = false;
-        // console.log(`✅ ¡Filtro de adicionales exitoso! Renderizados para ${this.activeCategory}:`, this.todo.length);
       },
       error: (error) => {
         console.error(`❌ Error al obtener productos para adicionales de ${this.activeCategory}:`, error);
         this.isLoading = false;
       }
     });
-  }
+}
+
 
   selectCategory(category: string) {
     this.activeCategory = category;

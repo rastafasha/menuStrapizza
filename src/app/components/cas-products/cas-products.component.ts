@@ -12,7 +12,7 @@ import { ProductoService } from '../../services/product.service';
 import { environment } from '../../../environments/environment';
 import { Categoria } from '../../models/categoria.model';
 import { CategoriasPipePipe } from '../../pipes/categorias-pipe.pipe';
-import { TranslatePipe } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 declare var bootstrap: any;
 @Component({
   selector: 'app-cas-products',
@@ -26,12 +26,30 @@ declare var bootstrap: any;
 export class CasProductsComponent implements OnInit, OnDestroy {
   @Output() msm_success: EventEmitter<boolean> = new EventEmitter<boolean>();
   @Input() refreshCasProducts: EventEmitter<void> | null = null;
-  @Input() activeCategory: string = 'all';
+  // @Input() activeCategory: string = 'all';
   @Input() activeSubCategory: string = 'all';
   @Input() title!: string;
   @Input() isVisible = false;
   @Input() tienda_moneda!: any;
   @Input() isLoading: boolean = false;
+
+  private _activeCategory: string = 'all';
+
+  @Input()
+  set activeCategory(value: string) {
+    // 🚨 OJO: Asignamos a la variable con guion bajo (_activeCategory), NO a 'this.activeCategory'
+    this._activeCategory = value || 'all';
+
+    // Llamamos a tu función de carga de forma segura
+    if (this.localIdActual) {
+      this.cargarProductosPorTiendaId(this.localIdActual);
+    }
+  }
+
+  // El getter también debe leer de la variable interna privada
+  get activeCategory(): string {
+    return this._activeCategory;
+  }
 
   option_selectedd: number = 1;
   solicitud_selectedd: any = null;
@@ -50,15 +68,21 @@ export class CasProductsComponent implements OnInit, OnDestroy {
 
   todo: Producto[] = [];
   selectedProduct: Producto | null = null;
+  localIdActual: any;
 
   private categoryService = inject(CategoryService);
   private productoService = inject(ProductoService);
   private tiendasService = inject(TiendaService);
   private tiendaSubscription!: Subscription;
 
+  constructor(
+    // Debe ser public para que el HTML pueda leer "translate.currentLang"
+    public translate: TranslateService
+  ) { }
+
   ngOnInit() {
     this.isLoading = true;
-    
+
     // 1. Escuchamos la tienda activa resuelta en la caché
     this.tiendaSubscription = this.tiendasService.getTiendaByNameCached().subscribe(tienda => {
       if (tienda) {
@@ -73,7 +97,7 @@ export class CasProductsComponent implements OnInit, OnDestroy {
     if (this.refreshCasProducts) {
       this.refreshCasProducts.subscribe(() => this.refreshData());
     }
-}
+  }
 
 
 
@@ -103,30 +127,67 @@ export class CasProductsComponent implements OnInit, OnDestroy {
   }
 
   // 🟢 TU NUEVA FUNCIÓN MAESTRA INTEGRAL (Limpia, rápida y libre de cruce de datos)
-cargarProductosPorTiendaId(localId: any) {
+  cargarProductosPorTiendaId(localId: any) {
     this.isLoading = true;
-    
-    // Consumimos tu endpoint nativo del backend
+
     this.productoService.find_by_storeId(localId).subscribe({
       next: (productos: any[]) => {
-        // Guardamos únicamente los productos que le pertenecen a este local
         this.products = productos || [];
-        // 1. Extraemos el campo subcategoria de forma segura protegiendo contra nulos
-        const subcategorias = this.products.map((producto: any) => {
-          return producto.subcategoria ? producto.subcategoria.trim() : null;
+
+        // 1. Extraemos el texto en español como clave única de agrupación
+        const subcategoriasEspanol = this.products.map((producto: any) => {
+          if (producto.subcategoria && typeof producto.subcategoria === 'object') {
+            return producto.subcategoria.es ? producto.subcategoria.es.trim() : null;
+          }
+          // Si en la base de datos local todavía es un string plano viejo:
+          return typeof producto.subcategoria === 'string' ? producto.subcategoria.trim() : null;
         });
 
-        // 2. Eliminamos duplicados y limpiamos valores vacíos
-        const subcategoriasUnicas = [...new Set(subcategorias.filter((sub: any) => !!sub))];
-        // console.log('📋 Las subcategorías únicas de esta tienda son:', subcategoriasUnicas);
+        // 2. Eliminamos duplicados del string de control
+        const subcategoriasUnicasEs = [...new Set(subcategoriasEspanol.filter((sub: any) => !!sub))];
 
-        // 3. Agrupamos los productos correspondientes bajo cada subcategoría exclusiva
-        this.subcategories = subcategoriasUnicas.map((subcatName: string) => ({
-          nombre: subcatName,
-          products: this.products.filter((product: any) => product.subcategoria?.trim() === subcatName)
-        })) || [];
+        // 3. Construimos el arreglo bilingüe agrupado
+        this.subcategories = subcategoriasUnicasEs.map((subcatEs: string) => {
 
-        // 4. Sincronizamos la grilla de platos e indicamos que cargue todo por defecto
+          // 🛡️ BUSQUEDA HÍBRIDA MEJORADA
+          const productoConSubcat = this.products.find((p: any) => {
+            if (!p.subcategoria) return false;
+            if (typeof p.subcategoria === 'object') {
+              // 🛡️ Al ser 'p: any', aquí jamás te volverá a decir que 'es' no existe
+              return p.subcategoria.es?.trim() === subcatEs; 
+            }
+            return p.subcategoria.trim() === subcatEs;
+          });
+
+          // 🔎 DIAGNÓSTICO EN CONSOLA: Vamos a espiar qué está llegando del backend para esta subcategoría
+          console.log(`Subcategoría evaluada: [${subcatEs}]. Datos en BD:`, productoConSubcat?.subcategoria);
+
+          let estructuraFinalNombre = { es: subcatEs, en: '' };
+
+          if (productoConSubcat && typeof productoConSubcat.subcategoria === 'object') {
+            // Si viene el objeto, nos aseguramos de mapear es y en perfectamente
+            estructuraFinalNombre = {
+              es: productoConSubcat.subcategoria.es || subcatEs,
+              en: productoConSubcat.subcategoria.en || ''
+            };
+          } else if (productoConSubcat && typeof productoConSubcat.subcategoria === 'string') {
+            // Si la BD guardó un string plano por error, dejamos 'en' vacío para que lo traduzca el Pipe
+            estructuraFinalNombre = { es: productoConSubcat.subcategoria, en: '' };
+          }
+
+          return {
+            nombre: estructuraFinalNombre,
+
+            products: this.products.filter((product: any) => {
+              if (!product.subcategoria) return false;
+              const actualEs = typeof product.subcategoria === 'object' ? product.subcategoria.es : product.subcategoria;
+              return actualEs?.trim() === subcatEs;
+            })
+          };
+        }) || [];
+
+        console.log(this.subcategories)
+        // 4. Sincronizamos la grilla de platos
         this.updateTodo();
         this.isLoading = false;
       },
@@ -135,7 +196,8 @@ cargarProductosPorTiendaId(localId: any) {
         this.isLoading = false;
       }
     });
-}
+  }
+
 
 
   selectCategory(category: string) {
@@ -146,12 +208,18 @@ cargarProductosPorTiendaId(localId: any) {
 
   updateTodo() {
     this.isLoading = true;
+
     if (this.activeCategory === 'all') {
       this.todo = this.products ? this.products.slice() : [];
     } else {
-      const selectedCategory = this.subcategories ? this.subcategories.find(subcat => subcat.nombre === this.activeCategory) : null;
+      // 💡 CORRECCIÓN: Comparamos el string plano contra la propiedad .es del objeto bilingüe
+      const selectedCategory = this.subcategories
+        ? this.subcategories.find(subcat => subcat.nombre?.es === this.activeCategory)
+        : null;
+
       this.todo = selectedCategory ? selectedCategory.products : [];
     }
+
     this.isLoading = false;
   }
 
@@ -197,7 +265,7 @@ cargarProductosPorTiendaId(localId: any) {
   trackByCharacterId: TrackByFunction<any> = (index: number, character: any) => character.id;
 
   // Actualizamos la función de refresco para que use el nuevo flujo limpio
-refreshData() {
+  refreshData() {
     this.isRefreshing = true;
     setTimeout(() => {
       this.isRefreshing = false;
@@ -205,6 +273,6 @@ refreshData() {
         this.cargarProductosPorTiendaId(this.tiendaSelected._id);
       }
     }, 2000);
-}
+  }
 
 }

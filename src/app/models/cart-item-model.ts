@@ -12,13 +12,16 @@ export class CartItemModel {
     category!:Categoria;
     img!:string;
 
-    constructor(product: Producto){
-      this.productId= product._id;
-      this.productName = product.titulo;
-      this.description = product.detalle;
-      this.productPrice = product.precio_ahora;
-      this.quantity = 1;
-    }
+   constructor(product: Producto){
+  this.productId = product._id;
+  
+  // Extraemos la propiedad .es del objeto bilingüe
+  this.productName = product.titulo ? product.titulo.es : '';
+  this.description = product.detalle ? product.detalle.es : '';
+  
+  this.productPrice = product.precio_ahora;
+  this.quantity = 1;
+}
 
 
 

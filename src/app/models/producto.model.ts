@@ -6,18 +6,22 @@ import { Selector } from './selector.model';
 
 const base_url = environment.mediaUrlRemoto;
 export class Producto {
-  titulo: string;
+
+  // 🌐 CAMPOS INTERNACIONALIZADOS (Ahora son objetos { es, en })
+  titulo!: { es: string; en: string };
+  info_short!: { es: string; en: string };
+  detalle!: { es: string; en: string };
+
   precio_ahora: number;
   precio_antes!: string;
   video_review!: string;
-  info_short!: string;
   comentarios!: string;
-  detalle!: string;
   slug!: string;
   stock!: number;
   cantidad!:number;
   categoria!: Categoria;
-  subcategoria!: string;
+  // subcategoria!: string;
+  subcategoria?: { es: string; en: string };
   marca!: Marca;
   color!: Color;
   nombre_selector!: string;
@@ -29,15 +33,17 @@ export class Producto {
   updatedAt!: Date;
   img!: string;
   _id?: string;
-
-  constructor(id: string | undefined, name: string, description: string, category: any, price: number ){
+  
+constructor(id: string | undefined, name: string, description: string, category: any, price: number ){
     this._id = id;
-    this.titulo = name;
-    this.detalle = description;
+    
+    // Asignamos el string plano dentro del objeto bilingüe
+    this.titulo = { es: name, en: '' };
+    this.detalle = { es: description, en: '' };
+    
     this.categoria = category;
     this.precio_ahora = price;
-    // this.img = imageUrl;
-  }
+}
 
 
   get imagenUrl(){

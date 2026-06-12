@@ -30,7 +30,7 @@
                             <div class="info-item">
                                 <img [src]="item.img | imagenPipe:'productos' " alt="">
                                 <div class="d-flex flex-column ">
-                                    <h2>{{item.titulo | slice:0:8}}...</h2>
+                                    <h2>{{item.titulo.es | slice:0:8}}...</h2>
                                 <p class="small">{{item.selector_elegido | slice:0:8}}...</p>
                                 </div>
                                 <p *ngIf="item.subcategoria === 'Pastas'">{{item.nombre_selector | slice:0:6}}...</p>

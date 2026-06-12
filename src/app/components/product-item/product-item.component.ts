@@ -9,6 +9,7 @@ import { ImagenPipe } from '../../pipes/imagen-pipe.pipe';
 import { ColorService } from '../../services/color.service';
 import { ToastrService } from 'ngx-toastr';
 import { RatingStarComponent } from '../ratingStar/ratingStar.component';
+import { TranslateService } from '@ngx-translate/core';
 declare var bootstrap: any;
 @Component({
   selector: 'app-product-item',
@@ -44,6 +45,10 @@ export class ProductItemComponent {
   private carritoService = inject(CarritoService);
   private _colorService = inject(ColorService);
   private toastr = inject(ToastrService);
+  constructor(
+  // Debe ser public para que el HTML pueda leer "translate.currentLang"
+  public translate: TranslateService 
+) {}
 
   ngOnInit(): void {
     let USER = localStorage.getItem("user");

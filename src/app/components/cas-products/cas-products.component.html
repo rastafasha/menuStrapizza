@@ -13,21 +13,20 @@
             <!-- Menú de Pestañas Horizontales / Filtros dinámicos -->
             <div class="tab-content-set">
                 <ul class="nav">
-                    
+
 
                     <!-- Ciclo de subcategorías internas (Pastas, Pizza, Especiales...) -->
                     <ng-container *ngFor="let subcat of subcategories | categoriasPipe">
-                        <li [class.active]="activeCategory.toLowerCase() === subcat.nombre.toLowerCase()"
-                            [ngStyle]="activeCategory.toLowerCase() === subcat.nombre.toLowerCase()  ? {'color': tiendaSelected?.color_primario} : {}">
-                            <a href="javascript:void(0);"
-                                [ngClass]="{'active': activeCategory.toLowerCase() === subcat.nombre.toLowerCase()}"
-                                (click)="selectCategory(subcat.nombre)"
-                                [style.color]="activeCategory.toLowerCase() === subcat.nombre.toLowerCase() ? (tiendaSelected?.color_primario + ' !important') : null">
+                        <li [class.active]="activeCategory === subcat.nombre?.es"
+                            [ngStyle]="activeCategory === subcat.nombre?.es ? {'color': tiendaSelected?.color_primario} : {}">
 
-                                {{ subcat.nombre }}
+                            <a href="javascript:void(0);" [ngClass]="{'active': activeCategory === subcat.nombre?.es}"
+                                (click)="selectCategory(subcat.nombre?.es || '')"
+                                [style.color]="activeCategory === subcat.nombre?.es ? (tiendaSelected?.color_primario + ' !important') : null">
+
+                                <!-- 🌐 TRADUCCIÓN GLOBAL: Traduce usando tu archivo local de Angular basándose en la clave base de la base de datos -->
+                                {{ (subcat.nombre?.es || '') | translate }}
                             </a>
-
-
                         </li>
                     </ng-container>
 
@@ -44,7 +43,7 @@
 
             <!-- Grilla / Lista de productos filtrados -->
             <div *ngFor="let product of todo; let i = index">
-                <app-product-item [activeCategory]="activeCategory" [tienda_moneda]="tienda_moneda" [product]="product" 
+                <app-product-item [activeCategory]="activeCategory" [tienda_moneda]="tienda_moneda" [product]="product"
                     data-bs-toggle="offcanvas" [attr.data-bs-target]="'#modalProduct-' + product._id"
                     (click)="openModal(product)">
                 </app-product-item>
