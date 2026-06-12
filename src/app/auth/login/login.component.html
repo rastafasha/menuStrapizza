@@ -5,7 +5,7 @@
         <div class="container">
             <div class="login-wrapper">
                 <a routerLink="/">
-                    <img [src]="(tiendaSelected?.img|| '') | imagenPipe: 'tiendas'"
+                    <img [src]="(tiendaSelected.img|| '') | imagenPipe: 'tiendas'"
                         style="" [alt]="tiendaSelected.nombre">
                 </a>
                 <div class="login">
@@ -16,16 +16,16 @@
                     <ul class="nav list-unstyled d-flex flex-row gap-2 mb-3">
                         <li>
                             <button type="button" class="btn "
-                                [ngStyle]="{'border-color': tiendaSelected?.color_primario }"
-                                [ngStyle]="{'color': tiendaSelected?.color_primario }"
+                                [ngStyle]="{'border-color': tiendaSelected.color_primario }"
+                                [ngStyle]="{'color': tiendaSelected.color_primario }"
                                 [ngClass]="{'active': option_selectedd == 1}" (click)="optionSelected(1)">
                                 Con Correo
                             </button>
                         </li>
                         <li>
                             <button type="button" class="btn "
-                                [ngStyle]="{'border-color': tiendaSelected?.color_primario }"
-                                [ngStyle]="{'color': tiendaSelected?.color_primario }"
+                                [ngStyle]="{'border-color': tiendaSelected.color_primario }"
+                                [ngStyle]="{'color': tiendaSelected.color_primario }"
                                 [ngClass]="{'active': option_selectedd == 2}" (click)="optionSelected(2)">
                                 Con Teléfono
                             </button>

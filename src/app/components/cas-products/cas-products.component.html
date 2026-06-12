@@ -17,15 +17,15 @@
 
                     <!-- Ciclo de subcategorías internas (Pastas, Pizza, Especiales...) -->
                     <ng-container *ngFor="let subcat of subcategories | categoriasPipe">
-                        <li [class.active]="activeCategory === subcat.nombre?.es"
-                            [ngStyle]="activeCategory === subcat.nombre?.es ? {'color': tiendaSelected?.color_primario} : {}">
+                        <li [class.active]="activeCategory === subcat.nombre.es"
+                            [ngStyle]="activeCategory === subcat.nombre.es ? {'color': tiendaSelected?.color_primario} : {}">
 
-                            <a href="javascript:void(0);" [ngClass]="{'active': activeCategory === subcat.nombre?.es}"
-                                (click)="selectCategory(subcat.nombre?.es || '')"
-                                [style.color]="activeCategory === subcat.nombre?.es ? (tiendaSelected?.color_primario + ' !important') : null">
+                            <a href="javascript:void(0);" [ngClass]="{'active': activeCategory === subcat.nombre.es}"
+                                (click)="selectCategory(subcat.nombre.es || '')"
+                                [style.color]="activeCategory === subcat.nombre.es ? (tiendaSelected?.color_primario + ' !important') : null">
 
                                 <!-- 🌐 TRADUCCIÓN GLOBAL: Traduce usando tu archivo local de Angular basándose en la clave base de la base de datos -->
-                                {{ (subcat.nombre?.es || '') | translate }}
+                                {{ (subcat.nombre.es || '') | translate }}
                             </a>
                         </li>
                     </ng-container>

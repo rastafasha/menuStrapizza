@@ -33,7 +33,7 @@
                                     <h2>{{item.titulo.es | slice:0:8}}...</h2>
                                 <p class="small">{{item.selector_elegido | slice:0:8}}...</p>
                                 </div>
-                                <p *ngIf="item.subcategoria === 'Pastas'">{{item.nombre_selector | slice:0:6}}...</p>
+                                <p *ngIf="item.nombre_selector !== 'unico'">{{item.nombre_selector | slice:0:6}}...</p>
                                 <div class="add-items justify-content-center">
                                     <i class="fa fa-minus icon-small" (click)="removeItem(item,i )"></i>
                                     <span>{{item.cantidad}}</span>
