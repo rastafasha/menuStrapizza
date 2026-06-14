@@ -32,7 +32,7 @@
                     <div class="mb-3 col-xs-12 col-sm-6 col-md-3">
                         <label class="form-label fw-bold text-secondary mb-1">{{'Nombre'|translate}}</label>
                         <input type="text" formControlName="first_name" class="form-control form-control-lg bg-light"
-                            placeholder="Nombre"
+                            placeholder="Jhon"
                             [ngClass]="{'is-invalid': reservaForm.get('first_name')?.touched && reservaForm.get('first_name')?.invalid}">
                     </div>
 
@@ -40,7 +40,7 @@
                     <div class="mb-2 col-xs-12 col-sm-6 col-md-3">
                         <label class="form-label fw-bold text-secondary mb-1">{{'Apellidos'|translate}}</label>
                         <input type="text" formControlName="last_name" class="form-control form-control-lg bg-light"
-                            placeholder="Apellidos"
+                            placeholder="Smith"
                             [ngClass]="{'is-invalid': reservaForm.get('last_name')?.touched && reservaForm.get('last_name')?.invalid}">
                     </div>
 
@@ -50,7 +50,7 @@
                     <div class="mb-3 col-xs-12 col-sm-6 col-md-3">
                         <label class="form-label fw-bold text-secondary mb-1">{{'Email'|translate}}</label>
                         <input type="email" formControlName="email" class="form-control form-control-lg bg-light"
-                            placeholder="Email"
+                            placeholder="user@email.com"
                             [ngClass]="{'is-invalid': reservaForm.get('email')?.touched && reservaForm.get('email')?.invalid}">
                     </div>
 
@@ -66,7 +66,7 @@
         </select> -->
                             <!-- Entrada del número telefónico -->
                             <input type="tel" formControlName="telefono" class="form-control form-control-lg bg-light"
-                                placeholder="Teléfono"
+                                placeholder="0414111223355"
                                 [ngClass]="{'is-invalid': reservaForm.get('telefono')?.touched && reservaForm.get('phone')?.invalid}">
                         </div>
                     </div>
@@ -107,14 +107,13 @@
                     <div class="text-end mb-3 ">
                         <a href="#" (click)="toggleComentario($event)"
                             class="text-decoration-none fw-semibold small text-primary">
-                            {{ mostrarComentario ? '- Quitar comentario' : 'Añadir un comentario' }}
+                            {{ (mostrarComentario ? 'Quitar comentario' : 'Añadir un comentario') | translate }}
                         </a>
                     </div>
 
                     <!-- Área de texto opcional para Comentarios -->
                     <div class="mb-3" *ngIf="mostrarComentario">
-                        <textarea formControlName="comentarios" class="form-control bg-light" rows="3"
-                            placeholder="Escribe tus notas o comentarios aquí..."></textarea>
+                        <textarea formControlName="comentarios" class="form-control bg-light" rows="3"></textarea>
                     </div>
 
                     <!-- Sección Interactiva: Intolerancia/Alergia -->
@@ -136,8 +135,7 @@
 
                     <!-- Campo adicional dinámico si marca que 'Si' posee alergias -->
                     <div class="mb-4" *ngIf="reservaForm.get('comensal_alergia')?.value === 'Si'">
-                        <label class="form-label fw-bold text-danger mb-1">{{'Especificar alergias o
-                            intolerancias'|translate}}</label>
+                        <label class="form-label fw-bold text-danger mb-1">{{'Especificar alergias o intolerancias'|translate}}</label>
                         <textarea formControlName="comentarios_alergia" class="form-control bg-light" rows="2"
                             placeholder="Ejemplo: Celíaco, Alergia al maní..."
                             [ngClass]="{'is-invalid': reservaForm.get('comentarios_alergia')?.touched && reservaForm.get('comentarios_alergia')?.invalid}"></textarea>

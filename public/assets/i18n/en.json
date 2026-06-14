@@ -47,8 +47,8 @@
     "Telefono":"Phone",
     "Nombre":"First Name",
     "Apellidos":"Last Name",
-    "Email":"CEmail",
-    "Personas":"Persons",
+    "Email":"Email",
+    "Personas":"Guests",
     "Persona":"Person",
     "Hora":"Time",
     "Si":"Yes",
@@ -59,7 +59,10 @@
 
     "Guía de Sección":"Section Guide",
     "No mostrar más en esta sección":"Dont Show more in this section",
-    "Entendido":"Understood",
+    "Entendido": "Got it",
+     "Quitar comentario":"Remove comment",
+    "Añadir un comentario":"Add Comment",
+    "¿Unirse a la lista de espera?":"Join to Wait list?",
 
     "Todos los Estatus":"All Status",
     "Pendiente":"Pending",
@@ -191,6 +194,7 @@
     "Mínimo 3 caracteres":"Minimum 3 characters",
     "CI/Indentificación":"ID / Identification",
     "Teléfono Móvil":"Mobile Phone",
+    "Teléfono":"Phone",
     "País":"Country",
     "Actualizar perfíl":"Update Profile",
     "En caso que quieras cambiar tu contraseña":"In case you want to change your password",
@@ -217,6 +221,8 @@
 
     "Las Mejores":"The Best",
     "de la Ciudad":"in Town",
+    "Categoría":"Category",
+    "Precio":"Price",
 
      "Descubre el verdadero sabor con nuestros ingredientes frescos y recetas tradicionales transmitidas por generaciones.": "Discover the true flavor with our fresh ingredients and traditional recipes passed down through generations.",
 

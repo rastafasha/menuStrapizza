@@ -15,7 +15,7 @@ import { ComentarioService } from '../../../../services/comentario.service';
 import { Venta } from '../../../../models/ventas.model';
 import { ModalCancelarComponent } from '../modal-cancelar/modal-cancelar.component';
 import { ModalComentariosComponent } from '../modalComentarios/modalComentarios.component';
-import { TranslatePipe } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 declare var jQuery: any;
 declare var $: any;
@@ -66,6 +66,7 @@ export class DetalleOrdenComponent implements OnInit {
     private _route: ActivatedRoute,
     private _ventaService: VentaService,
     private tiendaService: TiendaService,
+    public translate: TranslateService
   ) {
     let USER = localStorage.getItem('user');
     if (USER) {

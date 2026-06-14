@@ -212,7 +212,7 @@
                                                         style="width:100%" class="rounded-left" alt="Card image">
                                                     <div class="ifdet">
                                                         <h3 class="product-title font-size-base mb-2">
-                                                            {{item.producto.titulo}}
+                                                            {{ translate.currentLang() === 'en' ? item.producto?.titulo?.en :  item.producto?.titulo?.es }}
                                                         </h3>
                                                         <div class="font-size-sm"><span
                                                                 class="text-muted mr-2">{{'Cantidad'|translate}}:</span>

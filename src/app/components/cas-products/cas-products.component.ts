@@ -127,76 +127,71 @@ export class CasProductsComponent implements OnInit, OnDestroy {
   }
 
   // 🟢 TU NUEVA FUNCIÓN MAESTRA INTEGRAL (Limpia, rápida y libre de cruce de datos)
-  cargarProductosPorTiendaId(localId: any) {
-    this.isLoading = true;
+cargarProductosPorTiendaId(localId: any) {
+  this.isLoading = true;
 
-    this.productoService.find_by_storeId(localId).subscribe({
-      next: (productos: any[]) => {
-        this.products = productos || [];
+  this.productoService.find_by_storeId(localId).subscribe({
+    next: (productos: any[]) => {
+      this.products = productos || [];
 
-        // 1. Extraemos el texto en español como clave única de agrupación
-        const subcategoriasEspanol = this.products.map((producto: any) => {
-          if (producto.subcategoria && typeof producto.subcategoria === 'object') {
-            return producto.subcategoria.es ? producto.subcategoria.es.trim() : null;
-          }
-          // Si en la base de datos local todavía es un string plano viejo:
-          return typeof producto.subcategoria === 'string' ? producto.subcategoria.trim() : null;
+      // 1. Extraemos el texto base (ID o string en minúsculas) de la subcategoría del producto
+      const subcategoriasEspanol = this.products.map((producto: any) => {
+        if (producto.subcategoria) {
+          return typeof producto.subcategoria === 'string' 
+            ? producto.subcategoria.trim().toLowerCase() 
+            : producto.subcategoria.es?.trim().toLowerCase();
+        }
+        return null;
+      });
+
+      // 2. Eliminamos duplicados
+      const subcategoriasUnicasEs = [...new Set(subcategoriasEspanol.filter((sub: any) => !!sub))];
+
+      // 3. Construimos el arreglo bilingüe agrupado buscando en el objeto 'categoria'
+      this.subcategories = subcategoriasUnicasEs.map((subcatBase: string) => {
+
+        // Buscamos un producto que tenga el objeto 'categoria' cargado con sus subcategorías bilingües
+        const productoConDataCompleta = this.products.find((p: any) => {
+          const actualSub = typeof p.subcategoria === 'string' ? p.subcategoria : p.subcategoria?.es;
+          return actualSub?.trim().toLowerCase() === subcatBase && p.categoria?.subcategorias;
         });
 
-        // 2. Eliminamos duplicados del string de control
-        const subcategoriasUnicasEs = [...new Set(subcategoriasEspanol.filter((sub: any) => !!sub))];
+        let estructuraFinalNombre = { es: subcatBase, en: subcatBase };
 
-        // 3. Construimos el arreglo bilingüe agrupado
-        this.subcategories = subcategoriasUnicasEs.map((subcatEs: string) => {
-
-          // 🛡️ BUSQUEDA HÍBRIDA MEJORADA
-          const productoConSubcat = this.products.find((p: any) => {
-            if (!p.subcategoria) return false;
-            if (typeof p.subcategoria === 'object') {
-              // 🛡️ Al ser 'p: any', aquí jamás te volverá a decir que 'es' no existe
-              return p.subcategoria.es?.trim() === subcatEs; 
-            }
-            return p.subcategoria.trim() === subcatEs;
-          });
-
-          // 🔎 DIAGNÓSTICO EN CONSOLA: Vamos a espiar qué está llegando del backend para esta subcategoría
-          console.log(`Subcategoría evaluada: [${subcatEs}]. Datos en BD:`, productoConSubcat?.subcategoria);
-
-          let estructuraFinalNombre = { es: subcatEs, en: '' };
-
-          if (productoConSubcat && typeof productoConSubcat.subcategoria === 'object') {
-            // Si viene el objeto, nos aseguramos de mapear es y en perfectamente
-            estructuraFinalNombre = {
-              es: productoConSubcat.subcategoria.es || subcatEs,
-              en: productoConSubcat.subcategoria.en || ''
-            };
-          } else if (productoConSubcat && typeof productoConSubcat.subcategoria === 'string') {
-            // Si la BD guardó un string plano por error, dejamos 'en' vacío para que lo traduzca el Pipe
-            estructuraFinalNombre = { es: productoConSubcat.subcategoria, en: '' };
-          }
-
-          return {
-            nombre: estructuraFinalNombre,
-
-            products: this.products.filter((product: any) => {
-              if (!product.subcategoria) return false;
-              const actualEs = typeof product.subcategoria === 'object' ? product.subcategoria.es : product.subcategoria;
-              return actualEs?.trim() === subcatEs;
-            })
+        // Si encontramos el objeto 'categoria', extraemos las traducciones reales de allí
+        if (productoConDataCompleta && productoConDataCompleta.categoria.subcategorias) {
+          const subcatBD = productoConDataCompleta.categoria.subcategorias;
+          estructuraFinalNombre = {
+            es: subcatBD.es || subcatBase,
+            en: subcatBD.en || subcatBD.es || subcatBase
           };
-        }) || [];
+        }
 
-        console.log(this.subcategories)
-        // 4. Sincronizamos la grilla de platos
-        this.updateTodo();
-        this.isLoading = false;
-      },
-      error: (err) => {
-        console.error('Error al obtener los productos por tienda:', err);
-        this.isLoading = false;
-      }
-    });
-  }
+        return {
+          nombre: estructuraFinalNombre,
+
+          products: this.products.filter((product: any) => {
+            if (!product.subcategoria) return false;
+            const actualSub = typeof product.subcategoria === 'object' ? product.subcategoria.es : product.subcategoria;
+            return actualSub?.trim().toLowerCase() === subcatBase;
+          })
+        };
+      }) || [];
+
+      console.log('Subcategorías Bilingües Listas:', this.subcategories);
+      
+      // 4. Sincronizamos la grilla de platos
+      this.updateTodo();
+      this.isLoading = false;
+    },
+    error: (err) => {
+      console.error('Error al obtener los productos por tienda:', err);
+      this.isLoading = false;
+    }
+  });
+}
+
+
 
 
 

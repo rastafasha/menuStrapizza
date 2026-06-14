@@ -46,7 +46,7 @@
     "Fecha":"Fecha",
     "Editando Reservación":"Editando Reservación",
     "Creando Reservación":"Creando Reservación",
-    "Telefono":"Teléfono",
+    "Teléfono":"Teléfono",
     "Nombre":"Nombre",
     "Apellidos":"Apellidos",
     "Email":"Correo Electrónico",
@@ -62,6 +62,9 @@
     "Guía de Sección":"Guía de Sección",
     "No mostrar más en esta sección":"No mostrar más en esta sección",
     "Entendido":"Entendido",
+    "Quitar comentario":"Quitar comentario",
+    "Añadir un comentario":"Añadir un comentario",
+    "¿Unirse a la lista de espera?":"¿Unirse a la lista de espera?",
     
     
     "Todos los Estatus":"Todos los Estatus",
@@ -218,6 +221,8 @@
     "Eliminar notificación":"Eliminar notificación",
     "Las Mejores":"Las Mejores",
     "de la Ciudad":"de la Ciudad",
+    "Categoría":"Categoría",
+    "Precio":"Precio",
 
     
 

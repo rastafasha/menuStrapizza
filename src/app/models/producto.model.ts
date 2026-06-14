@@ -21,7 +21,7 @@ export class Producto {
   cantidad!:number;
   categoria!: Categoria;
   // subcategoria!: string;
-  subcategoria?: { es: string; en: string };
+  subcategorias?: { es: string; en: string };
   marca!: Marca;
   color!: Color;
   nombre_selector!: string;

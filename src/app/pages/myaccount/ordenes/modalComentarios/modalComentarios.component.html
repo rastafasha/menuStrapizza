@@ -43,8 +43,7 @@
                     </div>
                     <div class="form-group">
                         <label for="review-text">{{'Reseña'|translate}}<span class="text-danger">*</span></label>
-                        <textarea class="form-control" rows="5" required="" formControlName="comentario"
-                            placeholder="Escribe que tal te parecio el producto."></textarea>
+                        <textarea class="form-control" rows="5" required="" formControlName="comentario"></textarea>
                         @if(reviewForm.controls['comentario'].touched){
 
                         <div class="text-danger">
@@ -60,8 +59,7 @@
                     </div>
                     <div class="form-group">
                         <label for="review-pros">{{'Pros'|translate}}<span class="text-danger">*</span></label>
-                        <textarea class="form-control" rows="2" placeholder="Lo bueno"
-                            formControlName="pros"></textarea>
+                        <textarea class="form-control" rows="2" formControlName="pros"></textarea>
                         @if(reviewForm.controls['pros'].touched){
 
                         <div class="text-danger">
@@ -76,7 +74,7 @@
                     </div>
                     <div class="form-group mb-4">
                         <label for="review-cons">{{'Cons'|translate}}<span class="text-danger">*</span></label>
-                        <textarea class="form-control" rows="2" placeholder="Lo malo" formControlName="cons"></textarea>
+                        <textarea class="form-control" rows="2"  formControlName="cons"></textarea>
                         @if(reviewForm.controls['cons'].touched){
 
                         <div class="text-danger">

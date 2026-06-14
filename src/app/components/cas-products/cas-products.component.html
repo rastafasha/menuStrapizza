@@ -17,18 +17,25 @@
 
                     <!-- Ciclo de subcategorías internas (Pastas, Pizza, Especiales...) -->
                     <ng-container *ngFor="let subcat of subcategories | categoriasPipe">
-                        <li [class.active]="activeCategory === subcat.nombre.es"
-                            [ngStyle]="activeCategory === subcat.nombre.es ? {'color': tiendaSelected?.color_primario} : {}">
+    <!-- 🌐 Evaluamos dinámicamente si el idioma es inglés para usar .en, de lo contrario usamos .es -->
+    <ng-container *ngIf="(translate.currentLang() === 'en' ? subcat.nombre.en : subcat.nombre.es) as nombreTraducido">
+        
+        <li [class.active]="activeCategory === nombreTraducido"
+            [ngStyle]="activeCategory === nombreTraducido ? {'color': tiendaSelected?.color_primario} : {}">
 
-                            <a href="javascript:void(0);" [ngClass]="{'active': activeCategory === subcat.nombre.es}"
-                                (click)="selectCategory(subcat.nombre.es || '')"
-                                [style.color]="activeCategory === subcat.nombre.es ? (tiendaSelected?.color_primario + ' !important') : null">
+            <a href="javascript:void(0);" 
+               [ngClass]="{'active': activeCategory === nombreTraducido}"
+               (click)="selectCategory(nombreTraducido || '')"
+               [style.color]="activeCategory === nombreTraducido ? (tiendaSelected?.color_primario + ' !important') : null">
 
-                                <!-- 🌐 TRADUCCIÓN GLOBAL: Traduce usando tu archivo local de Angular basándose en la clave base de la base de datos -->
-                                {{ (subcat.nombre.es || '') | translate }}
-                            </a>
-                        </li>
-                    </ng-container>
+                <!-- 🌐 Renderizado directo del nombre traducido que viene de tu base de datos -->
+                {{ nombreTraducido }}
+            </a>
+        </li>
+
+    </ng-container>
+</ng-container>
+
 
                     <!-- Botón estático para ver TODO el menú principal -->
                     <li [class.active]="activeCategory === 'all' "
