@@ -8,7 +8,6 @@ import { Usuario } from '../../models/usuario.model';
 import { NgIf } from '@angular/common';
 import { LoadingComponent } from "../../shared/loading/loading.component";
 import { PwaNotifInstallerComponent } from '../../shared/pwa-notif-installer/pwa-notif-installer.component';
-import { ModalInicialComponent } from '../../components/modal-inicial/modal-inicial.component';
 import { Tienda } from '../../models/tienda.model';
 import { TiendaService } from '../../services/tienda.service';
 import { Subscription } from 'rxjs';
@@ -26,7 +25,6 @@ import { TranslatePipe } from '@ngx-translate/core';
     MenuFooterComponent, NgIf,
     LoadingComponent,
     PwaNotifInstallerComponent,
-    ModalInicialComponent,
     CatAdicionalesComponent,
     TranslatePipe
   ],
