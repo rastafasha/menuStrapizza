@@ -1,11 +1,12 @@
 import { Component, Input, AfterViewInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-modal-inicial',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, TranslatePipe],
   templateUrl: './modal-inicial.component.html',
   styleUrl: './modal-inicial.component.scss'
 })
@@ -52,5 +53,16 @@ export class ModalInicialComponent implements AfterViewInit {
       }
     }
     this.router.navigateByUrl('registro');
+  }
+
+   public open() {
+    setTimeout(() => {
+      const modalElement = document.getElementById('inicialModal') as HTMLElement;
+      if (modalElement) {
+        const bootstrapModal = (window as any).bootstrap?.Modal?.getInstance(modalElement) || 
+                               new (window as any).bootstrap.Modal(modalElement);
+        bootstrapModal.show();
+      }
+    }, 100);
   }
 }

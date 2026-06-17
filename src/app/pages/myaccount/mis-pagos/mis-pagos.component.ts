@@ -60,7 +60,7 @@ export class MisPagosComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private transferenciasService = inject(TransferenciasService);
   private tiendaService = inject(TiendaService);
-  private translate = inject(TranslateService);
+  public translate = inject(TranslateService);
 
   ngOnInit() {
     window.scrollTo(0, 0);
@@ -70,6 +70,15 @@ export class MisPagosComponent implements OnInit {
     this.userId = this.user.uid;
 
     this.getPagosUsuario();
+
+     // 1. Cargar el texto en el idioma activo actual al entrar a la vista
+    this.actualizarInstruccionesPagos();
+
+    // 2. 🧲 Suscripción Reactiva: Si el usuario mueve el switch en el Header,
+    // este bloque reescribe la variable 'info' en milisegundos
+    this.langSubscription = this.translate.onLangChange.subscribe(() => {
+      this.actualizarInstruccionesPagos();
+    });
 
     // LEER PARÁMETROS DE LA URL
     this.route.queryParams.subscribe(params => {
@@ -84,14 +93,7 @@ export class MisPagosComponent implements OnInit {
       this.escucharTiendaActiva();
     });
 
-     // 1. Cargar el texto en el idioma activo actual al entrar a la vista
-    this.actualizarInstruccionesPagos();
-
-    // 2. 🧲 Suscripción Reactiva: Si el usuario mueve el switch en el Header,
-    // este bloque reescribe la variable 'info' en milisegundos
-    this.langSubscription = this.translate.onLangChange.subscribe(() => {
-      this.actualizarInstruccionesPagos();
-    });
+    
   }
 
   private actualizarInstruccionesPagos() {
