@@ -16,6 +16,10 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 export class HeroComponent implements OnInit, OnDestroy {
 
   isLogued: boolean = false;
+  public activeLang = 'es';
+    flag = false;
+    is_visible: boolean = false;
+    langs: string[] = [];
 
   tiendaSelected: Tienda | null = null;
   private tiendaSubscription!: Subscription;
@@ -119,5 +123,22 @@ export class HeroComponent implements OnInit, OnDestroy {
     // Imagen de respaldo global por si el rubro es nuevo o es una pizzería
     return 'assets/images/pizza-queso.png';
   }
+
+    // 🌐 Función para alternar el idioma con el Switch
+toggleLanguageSwitch(event: Event) {
+  const input = event.target as HTMLInputElement;
+  
+  // Si está marcado (true) cambiamos a inglés ('en'), si no, a español ('es')
+  this.activeLang = input.checked ? 'en' : 'es';
+  
+  // Actualizamos el flag por si lo usas en otra parte de la vista
+  this.flag = input.checked; 
+
+  // Ejecutamos el cambio en la librería ngx-translate
+  this.translate.use(this.activeLang);
+  
+  // Guardamos la preferencia en el almacenamiento local
+  localStorage.setItem('lang', this.activeLang);
+}
 
 }

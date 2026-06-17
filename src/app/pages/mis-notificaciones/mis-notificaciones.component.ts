@@ -6,6 +6,9 @@ import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 import { ToastrService } from 'ngx-toastr';
 import { MenuFooterComponent } from '../../shared/menu-footer/menu-footer.component';
 import { TranslatePipe } from '@ngx-translate/core';
+import { TiendaService } from '../../services/tienda.service';
+import { Subscription } from 'rxjs';
+import { Tienda } from '../../models/tienda.model';
 
 
 declare var bootstrap: any;
@@ -31,6 +34,7 @@ export class MisNotificacionesComponent implements OnInit {
   public cargando: boolean = true;
   title = 'Notificaciones';
   public notifSeleccionada: any;
+  tiendaSelected: Tienda | undefined | null = null;
 
   info = `
   <h2>Sección: Notificaciones</h2>
@@ -43,6 +47,9 @@ export class MisNotificacionesComponent implements OnInit {
     <li><strong>Acceso a Detalles:</strong> Utiliza el <strong>botón azul</strong> en cada tarjeta para ampliar la información recibida.</li>
   </ul>`;
 
+  private tiendaSubscription!: Subscription;
+  
+    private tiendaService = inject(TiendaService);
 
   public notificacionService = inject(NotificacionService);
   public router = inject(Router);
@@ -51,6 +58,13 @@ export class MisNotificacionesComponent implements OnInit {
   ngOnInit() {
     window.scrollTo(0, 0);
     this.getNotificaciones();
+    this.getTienda();
+  }
+
+  getTienda(){
+    this.tiendaSubscription = this.tiendaService.selectedTiendaObservable$.subscribe(tienda => {
+      this.tiendaSelected = tienda;
+    });
   }
 
   onScroll(): void {
@@ -65,7 +79,7 @@ export class MisNotificacionesComponent implements OnInit {
     this.loading.set(true);
 
     // Pasamos la página actual al servicio
-    this.notificacionService.obtenerHistorialCompleto(this.pageNotif).subscribe({
+    this.notificacionService.obtenerHistorialCompleto(this.pageNotif, this.tiendaSelected?._id, false).subscribe({
       next: (resp: any) => {
         const newData = resp.notificaciones || [];
 

@@ -120,9 +120,9 @@ enviarFormularioExpress() {
       next: (resp: any) => {
         if (resp && resp.ok) {
           this.ngZone.run(() => {
-            this.router.navigate(['/my-account/pedidos']).then(navExitoso => {
+            this.router.navigate(['/']).then(navExitoso => {
               if (!navExitoso) {
-                window.location.href = '/my-account/pedidos';
+                window.location.href = '/';
               }
             });
           });

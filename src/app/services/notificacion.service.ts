@@ -143,12 +143,19 @@ export class NotificacionService {
   /**
    * 5. Obtener historial completo paginado (Tu backend usa "page", adaptemos el parámetro)
    */
-  obtenerHistorialCompleto(page: number = 1): Observable<{ ok: boolean, notificaciones: Notificacion[], proximo: number | null }> {
+ obtenerHistorialCompleto(page: number = 1, localId?: string, esAdmin: boolean = false): Observable<{ ok: boolean, notificaciones: Notificacion[], proximo: number | null }> {
+    // 🔑 Si viene el localId, construimos los Query Params dinámicamente
+    let url = `${BackendApi}/notificaciones/historial?page=${page}`;
+    
+    if (localId) {
+      url += `&localId=${localId}&esAdmin=${esAdmin}`;
+    }
+
     return this.http.get<{ ok: boolean, notificaciones: Notificacion[], proximo: number | null }>(
-      `${BackendApi}/notificaciones/historial?page=${page}`,
+      url,
       this.getOptions()
     );
-  }
+}
 
   /**
    * Helper dinámico para resolver rutas basándose en tus ENUMs reales
