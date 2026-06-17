@@ -6,10 +6,11 @@ import { Tienda } from '../../models/tienda.model';
 import { TiendaService } from '../../services/tienda.service';
 import { ReservaCrearComponent } from '../../pages/myaccount/reserva/reserva-crear/reserva-crear.component';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { ModalInicialComponent } from '../modal-inicial/modal-inicial.component';
 
 @Component({
   selector: 'app-hero',
-  imports: [RouterModule, CommonModule, NgStyle, ReservaCrearComponent, TranslatePipe],
+  imports: [RouterModule, CommonModule, NgStyle, ReservaCrearComponent, TranslatePipe, ModalInicialComponent],
   templateUrl: './hero.component.html',
   styleUrl: './hero.component.scss'
 })
