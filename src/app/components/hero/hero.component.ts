@@ -125,20 +125,20 @@ export class HeroComponent implements OnInit, OnDestroy {
   }
 
     // 🌐 Función para alternar el idioma con el Switch
-toggleLanguageSwitch(event: Event) {
-  const input = event.target as HTMLInputElement;
+setLanguage(lang: 'es' | 'en') {
+  // Asignamos el idioma seleccionado de forma directa
+  this.activeLang = lang;
   
-  // Si está marcado (true) cambiamos a inglés ('en'), si no, a español ('es')
-  this.activeLang = input.checked ? 'en' : 'es';
-  
-  // Actualizamos el flag por si lo usas en otra parte de la vista
-  this.flag = input.checked; 
+  // Actualizamos el flag booleano por si lo sigues usando en la vista (true para 'en')
+  this.flag = (lang === 'en'); 
 
   // Ejecutamos el cambio en la librería ngx-translate
-  this.translate.use(this.activeLang);
+  this.translate.use(lang);
   
   // Guardamos la preferencia en el almacenamiento local
-  localStorage.setItem('lang', this.activeLang);
+  localStorage.setItem('lang', lang);
 }
+
+
 
 }

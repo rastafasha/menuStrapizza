@@ -32,18 +32,22 @@
 
             <!-- Idioma Switch -->
                 <div class="lang-switch-container mt-3">
-                    <label class="switch">
-                        <!-- El switch se marca si activeLang es 'en' -->
-                        <input type="checkbox" [checked]="activeLang === 'en'" (change)="toggleLanguageSwitch($event)">
-                        <span class="slider round"></span>
-                    </label>
-
-                    <!-- Muestra el texto dinámico o la bandera actual junto al interruptor -->
-                    <p>
-                        <i class="flag-icon" [ngClass]="activeLang === 'en' ? 'flag-icon-us' : 'flag-icon-es'"></i>
-                        {{ 'Idioma' | translate }}
-                    </p>
-                </div>
+    <button type="button" 
+            class="lang-btn" 
+            [class.active]="activeLang === 'es'" 
+            (click)="setLanguage('es')">
+        <i class="flag-icon flag-icon-es me-1"></i> ES
+    </button>
+    
+    <span class="lang-divider">|</span>
+    
+    <button type="button" 
+            class="lang-btn" 
+            [class.active]="activeLang === 'en'" 
+            (click)="setLanguage('en')">
+        <i class="flag-icon flag-icon-us me-1"></i> EN
+    </button>
+</div>
                 <!-- Idioma Switch -->
         </div>
     </div>
