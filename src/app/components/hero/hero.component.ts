@@ -10,7 +10,9 @@ import { ModalInicialComponent } from '../modal-inicial/modal-inicial.component'
 
 @Component({
   selector: 'app-hero',
-  imports: [RouterModule, CommonModule, NgStyle, ReservaCrearComponent, TranslatePipe, ModalInicialComponent],
+  imports: [RouterModule, CommonModule, NgStyle,
+    ReservaCrearComponent, TranslatePipe,
+    ModalInicialComponent],
   templateUrl: './hero.component.html',
   styleUrl: './hero.component.scss'
 })
@@ -18,21 +20,25 @@ export class HeroComponent implements OnInit, OnDestroy {
 
   isLogued: boolean = false;
   public activeLang = 'es';
-    flag = false;
-    is_visible: boolean = false;
-    langs: string[] = [];
+  flag = false;
+  is_visible: boolean = false;
+  langs: string[] = [];
 
   tiendaSelected: Tienda | null = null;
   private tiendaSubscription!: Subscription;
   private tiendasService = inject(TiendaService);
-  constructor(
-    // Debe ser public para que el HTML pueda leer "translate.currentLang"
-    public translate: TranslateService
-  ) { }
+  public translate = inject(TranslateService);
 
   ngOnInit(): void {
     const USER = localStorage.getItem("user");
     this.isLogued = USER ? true : false;
+
+    // Leemos el idioma del localStorage, si no existe por defecto será 'es'
+  this.activeLang = (localStorage.getItem('lang') as 'es' | 'en') || 'es';
+  
+  // Sincronizamos la librería de traducción con este idioma inicial
+  this.translate.use(this.activeLang);
+  this.flag = (this.activeLang === 'en');
 
     // Escuchamos de forma reactiva la tienda que resolvió el subdominio de la URL [1]
     this.tiendaSubscription = this.tiendasService.selectedTiendaObservable$.subscribe(tienda => {
@@ -125,20 +131,20 @@ export class HeroComponent implements OnInit, OnDestroy {
     return 'assets/images/pizza-queso.png';
   }
 
-    // 🌐 Función para alternar el idioma con el Switch
-setLanguage(lang: 'es' | 'en') {
-  // Asignamos el idioma seleccionado de forma directa
-  this.activeLang = lang;
-  
-  // Actualizamos el flag booleano por si lo sigues usando en la vista (true para 'en')
-  this.flag = (lang === 'en'); 
+  // 🌐 Función para alternar el idioma con el Switch
+  setLanguage(lang: 'es' | 'en') {
+    // Asignamos el idioma seleccionado de forma directa
+    this.activeLang = lang;
 
-  // Ejecutamos el cambio en la librería ngx-translate
-  this.translate.use(lang);
-  
-  // Guardamos la preferencia en el almacenamiento local
-  localStorage.setItem('lang', lang);
-}
+    // Actualizamos el flag booleano por si lo sigues usando en la vista (true para 'en')
+    this.flag = (lang === 'en');
+
+    // Ejecutamos el cambio en la librería ngx-translate
+    this.translate.use(lang);
+
+    // Guardamos la preferencia en el almacenamiento local
+    localStorage.setItem('lang', lang);
+  }
 
 
 

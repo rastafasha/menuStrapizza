@@ -3,10 +3,7 @@
     <div class="title-top">
         <h1>{{'Confirmar Pedido'|translate}}</h1>
     </div>
-
-
     <div class="row m-t-20">
-
         <!-- PASO 1: RESUMEN DEL CARRITO (Tu vista actual con la bandejaList) -->
         <div class="step-container" *ngIf="pasoActual === 1">
             <!-- ... Aquí va tu lista actual de platos, totales, etc. ... -->
@@ -18,58 +15,54 @@
                 <div class="contenedor-ticket">
                     <div class="ticket d-flex justify-content-between align-items-start">
                         <div class="breadcrumb-item">
-                        <h3>{{'Confirmar'|translate}}</h3>
-                        <span class="burbleinfo"> {{fechaHoy | date:'dd/MM/YYYY'}}</span>
-                    </div>
-                    <div class="clear"></div>
-                    
-                    <div class="overf">
-                        <!-- itemlist -->
-                        <div class="list-item" *ngFor="let item of bandejaList; let i = index">
-                            <div class="clear"></div>
-                            <div class="info-item">
-                                <img [src]="item.img | imagenPipe:'productos' " alt="">
-                                <div class="d-flex flex-column ">
-                                    <h2>{{item.titulo.es | slice:0:8}}...</h2>
-                                <p class="small">{{item.selector_elegido | slice:0:8}}...</p>
-                                </div>
-                                <p *ngIf="item.nombre_selector !== 'unico'">{{item.nombre_selector | slice:0:6}}...</p>
-                                <div class="add-items justify-content-center">
-                                    <i class="fa fa-minus icon-small" (click)="removeItem(item,i )"></i>
-                                    <span>{{item.cantidad}}</span>
-                                    <i class="fa fa-plus icon-small" (click)="addItem(item, i)"></i>
-                                </div>
-                                <div class="price">
-                                    <p>{{item.precio_ahora * item.cantidad |number:'1.2-2'| currency:tienda_moneda}}
+                            <h3>{{'Confirmar'|translate}}</h3>
+                            <span class="burbleinfo"> {{fechaHoy | date:'dd/MM/YYYY'}}</span>
+                        </div>
+                        <div class="clear"></div>
+
+                        <div class="overf">
+                            <!-- itemlist -->
+                            <div class="list-item" *ngFor="let item of bandejaList; let i = index">
+                                <div class="clear"></div>
+                                <div class="info-item">
+                                    <img [src]="item.img | imagenPipe:'productos' " alt="">
+                                    <div class="d-flex flex-column ">
+                                        <h2>{{item.titulo.es | slice:0:8}}...</h2>
+                                        <p class="small">{{item.selector_elegido | slice:0:8}}...</p>
+                                    </div>
+                                    <p *ngIf="item.nombre_selector !== 'unico'">{{item.nombre_selector | slice:0:6}}...
                                     </p>
-                                    <!-- <p >{{item.precio_ahora | currency}}</p> -->
+                                    <div class="add-items justify-content-center">
+                                        <i class="fa fa-minus icon-small" (click)="removeItem(item,i )"></i>
+                                        <span>{{item.cantidad}}</span>
+                                        <i class="fa fa-plus icon-small" (click)="addItem(item, i)"></i>
+                                    </div>
+                                    <div class="price">
+                                        <p>{{item.precio_ahora * item.cantidad |number:'1.2-2'| currency:tienda_moneda}}
+                                        </p>
+                                        <!-- <p >{{item.precio_ahora | currency}}</p> -->
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <!-- itemlist -->
+                            <!-- itemlist -->
 
-                        <!-- Total a Pagar -->
-                        <div class="info_pago total">
-                            <!-- <div class="info_pago_titulo1"><span> Artículos</span> </div> -->
-                            <div class="info_pago_titulo1"><span>{{'Total a Pagar'|translate}}</span> </div>
-                            <!-- <div class="info_pagod_data3"><span>({{bandejaList.length}})</span> </div> -->
-                            <div class="info_pagod_data3"><span>{{total() |number:'1.2-2'|
-                                    currency:tienda_moneda}}</span>
+                            <!-- Total a Pagar -->
+                            <div class="info_pago total">
+                                <div class="info_pago_titulo1"><span>{{'Total a Pagar'|translate}}</span> </div>
+                                <div class="info_pagod_data3"><span>{{total() |number:'1.2-2'|
+                                        currency:tienda_moneda}}</span>
+                                </div>
+                            </div>
+                            <!-- Total a Pagar -->
+                            <div class="barcode" style="margin-top: 15px;">
+                                <h1>zlipmenu.com</h1>
+                                <p>{{'Gracias por su compra'|translate}}</p>
                             </div>
                         </div>
-                        <!-- Total a Pagar -->
-                         <div class="barcode" style="margin-top: 15px;">
-                            <h1>zlipmenu.com</h1>
-                            <p>{{'Gracias por su compra'|translate}}</p>
-                         </div>
-
                     </div>
-                    </div>
-                    
                 </div>
             </div>
             <!-- Botón para avanzar si está vacía la sesión -->
-
             <div class="order-button-container">
                 <button class="check-button" routerLink="/">
                     <i class="fa fa-chevron-left icon-small"></i>
@@ -84,7 +77,7 @@
         <!-- PASO 2: FORMULARIO EXPRESS (Nombre, Teléfono y Tipo de Entrega) -->
         <div class="checkout-container animated fadeInUp title-top" *ngIf="pasoActual === 2">
             <h3>👤 {{'Datos del Cliente'|translate}}</h3>
-            <form [formGroup]="expressForm" >
+            <form [formGroup]="expressForm">
                 <div class="form-group">
                     <label>{{'¿A nombre de quién dejamos el pedido?'|translate}}</label>
                     <input type="text" formControlName="first_name" placeholder="Ej. Juan Pérez" class="form-control">
@@ -106,25 +99,37 @@
 
                 <div class="mt-3 order-button-container">
                     <button type="button" class="check-button" (click)="pasoActual = 1">
-                        <i class="fa fa-chevron-left icon-small"></i> 
+                        <i class="fa fa-chevron-left icon-small"></i>
                         {{'Atrás'|translate}}
                     </button>
-                    <a [href]="urlWhatsApp"
-       target="_blank"
-       rel="noopener noreferrer"
-       (click)="expressForm.valid ? procesarClienteExpress() : $event.preventDefault()"
-       class="check-button"
-       [ngClass]="{'disabled-link': expressForm.invalid}"
-       style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">
-       
-       {{'Finalizar y Enviar Pedido'|translate}}
-       <i class="fa fa-chevron-right icon-small" style="margin-left: 8px;"></i>
-    </a>
+                    
+                    <!-- 🚀 BOTÓN UNIVERSAL: Eliminamos el <a>, el href y el target="_blank" -->
+                    <button type="button" 
+                            class="check-button" 
+                            *ngIf="tiendaSelected.tipoFlujo ==='POS_DIRECTO' "
+                            [disabled]="expressForm.invalid"
+                            [ngClass]="{'disabled-link': expressForm.invalid}"
+                            (click)="procesarClienteExpress()"
+                            style="display: inline-flex; align-items: center; justify-content: center;">
+
+                        {{'Finalizar y Enviar Pedido'|translate}}
+                        <i class="fa fa-chevron-right icon-small" style="margin-left: 8px;"></i>
+                    </button>
+                     <a [href]="urlWhatsApp"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        *ngIf="tiendaSelected.tipoFlujo ==='WHATSAPP' "
+                        (click)="expressForm.valid ? procesarClienteExpress() : $event.preventDefault()"
+                        class="check-button"
+                        [ngClass]="{'disabled-link': expressForm.invalid}"
+                        style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">
+                        
+                        {{'Finalizar y Enviar Pedido'|translate}}
+                        <i class="fa fa-chevron-right icon-small" style="margin-left: 8px;"></i>
+                        </a>
                 </div>
             </form>
         </div>
 
     </div>
-
-
 </main>

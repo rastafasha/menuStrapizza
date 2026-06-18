@@ -3,7 +3,6 @@ import { HomeComponent } from './pages/home/home.component';
 import { LoginComponent } from './auth/login/login.component';
 import { RecoveryComponent } from './auth/recovery/recovery.component';
 import { RegisterComponent } from './auth/register/register.component';
-import { CheckoutComponent } from './pages/checkout/checkout.component';
 import { CartCheckoutComponent } from './pages/myaccount/cart-checkout/cart-checkout.component';
 import { MyaccountComponent } from './pages/myaccount/myaccount.component';
 import { DetalleOrdenComponent } from './pages/myaccount/ordenes/detalle-orden/detalle-orden.component';
@@ -29,10 +28,6 @@ export const routes: Routes = [
     {
         path:'review',
         component: ReviewOrderComponent
-    },
-    {
-        path:'checkout',
-        component: CheckoutComponent
     },
     {
         path:'pay/:id',

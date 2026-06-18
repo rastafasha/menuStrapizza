@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { FormGroup, FormBuilder } from '@angular/forms';
@@ -13,6 +13,7 @@ import { AvisoComponent } from "../../../shared/aviso/aviso.component";
 import { HeaderComponent } from "../../../shared/header/header.component";
 import { AsideCuentaComponent } from "../aside-cuenta/aside-cuenta.component";
 import { TranslatePipe } from '@ngx-translate/core';
+import { ModalCrearDireccionComponent } from '../../../components/modal-crear-direccion/modal-crear-direccion.component';
 
 @Component({
   selector: 'app-direcciones',
@@ -24,11 +25,15 @@ import { TranslatePipe } from '@ngx-translate/core';
     AvisoComponent, 
     HeaderComponent, 
     AsideCuentaComponent,
-    TranslatePipe
+    TranslatePipe,
+    ModalCrearDireccionComponent
   ],
     styleUrls: ['./direcciones.component.scss']
 })
 export class DireccionesComponent implements OnInit {
+
+  @ViewChild('direccionEditModal') direccionModal!: any; // O el tipo de tu componente si lo tienes a mano
+  
 
 public url:any;
   public paises!:Pais;
@@ -109,7 +114,15 @@ public url:any;
   }
 
 
-
+despertarMapaHijo() {
+  // 🧠 Esperamos 400ms a que el off-canvas de Bootstrap termine de abrirse en la pantalla
+  setTimeout(() => {
+    if (this.direccionModal && typeof this.direccionModal.inicializarMapa === 'function') {
+      console.log('🗺️ Comunicando con el componente hijo: Despertando mapa...');
+      this.direccionModal.inicializarMapa(); 
+    }
+  }, 400);
+}
 
 
 

@@ -89,8 +89,7 @@ export class HomeComponent {
 
     // console.log(`📡 Buscando tienda en la API con el slug: ${nombreTiendaReal}`);
 
-    // 4. Invocamos tu servicio de tiendas original pasándole el parámetro plano en minúsculas
-    // URL resultante: https://back-ecomm-mall.onrender.com/api/tiendas/by_nombre/nombre/pizzeria
+    // 4.  servicio de tiendas original pasándole el parámetro plano en minúsculas
     this.tiendaSubscription = this.tiendasService.getTiendaByNameCached(nombreTiendaReal).subscribe({
       next: (tienda: any) => {
         this.tiendaSelected = tienda;

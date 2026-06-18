@@ -53,6 +53,7 @@ export class ReviewOrderComponent implements OnInit, OnDestroy {
   public whatsapp!: string;
 
   pedidoGuardado = false;
+  pedidoaProcesar!:string;
   // Variables del mapa
   public direccion: any;
   map: any; // Tu variable global para almacenar la instancia del mapa
@@ -133,7 +134,7 @@ export class ReviewOrderComponent implements OnInit, OnDestroy {
     this.tiendaService.selectedTiendaObservable$.subscribe(tienda => {
       if (tienda) {
         this.tiendaSelected = tienda;
-        this.tienda_moneda = this.tiendaSelected.moneda
+        this.tienda_moneda = this.tiendaSelected.moneda;
       }
     });
   }
@@ -271,72 +272,122 @@ export class ReviewOrderComponent implements OnInit, OnDestroy {
     this.pasoActual = 2;
   }
 
-  procesarClienteExpress() {
-    if (this.expressForm.invalid) return;
+ procesarClienteExpress() {
+  if (this.expressForm.invalid) return;
 
-    // 1. Extraemos el ID de la tienda actual (puedes jalarlo de tu servicio de tiendas o ruta)
-    const localId = this.tiendaSelected._id || '';
+  const localId = this.tiendaSelected._id || '';
 
-    // 2. Estructuramos el payload JSON plano con los nombres exactos que espera tu backend
-    const payloadExpress = {
-      first_name: this.expressForm.value.first_name,
-      telefono: this.expressForm.value.telefono,
-      local: localId
-    };
+  const payloadExpress = {
+    first_name: this.expressForm.value.first_name,
+    telefono: this.expressForm.value.telefono,
+    local: localId
+  };
 
-    // 1. Corres tu petición HTTP a Node.js para registrar al cliente de forma invisible (crearClienteExpress)
-    this.usuarioService.crearClienteExpress(payloadExpress).subscribe((resp: any) => {
-
-      this.toastr.success('Gracias por Registrate');
-      // 2. Al recibir la respuesta exitosa (y guardar el JWT/ID del usuario):
+  // 1. Registramos al cliente express en segundo plano de forma invisible
+  this.usuarioService.crearClienteExpress(payloadExpress).subscribe({
+    next: (resp: any) => {
+      this.toastr.success('Identificado correctamente', '¡Excelente!');
+      
       const uidDirecto = resp.uid || resp.usuario?._id || resp.usuario?.uid || resp.id;
 
-      this.guardarPedido(uidDirecto);
-      // SALVAVIDAS: Solo borramos el carrito si la URL de WhatsApp se calculó con éxito
-      if (this.urlWhatsApp && this.urlWhatsApp !== '') {
-        localStorage.removeItem('bandejaItems');
-        this.carritoService.clearCart();
-      }
+      // 🧠 EVALUAMOS EL DETECTOR DE FLUJO INTERNACIONAL
+      if (this.tiendaSelected.tipoFlujo === 'POS_DIRECTO') {
+        
+        // =========================================================================
+        // 🇺🇸 CARRIL A: MODO POS DIRECTO (Internacional / Autónomo)
+        // =========================================================================
+        console.log('📦 Checkout POS activado. Mudando el flujo al componente Pay.');
+          this.guardarPedido(uidDirecto);
+       
+        return;
 
-    }, (err) => {
-      this.toastr.error('Error', err.error.msg,);
-    })
-  }
+      } else {
+        // =========================================================================
+        // 🇻🇪 CARRIL B: MODO WHATSAPP (Híbrido tradicional de Venezuela)
+        // =========================================================================
+        // Sigue tu flujo de siempre: guarda el pedido directo en Mongo y abre WhatsApp
+        this.guardarPedido(uidDirecto);
+        // SALVAVIDAS: Solo borramos el carrito si la URL de WhatsApp se calculó con éxito
+        if (this.urlWhatsApp && this.urlWhatsApp !== '') {
+          localStorage.removeItem('bandejaItems');
+          this.carritoService.clearCart();
+        }
+      }
+    },
+    error: (err) => {
+      this.toastr.error('Error', err.error.msg);
+    }
+  });
+}
+
 
   // Recibimos el userId directamente para asegurar que no viaje como undefined
-  guardarPedido(userId?: string) {
-    this.pedidoGuardado = false;
+  // Recibimos el userId directamente para asegurar que no viaje como undefined
+guardarPedido(userId?: string) {
+  this.pedidoGuardado = false;
 
-    // Prioridad 1: ID directo del backend. Prioridad 2: LocalStorage.
-    const localStorageData = this.usuarioService.getLocalStorage();
-    const uid = userId || localStorageData?.uid;
+  // Prioridad 1: ID directo del backend. Prioridad 2: LocalStorage.
+  const localStorageData = this.usuarioService.getLocalStorage();
+  const uid = userId || localStorageData?.uid;
 
-    // Si sigue vacío, lanzamos la alerta para diagnosticarlo
-    if (!uid) {
-      this.toastr.error('Error', 'No se encontró el identificador del usuario. Intente de nuevo.');
-      console.error('Estructura de localStorage actual:', localStorageData);
-      return;
-    }
-
-    const data = {
-      user: uid, // Aquí ya viaja seguro el ID string
-      tienda: this.tiendaSelected._id,
-      pedidoList: this.bandejaList,
-      status: 'PENDING'
-    };
-
-    this.pedidoService.create(data).subscribe({
-      next: (resp: any) => {
-        this.pedidoGuardado = true;
-        this.toastr.success('¡Éxito!', 'Pedido Agregado');
-        this.actualizarUrlWhatsApp();
-
-      },
-      error: (err) => {
-        this.toastr.error('Error al guardar', err.error.msg || 'No se pudo registrar el pedido');
-      }
-    });
+  // Si sigue vacío, lanzamos la alerta para diagnosticarlo
+  if (!uid) {
+    this.toastr.error('Error', 'No se encontró el identificador del usuario. Intente de nuevo.');
+    console.error('Estructura de localStorage actual:', localStorageData);
+    return;
   }
+
+  // 🧠 EVOLUCIÓN INTERNACIONAL: Forzamos el estatus 'NEW' para tu ERP si es POS_DIRECTO, si no mantiene 'PENDING'
+  const estatusSeguro = this.tiendaSelected.tipoFlujo === 'POS_DIRECTO' ? 'NEW' : 'PENDING';
+
+  const data = {
+    user: uid, 
+    tienda: this.tiendaSelected._id,
+    pedidoList: this.bandejaList,
+    status: estatusSeguro,
+    
+    // 🛵 INYECCIÓN DE DELIVERY COMPATIBLE: Captura los datos del formulario express
+    delivery: this.expressForm.value.tipoEntrega === 'delivery',
+  };
+
+  this.pedidoService.create(data).subscribe({
+    next: (resp: any) => {
+      this.pedidoGuardado = true;
+      this.pedidoaProcesar = resp.pedido._id;
+      console.log('pedido guardado',resp)
+      this.toastr.success('¡Éxito!', 'Pedido Agregado');
+
+            // 🧠 EVALUAMOS EL SELECTOR DE CONFIGURACIÓN DEL LOCAL
+      if (this.tiendaSelected.tipoFlujo === 'POS_DIRECTO') {
+        
+        // =========================================================================
+        // 🇺🇸 CARRIL A: MODO POS DIRECTO (Internacional / Autónomo)
+        // =========================================================================
+        console.log('🛒 Pedido procesado. Redireccionando a la pasarela de pago.');
+        
+        // 🧹 Limpieza inmediata del carrito local
+        localStorage.removeItem('bandejaItems');
+        this.carritoService.clearCart();
+
+        // 🔀 REDIRECCIÓN CRÍTICA: Lo mandas directo al componente de pago usando el ID de la respuesta
+      
+        this.router.navigate(['/pay', this.pedidoaProcesar]);
+
+      } else {
+        // =========================================================================
+        // 🇻🇪 CARRIL B: MODO WHATSAPP (Híbrido tradicional de Venezuela)
+        // =========================================================================
+        this.actualizarUrlWhatsApp();
+      }
+
+
+    },
+    error: (err) => {
+      this.toastr.error('Error al guardar', err.error.msg || 'No se pudo registrar el pedido');
+    }
+  });
+}
+
 
 
   // Generate WhatsApp message with order items
@@ -380,6 +431,7 @@ export class ReviewOrderComponent implements OnInit, OnDestroy {
     message += `*${isEn ? 'Please confirm availability and payment method' : 'Por favor confirmar disponibilidad y método de pago'}:*`;
 
     return encodeURIComponent(message);
+    
   }
 
   // Llama a esta función dentro de tu ngOnInit() o cada vez que cambie el carrito/formulario

@@ -1,8 +1,7 @@
 <app-header></app-header>
 
 <main class="container">
-  <div class="title-top">
-  </div>
+  <div class="title-top"></div>
   <app-loading *ngIf="loading"></app-loading>
   <div class="order-list" *ngIf="!loading">
     <div class="order-list-bar"></div>
@@ -11,7 +10,6 @@
         <h3>{{'Pagar'|translate}}</h3>
       </div>
       <div class="clear"></div>
-
       <!-- listado -->
       <div class=" overf">
         <div class="list-item" *ngFor="let item of pedidos; let i = index">
@@ -31,7 +29,6 @@
             </div>
           </div>
         </div>
-
       </div>
       <!-- Total a Pagar -->
       <div class="info_pago total text-success mb-3">
@@ -39,52 +36,11 @@
         <div class="info_pagod_data3 "><span>{{totalAmount |number:'1.2-2'| currency:tienda_moneda}}</span> </div>
       </div>
 
-      <!-- Delivery -->
-      <!-- <div class="col-12" *ngIf="identity ">
-        <form [formGroup]="formDelivery">
-          <div class="card p-3" id="card-pay">
-            <label class="form-label">Desea delivery?</label>
-            <select id="paymentMethod" class="form-control" (change)="onDeliveryMethodChange($event)"
-              [(ngModel)]="selectedDelivery" formControlName="delivery">
-              <option value=" ">Seleccione</option>
-              <option value="Delivery">Si</option>
-              <option value="Pickup">Voy por la tienda</option>
-            </select>
-            <div *ngIf="habilitacionAddresLocal" class="mt-1 mb-1 ">
-              <div class="card mb-3">
-                <div class="card-body alert-warning ">
-                  <p>Claro! Aqui tienes nuestra ubicacion y telefonos:</p>
-                  <div *ngIf="tiendaSelected.direccion" [innerHtml]="tiendaSelected?.direccion " class="directinonfo">
-                  </div>
-                  <p *ngIf="tiendaSelected.telefono">telefono:&nbsp;{{tiendaSelected.telefono}}</p>
-                </div>
-              </div>
-            </div>
-            <div *ngIf="habilitacionFormDelivery" class="mt-1 mb-1 ">
-              <form [formGroup]="formDelivery">
-                <div class="mb-3 mt-2 col-12">
-                  <label class="form-label">Dirección de Entrega</label>
-                  <select formControlName="deliveryAddres" class="form-control" (change)="onChangeDireccion($event)"
-                    name="deliveryAddres" id="deliveryAddres">
-                    <option value=" ">Seleccione Dirección</option>
-                    <option [value]="direccion._id" *ngFor="let direccion of direcciones">
-                      {{direccion.direccion }}
-                    </option>
-                  </select>
-                </div>
-              </form>
-            </div>
-          </div>
-        </form>
-      </div> -->
-      <!-- Fila única de montos (Estilo la imagen enviada) -->
       <!-- Fila única de montos (Estilo la imagen enviada) -->
       <div class="row g-3 mb-4">
-
-
-
         <!-- Columna 2: Equivalente en Bolívares + Tasa del día -->
-        <div class="col-12 col-sm-6" *ngIf="tienda_moneda === 'USD' || tienda_moneda === 'EUR'">
+        <!-- 🧠 Columna 2: Solo se renderiza si la tienda tiene activo el flag 'mostrarTasas' -->
+        <div class="col-12 col-sm-6" *ngIf="tiendaSelected?.mostrarTasas && (tienda_moneda === 'USD' || tienda_moneda === 'EUR')">
           <div class="d-flex justify-content-between align-items-center mb-2">
             <label class="form-label fw-semibold text-secondary small text-uppercase tracking-wider mb-0">
               {{'Equivalente'|translate}} Bs.
@@ -112,11 +68,57 @@
           </div>
         </div>
 
+
       </div>
 
+      <!-- Delivery -->
+      <div class="col-12" *ngIf="tiendaSelected.tipoFlujo ==='POS_DIRECTO' ">
+        <form [formGroup]="formDelivery">
+          <div class="card p-3" id="card-pay">
+            <label class="form-label">Desea delivery?</label>
+            <select id="paymentMethod" class="form-control" (change)="onDeliveryMethodChange($event)"
+              [(ngModel)]="selectedDelivery" formControlName="delivery">
+              <option value=" ">Seleccione</option>
+              <option value="Delivery">Si</option>
+              <option value="Pickup">Voy por la tienda</option>
+            </select>
+            
+            <div *ngIf="habilitacionAddresLocal" class="mt-1 mb-1 ">
+              <div class="card mb-3">
+                <div class="card-body alert-warning ">
+                  <p>Claro! Aqui tienes nuestra ubicacion y telefonos:</p>
+                  <div *ngIf="tiendaSelected.direccion" [innerHtml]="tiendaSelected?.direccion " class="directinonfo">
+                  </div>
+                  <p *ngIf="tiendaSelected.telefono">telefono:&nbsp;{{tiendaSelected.telefono}}</p>
+                </div>
+              </div>
+            </div>
+            <div *ngIf="habilitacionFormDelivery" class="mt-1 mb-1 ">
+              <form [formGroup]="formDelivery">
+                <div class="mb-3 mt-2 col-12">
+                  <label class="form-label">Dirección de Entrega</label>
+                  <select formControlName="deliveryAddres" class="form-control" (change)="onChangeDireccion($event)"
+                    name="deliveryAddres" id="deliveryAddres">
+                    <option value=" ">Seleccione Dirección</option>
+                    <option [value]="direccion._id" *ngFor="let direccion of direcciones">
+                      {{direccion.direccion }}
+                    </option>
+                  </select>
+                </div>
+              </form>
+              <div class="botns" >
+                <button class="btn btn-primary rounded-rounded" 
+                      data-bs-target="#add_direccion"
+                      data-bs-toggle="offcanvas"
+                      (click)="despertarMapaHijo()">
+                  {{'Crear Direccion' | translate}}
+              </button>
 
-
-
+            </div> 
+            </div>
+          </div>
+        </form>
+      </div>
       <!-- Metodos de Pago -->
       <div class="col-12">
         <div class="card border-0 shadow-sm rounded-3 overflow-hidden" id="card-pay">
@@ -209,53 +211,18 @@
                   </div>
                 </div>
 
-                <!-- Formularios Dólares / Euros / Bolívares -->
-                <div class="row g-3 mb-3"
-                  *ngIf="paymentSelected && (paymentSelected.tipo === 'Transferencia Dólares' || paymentSelected.tipo === 'Transferencia Bolivares' || paymentSelected.tipo === 'Transferencia Euro')">
-
-
-                  <!-- Numero de referencia -->
+                <div class="row g-3 mb-3" *ngIf="paymentSelected">
+                  
+                  <!-- Número de referencia genérico -->
                   <div class="col-12 col-sm-6">
-                    <label for="referencia" class="form-label fw-medium text-secondary">{{'Núm. de Referencia'|translate}}</label>
+                    <label for="referencia" class="form-label fw-medium text-secondary">
+                      {{ (paymentSelected.tipo === 'zelle') ? ('Núm. de Referencia / Nombre Titular'|translate) : ('Núm. de Referencia'|translate) }}
+                    </label>
                     <input type="text" formControlName="referencia" class="form-control rounded-3"
                       [ngClass]="{'is-invalid': formTransferencia.get('referencia')?.touched && formTransferencia.get('referencia')?.invalid}"
-                      name="referencia" id="referencia" placeholder="Ej: 123456">
-                    <div
-                      *ngIf="formTransferencia.get('referencia')?.touched && formTransferencia.get('referencia')?.invalid"
-                      class="invalid-feedback">
-                      {{'El número de referencia es requerido (mínimo 4 caracteres)'|translate}}.
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Formularios Pago Móvil -->
-                <div class="row g-3 mb-3" *ngIf="paymentSelected && paymentSelected.tipo === 'pagomovil'">
-                  <!-- Numero de referencia -->
-                  <div class="col-12 col-sm-6 order-sm-2">
-                    <label for="referencia_pm" class="form-label fw-medium text-secondary">{{'Núm. de Referencia'|translate}}</label>
-                    <input type="text" formControlName="referencia" class="form-control rounded-3"
-                      [ngClass]="{'is-invalid': formTransferencia.get('referencia')?.touched && formTransferencia.get('referencia')?.invalid}"
-                      name="referencia" id="referencia_pm" placeholder="Ej: 1234">
-                    <div
-                      *ngIf="formTransferencia.get('referencia')?.touched && formTransferencia.get('referencia')?.invalid"
-                      class="invalid-feedback">
-                      {{'El número de referencia es requerido (mínimo 4 caracteres)'|translate}}.
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Formularios Zelle -->
-                <div class="row g-3 mb-3" *ngIf="paymentSelected && paymentSelected.tipo === 'zelle'">
-                  <!-- Numero de referencia -->
-                  <div class="col-12 col-sm-6">
-                    <label for="referencia_z" class="form-label fw-medium text-secondary">
-                      {{'Núm. de Referencia / Nombre Titular'|translate}}</label>
-                    <input type="text" formControlName="referencia" class="form-control rounded-3"
-                      [ngClass]="{'is-invalid': formTransferencia.get('referencia')?.touched && formTransferencia.get('referencia')?.invalid}"
-                      name="referencia" id="referencia_z" placeholder="Ej: Confirmación Zelle">
-                    <div
-                      *ngIf="formTransferencia.get('referencia')?.touched && formTransferencia.get('referencia')?.invalid"
-                      class="invalid-feedback">
+                      name="referencia" id="referencia" [placeholder]="paymentSelected.tipo === 'zelle' ? 'Ej: Confirmación Zelle' : 'Ej: 123456'">
+                    
+                    <div *ngIf="formTransferencia.get('referencia')?.touched && formTransferencia.get('referencia')?.invalid" class="invalid-feedback">
                       {{'El número de referencia es requerido (mínimo 4 caracteres)'|translate}}.
                     </div>
                   </div>
@@ -310,7 +277,6 @@
 
               </form>
             </div>
-
           </div>
         </div>
       </div>
@@ -325,6 +291,6 @@
       {{'Volver'|translate}}
     </button>
   </div>
-
-
 </main>
+
+<app-modal-crear-direccion (refreshPostList)="getDireccionbyUser()" #direccionEditModal></app-modal-crear-direccion>

@@ -12,6 +12,7 @@
                     {{product.precio_antes|number:'1.2-2'| currency:tienda_moneda}}</div>
                 <div class="product-price">{{product.precio_ahora|number:'1.2-2'| currency:tienda_moneda}}</div>
                 <app-ratingStar [product]="product"></app-ratingStar>
+                <p>Disponible: {{product.stock}}</p>
             </div>
             <div class="botns">
                 <!-- 2. Quitamos data-bs del botón del ojo y agregamos (click) -->

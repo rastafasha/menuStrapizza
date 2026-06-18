@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
@@ -30,25 +30,32 @@ import { PagosFilterPipe } from '../../pipes/pagos-filter.pipe';
 import { AuthService } from '../../services/auth.service';
 import { LoadingComponent } from '../../shared/loading/loading.component';
 import { TranslatePipe } from '@ngx-translate/core';
+import { ModalCrearDireccionComponent } from '../../components/modal-crear-direccion/modal-crear-direccion.component';
 declare var $: any;
+
+declare var bootstrap: any;
 
 @Component({
   selector: 'app-pay',
   imports: [
-    HeaderComponent, 
+    HeaderComponent,
     CommonModule, RouterModule,
-    ReactiveFormsModule, 
+    ReactiveFormsModule,
     FormsModule,
     ImagenPipe,
     NgxPayPalModule,
-    PagosFilterPipe, 
+    PagosFilterPipe,
     LoadingComponent,
-    TranslatePipe
+    TranslatePipe,
+    ModalCrearDireccionComponent
   ],
   templateUrl: './pay.component.html',
   styleUrl: './pay.component.scss'
 })
 export class PayComponent {
+
+  @ViewChild('direccionEditModal') direccionModal!: any; // O el tipo de tu componente si lo tienes a mano
+
 
   bandejaList: Producto[] = [];
   fechaHoy: string = new Date().toISOString().split('T')[0];
@@ -91,9 +98,7 @@ export class PayComponent {
 
   public payPalConfig?: IPayPalConfig;
   public payPalCardConfig?: IPayPalConfig;
-  cartItems: any[] = [];
-
-  pedidoGuardado = false;
+  cartItems!: any[];
 
   public url!: string;
   public postales: any;
@@ -122,6 +127,7 @@ export class PayComponent {
   direccionSelected!: Direccion;
   efectivo: string = 'efectivo';
   paypalinfo?: Paypal;
+
 
 
   paymentMethods: PaymentMethod[] = []; //array metodos de pago para transferencia (dolares, bolivares, movil)
@@ -182,30 +188,128 @@ export class PayComponent {
 
   }
   ngOnInit() {
-
+    // 1. Rescatamos la identidad del usuario (Tradicional o Express)
     this.identity = this.authService.getLocalStorage() as Usuario;
-    this.userId = this.identity.uid;
-    this.escucharTiendaActiva();
-    this.getDireccionbyUser();
-    this._activatedRoute.params.subscribe(({ id }) => this.loadPedido(id));
+    this.userId = this.identity?.uid || localStorage.getItem('uid_checkout_temporal') || '';
+
+    // 2. OBLIGATORIO: Levantamos la tienda primero (Sincrónica/Local)
+    this.asegurarTiendaActiva();
+
+    // 3. Traemos las direcciones del usuario
+    if (this.userId) {
+      this.getDireccionbyUser();
+    }
+
+    // 4. Ahora que la tienda existe con seguridad en memoria, evaluamos el flujo de la ruta
+    this._activatedRoute.params.subscribe(({ id }) => {
+      if (this.tiendaSelected && this.tiendaSelected.tipoFlujo === 'POS_DIRECTO') {
+        console.log('✅ Modo POS_DIRECTO validado con éxito. Armando flujo local.');
+        this.loadPedido(id); // O la función híbrida que adaptamos
+      } else {
+        console.log('🇻🇪 Modo Tradicional validado. Buscando pedido en BD.');
+        this.loadPedido(id);
+      }
+    });
+
+
   }
 
 
+  asegurarTiendaActiva() {
+    // Primero intentamos la vía tradicional (tu método de escucha actual)
+    this.escucharTiendaActiva();
+
+    // Si tras escuchar, el objeto de la tienda en memoria está vacío (por un F5), lo rescatamos del localStorage
+    if (!this.tiendaSelected || !this.tiendaSelected._id) {
+      const tiendaGuardada = localStorage.getItem('tienda_checkout_temporal');
+      if (tiendaGuardada) {
+        this.tiendaSelected = JSON.parse(tiendaGuardada);
+        console.log('🏪 Tienda restaurada con éxito desde persistencia:', this.tiendaSelected);
+      }
+    }
+  }
+
+loadPedido(id: string) {
+  this.loading = true;
+
+  // 🚀 LOGICA UNIFICADA: Tanto WhatsApp como POS_DIRECTO consultan el pedido real en la BD
+  this.pedidosService.getById(id).subscribe({
+    next: (resp: any) => {
+      // Guardamos el objeto completo del pedido que devolvió MongoDB
+      this.pedido = resp;
+      console.log('📦 Pedido real cargado en la vista de pagos:', this.pedido);
+      
+      // Extraemos el listado de platos de forma segura
+      this.pedidos = resp.pedidoList || [];
+
+      // Inicializamos acumuladores de la vista
+      this.subtotal = 0;
+      this.data_detalle = [];
+
+      // Procesamos los totales financieros de forma exacta
+      this.totalAmount = this.pedidos.reduce((sum, item) =>
+        sum + (item.precio_ahora * item.cantidad), 0
+      );
+
+      this.pedidos.forEach(element => {
+        this.subtotal = Math.round(this.subtotal + (element.precio_ahora * element.cantidad));
+        this.data_detalle.push({
+          producto: element,
+          cantidad: element.cantidad,
+          precio: Math.round(element.precio_ahora),
+          color: element.color,
+          selector: element.nombre_selector
+        });
+      });
+      
+      this.loading = false;
+    },
+    error: (err) => {
+      console.error('Error cargando el pedido desde el servidor:', err);
+      this.toastr.error('No se pudo recuperar el resumen de la orden.');
+      this.loading = false;
+    }
+  });
+}
+
+
+
+
+
   escucharTiendaActiva() {
+    // 1. Nos suscribimos al observable de la forma tradicional
     this.tiendaService.selectedTiendaObservable$.subscribe(tienda => {
       if (tienda) {
-        this.tiendaSelected = tienda;
-        this.tienda_moneda = this.tiendaSelected.moneda;
-        this.getTiposdePagoByLocal();
-        this.getPaypalByTienda();
-
-        if (this.tienda_moneda === 'USD') {
-          this.getTasadelDia();
-        } else if (this.tienda_moneda === 'EUR') {
-          this.getTasaeuro();
-        }
+        this.inicializarDatosTienda(tienda);
       }
     });
+
+    // 2. 🧠 RESPALDO ANTIFALLOS (F5 / POS_DIRECTO):
+    // Si el observable no ha emitido nada o la variable sigue vacía, la rescatamos del localStorage
+    if (!this.tiendaSelected || !this.tiendaSelected._id) {
+      const tiendaGuardada = localStorage.getItem('tienda_checkout_temporal');
+      if (tiendaGuardada) {
+        const tiendaParseada = JSON.parse(tiendaGuardada);
+        console.log('🏪 Tienda rescatada del localStorage para inicializar pagos:', tiendaParseada);
+        this.inicializarDatosTienda(tiendaParseada);
+      }
+    }
+  }
+
+  inicializarDatosTienda(tienda: any) {
+    this.tiendaSelected = tienda;
+    this.tienda_moneda = this.tiendaSelected.moneda;
+
+    // Cargamos los métodos de pago y configuraciones de la tienda pasándole el ID
+    this.getTiposdePagoByLocal();
+    this.getPaypalByTienda();
+
+    // Evaluamos las tasas de cambio según la moneda internacional configurada
+    if (this.tienda_moneda === 'USD') {
+      this.getTasadelDia();
+    } else if (this.tienda_moneda === 'EUR') {
+      this.getTasaeuro();
+    }
   }
 
   getTasadelDia() {
@@ -242,28 +346,6 @@ export class PayComponent {
     });
   }
 
-  loadPedido(id: string) {
-    this.loading = true;
-    this.pedidosService.getById(id).subscribe((resp: any) => {
-      this.pedido = resp;
-      this.pedidos = resp.pedidoList;
-      this.totalAmount = this.pedidos.reduce((sum, item) =>
-        sum + item.precio_ahora * item.cantidad, 0
-      );
-
-      this.pedidos.forEach(element => {
-        this.subtotal = Math.round(this.subtotal + (element.precio_ahora * element.cantidad));
-        this.data_detalle.push({
-          producto: element,
-          cantidad: element.cantidad,
-          precio: Math.round(element.precio_ahora),
-          color: element.color,
-          selector: element.nombre_selector
-        });
-      })
-      this.loading = false;
-    })
-  }
 
 
   total() {
@@ -324,59 +406,105 @@ export class PayComponent {
   }
 
   sendFormTransfer() {
+    // 1. Validaciones del formulario de pago (banco, referencia, etc.)
     if (!this.formTransferencia.valid) {
-      //mostramos las alertas de los campos requeridos
-      this.formTransferencia.markAllAsTouched(); // Esto activa las validaciones visuales
-      return
+      this.formTransferencia.markAllAsTouched();
+      return;
     }
-    if (this.formTransferencia.valid) {
 
+    this.loading = true;
 
-      this.loading = true;
-      const solicitudId = this.pedido._id;
-      // 💡 SOLUCIÓN SUBIDA DE IMAGEN: Usamos el Idel cliente logueado temporalmente para asegurar un archivo único,
-      // o el ID de la solicitud si tu fileUploadService está ruteado estrictamente de esa manera.
-      this.fileUploadService.actualizarFoto(this.selectedFile!, 'transferencias', solicitudId)
-        .then(imgUrl => {
+    
+    // Tu flujo de siempre: Usa directamente this.pedido._id porque ya existe con total seguridad
+    this.fileUploadService.actualizarFoto(this.selectedFile!, 'transferencias', this.pedido._id)
+      .then(imgUrl => {
 
-          // CONSTRUCCIÓN DEL PAYLOAD FIEL A TU ESQUEMA REAL DE MONGO
-          const data = {
-            local: this.tiendaSelected._id,
-            user: this.identity.uid,
-            name_person: this.identity.first_name,
-            phone: this.identity.telefono,
-            amount: this.totalAmount,
-            referencia: this.formTransferencia.value.referencia,
-            bankName: this.paymentSelected.bankName,
-            pedido: this.pedido._id,
-            // Condicional dinámica para seleccionar la tasa correcta usando tus Signals
-            tasa: this.tienda_moneda === 'USD'
-              ? (this.tasadollar() || 0)
-              : (this.tienda_moneda === 'EUR' ? (this.tasaeuro() || 0) : 1),
-            img: imgUrl,
-            ...this.formTransferencia.value
+        // Tu payload original fiel a tu esquema usando tu variable de siempre
+        const data = {
+          local: this.tiendaSelected._id,
+          user: this.identity?.uid,
+          name_person: this.identity?.first_name || 'Cliente',
+          phone: this.identity?.telefono || 'N/A',
+          amount: this.totalAmount,
+          referencia: this.formTransferencia.value.referencia,
+          bankName: this.paymentSelected.bankName,
+          pedido: this.pedido._id, // 🚨 Tu campo original directo de memoria
+          tasa: this.tienda_moneda === 'USD'
+            ? (this.tasadollar() || 0)
+            : (this.tienda_moneda === 'EUR' ? (this.tasaeuro() || 0) : 1),
+          img: imgUrl,
+          ...this.formTransferencia.value
+        };
+
+        // Guardamos la transferencia en tu servicio
+        this._trasferencias.createTransfer(data).subscribe({
+          next: () => {
+            this.toastr.success('¡Transferencia registrada con éxito!');
+            this.onItemRemoved();
+            this._router.navigate(['/mis-pagos']);
+            this.loading = false;
+          },
+          error: (err) => {
+            this.loading = false;
+            this.toastr.error('Error al registrar la transacción en el servidor');
           }
-
-          this._trasferencias.createTransfer(data).subscribe({
-            next: () => {
-              this.toastr.success('¡Transferencia registrada con exito');
-              this.onItemRemoved();
-              this._router.navigate(['/mis-pagos']);
-            },
-            error: (err) => {
-              this.loading = false;
-              this.toastr.error('Error al registrar la transacción en el servidor');
-            }
-          });
-        })
-        .catch(err => {
-          this.loading = false;
-          this.toastr.error('Error al registrar la transferencia');
         });
-
-
-    }
+      })
+      .catch(err => {
+        this.loading = false;
+        this.toastr.error('Error al subir el comprobante de transferencia');
+      });
   }
+
+
+
+  // 📦 FUNCIÓN REUTILIZABLE PARA LA SUBIDA DE FOTO Y REGISTRO DE TRANSFERENCIA
+  procesarSubidaYRegistroPago(solicitudId: string) {
+    this.fileUploadService.actualizarFoto(this.selectedFile!, 'transferencias', solicitudId)
+      .then(imgUrl => {
+
+        // CONSTRUCCIÓN DEL PAYLOAD FIEL A TU ESQUEMA REAL DE MONGO
+        const data = {
+          local: this.tiendaSelected._id,
+          user: this.userId, // Usamos la variable unificada (identity.uid o temporal)
+          name_person: this.identity?.first_name || 'Cliente Express',
+          phone: this.identity?.telefono || 'N/A',
+          amount: this.totalAmount,
+          referencia: this.formTransferencia.value.referencia,
+          bankName: this.paymentSelected.bankName,
+          pedido: solicitudId, // 🚨 Vinculamos de forma exacta al ID real del pedido
+          tasa: this.tienda_moneda === 'USD'
+            ? (this.tasadollar() || 0)
+            : (this.tienda_moneda === 'EUR' ? (this.tasaeuro() || 0) : 1),
+          img: imgUrl,
+          ...this.formTransferencia.value
+        };
+
+        this._trasferencias.createTransfer(data).subscribe({
+          next: () => {
+            this.toastr.success('¡Transferencia registrada con éxito!');
+
+            // Limpieza de persistencias locales si es POS_DIRECTO
+            if (this.tiendaSelected?.tipoFlujo === 'POS_DIRECTO') {
+              localStorage.removeItem('uid_checkout_temporal');
+              localStorage.removeItem('bandejaItems');
+            }
+
+            this.onItemRemoved();
+            this._router.navigate(['/mis-pagos']);
+          },
+          error: (err) => {
+            this.loading = false;
+            this.toastr.error('Error al registrar la transacción en el servidor');
+          }
+        });
+      })
+      .catch(err => {
+        this.loading = false;
+        this.toastr.error('Error al registrar la transferencia');
+      });
+  }
+
 
   sendFormEfectivo() {
 
@@ -470,31 +598,6 @@ export class PayComponent {
 
 
 
-  carrito_real_time() {
-    // this.socket.on('new-carrito', function (data:any) {
-    //   this.subtotal = 0;
-
-    //   this._carritoService.preview_carrito(this.clienteSeleccionado.uid).subscribe(
-    //     response =>{
-    //       this.carrito = response;
-
-    //       this.carrito.forEach(element => {
-    //         this.subtotal = Math.round(this.subtotal + (element.precio * element.cantidad));
-    //       });
-
-    //     },
-    //     error=>{
-    //       console.log(error);
-
-    //     }
-    //   );
-
-    // }.bind(this));
-  }
-
-
-
-
   // Método que se llama cuando cambia el select
   onDeliveryMethodChange(event: any) {
     this.selectedDelivery = event.target.value;
@@ -531,6 +634,16 @@ export class PayComponent {
     })
   }
 
+ despertarMapaHijo() {
+  // 🧠 Esperamos 400ms a que el off-canvas de Bootstrap termine de abrirse en la pantalla
+  setTimeout(() => {
+    if (this.direccionModal && typeof this.direccionModal.inicializarMapa === 'function') {
+      console.log('🗺️ Comunicando con el componente hijo: Despertando mapa...');
+      this.direccionModal.inicializarMapa(); 
+    }
+  }, 400);
+}
+
   // metodo para el cambio del select 'tipo de transferencia'
   onChangeDireccion(event: Event) {
     const target = event.target as HTMLSelectElement; //obtengo el valor
@@ -552,8 +665,15 @@ export class PayComponent {
 
 
   verify_dataComplete(total_pagado: number) {
-    if (this.direccionSelected) {
+    // 1. Capturamos la dirección del select actual
+    const direccionSeleccionadaId = this.formDelivery.get('deliveryAddres')?.value;
+
+    if (direccionSeleccionadaId && direccionSeleccionadaId.trim() !== '') {
       this.msm_error = '';
+
+      // Buscamos el objeto completo de la dirección en tu array para llenar el payload viejo
+      const direccionCompleta = this.direcciones.find(d => d._id === direccionSeleccionadaId);
+
       if (this.data_cupon) {
         if (this.data_cupon.categoria) {
           this.info_cupon_string = this.data_cupon.descuento + '% de descuento en ' + this.data_cupon.categoria.nombre;
@@ -563,86 +683,144 @@ export class PayComponent {
       }
 
       var fecha = new Date();
-
       var months = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Deciembre"];
-      fecha.setDate(fecha.getDate() + parseInt(this.medio_postal.dias));
+
+      // Blindamos los días postales por si no existen en esta tienda
+      const diasEnvio = this.medio_postal?.dias ? parseInt(this.medio_postal.dias) : 0;
+      fecha.setDate(fecha.getDate() + diasEnvio);
       this.date_string = fecha.getDate() + ' de ' + months[fecha.getMonth()] + ' del ' + fecha.getFullYear();
 
-
+      // CONSTRUCCIÓN DEL PAYLOAD HÍBRIDO (Sirve para Express y Tradicional)
       this.data_venta = {
-        user: this.identity.uid,
+        user: this.userId, // 🚨 AJUSTE: Usa el ID unificado (Express o tradicional)
         local: this.tiendaSelected._id,
         total_pagado: total_pagado,
-        codigo_cupon: this.cupon,
-        info_cupon: this.info_cupon_string,
+        codigo_cupon: this.cupon || '',
+        info_cupon: this.info_cupon_string || '',
         idtransaccion: null,
-        metodo_pago: this.selectedMethod,
-        // metodo_pago : 'Paypal',
+        metodo_pago: this.selectedMethod || 'Transferencia',
 
-        tipo_envio: this.selectedDelivery,
+        tipo_envio: this.selectedDelivery || 'SI',
         precio_envio: "0",
-        tiempo_estimado: this.fechaHoy,
+        tiempo_estimado: this.fechaHoy || new Date(),
 
-        direccion: this.data_direccion.direccion,
-        destinatario: this.data_direccion.nombres_completos,
-        detalles: this.data_detalle,
-        referencia: this.data_direccion.referencia,
-        pais: this.data_direccion.pais,
-        ciudad: this.data_direccion.ciudad,
-        zip: this.data_direccion.zip,
+        // Mapeamos los datos extraídos del objeto de la dirección del select
+        direccion: direccionCompleta?.direccion || 'N/A',
+        destinatario: direccionCompleta?.nombres_completos || this.identity?.first_name || 'Cliente Express',
+        detalles: this.data_detalle, // 🍕 ¡Aquí van tus pizzas con sus precios!
+        referencia: direccionCompleta?.referencia || '',
+        pais: this.tiendaSelected?.pais || 'Venezuela',
+        ciudad: direccionCompleta?.ciudad || '',
+        zip: direccionCompleta?.zip || '',
       }
 
-      console.log(this.data_venta);
+      console.log('📦 Data Venta unificada lista para guardarse:', this.data_venta);
 
+      // Ejecutas tu guardado original
       this.saveVenta();
 
     } else {
-      this.msm_error = "Seleccione una dirección de envio.";
+      this.toastr.warning("Seleccione una dirección de envío.", "Requerido");
+      this.msm_error = "Seleccione una dirección de envío.";
     }
-
   }
+
 
   saveVenta() {
-    this._ventaService.registro(this.data_venta).subscribe(response => {
-      this.data_venta.detalles.forEach((element: { producto: { _id: any; }; cantidad: any; }) => {
-        console.log(element);
-        this._productoService.aumentar_ventas(element.producto._id).subscribe(
-          response => {
-          },
-          error => {
-            console.log(error);
+    this._ventaService.registro(this.data_venta).subscribe({
+      next: (response: any) => {
+        console.log('✅ Venta registrada con éxito en el backend:', response);
 
+        // 🚨 EXTRAEMOS EL ID REAL DE LA VENTA (Ajusta si tu backend lo devuelve en response._id o response.id)
+        const idVentaReal = response._id || response.data?._id || response.id;
+
+        // 1. Procesamos la actualización de estadísticas y stock en segundo plano
+        this.data_venta.detalles.forEach((element: { producto: { _id: any; }; cantidad: any; }) => {
+          this._productoService.aumentar_ventas(element.producto._id).subscribe({
+            error: (err) => console.error('Error al aumentar ventas:', err)
+          });
+
+          this._productoService.reducir_stock(element.producto._id, element.cantidad).subscribe({
+            next: () => {
+              // Solo limpiamos los carritos de la vista sin romper el estado actual
+              this.listar_carrito();
+            },
+            error: (err) => console.error('Error al reducir stock:', err)
+          });
+        });
+
+        // =========================================================================
+        // 🇺🇸 CONDICIONAL PARA EL CARRIL A: MODO POS DIRECTO (Internacional)
+        // =========================================================================
+        if (this.tiendaSelected?.tipoFlujo === 'POS_DIRECTO') {
+          console.log('📸 Subiendo el comprobante bancario para la venta:', idVentaReal);
+
+          // Llamamos directamente a la subida de tu foto usando el ID real que nos dio el backend
+          this.fileUploadService.actualizarFoto(this.selectedFile!, 'transferencias', idVentaReal)
+            .then(imgUrl => {
+
+              // Construimos el payload de la transferencia amarrado al ID real de la venta
+              const dataTransferencia = {
+                local: this.tiendaSelected._id,
+                user: this.userId,
+                name_person: this.identity?.first_name || 'Cliente Express',
+                phone: this.identity?.telefono || 'N/A',
+                amount: this.totalAmount,
+                referencia: this.formTransferencia.value.referencia,
+                bankName: this.paymentSelected.bankName,
+                pedido: idVentaReal, // 🚨 Vinculado al ObjectId limpio como String puro
+                tasa: this.tienda_moneda === 'USD'
+                  ? (this.tasadollar() || 0)
+                  : (this.tienda_moneda === 'EUR' ? (this.tasaeuro() || 0) : 1),
+                img: imgUrl,
+                ...this.formTransferencia.value
+              };
+
+              // Registramos la transferencia en tu base de datos
+              this._trasferencias.createTransfer(dataTransferencia).subscribe({
+                next: () => {
+                  this.toastr.success('¡Transferencia y orden registradas con éxito!');
+
+                  // Limpieza total de persistencias locales
+                  localStorage.removeItem('uid_checkout_temporal');
+                  localStorage.removeItem('bandejaItems');
+                  this.remove_carrito();
+
+                  this.onItemRemoved();
+                  this._router.navigate(['/mis-pagos']);
+                },
+                error: (err) => {
+                  this.toastr.error('Error al registrar el pago en el servidor');
+                }
+              });
+            })
+            .catch(err => {
+              console.error('Error subiendo comprobante:', err);
+              this.toastr.error('Error al subir la imagen del pago');
+            });
+
+        } else {
+          // =========================================================================
+          // 🇻🇪 CARRIL B: MODO WHATSAPP TRADICIONAL (Tu flujo de siempre)
+          // =========================================================================
+          this.remove_carrito();
+
+          if (this.tienda && this.tienda.telefono) {
+            const message = `Haz recibido una compra ${this.randomNum}, favor verifica y, procesala pronto !`;
+            const url = `https://wa.me/${this.tienda.telefono}?text=${encodeURIComponent(message)}`;
+            window.open(url, '_blank');
           }
-        );
-        this._productoService.reducir_stock(element.producto._id, element.cantidad).subscribe(
-          response => {
-            this.remove_carrito();
-            this.listar_carrito();
-            // this.socket.emit('save-carrito', {new:true});
-            // this.socket.emit('save-stock', {new:true});
-            // this._router.navigate(['/dashboard/ventas/modulo']);
 
-          },
-          error => {
-            console.log(error);
-
-          }
-        );
-
-
-      });
-
-      // Enviar mensaje de WhatsApp a la tienda
-      if (this.tienda && this.tienda.telefono) {
-        const message = `Haz recibido una compra ${this.randomNum}, favor verifica y, procesala pronto !`;
-        const url = `https://wa.me/${this.tienda.telefono}?text=${encodeURIComponent(message)}`;
-        window.open(url, '_blank');
+          this.actualizarPedido();
+        }
+      },
+      error: (err) => {
+        this.toastr.error('No se pudo registrar la venta en el sistema.');
+        console.error('Error en registro venta:', err);
       }
-
-      this.actualizarPedido();
-
-    },)
+    });
   }
+
 
   actualizarPedido() {
     const data = {
