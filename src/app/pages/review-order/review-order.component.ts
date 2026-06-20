@@ -102,6 +102,7 @@ export class ReviewOrderComponent implements OnInit, OnDestroy {
     this.loadBandejaListFromLocalStorage();
     this.chekpedidoguardado();
     this.crearFormularioExpress();
+    this.validarFormulario();
 
     this.expressForm.valueChanges.subscribe(() => {
       this.actualizarUrlWhatsApp();
@@ -117,6 +118,19 @@ export class ReviewOrderComponent implements OnInit, OnDestroy {
         this.router.navigate(['/']);
       }
     });
+  }
+
+  validarFormulario() {
+    this.expressForm = this.fb.group({
+      first_name: ['', Validators.required, Validators.minLength(3)],
+      telefono: ['', [
+    Validators.required,
+    Validators.minLength(11),
+    Validators.maxLength(13),
+    // Alerta: Solo permite números, ideal para la API de WhatsApp
+    Validators.pattern('^[0-9]+$') 
+  ]]
+    })
   }
 
 

@@ -80,12 +80,32 @@
             <form [formGroup]="expressForm">
                 <div class="form-group">
                     <label>{{'¿A nombre de quién dejamos el pedido?'|translate}}</label>
-                    <input type="text" formControlName="first_name" placeholder="Ej. Juan Pérez" class="form-control">
+                    <input type="text" formControlName="first_name" placeholder="Ej. Juan Pérez" class="form-control"
+                        required>
+                    <div *ngIf="expressForm.get('first_name')?.touched && expressForm.get('first_name')?.invalid"
+                        class="text-danger">
+                        <div *ngIf="expressForm.get('first_name')?.errors?.['required']">
+                            {{'Campo Requerido'|translate}}
+                        </div>
+                        <div *ngIf="expressForm.get('first_name')?.errors?.['minlength']">
+                            {{'Un Nombre y Un Apellido'|translate}}
+                        </div>
+                    </div>
+
                 </div>
 
                 <div class="form-group">
                     <label>{{'Teléfono de contacto'|translate}}</label>
                     <input type="tel" formControlName="telefono" placeholder="Ej. 04121234567" class="form-control">
+                    <div *ngIf="expressForm.get('telefono')?.touched && expressForm.get('telefono')?.invalid"
+                        class="text-danger">
+                        <div *ngIf="expressForm.get('telefono')?.errors?.['required']">
+                            {{'Campo Requerido'|translate}}
+                        </div>
+                        <div *ngIf="expressForm.get('telefono')?.errors?.['minlength']">
+                            {{'Número Válido'|translate}}
+                        </div>
+                    </div>
                 </div>
 
                 <div class="form-group">
@@ -102,31 +122,25 @@
                         <i class="fa fa-chevron-left icon-small"></i>
                         {{'Atrás'|translate}}
                     </button>
-                    
+
                     <!-- 🚀 BOTÓN UNIVERSAL: Eliminamos el <a>, el href y el target="_blank" -->
-                    <button type="button" 
-                            class="check-button" 
-                            *ngIf="tiendaSelected.tipoFlujo ==='POS_DIRECTO' "
-                            [disabled]="expressForm.invalid"
-                            [ngClass]="{'disabled-link': expressForm.invalid}"
-                            (click)="procesarClienteExpress()"
-                            style="display: inline-flex; align-items: center; justify-content: center;">
+                    <button type="button" class="check-button" *ngIf="tiendaSelected.tipoFlujo ==='POS_DIRECTO' "
+                        [disabled]="expressForm.invalid" [ngClass]="{'disabled-link': expressForm.invalid}"
+                        (click)="procesarClienteExpress()"
+                        style="display: inline-flex; align-items: center; justify-content: center;">
 
                         {{'Finalizar y Enviar Pedido'|translate}}
                         <i class="fa fa-chevron-right icon-small" style="margin-left: 8px;"></i>
                     </button>
-                     <a [href]="urlWhatsApp"
-                        target="_blank"
-                        rel="noopener noreferrer"
+                    <a [href]="urlWhatsApp" target="_blank" rel="noopener noreferrer"
                         *ngIf="tiendaSelected.tipoFlujo ==='WHATSAPP' "
                         (click)="expressForm.valid ? procesarClienteExpress() : $event.preventDefault()"
-                        class="check-button"
-                        [ngClass]="{'disabled-link': expressForm.invalid}"
+                        class="check-button" [ngClass]="{'disabled-link': expressForm.invalid}"
                         style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">
-                        
+
                         {{'Finalizar y Enviar Pedido'|translate}}
                         <i class="fa fa-chevron-right icon-small" style="margin-left: 8px;"></i>
-                        </a>
+                    </a>
                 </div>
             </form>
         </div>
