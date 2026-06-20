@@ -102,7 +102,6 @@ export class ReviewOrderComponent implements OnInit, OnDestroy {
     this.loadBandejaListFromLocalStorage();
     this.chekpedidoguardado();
     this.crearFormularioExpress();
-    this.validarFormulario();
 
     this.expressForm.valueChanges.subscribe(() => {
       this.actualizarUrlWhatsApp();
@@ -120,18 +119,7 @@ export class ReviewOrderComponent implements OnInit, OnDestroy {
     });
   }
 
-  validarFormulario() {
-    this.expressForm = this.fb.group({
-      first_name: ['', Validators.required, Validators.minLength(3)],
-      telefono: ['', [
-    Validators.required,
-    Validators.minLength(11),
-    Validators.maxLength(13),
-    // Alerta: Solo permite números, ideal para la API de WhatsApp
-    Validators.pattern('^[0-9]+$') 
-  ]]
-    })
-  }
+ 
 
 
 
@@ -262,8 +250,11 @@ export class ReviewOrderComponent implements OnInit, OnDestroy {
   //proceso para registro express
   crearFormularioExpress() {
     this.expressForm = this.fb.group({
-      first_name: ['', Validators.required],
-      telefono: ['', [Validators.required, Validators.pattern(/^[0-9]{10,11}$/)]], // Valida números telefónicos
+      first_name: ['', Validators.required, Validators.minLength(3)],
+      telefono: ['', [Validators.required, 
+        Validators.minLength(11),
+    Validators.maxLength(13),
+        Validators.pattern(/^[0-9]{10,11}$/)]], // Valida números telefónicos
       tipoEntrega: ['delivery', Validators.required],
       direccion: [''] // Lo validaremos dinámicamente según la entrega
     });

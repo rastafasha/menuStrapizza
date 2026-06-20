@@ -104,6 +104,15 @@
                       {{direccion.direccion }}
                     </option>
                   </select>
+                  <div *ngIf="formDelivery.get('deliveryAddres')?.touched && formDelivery.get('deliveryAddres')?.invalid"
+                        class="text-danger">
+                        <div *ngIf="formDelivery.get('deliveryAddres')?.errors?.['required']">
+                            {{'Campo Requerido'|translate}}
+                        </div>
+                        <div *ngIf="formDelivery.get('deliveryAddres')?.errors?.['minlength']">
+                            {{'Seleccione o agregue una dirección'|translate}}
+                        </div>
+                    </div>
                 </div>
               </form>
               <div class="botns" >
