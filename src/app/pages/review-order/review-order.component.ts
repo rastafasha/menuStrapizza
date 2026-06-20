@@ -251,10 +251,12 @@ export class ReviewOrderComponent implements OnInit, OnDestroy {
   crearFormularioExpress() {
     this.expressForm = this.fb.group({
       first_name: ['', Validators.required, Validators.minLength(3)],
-      telefono: ['', [Validators.required, 
-        Validators.minLength(11),
-    Validators.maxLength(13),
-        Validators.pattern(/^[0-9]{10,11}$/)]], // Valida números telefónicos
+      telefono: ['', [
+        Validators.required, 
+        Validators.minLength(7),
+    Validators.maxLength(15),
+    Validators.pattern('^[0-9]+$')
+      ]], // Valida números telefónicos
       tipoEntrega: ['delivery', Validators.required],
       direccion: [''] // Lo validaremos dinámicamente según la entrega
     });
@@ -440,19 +442,59 @@ guardarPedido(userId?: string) {
   }
 
   // Llama a esta función dentro de tu ngOnInit() o cada vez que cambie el carrito/formulario
-  actualizarUrlWhatsApp(): void {
+//   actualizarUrlWhatsApp(): void {
+//     if (!this.tiendaSelected?.telefono) return;
+
+//     // 1. Limpia letras, espacios y guiones (deja solo números puros)
+//     let phone = this.tiendaSelected.telefono.replace(/\D/g, '');
+    
+//     // 💡 LA CORRECCIÓN: Si el número de la tienda empieza con 0412, 0414, etc.
+//     // le quitamos el "0" inicial y le inyectamos el "58" de Venezuela
+//     if (phone.startsWith('04')) {
+//       phone = '58' + phone.substring(1); // Pasa de "0412..." a "58412..."
+//     }
+
+//     const message = this.getWhatsAppMessage();
+
+//     if (message && phone) {
+//       // Lleva obligatoriamente api.whatsapp.com con el formato internacional listo
+//       this.urlWhatsApp = `https://api.whatsapp.com/send?phone=${phone}&text=${message}`;
+//     } else {
+//       this.urlWhatsApp = '';
+//     }
+// }
+
+actualizarUrlWhatsApp(): void {
     if (!this.tiendaSelected?.telefono) return;
 
-    const phone = this.tiendaSelected.telefono.replace(/\D/g, '');
+    // 1. Deja solo los números puros (elimina espacios, guiones y el signo +)
+    let phone = this.tiendaSelected.telefono.replace(/\D/g, '');
+    if (!phone) return;
+
+    // 2. LÓGICA INTELIGENTE DE DETECCIÓN:
+    if (phone.startsWith('0')) {
+      // Si empieza con 0 (ej: 04121234567 o prefijos locales de otros países),
+      // asumimos que es Venezuela, quitamos el 0 y ponemos el 58.
+      phone = '58' + phone.substring(1);
+    } 
+    else if (phone.length === 10 && (phone.startsWith('412') || phone.startsWith('414') || phone.startsWith('424') || phone.startsWith('416') || phone.startsWith('426'))) {
+      // Si el usuario escribió el número de Venezuela directo sin el 0 (ej: 4121234567 tiene 10 dígitos)
+      // le inyectamos el 58 automáticamente.
+      phone = '58' + phone;
+    }
+    // Si no cumple lo anterior y tiene más de 10 dígitos (ej: 573001234567 o 13051234567),
+    // significa que el usuario ya escribió su código internacional por su cuenta. Lo dejamos pasar intacto.
+
     const message = this.getWhatsAppMessage();
 
     if (message && phone) {
-      // CORRECCIÓN CLAVE: Debe llevar obligatoriamente "api." al principio
       this.urlWhatsApp = `https://api.whatsapp.com/send?phone=${phone}&text=${message}`;
     } else {
       this.urlWhatsApp = '';
     }
-  }
+}
+
+
 
 
 
