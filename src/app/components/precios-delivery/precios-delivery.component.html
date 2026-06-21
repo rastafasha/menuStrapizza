@@ -1,0 +1,43 @@
+<div class="card border-0 shadow-sm rounded-3 overflow-hidden">
+    <div class="card-header bg-dark text-white py-2 px-3 d-flex align-items-center gap-2">
+        <i class="fa fa-motorcycle text-warning"></i>
+        <span class="fw-bold small">{{ 'Tarifas de Envío del Local' | translate }}</span>
+    </div>
+
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover table-striped align-middle mb-0 text-start" style="font-size: 0.9rem;">
+                <thead class="table-light">
+                    <tr>
+                        <th class="ps-3 fw-bold text-secondary">{{ 'Zona / Cobertura' | translate }}</th>
+                        <th class="text-center fw-bold text-secondary">{{ 'Distancia Máx.' | translate }}</th>
+                        <th class="text-end pe-3 fw-bold text-secondary">{{ 'Precio' | translate }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let del of listaDeliveries">
+                        <td class="ps-3 fw-bold text-dark">
+                            {{ del.titulo || del.nombre || ('Envío Estándar' | translate) }}
+                        </td>
+                        <td class="text-center text-muted font-weight-bold">
+                            {{ del.distancia || del.kms || '5' }} km
+                        </td>
+                        <td class="text-end pe-3 fw-bold text-success">
+                            <span *ngIf="(del.precio || del.monto) === 0; else conPrecio" class="badge bg-success-light text-success px-2 py-1">
+                                {{ '¡Gratis!' | translate }}
+                            </span>
+                            <ng-template #conPrecio>
+                                {{ del.precio | currency:tienda_moneda}}
+                            </ng-template>
+                        </td>
+                    </tr>
+                    <tr *ngIf="listaDeliveries.length === 0">
+                        <td colspan="3" class="text-center text-muted py-3 small">
+                            <i class="fa fa-info-circle me-1"></i> {{ 'Cargando zonas de cobertura...' | translate }}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

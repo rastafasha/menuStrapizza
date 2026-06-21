@@ -214,12 +214,12 @@
 
       <div class="d-flex justify-content-between mb-3 border-bottom pb-2">
         <span class="text-muted small">{{'Categoría'|translate}}</span>
-        <span class="fw-bold small">{{ item.subcategoria }}</span>
+        <span class="fw-bold small">{{ translate.currentLang() === 'en' ? item.categoria.subcategorias?.en  : item.categoria.subcategorias?.es  }}</span>
       </div>
       <div class="d-flex justify-content-between mb-3 border-bottom pb-2 flex-column">
         <span class="text-muted small">{{'Nombre'|translate}}</span>
         <div class="d-flex flex-column ">
-          <span class="fw-bold small">{{ item.titulo }}</span>
+          <span class="fw-bold small">{{ translate.currentLang() === 'en' ? item.titulo.en : item.titulo.es }}</span>
           <span class="fw-bold small">{{ item.selector_elegido }}</span>
         </div>
       </div>

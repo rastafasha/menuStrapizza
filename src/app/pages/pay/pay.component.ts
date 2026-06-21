@@ -29,8 +29,10 @@ import { TasaeurobcvService } from '../../services/tasaeurobcv.service';
 import { PagosFilterPipe } from '../../pipes/pagos-filter.pipe';
 import { AuthService } from '../../services/auth.service';
 import { LoadingComponent } from '../../shared/loading/loading.component';
-import { TranslatePipe } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ModalCrearDireccionComponent } from '../../components/modal-crear-direccion/modal-crear-direccion.component';
+import { PreciosDeliveryComponent } from '../../components/precios-delivery/precios-delivery.component';
+import { PostalService } from '../../services/postal.service';
 declare var $: any;
 
 declare var bootstrap: any;
@@ -47,7 +49,8 @@ declare var bootstrap: any;
     PagosFilterPipe,
     LoadingComponent,
     TranslatePipe,
-    ModalCrearDireccionComponent
+    ModalCrearDireccionComponent,
+    PreciosDeliveryComponent,
   ],
   templateUrl: './pay.component.html',
   styleUrl: './pay.component.scss'
@@ -55,7 +58,8 @@ declare var bootstrap: any;
 export class PayComponent {
 
   @ViewChild('direccionEditModal') direccionModal!: any; // O el tipo de tu componente si lo tienes a mano
-
+  @ViewChild('preciosComponent') preciosComponent!: PreciosDeliveryComponent;
+  @ViewChild('direccionEditModal') direccionEditModal!: any;
 
   bandejaList: Producto[] = [];
   fechaHoy: string = new Date().toISOString().split('T')[0];
@@ -128,6 +132,11 @@ export class PayComponent {
   efectivo: string = 'efectivo';
   paypalinfo?: Paypal;
 
+  public listaDeliveries: any[] = [];
+  public totalGeneral: number = 0;
+  public costoDeliveryAplicado: number = 0;
+  cargandoGps: boolean = false;
+
 
 
   paymentMethods: PaymentMethod[] = []; //array metodos de pago para transferencia (dolares, bolivares, movil)
@@ -155,7 +164,6 @@ export class PayComponent {
     paymentday: new FormControl('', Validators.required)
   });
 
-
   constructor(
     private _trasferencias: TransferenciasService,
     private _efectivo: PagoEfectivoService,
@@ -174,6 +182,8 @@ export class PayComponent {
     private tasaDollarService: TasadollarbcvService,
     private tasaEuroService: TasaeurobcvService,
     private authService: AuthService,
+    private postalService: PostalService,
+    public translate: TranslateService,
   ) {
     window.scrollTo(0, 0);
     // obtenemos el cliente del localstorage
@@ -229,48 +239,50 @@ export class PayComponent {
     }
   }
 
-loadPedido(id: string) {
-  this.loading = true;
 
-  // 🚀 LOGICA UNIFICADA: Tanto WhatsApp como POS_DIRECTO consultan el pedido real en la BD
-  this.pedidosService.getById(id).subscribe({
-    next: (resp: any) => {
-      // Guardamos el objeto completo del pedido que devolvió MongoDB
-      this.pedido = resp;
-      console.log('📦 Pedido real cargado en la vista de pagos:', this.pedido);
-      
-      // Extraemos el listado de platos de forma segura
-      this.pedidos = resp.pedidoList || [];
 
-      // Inicializamos acumuladores de la vista
-      this.subtotal = 0;
-      this.data_detalle = [];
+  loadPedido(id: string) {
+    this.loading = true;
 
-      // Procesamos los totales financieros de forma exacta
-      this.totalAmount = this.pedidos.reduce((sum, item) =>
-        sum + (item.precio_ahora * item.cantidad), 0
-      );
+    // 🚀 LOGICA UNIFICADA: Tanto WhatsApp como POS_DIRECTO consultan el pedido real en la BD
+    this.pedidosService.getById(id).subscribe({
+      next: (resp: any) => {
+        // Guardamos el objeto completo del pedido que devolvió MongoDB
+        this.pedido = resp;
+        console.log('📦 Pedido real cargado en la vista de pagos:', this.pedido);
 
-      this.pedidos.forEach(element => {
-        this.subtotal = Math.round(this.subtotal + (element.precio_ahora * element.cantidad));
-        this.data_detalle.push({
-          producto: element,
-          cantidad: element.cantidad,
-          precio: Math.round(element.precio_ahora),
-          color: element.color,
-          selector: element.nombre_selector
+        // Extraemos el listado de platos de forma segura
+        this.pedidos = resp.pedidoList || [];
+
+        // Inicializamos acumuladores de la vista
+        this.subtotal = 0;
+        this.data_detalle = [];
+
+        // Procesamos los totales financieros de forma exacta
+        this.totalAmount = this.pedidos.reduce((sum, item) =>
+          sum + (item.precio_ahora * item.cantidad), 0
+        );
+
+        this.pedidos.forEach(element => {
+          this.subtotal = Math.round(this.subtotal + (element.precio_ahora * element.cantidad));
+          this.data_detalle.push({
+            producto: element,
+            cantidad: element.cantidad,
+            precio: Math.round(element.precio_ahora),
+            color: element.color,
+            selector: element.nombre_selector
+          });
         });
-      });
-      
-      this.loading = false;
-    },
-    error: (err) => {
-      console.error('Error cargando el pedido desde el servidor:', err);
-      this.toastr.error('No se pudo recuperar el resumen de la orden.');
-      this.loading = false;
-    }
-  });
-}
+
+        this.loading = false;
+      },
+      error: (err) => {
+        console.error('Error cargando el pedido desde el servidor:', err);
+        this.toastr.error('No se pudo recuperar el resumen de la orden.');
+        this.loading = false;
+      }
+    });
+  }
 
 
 
@@ -395,6 +407,130 @@ loadPedido(id: string) {
     })
   }
 
+
+  // Método que se llama cuando cambia el select
+  onDeliveryMethodChange(event: any) {
+    this.selectedDelivery = event.target.value;
+    this.renderDelivery(); // Renderiza el botón de nuevo según la opción seleccionada
+  }
+
+
+  private renderDelivery() {
+    // Primero, limpiar el contenedor anterior
+    // this.paypalElement.nativeElement.innerHTML = '';
+
+    if (this.selectedDelivery === 'Delivery') {
+      // deshabilitar el formulario de pago con transferencia
+      this.habilitacionAddresLocal = false;
+      this.habilitacionFormDelivery = true;
+      // Cargar el botón de PayPal con las opciones seleccionadas
+      // this.initPayPalConfig();
+      this.getDeliveryStore();
+    }
+    else if (this.selectedDelivery === 'Pickup') {
+      // transferencia bancaria => abrir formulario (en un futuro un modal con formulario)
+      this.habilitacionAddresLocal = true;
+      this.habilitacionFormDelivery = false;
+    }
+    else {
+      this.habilitacionAddresLocal = false;
+      this.habilitacionFormDelivery = false;
+    }
+
+  }
+
+  getDeliveryStore(): void {
+
+    this.postalService.getPostalesLocal(this.tiendaSelected._id).subscribe({
+      next: (resp: any) => {
+        // Guardamos la lista de tarifas que viene del backend
+        this.listaDeliveries = Array.isArray(resp) ? resp : [];
+        console.log(this.listaDeliveries)
+      },
+      error: (err) => console.error("Error al traer tarifas:", err)
+    });
+  }
+
+
+  dispararGpsDirecto(): void {
+    // 🛑 ESCUDO ANTI-BUCLE: Si ya se está ejecutando un cálculo, bloqueamos el paso
+    if (this.cargandoGps) {
+      console.log('🛑 GPS bloqueado para evitar bucle infinito en el renderizado.');
+      return;
+    }
+
+    if (this.direccionEditModal) {
+      // Encendemos el candado
+      this.cargandoGps = true;
+      console.log('📡 Disparando satélites de forma directa desde el carrito POS...');
+
+      // 1. Ejecutamos la función nativa que busca la ubicación
+      this.direccionEditModal.useCurrentLocation();
+
+      // 2. Esperamos el segundo para que Google responda el Geocoding
+      setTimeout(() => {
+        const coords = this.direccionEditModal.selectedCoords;
+
+        if (coords && coords.lat && coords.lng) {
+          const lat = Number(coords.lat);
+          const lng = Number(coords.lng);
+
+          console.log(`🎯 Coordenadas recuperadas con éxito: Lat ${lat}, Lng ${lng}`);
+
+          if (this.preciosComponent) {
+            // 3. Forzamos al Hijo de Precios a calcular la tarifa
+            this.preciosComponent.procesarUbicacionYCalcularPrecio(lat, lng);
+            console.log('⚡ Módulo financiero actualizado.');
+          }
+        }
+
+        // 🔓 Apagamos el candado un momento después para permitir un clic manual futuro si el cliente se mueve
+        setTimeout(() => {
+          this.cargandoGps = false;
+        }, 2000); // 2 segundos de inmunidad total
+
+      }, 1000);
+    }
+  }
+
+  despertarMapaHijo() {
+    // 🧠 Esperamos 400ms a que el off-canvas de Bootstrap termine de abrirse en la pantalla
+    setTimeout(() => {
+      if (this.direccionModal && typeof this.direccionModal.inicializarMapa === 'function') {
+        console.log('🗺️ Comunicando con el componente hijo: Despertando mapa...');
+        this.direccionModal.inicializarMapa();
+      }
+    }, 400);
+  }
+
+  // metodo para el cambio del select 'tipo de transferencia'
+  onChangeDireccion(event: Event) {
+    const target = event.target as HTMLSelectElement; //obtengo el valor
+    // guardo el metodo seleccionado en la variable de clase direccionSelected
+    this.direccionSelected = this.direcciones.filter(method => method._id === target.value)[0]
+    this.get_direccion(this.direccionSelected)
+  }
+
+  get_direccion(direccionSelected: any) {
+    this.data_direccion = direccionSelected._id;
+    this._direccionService.get_direccion(this.data_direccion).subscribe(
+      response => {
+        this.data_direccion = response;
+        console.log(this.data_direccion)
+      }
+    );
+
+  }
+
+
+
+  getDireccionbyUser() {
+    this._direccionService.listarUsuario(this.userId).subscribe((resp: any) => {
+      this.direcciones = resp.direcciones;
+    })
+  }
+
+
   onFileSelected(event: any) {
     const file = event.target.files[0];
     if (file) {
@@ -405,7 +541,7 @@ loadPedido(id: string) {
     }
   }
 
-  
+
 
   sendFormTransfer() {
     // 1. Validaciones del formulario de pago (banco, referencia, etc.)
@@ -416,7 +552,7 @@ loadPedido(id: string) {
 
     this.loading = true;
 
-    
+
     // Tu flujo de siempre: Usa directamente this.pedido._id porque ya existe con total seguridad
     this.fileUploadService.actualizarFoto(this.selectedFile!, 'transferencias', this.pedido._id)
       .then(imgUrl => {
@@ -600,70 +736,6 @@ loadPedido(id: string) {
 
 
 
-  // Método que se llama cuando cambia el select
-  onDeliveryMethodChange(event: any) {
-    this.selectedDelivery = event.target.value;
-    this.renderDelivery(); // Renderiza el botón de nuevo según la opción seleccionada
-  }
-
-
-  private renderDelivery() {
-    // Primero, limpiar el contenedor anterior
-    // this.paypalElement.nativeElement.innerHTML = '';
-
-    if (this.selectedDelivery === 'Delivery') {
-      // deshabilitar el formulario de pago con transferencia
-      this.habilitacionAddresLocal = false;
-      this.habilitacionFormDelivery = true;
-      // Cargar el botón de PayPal con las opciones seleccionadas
-      // this.initPayPalConfig();
-    }
-    else if (this.selectedDelivery === 'Pickup') {
-      // transferencia bancaria => abrir formulario (en un futuro un modal con formulario)
-      this.habilitacionAddresLocal = true;
-      this.habilitacionFormDelivery = false;
-    }
-    else {
-      this.habilitacionAddresLocal = false;
-      this.habilitacionFormDelivery = false;
-    }
-
-  }
-
-  getDireccionbyUser() {
-    this._direccionService.listarUsuario(this.userId).subscribe((resp: any) => {
-      this.direcciones = resp.direcciones;
-    })
-  }
-
- despertarMapaHijo() {
-  // 🧠 Esperamos 400ms a que el off-canvas de Bootstrap termine de abrirse en la pantalla
-  setTimeout(() => {
-    if (this.direccionModal && typeof this.direccionModal.inicializarMapa === 'function') {
-      console.log('🗺️ Comunicando con el componente hijo: Despertando mapa...');
-      this.direccionModal.inicializarMapa(); 
-    }
-  }, 400);
-}
-
-  // metodo para el cambio del select 'tipo de transferencia'
-  onChangeDireccion(event: Event) {
-    const target = event.target as HTMLSelectElement; //obtengo el valor
-    // guardo el metodo seleccionado en la variable de clase direccionSelected
-    this.direccionSelected = this.direcciones.filter(method => method._id === target.value)[0]
-    this.get_direccion(this.direccionSelected)
-  }
-
-  get_direccion(direccionSelected: any) {
-    this.data_direccion = direccionSelected._id;
-    this._direccionService.get_direccion(this.data_direccion).subscribe(
-      response => {
-        this.data_direccion = response;
-        console.log(this.data_direccion)
-      }
-    );
-
-  }
 
 
   verify_dataComplete(total_pagado: number) {

@@ -17,7 +17,10 @@
           <div class="info-item">
             <img [src]="item.img | imagenPipe:'productos' " alt="">
             <div class="d-flex flex-column ">
-              <h2>{{item.titulo.es | slice:0:8}}...</h2>
+              <h2>{{translate.currentLang() === 'en' ? item.titulo.en : item.titulo.es | slice:0:8}}...
+
+                
+              </h2>
               <p class="small">{{item.selector_elegido | slice:0:8}}...</p>
             </div>
             <div class="add-items justify-content-center">
@@ -77,7 +80,7 @@
           <div class="card p-3" id="card-pay">
             <label class="form-label">Desea delivery?</label>
             <select id="paymentMethod" class="form-control" (change)="onDeliveryMethodChange($event)"
-              [(ngModel)]="selectedDelivery" formControlName="delivery">
+               formControlName="delivery">
               <option value=" ">Seleccione</option>
               <option value="Delivery">Si</option>
               <option value="Pickup">Voy por la tienda</option>
@@ -93,7 +96,27 @@
                 </div>
               </div>
             </div>
-            <div *ngIf="habilitacionFormDelivery" class="mt-1 mb-1 ">
+            <div *ngIf="habilitacionFormDelivery" class="mt-3 animated fadeIn">
+
+              <!-- precios Delivery -->
+              <app-precios-delivery #preciosComponent [totalAmount]="totalAmount" [tiendaSelected]="tiendaSelected"
+                            [listaDeliveries]="listaDeliveries"
+                            (onTotalCalculado)="totalGeneral = $event"></app-precios-delivery>
+
+              <!-- 💡 EL BOTÓN DIRECTO: Activa el GPS con 1 solo clic sin abrir el modal -->
+                    <button type="button" class="btn btn-primary w-100 fw-bold shadow-sm py-2 mb-3 mt-3 animated fadeIn"
+                        (click)="dispararGpsDirecto()">
+                        📍 {{ 'Calcular mi Delivery Automático con GPS' | translate }}
+                    </button>
+                    <!-- Total a Pagar -->
+                    <div class="info_pago total mt-3 animated fadeIn">
+                        <div class="info_pago_titulo1"><span>{{'Total con delivery'|translate}}</span> </div>
+                        <div class="info_pagod_data3"><span>{{totalGeneral |number:'1.2-2'| currency:tienda_moneda}}</span>
+                        </div>
+                    </div>
+             
+              <!-- precios Delivery -->
+
               <form [formGroup]="formDelivery">
                 <div class="mb-3 mt-2 col-12">
                   <label class="form-label">Dirección de Entrega</label>
@@ -101,7 +124,7 @@
                     name="deliveryAddres" id="deliveryAddres">
                     <option value=" ">Seleccione Dirección</option>
                     <option [value]="direccion._id" *ngFor="let direccion of direcciones">
-                      {{direccion.direccion }}
+                      {{direccion.direccion | slice:0:30 }}...
                     </option>
                   </select>
                   <div *ngIf="formDelivery.get('deliveryAddres')?.touched && formDelivery.get('deliveryAddres')?.invalid"

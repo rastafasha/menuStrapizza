@@ -73,10 +73,10 @@
                                 
                                 <ul class="listpedido" *ngFor="let item_pedido of item_pedido.pedidoList">
                                     <li>
-                                        <div class="itempedido ">
+                                        <div class="itempedido " >
                                             <div class="infoitempedi">
-                                                <h2 [ngStyle]="{'color': tiendaSelected?.color_primario }">{{item_pedido.titulo }}</h2>
-                                                <p class="small">{{item_pedido.selector_elegido | slice:0:8}}...</p>
+                                                <h2 [ngStyle]="{'color': tiendaSelected?.color_primario }">{{ translate.currentLang() === 'en' ? item_pedido.titulo.en : item_pedido.titulo.es}}</h2>
+                                                <p *ngIf="item_pedido.selector_elegido" class="small">{{item_pedido.selector_elegido | slice:0:8}}...</p>
                                             </div>
                                             <div class="preciocantidad">
                                                 <p>{{'Cant'|translate}}:&nbsp;{{ item_pedido.cantidad }}</p>

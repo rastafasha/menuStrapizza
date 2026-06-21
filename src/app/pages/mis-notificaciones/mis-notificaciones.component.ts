@@ -35,6 +35,9 @@ export class MisNotificacionesComponent implements OnInit {
   title = 'Notificaciones';
   public notifSeleccionada: any;
   tiendaSelected: Tienda | undefined | null = null;
+  tiendaId!: any;
+  user: any;
+  userId: any;
 
   info = `
   <h2>Sección: Notificaciones</h2>
@@ -48,8 +51,8 @@ export class MisNotificacionesComponent implements OnInit {
   </ul>`;
 
   private tiendaSubscription!: Subscription;
-  
-    private tiendaService = inject(TiendaService);
+
+  private tiendaService = inject(TiendaService);
 
   public notificacionService = inject(NotificacionService);
   public router = inject(Router);
@@ -57,15 +60,29 @@ export class MisNotificacionesComponent implements OnInit {
 
   ngOnInit() {
     window.scrollTo(0, 0);
-    this.getNotificaciones();
+    let USER = localStorage.getItem("user");
+    this.user = JSON.parse(USER ? USER : '');
+    this.userId = this.user.uid;
     this.getTienda();
   }
 
-  getTienda(){
+  getTienda() {
     this.tiendaSubscription = this.tiendaService.selectedTiendaObservable$.subscribe(tienda => {
       this.tiendaSelected = tienda;
+      this.tiendaId = this.tiendaSelected?._id;
+      
+      // 💡 LA SOLUCIÓN: Solo si el ID de la tienda existe y es real,
+      // disparamos la petición del historial de notificaciones con seguridad.
+      if (this.tiendaId) {
+        // Inicializamos la página en 1 y limpiamos la señal para la nueva tienda
+        this.pageNotif = 1;
+        this.notificaciones.set([]); 
+        
+        // 🚀 Ejecutamos el llamado de las señales que revisamos hace un momento
+        this.getNotificaciones(); 
+      }
     });
-  }
+}
 
   onScroll(): void {
     if (this.loading() || !this.hasMoreNotif()) return;
@@ -79,7 +96,8 @@ export class MisNotificacionesComponent implements OnInit {
     this.loading.set(true);
 
     // Pasamos la página actual al servicio
-    this.notificacionService.obtenerHistorialCompleto(this.pageNotif, this.tiendaSelected?._id, false).subscribe({
+    // 💡 SOLUCIÓN: Le pasamos 'this.user.role' (o la variable donde guardes el rol del admin) como tercer argumento
+    this.notificacionService.obtenerHistorialCompleto(this.pageNotif, this.tiendaId, this.user.role).subscribe({
       next: (resp: any) => {
         const newData = resp.notificaciones || [];
 
@@ -89,14 +107,13 @@ export class MisNotificacionesComponent implements OnInit {
           return;
         }
 
-        // Actualizamos la señal de notificaciones evitando duplicados
+        // Tu lógica brillante con Signals (Se queda exactamente igual, ¡está perfecta!)
         this.notificaciones.update(current => {
           const ids = new Set(current.map(n => n._id));
           const unique = newData.filter((n: any) => !ids.has(n._id));
           return [...current, ...unique];
         });
 
-        // Si el backend nos dice que ya no hay más páginas (proximo === null)
         if (resp.proximo === null) {
           this.hasMoreNotif.set(false);
         }
@@ -147,15 +164,15 @@ export class MisNotificacionesComponent implements OnInit {
   }
 
   cerrarOffcanvas() {
-  const el = document.getElementById('offcanvasNotif');
-  // Obtenemos la instancia existente de Bootstrap en ese elemento
-  const bsOffcanvas = bootstrap.Offcanvas.getInstance(el);
-  
-  // Si la instancia existe, la cerramos
-  if (bsOffcanvas) {
-    bsOffcanvas.hide();
+    const el = document.getElementById('offcanvasNotif');
+    // Obtenemos la instancia existente de Bootstrap en ese elemento
+    const bsOffcanvas = bootstrap.Offcanvas.getInstance(el);
+
+    // Si la instancia existe, la cerramos
+    if (bsOffcanvas) {
+      bsOffcanvas.hide();
+    }
   }
-}
 
 
 
@@ -191,23 +208,23 @@ export class MisNotificacionesComponent implements OnInit {
   }
 
   // 1. Este botón abre el modal en lugar del confirm feo
-vaciarTodo() {
-  const el = document.getElementById('modalConfirmarVaciar');
-  const modal = new bootstrap.Modal(el);
-  modal.show();
-}
-
-// 2. Esta función se ejecuta solo si le da al botón "Sí, borrar todo"
-confirmarVaciarTodo() {
-  this.notificacionService.limpiarBuzonCompleto().subscribe(() => {
-    this.getNotificaciones(); 
-    
-    // Cerramos el modal de forma limpia
+  vaciarTodo() {
     const el = document.getElementById('modalConfirmarVaciar');
-    const modal = bootstrap.Modal.getInstance(el);
-    if (modal) modal.hide();
-  });
-}
+    const modal = new bootstrap.Modal(el);
+    modal.show();
+  }
+
+  // 2. Esta función se ejecuta solo si le da al botón "Sí, borrar todo"
+  confirmarVaciarTodo() {
+    this.notificacionService.limpiarBuzonCompleto().subscribe(() => {
+      this.getNotificaciones();
+
+      // Cerramos el modal de forma limpia
+      const el = document.getElementById('modalConfirmarVaciar');
+      const modal = bootstrap.Modal.getInstance(el);
+      if (modal) modal.hide();
+    });
+  }
 
 
 

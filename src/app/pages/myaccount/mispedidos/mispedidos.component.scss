@@ -10,10 +10,16 @@
 .itempedido {
     display: grid;
     grid-template-columns: 1fr 1fr;
+    border-bottom: 1px dashed #ccc;
+    padding-bottom: 10px;
     & p {
         margin: 0;
         padding: 0;
     }
+}
+
+.itempedido :last-child {
+    border-bottom: none;
 }
 
 .preciocantidad {

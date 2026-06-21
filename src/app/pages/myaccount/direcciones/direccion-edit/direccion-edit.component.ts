@@ -86,7 +86,7 @@ export class DireccionEditComponent implements OnInit, AfterViewInit, OnDestroy 
       next: (position) => {
         const lat = position.coords.latitude;
         const lng = position.coords.longitude;
-        console.log('Initial geolocation success - Lat:', lat, 'Lng:', lng);
+        // console.log('Initial geolocation success - Lat:', lat, 'Lng:', lng);
         // Solo usar GPS si no hay coordenadas ya seleccionadas
         if (!this.selectedCoords && this.map) {
           this.map.setView([lat, lng], 15);
@@ -95,7 +95,7 @@ export class DireccionEditComponent implements OnInit, AfterViewInit, OnDestroy 
         this.mapError = '';
       },
       error: (error) => {
-        console.error('Error de geolocalización:', error);
+        // console.error('Error de geolocalización:', error);
         this.mapLoading = false;
         switch (error.code) {
           case error.PERMISSION_DENIED:
@@ -126,7 +126,7 @@ export class DireccionEditComponent implements OnInit, AfterViewInit, OnDestroy 
   ngAfterViewInit() {
     // Delay aumentado para asegurar DOM listo y logging
     setTimeout(() => {
-      console.log('Attempting to init map. Container ready?', !!this.mapContainer?.nativeElement);
+      // console.log('Attempting to init map. Container ready?', !!this.mapContainer?.nativeElement);
       this.initMap();
     }, 300);
   }
@@ -145,7 +145,7 @@ export class DireccionEditComponent implements OnInit, AfterViewInit, OnDestroy 
    * Inicializa el mapa de Leaflet
    */
   private initMap(): void {
-    console.log('Map container element:', this.mapContainer?.nativeElement);
+    // console.log('Map container element:', this.mapContainer?.nativeElement);
     // Verificar que el contenedor del mapa existe
     if (!this.mapContainer?.nativeElement) {
       console.error('Contenedor del mapa no encontrado');
@@ -192,14 +192,14 @@ export class DireccionEditComponent implements OnInit, AfterViewInit, OnDestroy 
 
     // Always set coords FIRST
     this.selectedCoords = { lat, lng };
-    console.log('selectedCoords set:', this.selectedCoords);
+    // console.log('selectedCoords set:', this.selectedCoords);
 
     // Patch form fields
     this.direccionForm.patchValue({ latitud: lat, longitud: lng });
-    console.log('Form lat/lng:', this.direccionForm.value.latitud, this.direccionForm.value.longitud);
+    // console.log('Form lat/lng:', this.direccionForm.value.latitud, this.direccionForm.value.longitud);
 
     if (!this.map) {
-      console.error('Map not ready - coords saved anyway');
+      // console.error('Map not ready - coords saved anyway');
       this.fetchAddress(lat, lng);
       return;
     }
@@ -227,7 +227,7 @@ export class DireccionEditComponent implements OnInit, AfterViewInit, OnDestroy 
       .then(data => {
         const address = data.display_name || `Lat ${lat.toFixed(4)}, Lng ${lng.toFixed(4)}`;
         this.direccionForm.patchValue({ direccion: `📍 ${address}` });
-        console.log('Address:', address);
+        // console.log('Address:', address);
       })
       .catch(() => {
         this.direccionForm.patchValue({ direccion: `📍 GPS: ${lat.toFixed(6)}, ${lng.toFixed(6)}` });
@@ -239,12 +239,12 @@ export class DireccionEditComponent implements OnInit, AfterViewInit, OnDestroy 
    */
   useCurrentLocation(): void {
     this.mapLoading = true;
-    console.log('Starting GPS location');
+    // console.log('Starting GPS location');
     this.geolocation$.subscribe({
       next: (position) => {
         const lat = position.coords.latitude;
         const lng = position.coords.longitude;
-        console.log('GPS Success:', lat, lng);
+        // console.log('GPS Success:', lat, lng);
         this.placeMarker(lat, lng);
         this.mapLoading = false;
       },
@@ -266,7 +266,7 @@ export class DireccionEditComponent implements OnInit, AfterViewInit, OnDestroy 
         this.iniciarFormulario();
         this.isLoading = false;
       }, error => {
-        console.error('loadIdentity error:', error);
+        // console.error('loadIdentity error:', error);
         this.isLoading = false;
       })
     } else {
@@ -330,7 +330,7 @@ export class DireccionEditComponent implements OnInit, AfterViewInit, OnDestroy 
       longitud: this.selectedCoords?.lng || this.direccionForm.value.longitud || 0
     };
 
-    console.log('Final data:', data);
+    // console.log('Final data:', data);
 
     if (this.direccion && this.direccion._id) {
       data._id = this.direccion._id;

@@ -8,6 +8,8 @@ export class Pedido{
         public tienda: Tienda,
         public status: string,
         public delivery: string,
+        public costoDelivery: number,
+        public direccion: string,
         public deliveryAddres: string,
         public createdAt: Date,
     ){

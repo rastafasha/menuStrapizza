@@ -14,7 +14,7 @@ import { TiendaService } from '../../../services/tienda.service';
 import { ModalinfoPedidosComponent } from "../../../components/modalinfo-pedidos/modalinfo-pedidos.component";
 import { LoadingComponent } from '../../../shared/loading/loading.component';
 import { AuthService } from '../../../services/auth.service';
-import { TranslatePipe } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-mispedidos',
@@ -59,6 +59,8 @@ export class MispedidosComponent {
     private pedidoService: PedidomenuService,
     private tiendaService: TiendaService,
     private authService: AuthService,
+    public translate: TranslateService
+    ,
   ) {}
 
   ngOnInit(): void {
