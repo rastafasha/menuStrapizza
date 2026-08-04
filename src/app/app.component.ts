@@ -3,6 +3,7 @@ import { Router, RouterOutlet } from '@angular/router';
 import { SwPush } from '@angular/service-worker';
 import { ConectividadService } from './services/conectividad.service';
 import { NotificacionService } from './services/notificacion.service';
+import { AuthService } from './services/auth.service';
 
 @Component({
   selector: 'app-root',
@@ -12,14 +13,20 @@ import { NotificacionService } from './services/notificacion.service';
 })
 export class AppComponent {
   title = 'menuapp';
+  user:any;
   private swPush = inject(SwPush);
   private router = inject(Router);
   private connectivity = inject(ConectividadService);
   private notificacionService = inject(NotificacionService);
+  private authService = inject(AuthService);
 
 
   ngOnInit() {
-    this.configurarNotificaciones();
+    this.user = this.authService.getLocalStorage();
+    if(this.user){
+      this.configurarNotificaciones();
+
+    }
   }
 
   private configurarNotificaciones() {

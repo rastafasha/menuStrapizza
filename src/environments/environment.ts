@@ -4,9 +4,9 @@
 
 export const environment = {
   production: true,
-  // baseUrl: 'http://localhost:3000/api',
-  // mediaUrl: 'http://localhost:3000/api/uploads',
-  // soketServer : 'http://localhost:3000',
+  // baseUrl: 'http://localhost:5000/api',
+  // mediaUrl: 'http://localhost:5000/api/uploads',
+  // soketServer : 'http://localhost:5000',
   // nombreSelected: 'pizzeria',
 
   //remoto vercel

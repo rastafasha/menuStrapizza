@@ -26,6 +26,11 @@ import { MapaComponent } from './pages/myaccount/ordenes/mapa/mapa.component';
 
 export const routes: Routes = [
     {
+        path: '',
+        redirectTo: '/home',
+        pathMatch: 'full'
+    },
+    {
         path:'home',
         component: HomeComponent
     },
