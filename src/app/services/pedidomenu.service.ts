@@ -82,6 +82,11 @@ export class PedidomenuService {
       const url = `${base_url}/pedidomenu/update/${pedido._id}`;
       return this.http.put(url, pedido, this.headers);
     }
+
+    actualizarStatusPedido(data: any) {
+    const url = `${base_url}/pedidomenu/updatestatus/`;
+    return this.http.put(url, data, this.headers);
+  }
   
     borrarPedido(_id:string){
       const url = `${base_url}/pedidomenu/remove/${_id}`;

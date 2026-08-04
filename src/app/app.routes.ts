@@ -18,11 +18,15 @@ import { MisPagosComponent } from './pages/myaccount/mis-pagos/mis-pagos.compone
 import { FavoritesComponent } from './pages/myaccount/favorites/favorites.component';
 import { ReservacionesComponent } from './pages/myaccount/reserva/reservaciones/reservaciones.component';
 import { TrackOrdenComponent } from './pages/myaccount/ordenes/track-orden/track-orden.component';
+import { PresupuestoListComponent } from './pages/myaccount/presupuesto/presupuesto-list/presupuesto-list.component';
+import { PresupuestoEditComponent } from './pages/myaccount/presupuesto/presupuesto-edit/presupuesto-edit.component';
+import { ChatComponent } from './pages/myaccount/ordenes/chat/chat.component';
+import { MapaComponent } from './pages/myaccount/ordenes/mapa/mapa.component';
 // import { ReviewOrderComponent } from './pages/review-order/review-order.component';
 
 export const routes: Routes = [
     {
-        path:'',
+        path:'home',
         component: HomeComponent
     },
     {
@@ -42,19 +46,27 @@ export const routes: Routes = [
         component: RegisterComponent
     },
     {path: 'recovery-password', component: RecoveryComponent },
+
+    {path: 'chat/:id', component: ChatComponent },
+    {path: 'mapa-page/:id', component: MapaComponent},
+    
     {path: 'my-account', component: MyaccountComponent },
     {path: 'my-account/perfil/:id', component: PerfilComponent },
-    { path: 'my-account/ordenes', component: IndexOrdenesComponent},
-    { path: 'my-account/pedidos', component: MispedidosComponent},
-    { path: 'my-account/ordenes/detalles/:id', component: DetalleOrdenComponent},
-    { path: 'my-account/ordenes/tracking/:id', component: TrackOrdenComponent},
+    {path: 'my-account/ordenes', component: IndexOrdenesComponent},
+    {path: 'my-account/pedidos', component: MispedidosComponent},
+    {path: 'my-account/ordenes/detalles/:id', component: DetalleOrdenComponent},
+    {path: 'my-account/ordenes/tracking/:id', component: TrackOrdenComponent},
     {path: 'my-account/cart', component: CartCheckoutComponent },
+
     {path: 'my-account/direcciones', component: DireccionesComponent },
     {path: 'my-account/direccion/create', component: DireccionEditComponent },
     { path: 'my-account/direccion/edit/:id', component: DireccionEditComponent},
+
     { path: 'notificaciones', component: MisNotificacionesComponent},
     { path: 'mis-pagos', component: MisPagosComponent},
     { path: 'favoritos', component: FavoritesComponent},
     { path: 'reservaciones', component: ReservacionesComponent},
+    { path: 'cotizar', component: PresupuestoEditComponent},
+    { path: 'mis-cotizaciones', component: PresupuestoListComponent},
 ];
 

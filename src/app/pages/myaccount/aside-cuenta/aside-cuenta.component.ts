@@ -5,6 +5,8 @@ import { ImagenPipe } from '../../../pipes/imagen-pipe.pipe';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { Tienda } from '../../../models/tienda.model';
+import { TiendaService } from '../../../services/tienda.service';
 
 @Component({
   selector: 'app-aside-cuenta',
@@ -22,6 +24,7 @@ export class AsideCuentaComponent implements OnInit {
   @Input() isNotvisible:boolean =false;
   public url!:string;
   public identity!: Usuario;
+  tiendaSelected!:Tienda;
 
   public activeLang = 'es';
     flag = false;
@@ -31,6 +34,7 @@ export class AsideCuentaComponent implements OnInit {
   constructor(
     private usuarioService: UsuarioService,
     private translate: TranslateService,
+    private tiendaService: TiendaService,
     
   ) {
     let USER = localStorage.getItem('user');
@@ -51,7 +55,23 @@ export class AsideCuentaComponent implements OnInit {
    }
 
   ngOnInit(): void {
+    // 1. Comenzamos a escuchar el observable del servicio
+    this.escucharTiendaActiva();
+
+    // 2. Disparamos la petición inicial (usa el slug automático 'pizzeria')
+    // Esto llenará el BehaviorSubject interno de tu servicio
+    this.tiendaService.getTiendaByNameCached().subscribe();
   }
+
+  escucharTiendaActiva() {
+    this.tiendaService.selectedTiendaObservable$.subscribe(tienda => {
+      // Al principio será null, pero en cuanto getTiendaByNameCached responda, 
+      // el tap del servicio emitirá la tienda real aquí.
+      if (tienda) {
+        this.tiendaSelected = tienda;
+      }
+    });
+}
 
   slir(){
     this.usuarioService.logout()

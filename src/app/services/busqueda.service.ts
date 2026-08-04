@@ -7,6 +7,8 @@ import { of } from 'rxjs';
 import { Transferencia } from '../models/transferencia';
 import { environment } from '../../environments/environment';
 import { Usuario } from '../models/usuario.model';
+import { Reservacion } from '../models/reservacion.model';
+import { Presupuesto } from '../models/presupuesto';
 
 
 
@@ -55,12 +57,20 @@ export class BusquedasService {
   // Aquí podrías agregar lógica de fechas si tu modelo Facturacion la requiere
   return resultados; 
 }
+  private trasnformarReservaciones(resultados: any[]): Reservacion[] {
+  // Aquí podrías agregar lógica de fechas si tu modelo Facturacion la requiere
+  return resultados; 
+}
+  private trasnformarPresupuesto(resultados: any[]): Presupuesto[] {
+  // Aquí podrías agregar lógica de fechas si tu modelo Facturacion la requiere
+  return resultados; 
+}
 
  
 
 
  buscar(
-    tipo: 'usuarios' | 'transferencias'|'reservaciones' ,
+    tipo: 'usuarios' | 'transferencias'|'reservaciones'|'presupuestos' ,
     termino: string = ''
   ) {
     // Si el término está vacío, podrías retornar un array vacío o manejarlo según tu UX
@@ -77,6 +87,10 @@ export class BusquedasService {
             return this.trasnformarUsuarios(resp.resultados);
           case 'transferencias':
             return this.trasnformarTransferencias(resp.resultados);
+          case 'reservaciones':
+            return this.trasnformarReservaciones(resp.resultados);
+          case 'presupuestos':
+            return this.trasnformarPresupuesto(resp.resultados);
           default:
             return [];
         }

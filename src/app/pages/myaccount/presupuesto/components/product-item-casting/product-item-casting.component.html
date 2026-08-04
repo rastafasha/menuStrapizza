@@ -1,0 +1,32 @@
+<div class="products-grid">
+    <div class="product-card">
+        <!-- 1. Quitamos data-bs de la imagen y agregamos (click) -->
+        <div class="product-image" (click)="verDetalles()">
+            <img [src]="product.img | imagenPipe: 'productos'" [alt]="product.titulo?.es">
+        </div>
+        <div class="product-content">
+            <div class="infpr">
+                <h4>{{ translate.currentLang() === 'en' ? product.titulo.en?.substring(0,25) : product.titulo.es?.substring(0,25)}}...</h4>
+                <div class="product-price text-danger" style="text-decoration: line-through;"
+                    *ngIf="product.precio_antes > product.precio_ahora">
+                    {{product.precio_antes|number:'1.2-2'| currency:tienda_moneda}}</div>
+                <div class="product-price">{{product.precio_ahora|number:'1.2-2'| currency:tienda_moneda}}</div>
+                
+                <app-ratingStar [product]="product"></app-ratingStar>
+            </div>
+            <div class="botns">
+                <!-- 2. Quitamos data-bs del botón del ojo y agregamos (click) -->
+                <div class="botns">
+                    <button class="btn-secondary btn" (click)="verDetalles()">
+                        <i class="fa fa-eye"></i>
+                    </button>
+                    <!-- Tu botón de agregar se queda igual, sin propagar -->
+                    <button class="btn-success btn" *ngIf="product.nombre_selector === 'unico'"
+                        (click)="addItem(product); $event.stopPropagation()">
+                        <i class="fa fa-shopping-bag"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

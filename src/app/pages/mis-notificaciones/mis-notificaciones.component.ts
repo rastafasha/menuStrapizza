@@ -198,6 +198,13 @@ export class MisNotificacionesComponent implements OnInit {
       });
     }
   }
+  irACotizaciones(tipo: string) {
+    if (tipo === 'PRESUPUESTO_ACTUALIZADO') {
+      this.router.navigate(['/mis-cotizaciones'], {
+        queryParams: { estado: 'PENDIENTE' }
+      });
+    }
+  }
 
   eliminarIndividual(id: string) {
     this.notificacionService.borrarNotificacion(id).subscribe(() => {

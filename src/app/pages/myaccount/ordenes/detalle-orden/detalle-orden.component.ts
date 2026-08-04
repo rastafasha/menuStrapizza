@@ -16,6 +16,9 @@ import { Venta } from '../../../../models/ventas.model';
 import { ModalCancelarComponent } from '../modal-cancelar/modal-cancelar.component';
 import { ModalComentariosComponent } from '../modalComentarios/modalComentarios.component';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { AsignardeliveryService } from '../../../../services/asignardelivery.service';
+import { Asignacion } from '../../../../models/asignaciondelivery.model';
+import { PedidomenuService } from '../../../../services/pedidomenu.service';
 
 declare var jQuery: any;
 declare var $: any;
@@ -44,6 +47,7 @@ export class DetalleOrdenComponent implements OnInit {
   public url!: string;
   public msm_error = false;
   public msm_success = false;
+  public usaDelivery = false;
   public id!: string;
   public detalle: any = {};
   public venta!: Venta;
@@ -61,11 +65,16 @@ export class DetalleOrdenComponent implements OnInit {
   public tienda_moneda!: any;
   public itemSeleccionado!: any;
 
+  asignacion!: Asignacion;
+  pedido:any;
+
   constructor(
     private _router: Router,
     private _route: ActivatedRoute,
     private _ventaService: VentaService,
     private tiendaService: TiendaService,
+    private asignacionDServices: AsignardeliveryService,
+    private pedidoService: PedidomenuService,
     public translate: TranslateService
   ) {
     let USER = localStorage.getItem('user');
@@ -121,8 +130,14 @@ export class DetalleOrdenComponent implements OnInit {
   getTienda() {
     this.tiendaService.getTiendaById(this.local).subscribe((resp: any) => {
       this.tienda_moneda = resp.moneda;
+      this.usaDelivery = resp.usaDelivery;
 
     })
+  }
+  getasignacion(){
+    // this.asignacionDServices.getById().subscribe((resp:any)=>{
+
+    // })
   }
 
   get_cancelacion() {
@@ -159,18 +174,31 @@ export class DetalleOrdenComponent implements OnInit {
             $('#finalizar').modal('hide');
             $('.modal-backdrop').removeClass('show');
             // this.data_reviews();
-
-          },
-          error => {
-
-          }
-        );
+            this.marcarRecibido();
+          });
       },
-      error => {
-
-      }
     );
   }
+  marcarRecibido() {
+    this.asignacionDServices.recibido(this.asignacion._id).subscribe((resp: any) => {
+      // console.log(resp);
+      this.asignacion = resp.asignacion;
+      this.updatePedidoEntregado();
+      this.ngOnInit();
+    });
+  }
+
+  updatePedidoEntregado() {
+    const data = {
+      id: this.asignacion.pedido,
+      status: 'Recibidas'
+    }
+    this.pedidoService.actualizarStatusPedido(data).subscribe((resp: any) => {
+      this.pedido = resp
+    })
+  }
+
+  
 
   cancelar(cancelarForm: any) {
     if (cancelarForm.valid) {

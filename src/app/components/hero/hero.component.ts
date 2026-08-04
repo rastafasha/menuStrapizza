@@ -1,5 +1,5 @@
 import { CommonModule, NgStyle } from '@angular/common';
-import { Component, inject, OnDestroy, OnInit, computed } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit, computed, signal } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { Tienda } from '../../models/tienda.model';
@@ -12,7 +12,8 @@ import { ModalInicialComponent } from '../modal-inicial/modal-inicial.component'
   selector: 'app-hero',
   imports: [RouterModule, CommonModule, NgStyle,
     ReservaCrearComponent, TranslatePipe,
-    ModalInicialComponent],
+    ModalInicialComponent
+  ],
   templateUrl: './hero.component.html',
   styleUrl: './hero.component.scss'
 })
@@ -25,6 +26,8 @@ export class HeroComponent implements OnInit, OnDestroy {
   langs: string[] = [];
 
   tiendaSelected: Tienda | null = null;
+   presupuestoSeleccionado = signal<any>(null);
+   
   private tiendaSubscription!: Subscription;
   private tiendasService = inject(TiendaService);
   public translate = inject(TranslateService);

@@ -3,6 +3,7 @@ import { Router, RouterOutlet } from '@angular/router';
 import { SwPush } from '@angular/service-worker';
 import { ConectividadService } from './services/conectividad.service';
 import { NotificacionService } from './services/notificacion.service';
+
 @Component({
   selector: 'app-root',
   imports: [RouterOutlet],

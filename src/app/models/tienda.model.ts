@@ -21,6 +21,7 @@ export class Tienda{
     public color_fondo: string,
     public color_primario: string,
     public has_reservacion: boolean,
+    public has_cotizacion: boolean,
     public capacidad_por_hora: number,
 
     // 🔑 INTERNACIONALIZACIÓN Y CONTROL DE FLUJO ERPS/POS:

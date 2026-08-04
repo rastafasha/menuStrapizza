@@ -1,12 +1,6 @@
 <div class="container mt-3 animate fadeIn">
-    <!-- <app-back-button [title]="title"></app-back-button> -->
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h4>🔔&nbsp; {{'Mis Notificaciones'|translate}}</h4>
-        <!-- <app-backButtn [pageTitle]='"🔔&nbsp; Mis Notificaciones"'></app-backButtn> -->
-        <!-- <button class="btn btn-outline-primary btn-sm rounded-circle shadow-sm" (click)="instruccionesModal.open()"
-            title="Ayuda de la sección">
-            <i class="fa fa-question"></i>
-        </button> -->
     </div>
     <div class="modal fade" id="modalConfirmarVaciar" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-sm">
@@ -42,7 +36,8 @@
             @for (n of notificaciones(); track n._id) {
             <div (click)="abrirDetalle(n)" class="card mb-2 shadow-sm border-start border-4" [ngClass]="{
                 'border-success': n.tipo === 'PAGO_APROBADO',
-                'border-danger': n.tipo === 'PAGO_RECHAZADO' || n.tipo === 'AVISO_MOROSIDAD',
+                'border-info': n.tipo === 'PRESUPUESTO_ACTUALIZADO',
+                'border-danger': n.tipo === 'PAGO_RECHAZADO' ,
                 'border-warning': n.tipo === 'COMUNICADO_ADMIN',
                 'bg-light': n.leido
              }">
@@ -99,10 +94,10 @@
     <div class="offcanvas-body p-4" *ngIf="notifSeleccionada">
         <div class="d-flex justify-content-between align-items-center mb-4 flex-column">
             <span class="badge rounded-pill px-3 py-2" [ngClass]="{
-                            'bg-success-soft text-success': notifSeleccionada.tipo === 'PAGO_APROBADO', 
+                          'bg-success-soft text-success': notifSeleccionada.tipo === 'PAGO_APROBADO', 
                           'bg-danger-soft text-danger': notifSeleccionada.tipo === 'PAGO_RECHAZADO',
+                          'bg-info-soft text-info': notifSeleccionada.tipo === 'PRESUPUESTO_ACTUALIZADO',
                           'bg-warning-soft text-warning': notifSeleccionada.tipo === 'COMUNICADO_ADMIN',
-                          'bg-info-soft text-info': notifSeleccionada.tipo === 'NUEVA_FACTURA',
                           }">
                 {{ notifSeleccionada.tipo }}
             </span>
@@ -120,7 +115,7 @@
             </button>
         </div>
 
-        <!-- Botón de acción Facturas-->
+        <!-- Botón de acción -->
         <div class="mt-5" *ngIf="notifSeleccionada.tipo === 'RESERVACION_CANCELADA'">
             <button class="btn btn-primary w-100 py-3 rounded-4 fw-bold"
                 (click)="irAReservaciones(notifSeleccionada.tipo)" data-bs-dismiss="offcanvas">
@@ -131,6 +126,12 @@
             <button class="btn btn-primary w-100 py-3 rounded-4 fw-bold" (click)="irAPedidos(notifSeleccionada.tipo)"
                 data-bs-dismiss="offcanvas">
                 {{'Revisar mis Pedidos'|translate}}
+            </button>
+        </div>
+        <div class="mt-5" *ngIf="notifSeleccionada.tipo === 'PRESUPUESTO_ACTUALIZADO'">
+            <button class="btn btn-primary w-100 py-3 rounded-4 fw-bold" (click)="irACotizaciones(notifSeleccionada.tipo)"
+                data-bs-dismiss="offcanvas">
+                {{'Revisar mis Cotizaciones'|translate}}
             </button>
         </div>
         <div class="mt-5">

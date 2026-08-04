@@ -103,6 +103,18 @@ export class NotificacionService {
             case 'RESERVACION_COMPLETADA':
               toast = this.toastr.error(notif.mensaje, '✅ Reservación Completada', config);
               break;
+            case 'NUEVA_SOLICITUD':
+              toast = this.toastr.success(notif.mensaje, '✅ Cotización Confirmada', config);
+              break;
+            case 'PRESUPUESTO_APROBADO':
+              toast = this.toastr.error(notif.mensaje, '✅ Cotización Confirmada', config);
+              break;
+            case 'PRESUPUESTO_ACTUALIZADO':
+              toast = this.toastr.error(notif.mensaje, '✅ Cotización Actualizado', config);
+              break;
+            case 'PRESUPUESTO_RECHAZADO':
+              toast = this.toastr.error(notif.mensaje, '❌ Cotización Rechazada', config);
+              break;
            
             default:
               toast = this.toastr.info(notif.mensaje, '🔔 Aviso Nuevo', config);
@@ -163,6 +175,7 @@ export class NotificacionService {
     if (tipo.startsWith('PAGO_') || tipo === 'NUEVO_PAGO') return `/mis-pagos`;
     if (tipo.startsWith('PEDIDO_') || tipo === 'NUEVA_SOLICITUD') return `/solicitudes`;
     if (tipo.startsWith('RESERVACION_')) return `/reservaciones`;
+    if (tipo.startsWith('PRESUPUESTO_')) return `/mis-cotizaciones`;
     return '/home';
   }
 

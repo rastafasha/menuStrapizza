@@ -74,6 +74,12 @@
                             <p>{{ 'Reservaciones' | translate }}</p>
                         </a>
                     </div>
+                    <div class="iconop shadow-sm" *ngIf="identity.telefono && tiendaSelected.has_cotizacion === true">
+                        <a [routerLink]="['/mis-cotizaciones']">
+                            <i class="fa fa-receipt"></i>
+                            <p>{{ 'Cotizaciones' | translate }}</p>
+                        </a>
+                    </div>
 
                     <div class="iconop shadow-sm">
                         <!-- Idioma Switch -->
@@ -86,7 +92,7 @@
                             </label>
 
                             <!-- Muestra el texto dinámico o la bandera actual junto al interruptor -->
-                            <p>
+                            <p style="padding-top: 8px;">
                                 <i class="flag-icon"
                                     [ngClass]="activeLang === 'en' ? 'flag-icon-us' : 'flag-icon-es'"></i>
                                 {{ 'Idioma' | translate }}

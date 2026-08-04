@@ -11,6 +11,8 @@ import { MenuFooterComponent } from "../../shared/menu-footer/menu-footer.compon
 import { PushNotificationService } from '../../services/push-notification.service';
 import { ToastrService } from 'ngx-toastr';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { TiendaService } from '../../services/tienda.service';
+import { Tienda } from '../../models/tienda.model';
 
 @Component({
   selector: 'app-myaccount',
@@ -36,15 +38,17 @@ export class MyaccountComponent implements OnInit {
     flag = false;
     is_visible: boolean = false;
     langs: string[] = [];
+    tiendaSelected!:Tienda;
 
   constructor(
     public router: Router,
     public http: HttpClient,
     private usuarioService: UsuarioService,
+    private tiendaService: TiendaService,
     public activatedRoute: ActivatedRoute,
     public pushService: PushNotificationService,
     public toastr: ToastrService,
-    private translate: TranslateService,
+    public translate: TranslateService,
     handler: HttpBackend
   ) {
     this.http = new HttpClient(handler);
@@ -72,6 +76,12 @@ export class MyaccountComponent implements OnInit {
     }else{
      this.router.navigateByUrl('/login');
     }
+    // 1. Comenzamos a escuchar el observable del servicio
+    this.escucharTiendaActiva();
+
+    // 2. Disparamos la petición inicial (usa el slug automático 'pizzeria')
+    // Esto llenará el BehaviorSubject interno de tu servicio
+    this.tiendaService.getTiendaByNameCached().subscribe();
   }
 
   logout(){
@@ -85,6 +95,19 @@ export class MyaccountComponent implements OnInit {
      
     })
   }
+
+  escucharTiendaActiva() {
+    this.tiendaService.selectedTiendaObservable$.subscribe(tienda => {
+      // Al principio será null, pero en cuanto getTiendaByNameCached responda, 
+      // el tap del servicio emitirá la tienda real aquí.
+      if (tienda) {
+        this.tiendaSelected = tienda;
+        
+      }
+    });
+}
+
+  
 
 
   async togglePush() {

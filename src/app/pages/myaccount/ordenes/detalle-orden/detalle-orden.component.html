@@ -2,7 +2,7 @@
 
 <!-- Page Content-->
 <div class="container pb-5 mb-2 mb-md-3" style="margin-top: 100px;">
-    
+
     <div class="row">
         <!-- Sidebar-->
         <aside class="col-lg-4  pt-lg-0">
@@ -100,29 +100,18 @@
                                                 <i class="fa fa-check mr-2"></i>
                                                 {{'Confirmar entrega'|translate}}
                                             </button>
+                                            <button *ngIf="usaDelivery === true" type="button" class="btn btn-info"
+                                                [routerLink]="['/mapa-page/',venta._id]">
+                                                <i class="fa fa-eye mr-2"></i>
+                                                {{'seguimiento'|translate}}
+                                            </button>
+                                            <button *ngIf="usaDelivery === true" type="button" class="btn btn-warning"
+                                                [routerLink]="['/chat/',venta._id]">
+                                                <i class="fa fa-pencil mr-2"></i>
+                                                {{'Chat'|translate}}
+                                            </button>
 
-                                            <div class="modal fade" id="finalizar" tabindex="-1" role="dialog"
-                                                style="display: none;" aria-bs-hidden="true">
-                                                <div class="modal-dialog modal-dialog-centered" role="document">
-                                                    <div class="modal-content">
-                                                        <div class="modal-header">
-                                                            <h4 class="modal-title">{{'Confirmación'|translate}}</h4>
-                                                            <button class="close" type="button" data-bs-dismiss="modal"
-                                                                aria-label="Close"><span
-                                                                    aria-hidden="true">×</span></button>
-                                                        </div>
-                                                        <div class="modal-body">
-                                                            <p class="font-size-sm">{{'Al aceptar estas confimando la recepción de la compra'|translate}}.</p>
-                                                        </div>
-                                                        <div class="modal-footer">
-                                                            <button class="btn btn-secondary btn-sm" type="button"
-                                                                data-bs-dismiss="modal">{{'Cerrar'|translate}}</button>
-                                                            <button class="btn btn-primary btn-shadow btn-sm"
-                                                                type="button" (click)="finalizar(id)">{{'Confirmar'|translate}}</button>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
+
                                         </div>
 
                                     </div>
@@ -212,7 +201,8 @@
                                                         style="width:100%" class="rounded-left" alt="Card image">
                                                     <div class="ifdet">
                                                         <h3 class="product-title font-size-base mb-2">
-                                                            {{ translate.currentLang() === 'en' ? item.producto?.titulo?.en :  item.producto?.titulo?.es }}
+                                                            {{ translate.currentLang() === 'en' ?
+                                                            item.producto?.titulo?.en : item.producto?.titulo?.es }}
                                                         </h3>
                                                         <div class="font-size-sm"><span
                                                                 class="text-muted mr-2">{{'Cantidad'|translate}}:</span>
@@ -236,7 +226,8 @@
                                                                         {{item.selector}}
                                                                     </div>
                                                                     <div class="font-size-sm">
-                                                                        <span class="text-muted mr-2">{{'Selector'|translate}}:</span>
+                                                                        <span
+                                                                            class="text-muted mr-2">{{'Selector'|translate}}:</span>
                                                                         {{item.selector_elegido}}
                                                                     </div>
                                                                     <!-- <div class="font-size-sm"><span
@@ -251,14 +242,16 @@
 
                                                                     <ng-container
                                                                         *ngIf="venta.estado == 'Finalizado' || venta.estado == 'Enviado'">
-                                                                        
-                                                                         <button type="button" class="btn btn-outline-info mt-3"
-                                                                        (click)="onEditComentario(item)"
-                                                                        data-bs-toggle="modal"
-                                                                        data-bs-target="#editCommentModal">
-                                                                        <i style="color: gold;" class="fa fa-star mr-2"></i> 
-                                                                        {{'Emitir comentario'|translate}}
-                                                                    </button>
+
+                                                                        <button type="button"
+                                                                            class="btn btn-outline-info mt-3"
+                                                                            (click)="onEditComentario(item)"
+                                                                            data-bs-toggle="modal"
+                                                                            data-bs-target="#editCommentModal">
+                                                                            <i style="color: gold;"
+                                                                                class="fa fa-star mr-2"></i>
+                                                                            {{'Emitir comentario'|translate}}
+                                                                        </button>
                                                                     </ng-container>
 
                                                                 </div>
@@ -283,8 +276,28 @@
         </section>
     </div>
 </div>
+
+<div class="modal fade" id="finalizar" tabindex="-1" role="dialog" style="display: none;" aria-bs-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">{{'Confirmación'|translate}}</h4>
+                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="font-size-sm">{{'Al aceptar estas confimando la recepción de la compra'|translate}}.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary btn-sm" type="button"
+                    data-bs-dismiss="modal">{{'Cerrar'|translate}}</button>
+                <button class="btn btn-primary btn-shadow btn-sm" type="button"
+                    (click)="finalizar(id)">{{'Confirmar'|translate}}</button>
+            </div>
+        </div>
+    </div>
+</div>
 <!-- modal comentarios -->
-<app-modalComentarios [item]="itemSeleccionado" [local]="local"  #editComment></app-modalComentarios>
+<app-modalComentarios [item]="itemSeleccionado" [local]="local" #editComment></app-modalComentarios>
 <!-- modal comentarios -->
 <!-- modal cancelacion -->
 <app-modal-cancelar></app-modal-cancelar>

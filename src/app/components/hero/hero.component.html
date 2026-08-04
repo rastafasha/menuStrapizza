@@ -36,6 +36,14 @@
                     {{'Reservar' | translate}}
                 </button>
             </div>
+            <div class="botns mt-3" *ngIf="tiendaSelected?.has_cotizacion === true">
+                <button class="btn btn-primary rounded-rounded " [routerLink]="['/cotizar']">
+                    {{'Cotizar' | translate}}
+                </button>
+
+                
+            </div>
+                
 
             <!-- Idioma Switch -->
                 <div class="lang-switch-container mt-3">

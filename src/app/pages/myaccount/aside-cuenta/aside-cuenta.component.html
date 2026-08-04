@@ -61,6 +61,20 @@
               {{ 'Reservaciones' | translate }}
             </a>
           </li>
+          <li *ngIf="identity.telefono && tiendaSelected.has_cotizacion === true">
+            <a class="nav-links shadow-sm" [routerLink]="['/mis-cotizaciones']" routerLinkActive="active"
+              [routerLinkActiveOptions]="{exact: true}">
+              <i class="fa fa-receipt"></i>
+              {{ 'Cotizaciones' | translate }}
+            </a>
+          </li>
+          <li *ngIf="identity.telefono && tiendaSelected.has_cotizacion === true">
+            <a class="nav-links shadow-sm" [routerLink]="['/mis-cotizaciones']" routerLinkActive="active"
+              [routerLinkActiveOptions]="{exact: true}">
+              <i class="fa fa-receipt"></i>
+              {{ 'Inicio Cuenta' | translate }}
+            </a>
+          </li>
           <li *ngIf="identity.telefono">
             <!-- Idioma Switch -->
             <div class="nav-links shadow-sm">
@@ -71,7 +85,7 @@
               </label>
 
               <!-- Muestra el texto dinámico o la bandera actual junto al interruptor -->
-              <p>
+              <p style="padding-top: 8px;">
                 <i class="flag-icon" [ngClass]="activeLang === 'en' ? 'flag-icon-us' : 'flag-icon-es'"></i>
                 {{ 'Idioma' | translate }}
               </p>

@@ -141,7 +141,7 @@ export class ReviewOrderComponent implements OnInit, OnDestroy {
       this.isbandejaList = items.length > 0;
       // If cart becomes empty, navigate to home
       if (items.length === 0 && this.router.url.includes('/review')) {
-        this.router.navigate(['/']);
+        this.router.navigate(['/home']);
       }
     });
   }
@@ -689,35 +689,6 @@ export class ReviewOrderComponent implements OnInit, OnDestroy {
   }
 
 
-
-
-
-  // Tu función original intacta
-  // sendWhatsAppOrder(): void {
-  //   this.whatsapp = this.tiendaSelected.telefono;
-  //   const phone = this.whatsapp.replace(/\D/g, '');
-
-  //   // 1. TRUCO DE MAGIA: Abrimos una pestaña en blanco INMEDIATAMENTE.
-  //   // Como ocurre al instante del clic, el teléfono NO la bloquea.
-  //   const nuevaPestana = window.open('about:blank', '_blank');
-
-  //   // 2. Procesamos el mensaje (aquí es donde se tardaba el código)
-  //   const message = this.getWhatsAppMessage();
-
-  //   if (message && nuevaPestana) {
-  //     // 3. Si el mensaje se generó bien, le cambiamos la URL a la pestaña que ya abrimos
-  //     nuevaPestana.location.href = `https://wa.me/${phone}?text=${message}`;
-  //   } else if (nuevaPestana) {
-  //     // Si algo falló, cerramos la pestaña silenciosamente para no dejarla colgada
-  //     nuevaPestana.close();
-  //     console.warn('No se pudo generar el mensaje.');
-  //     return;
-  //   }
-
-  //   // 4. Tu lógica de limpieza original intacta
-  //   localStorage.removeItem('bandejaItems');
-  //   this.carritoService.clearCart();
-  // }
 
 
 

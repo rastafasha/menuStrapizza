@@ -2,7 +2,7 @@
 <header class="header" >
     <div class="header-container" (pulldown)="onPullRefresh()">
         <div class="logo">
-            <a routerLink="/">
+            <a routerLink="/home">
                 <span class="logo-text"><img src="assets/svg/logo-zlipmenu_logotipo.svg" > </span>
             </a>
             <!-- CAMPANA CON BADGE -->
@@ -23,7 +23,7 @@
 
             <span class="logo-text" [ngStyle]="{'color': tiendaSelected?.color_primario }">| {{titleapp}}</span>
             <app-loading *ngIf="isLoading"></app-loading>
-            <a routerLink="/" *ngIf="tiendaSelected && !isLoading">
+            <a routerLink="/home" *ngIf="tiendaSelected && !isLoading">
                 <img style="border-radius: 100px;" [src]="tiendaSelected.img | imagenPipe: 'tiendas'" [alt]="tiendaSelected.nombre">
                 
             </a>

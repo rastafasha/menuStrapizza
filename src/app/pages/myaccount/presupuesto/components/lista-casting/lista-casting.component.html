@@ -1,0 +1,68 @@
+<section class="categories-section" id="categorias">
+    <div class="container">
+        <!-- Título Principal de la Carta -->
+        <div class="title-section text-center">
+            <h2 class="title-carta">{{title}}</h2>
+            <div class="divider-line"></div>
+        </div>
+
+        <!-- Indicador de carga -->
+        <app-loading *ngIf="isLoading"></app-loading>
+
+        <div *ngIf="!isLoading">
+            <!-- Menú de Pestañas Horizontales / Filtros dinámicos -->
+            <div class="tab-content-set">
+                <ul class="nav">
+                    <!-- Ciclo de subcategorías internas (Pastas, Pizza, Especiales...) -->
+                    <ng-container *ngFor="let subcat of subcategories | categoriasPipe">
+                        <!-- 🌐 Extraemos el nombre que ve el usuario según el idioma del sistema -->
+                        <ng-container
+                            *ngIf="(translate.currentLang() === 'en' ? subcat.nombre.en : subcat.nombre.es) as nombreTraducido">
+
+                            <!-- 🧠 IMPORTANTE: Evaluamos .active usando SIEMPRE el string en español (.es) como ID único -->
+                            <li [class.active]="activeCategory === subcat.nombre.es"
+                                [ngStyle]="activeCategory === subcat.nombre.es ? {'color': tiendaSelected?.color_primario} : {}">
+
+                                <!-- 🧠 Pasamos subcat.nombre.es a selectCategory para que el filtro interno del .ts no se rompa -->
+                                <a href="javascript:void(0);"
+                                    [ngClass]="{'active': activeCategory === subcat.nombre.es}"
+                                    (click)="selectCategory(subcat.nombre.es || '')"
+                                    [style.color]="activeCategory === subcat.nombre.es ? (tiendaSelected?.color_primario + ' !important') : null">
+
+                                    <!-- 🌐 Lo que ve el cliente sí cambia de idioma correctamente -->
+                                    {{ nombreTraducido | titlecase }}
+                                </a>
+                            </li>
+
+                        </ng-container>
+                    </ng-container>
+
+
+
+                    <!-- Botón estático para ver TODO el menú principal -->
+                    <li [class.active]="activeCategory === 'all' "
+                        [ngStyle]="{'color': tiendaSelected?.color_primario }">
+                        <a href="#" onclick="return false;" [ngClass]="{'active': activeCategory === 'all'}"
+                            (click)="selectCategory('all')">
+                            {{'Todo'| translate}}
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Grilla / Lista de productos filtrados -->
+            <div *ngFor="let product of todo; let i = index">
+                <app-product-item-casting [activeCategory]="activeCategory" [tienda_moneda]="tienda_moneda" [product]="product"
+                    data-bs-toggle="offcanvas" [attr.data-bs-target]="'#modalProductCasting-' + product._id"
+                    (click)="openModal(product)">
+                </app-product-item-casting>
+            </div>
+        </div>
+    </div>
+</section>
+<div class="clear"></div>
+
+<!-- Modal global e independiente para el detalle del plato seleccionado -->
+<app-modal-product-casting [product]="selectedProduct" [activeCategory]="activeCategory" [tienda_moneda]="tienda_moneda"
+    (modalClosed)="selectedProduct = null" *ngIf="selectedProduct && !isLoading">
+</app-modal-product-casting>
