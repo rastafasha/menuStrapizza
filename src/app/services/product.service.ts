@@ -83,6 +83,14 @@ export class ProductoService {
     const url = `${base_url}/productos/producto_by_categorynombre/${nombre}`;
     return this.http.get<any>(url)
   }
+  bypedido(localId: any):Observable<any>{
+
+     const url = `${base_url}/productos/bypedido/${localId}`;
+    return this.http.get<any>(url, this.headers)
+    .pipe(
+      map((resp:{ok: boolean, products: Producto}) => resp.products)
+      );
+  }
 
 
   // cat_by_name(name):Observable<any>{

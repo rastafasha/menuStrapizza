@@ -1,7 +1,50 @@
 <app-header></app-header>
 <main class="container pb-5 mb-2 mb-md-3" style="margin-top: 130px;">
     <app-loading *ngIf="isLoading"></app-loading>
-    <form  [formGroup]="presupuestoForm" *ngIf="!isLoading">
+    <form [formGroup]="presupuestoForm" *ngIf="!isLoading">
+
+        <div class="form-group" *ngIf="!user">
+            <label class="form-label fw-bold text-secondary mb-1">{{'Nombre'|translate}}</label>
+            <input type="text" formControlName="first_name" placeholder="Ej. Juan " class="form-control" required>
+            <div *ngIf="presupuestoForm.get('first_name')?.touched && presupuestoForm.get('first_name')?.invalid"
+                class="text-danger">
+                <div *ngIf="presupuestoForm.get('first_name')?.errors?.['required']">
+                    {{'Campo Requerido'|translate}}
+                </div>
+                <div *ngIf="presupuestoForm.get('first_name')?.errors?.['minlength']">
+                    {{'Un Apellido'|translate}}
+                </div>
+            </div>
+
+        </div>
+        <div class="form-group" *ngIf="!user">
+            <label class="form-label fw-bold text-secondary mb-1">{{'Apellido'|translate}}</label>
+            <input type="text" formControlName="last_name" placeholder="Ej. Pérez" class="form-control" required>
+            <div *ngIf="presupuestoForm.get('last_name')?.touched && presupuestoForm.get('last_name')?.invalid"
+                class="text-danger">
+                <div *ngIf="presupuestoForm.get('last_name')?.errors?.['required']">
+                    {{'Campo Requerido'|translate}}
+                </div>
+                <div *ngIf="presupuestoForm.get('last_name')?.errors?.['minlength']">
+                    {{'Un Apellido'|translate}}
+                </div>
+            </div>
+
+        </div>
+
+        <div class="form-group" *ngIf="!user">
+            <label class="form-label fw-bold text-secondary mb-1">{{'Teléfono de contacto'|translate}}</label>
+            <input type="tel" formControlName="telefono" placeholder="Ej. 04121234567" class="form-control">
+            <div *ngIf="presupuestoForm.get('telefono')?.touched && presupuestoForm.get('telefono')?.invalid"
+                class="text-danger">
+                <div *ngIf="presupuestoForm.get('telefono')?.errors?.['required']">
+                    {{'Campo Requerido'|translate}}
+                </div>
+                <div *ngIf="presupuestoForm.get('telefono')?.errors?.['minlength']">
+                    {{'Número Válido'|translate}}
+                </div>
+            </div>
+        </div>
 
         <!-- Campo: fecha -->
         <div class="mb-3 col-xs-12 col-sm-6 col-md-3">
@@ -68,14 +111,13 @@
             </div>
         </div>
         <!-- SECCIÓN: ITEMS -->
-        <app-lista-casting *ngIf="!isLoading" [isVisible]="true" 
-            [refreshCasProducts]="refreshCasProducts" >
+        <app-lista-casting *ngIf="!isLoading" [isVisible]="true" [refreshCasProducts]="refreshCasProducts">
         </app-lista-casting>
 
         <div class="row align-items-center">
             <div class="col-12">
-                <div class="doctor-submit text-end">
-                    <button type="button" class="btn btn-primary submit-form me-2" (click)="save()">Guardar</button>
+                <div class="doctor-submit ">
+                    <button type="button" class="btn btn-outline-success w-100 py-3 rounded-pill" (click)="save()">Guardar</button>
 
                 </div>
             </div>

@@ -22,6 +22,8 @@ import { PresupuestoListComponent } from './pages/myaccount/presupuesto/presupue
 import { PresupuestoEditComponent } from './pages/myaccount/presupuesto/presupuesto-edit/presupuesto-edit.component';
 import { ChatComponent } from './pages/myaccount/ordenes/chat/chat.component';
 import { MapaComponent } from './pages/myaccount/ordenes/mapa/mapa.component';
+import { BajoPedidoComponent } from './pages/producto/bajo-pedido/bajo-pedido.component';
+import { RevisarPedidoComponent } from './pages/producto/revisar-pedido/revisar-pedido.component';
 // import { ReviewOrderComponent } from './pages/review-order/review-order.component';
 
 export const routes: Routes = [
@@ -37,6 +39,10 @@ export const routes: Routes = [
     {
         path:'review',
         component: ReviewOrderComponent
+    },
+    {
+        path:'review-solicitud',
+        component: RevisarPedidoComponent
     },
     {
         path:'pay/:id',
@@ -73,5 +79,7 @@ export const routes: Routes = [
     { path: 'reservaciones', component: ReservacionesComponent},
     { path: 'cotizar', component: PresupuestoEditComponent},
     { path: 'mis-cotizaciones', component: PresupuestoListComponent},
+
+    { path: 'bajopedido', component: BajoPedidoComponent},
 ];
 

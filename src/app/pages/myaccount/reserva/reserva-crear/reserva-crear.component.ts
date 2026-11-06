@@ -6,7 +6,6 @@ import { ToastrService } from 'ngx-toastr';
 import { Reservacion } from '../../../../models/reservacion.model';
 import { AuthService } from '../../../../services/auth.service';
 import { ReservacionService } from '../../../../services/reservacion.service';
-import { LoadingComponent } from '../../../../shared/loading/loading.component';
 import { TranslatePipe } from '@ngx-translate/core';
 declare var bootstrap: any;
 @Component({

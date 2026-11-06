@@ -16,6 +16,16 @@
                 <i class="fa fa-shopping-cart animated tada "></i>
             </a>
         </li>
+        <li *ngIf="totalSolicitudList > 0 || bandejaListPedido.length > 0">
+            <a [routerLink]="['/review-solicitud']" routerLinkActive="active" class="carrito">
+                <!-- <i class="fa fa-shopping-bag"></i> -->
+                <span class="cart-count-badge" *ngIf="bandejaListPedido.length > 0 && bandejaListPedido.length <= 10">
+                    {{totalSolicitudList}}</span>
+                <span class="cart-count-badge" *ngIf="bandejaListPedido.length > 10">
+                    +10</span>
+                <i class="fa fa-shopping-bag animated tada "></i>
+            </a>
+        </li>
 
         <li>
             <a [routerLink]="['/my-account']" routerLinkActive="active">

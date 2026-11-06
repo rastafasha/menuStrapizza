@@ -24,9 +24,11 @@ export class Producto {
   subcategorias?: { es: string; en: string };
   marca!: Marca;
   color!: Color;
+  condition!: 'new' | 'used';
   nombre_selector!: string;
   selector_elegido!:string;
   isFeatured!: boolean;
+  bajoPedido!: boolean;
   selector?: Selector;
   status!: boolean;
   createdAt!: Date;

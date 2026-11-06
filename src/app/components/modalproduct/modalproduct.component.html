@@ -17,7 +17,8 @@
                     <img [src]="product.img | imagenPipe: 'productos'" [alt]="product.titulo" class="img-fluid mb-5" />
                 </div>
                 <div class="infoinicial">
-                    <h2 class="recipe-title">{{ translate.currentLang() === 'en' ? product.titulo.en : product.titulo.es}}</h2>
+                    <h2 class="recipe-title">{{ translate.currentLang() === 'en' ? product.titulo.en :
+                        product.titulo.es}}</h2>
                     <ul class="recipe-details list-unstyled">
                         <li class="recipe-details-item servings">
                             <span class="value text-muted me-2" style="text-decoration: line-through;"
@@ -37,22 +38,24 @@
 
             <div class="ft-recipe__content mt-3">
 
-                <p class="description" [innerHTML]="translate.currentLang() === 'en' ? product.detalle?.en : product.detalle?.es"></p>
+                <p class="description"
+                    [innerHTML]="translate.currentLang() === 'en' ? product.detalle?.en : product.detalle?.es"></p>
 
 
                 <!-- selectores -->
-               <div *ngIf="product.nombre_selector !== 'unico'" class="mb-3">
-                <p class="small">{{ 'Selecciona alguna opción por favor' | translate }}.</p>
-                <select class="form-select" id="product-size" name="selector_to_cart" [(ngModel)]="selector_to_cart"
-                    (change)="selector_error = false">
-                    <option value=" " selected disabled>{{ 'Selecciona' | translate }}</option>
-                    
-                    <!-- 💡 Ejecutamos el Signal añadiendo () -->
-                    <option [value]="translate.currentLang() === 'en' ? selector.titulo.en : selector.titulo.es" *ngFor="let selector of selectores">
-                        {{ translate.currentLang() === 'en' ? selector.titulo.en : selector.titulo.es }}
-                    </option>
-                </select>
-            </div>
+                <div *ngIf="product.nombre_selector !== 'unico'" class="mb-3">
+                    <p class="small">{{ 'Selecciona alguna opción por favor' | translate }}.</p>
+                    <select class="form-select" id="product-size" name="selector_to_cart" [(ngModel)]="selector_to_cart"
+                        (change)="selector_error = false">
+                        <option value=" " selected disabled>{{ 'Selecciona' | translate }}</option>
+
+                        <!-- 💡 Ejecutamos el Signal añadiendo () -->
+                        <option [value]="translate.currentLang() === 'en' ? selector.titulo.en : selector.titulo.es"
+                            *ngFor="let selector of selectores">
+                            {{ translate.currentLang() === 'en' ? selector.titulo.en : selector.titulo.es }}
+                        </option>
+                    </select>
+                </div>
 
                 <div class="d-grid gap-2 mt-3">
                     <button class="btn btn-outline-success w-100 py-3 rounded-pill" (click)="addItem(product)">
@@ -61,6 +64,10 @@
                     <button class="btn btn-outline-danger w-100 py-3 rounded-pill" *ngIf="user"
                         (click)="addToFavorites(product)" type="button">
                         <i class="fa fa-heart"></i> {{ 'Agregar a favoritos' | translate }}
+                    </button>
+                    <button class="btn btn-outline-danger w-100 py-3 rounded-pill" *ngIf="user && product.bajoPedido === true"
+                        (click)="irASolicitud()" type="button">
+                        <i class="fa fa-edit"></i> {{ 'Solicitar' | translate }}
                     </button>
                 </div>
 

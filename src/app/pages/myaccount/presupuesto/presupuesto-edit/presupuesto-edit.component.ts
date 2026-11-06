@@ -11,6 +11,7 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { HeaderComponent } from '../../../../shared/header/header.component';
 import { ListaCastingComponent } from '../components/lista-casting/lista-casting.component';
 import { Producto } from '../../../../models/producto.model';
+import { TiendaService } from '../../../../services/tienda.service';
 declare var bootstrap: any;
 
 @Component({
@@ -34,10 +35,11 @@ export class PresupuestoEditComponent implements OnInit, OnChanges {
   @Output() refreshCasProducts: EventEmitter<void> = new EventEmitter<void>();
 
   activeCategory!: string;
+  
 
   public presupuestoForm!: FormGroup;
   public presupuesto!: Presupuesto;
-  pageTitle!: string;
+  pageTitle: string = 'Creando Presupuesto';
   public medical: any = [];
   description: any;
   name_medical: any;
@@ -57,8 +59,12 @@ export class PresupuestoEditComponent implements OnInit, OnChanges {
   subtotal = 0;
   public expressForm!: FormGroup;
 
+  tiendaSelected: any;
+
+
   constructor(
     public presupuestoService: PresupuestoService,
+    public tiendaService: TiendaService,
     public authService: AuthService,
     public router: Router,
     public toastr: ToastrService,
@@ -70,7 +76,17 @@ export class PresupuestoEditComponent implements OnInit, OnChanges {
   ngOnInit() {
     window.scrollTo(0, 0);
     this.validarFormulario();
+    this.escucharTiendaActiva();
     this.loadBandejaListFromLocalStorage();
+  }
+
+   escucharTiendaActiva() {
+    this.tiendaService.selectedTiendaObservable$.subscribe(tienda => {
+      if (tienda) {
+        this.tiendaSelected = tienda;
+        console.log(this.tiendaSelected)
+      }
+    });
   }
   
   ngOnChanges(changes: SimpleChanges): void {
@@ -90,9 +106,13 @@ export class PresupuestoEditComponent implements OnInit, OnChanges {
         id: presupuesto._id,
         title: presupuesto.title,
         description: presupuesto.description,
+        hora: presupuesto.hora,
         amount: this.amount,
         status: presupuesto.status,
         cliente: this.cliente,
+        first_name: presupuesto.first_name,
+        last_name: presupuesto.last_name,
+        telefono: presupuesto.telefono,
         medical: this.medical,
         usuario: this.user.uid,
       });
@@ -119,6 +139,10 @@ export class PresupuestoEditComponent implements OnInit, OnChanges {
       amount: null,
       status: null,
       fechaEvento: null,
+      hora: null,
+      first_name: null,
+      last_name: null,
+      telefono: null,
       cantidadPersonas: null,
       listItems: [],
     });
@@ -133,8 +157,13 @@ export class PresupuestoEditComponent implements OnInit, OnChanges {
       surname: [''],
       status: [''],
       fechaEvento: [''],
+      hora: [''],
+      first_name: [''],
+      last_name: [''],
+      telefono: [''],
       cantidadPersonas: [''],
       description: [''],
+      tienda: [this.tiendaSelected],
     })
   }
 
@@ -181,10 +210,15 @@ export class PresupuestoEditComponent implements OnInit, OnChanges {
     const data = {
       title: this.presupuestoForm.value.title,
       description: this.presupuestoForm.value.description,
-      cliente: this.usuarioSelected,
-      usuario: this.user.uid,
+      fechaEvento: this.presupuestoForm.value.fechaEvento,
+      hora: this.presupuestoForm.value.hora,
+      first_name: this.presupuestoForm.value.first_name,
+      last_name: this.presupuestoForm.value.last_name,
+      telefono: this.presupuestoForm.value.telefono,
+      cliente: this.usuarioSelected || null,
       pedidoList: this.bandejaList,
       amount: this.amount,
+      tienda:this.tiendaSelected._id,
       status: 'PENDING',
     }
 

@@ -12,7 +12,7 @@ import { ModalInicialComponent } from '../modal-inicial/modal-inicial.component'
   selector: 'app-hero',
   imports: [RouterModule, CommonModule, NgStyle,
     ReservaCrearComponent, TranslatePipe,
-    ModalInicialComponent
+    ModalInicialComponent,
   ],
   templateUrl: './hero.component.html',
   styleUrl: './hero.component.scss'

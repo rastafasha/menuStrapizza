@@ -26,7 +26,8 @@ declare var bootstrap: any;
 export class CasProductsComponent implements OnInit, OnDestroy {
   @Output() msm_success: EventEmitter<boolean> = new EventEmitter<boolean>();
   @Input() refreshCasProducts: EventEmitter<void> | null = null;
-  // @Input() activeCategory: string = 'all';
+  
+  
   @Input() activeSubCategory: string = 'all';
   @Input() title!: string;
   @Input() isVisible = false;

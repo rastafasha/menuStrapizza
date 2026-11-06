@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, inject, Input, Output, OnInit, OnDestroy, EventEmitter, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
 import { Producto } from '../../models/producto.model';
 import { StorageService } from '../../services/storage.service';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { Usuario } from '../../models/usuario.model';
 import { TiendaService } from '../../services/tienda.service';
 import { Tienda } from '../../models/tienda.model';
@@ -54,7 +54,7 @@ export class ModalproductComponent implements OnInit, OnDestroy, AfterViewInit {
   comentarios!: Comentario;
   stars: number = 0;
 
-  private tiendaService = inject(TiendaService);
+  private router = inject(Router);
   private carritoService = inject(CarritoService);
   private selectorService = inject(SelectorService);
   private favoritoService = inject(FavoritoService);
@@ -183,7 +183,6 @@ export class ModalproductComponent implements OnInit, OnDestroy, AfterViewInit {
     this.toastr.success('Artículo removido del carrito');
   }
   addToFavorites(producto: Producto) {
-    console.log(this.producto);
 
     const data = {
       producto: producto._id,
@@ -194,6 +193,11 @@ export class ModalproductComponent implements OnInit, OnDestroy, AfterViewInit {
       this.favoriteItem = res;
       this.toastr.success('Producto agregado a favoritos');
     });
+  }
+
+  irASolicitud() {
+    this.onModalHidden(); // Cierra el modal antes de navegar
+    this.router.navigate(['/bajopedido']);
   }
 
   closeAviso() {

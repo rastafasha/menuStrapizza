@@ -40,8 +40,11 @@
                 <button class="btn btn-primary rounded-rounded " [routerLink]="['/cotizar']">
                     {{'Cotizar' | translate}}
                 </button>
-
-                
+            </div>
+            <div class="botns mt-3" *ngIf="tiendaSelected?.usaPedido === true">
+                <button class="btn btn-primary rounded-rounded " [routerLink]="['/bajopedido']">
+                    {{'Pedidos' | translate}}
+                </button>
             </div>
                 
 
@@ -69,4 +72,5 @@
 </section>
 <div class="clear"></div>
 <app-reserva-crear #presupuestoEditModal [tiendaSelected]="tiendaSelected"></app-reserva-crear>
+
 <app-modal-inicial #modalInicial></app-modal-inicial>

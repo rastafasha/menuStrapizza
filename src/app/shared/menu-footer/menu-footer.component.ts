@@ -10,6 +10,8 @@ import { PedidomenuService } from '../../services/pedidomenu.service';
 import { Pedido } from '../../models/pedido.model';
 import { UsuarioService } from '../../services/usuario.service';
 import { NotificacionService } from '../../services/notificacion.service';
+import { SolicitudService } from '../../services/solicitud.service';
+import { Solicitud } from '../../models/solicitud.model';
 
 @Component({
   selector: 'app-menu-footer',
@@ -20,10 +22,12 @@ import { NotificacionService } from '../../services/notificacion.service';
 export class MenuFooterComponent {
 
   totalList: number = 0;
+  totalSolicitudList: number = 0;
   tiendas: Tienda[] = [];
   tienda!: Tienda;
   tiendaSelected!: Tienda;
   bandejaList: any[] = [];
+  bandejaListPedido: any[] = [];
 
   year: number = new Date().getFullYear();
   public user!: any;
@@ -33,14 +37,20 @@ export class MenuFooterComponent {
   pedido: any;
   public pedidos!: Pedido[] | null;
 
+  public solicitudes!: Solicitud[] | null;
+   solicitudGuardado = false;
+   solicitud: any;
+
    
 
   private pedidoService = inject(PedidomenuService);
   private carritoService = inject(CarritoService);
+  private solicitudService = inject(SolicitudService);
   private userService = inject(UsuarioService);
  
 
   private cartSubscription!: Subscription;
+  private solicitudSubscription!: Subscription;
 
   ngOnInit(): void {
     this.user = this.userService.getLocalStorage();
@@ -48,6 +58,7 @@ export class MenuFooterComponent {
     
     // Subscribe to cart changes
     this.cartSubcrpt();
+    this.solicSubcrpt();
     this.chekpedidoguardado();
 
   }
@@ -59,10 +70,19 @@ export class MenuFooterComponent {
       // console.log(this.bandejaList)
     });
   }
+  solicSubcrpt() {
+    this.solicitudSubscription = this.solicitudService.bandejaListPedido$.subscribe(items => {
+      this.bandejaListPedido = items;
+      this.totalSolicitudList = items.length;
+    });
+  }
 
   ngOnDestroy(): void {
     if (this.cartSubscription) {
       this.cartSubscription.unsubscribe();
+    }
+    if (this.solicitudSubscription) {
+      this.solicitudSubscription.unsubscribe();
     }
   }
 
@@ -119,6 +139,63 @@ export class MenuFooterComponent {
       this.pedidoGuardado = pedidoCoincide;
 
       this.pedido = resp[0]
+      // this.borrarPedidoß()
+      this.cartSubcrpt();
+    })
+  }
+  chekpSolicitudguardado() {
+    const storedItems = localStorage.getItem('bandejaPedidoItems');
+    // Si no hay items en localStorage, no hay pedido guardado
+    if (!storedItems) {
+      this.pedidoGuardado = false;
+      return;
+    }
+
+    // Si no hay userId, no hay pedido guardado
+    if (!this.userId) {
+      this.pedidoGuardado = false;
+      return;
+    }
+    this.solicitudService.getSolicitudByUser(this.userId).subscribe((resp: any) => {
+      this.solicitudes = resp;
+      // console.log('Pedidos del usuario:', resp);
+
+      // resp es un array de pedidos
+      // Si el array está vacío, no hay pedido guardado
+      if (!resp || resp.length === 0) {
+        this.solicitudGuardado = false;
+        return;
+      }
+
+      // Convertir storedItems a objeto para comparar
+      const bandejaItems = JSON.parse(storedItems);
+
+      // Verificar si existe algún solicitud que coincida con los items actuales
+      // Comparamos el contenido de los arrays, no por referencia
+      const solicitudCoincide = resp.some((solicitud: any) => {
+        // Comparamos que la tienda sea la misma
+        const mismaTienda = solicitud.tienda === this.tiendaSelected?._id;
+
+        // Comparamos que los solicituds tengan los mismos items (misma longitud y mismos IDs)
+        const mismaBandeja = solicitud.solicitud && solicitud.solicitud.length === bandejaItems.length;
+
+        // Comparamos que el status sea PENDING
+        const statusIgual = solicitud.status === 'PENDING';
+
+        // Comparamos que sea de la misma fecha
+        const solicitudFecha = new Date(solicitud.createdAt).toDateString();
+        const todayFecha = new Date().toDateString();
+        const mismaFecha = solicitudFecha === todayFecha;
+
+        return mismaTienda && mismaBandeja && statusIgual && mismaFecha;
+      });
+
+      // solicitudGuardado es true solo si:
+      // 1. Hay items en localStorage Y
+      // 2. Hay un solicitud en la BD que coincida con esos items
+      this.solicitudGuardado = solicitudCoincide;
+
+      this.solicitud = resp[0]
       // this.borrarPedidoß()
       this.cartSubcrpt();
     })
