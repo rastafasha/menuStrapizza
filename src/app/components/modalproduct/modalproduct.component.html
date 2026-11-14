@@ -17,6 +17,9 @@
                     <img [src]="product.img | imagenPipe: 'productos'" [alt]="product.titulo" class="img-fluid mb-5" />
                 </div>
                 <div class="infoinicial">
+                    <span class="badge text-bg-success" *ngIf="product.condition === 'new'">{{product.condition}}</span>
+                    <span class="badge text-bg-warning"
+                        *ngIf="product.condition === 'used'">{{product.condition}}</span>
                     <h2 class="recipe-title">{{ translate.currentLang() === 'en' ? product.titulo.en :
                         product.titulo.es}}</h2>
                     <ul class="recipe-details list-unstyled">
@@ -25,15 +28,21 @@
                                 *ngIf="+product.precio_antes > +product.precio_ahora">
                                 {{product.precio_antes | number:'1.2-2' | currency:tienda_moneda}}
                             </span>
-                            <span class="value fw-bold">
-                                {{product.precio_ahora | number:'1.2-2' | currency:tienda_moneda}}
-                            </span>
+                            <h4>{{product.precio_ahora | number:'1.2-2' | currency:tienda_moneda}}</h4>
                         </li>
                     </ul>
                     <p>Disponible: {{product.stock}}</p>
+
                     <app-ratingStar [product]="product"></app-ratingStar>
+
                 </div>
 
+            </div>
+
+            <div *ngIf="product.stock < 2 && product.bajoPedido === true">
+                <div class="alert alert-warning mt-3">
+                    <p class="mb-0">{{ 'Aun puedes solicitarlo para mas tarde' | translate }}</p>
+                </div>
             </div>
 
             <div class="ft-recipe__content mt-3">
@@ -43,32 +52,34 @@
 
 
                 <!-- selectores -->
-                <div *ngIf="product.nombre_selector !== 'unico'" class="mb-3">
-                    <p class="small">{{ 'Selecciona alguna opción por favor' | translate }}.</p>
-                    <select class="form-select" id="product-size" name="selector_to_cart" [(ngModel)]="selector_to_cart"
-                        (change)="selector_error = false">
-                        <option value=" " selected disabled>{{ 'Selecciona' | translate }}</option>
-
-                        <!-- 💡 Ejecutamos el Signal añadiendo () -->
-                        <option [value]="translate.currentLang() === 'en' ? selector.titulo.en : selector.titulo.es"
-                            *ngFor="let selector of selectores">
+                <div *ngIf="product.nombre_selector !== 'unico'" class="mb-3 mt-3">
+                    <h4>{{ 'Selecciona alguna opción por favor' | translate }}.</h4>
+                    <div class="selector-pills-container">
+                        <button type="button"
+                            *ngFor="let selector of selectores"
+                            class="selector-pill"
+                            [class.active]="selector_to_cart === (translate.currentLang() === 'en' ? selector.titulo.en : selector.titulo.es)"
+                            (click)="seleccionarOpcion(selector)">
                             {{ translate.currentLang() === 'en' ? selector.titulo.en : selector.titulo.es }}
-                        </option>
-                    </select>
+                        </button>
+                    </div>
                 </div>
 
                 <div class="d-grid gap-2 mt-3">
-                    <button class="btn btn-outline-success w-100 py-3 rounded-pill" (click)="addItem(product)">
-                        <i class="fa fa-shopping-bag"></i> {{ 'Agregar al Pedido' | translate }}
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-outline-danger w-100 py-2 rounded-pill" *ngIf="user"
+                            (click)="addToFavorites(product)" type="button">
+                            <i class="fa fa-heart"></i>
+                        </button>
+                        <button class="btn btn-outline-warning w-100 py-2 rounded-pill"
+                            (click)="addItemPedido(product)">
+                            <i class="fa fa-shopping-bag"></i>
+                        </button>
+                    </div>
+                    <button class="btn btn-success w-100 py-2 rounded-pill" (click)="addItem(product)">
+                        <i class="fa fa-shopping-cart"></i>
                     </button>
-                    <button class="btn btn-outline-danger w-100 py-3 rounded-pill" *ngIf="user"
-                        (click)="addToFavorites(product)" type="button">
-                        <i class="fa fa-heart"></i> {{ 'Agregar a favoritos' | translate }}
-                    </button>
-                    <button class="btn btn-outline-danger w-100 py-3 rounded-pill" *ngIf="user && product.bajoPedido === true"
-                        (click)="irASolicitud()" type="button">
-                        <i class="fa fa-edit"></i> {{ 'Solicitar' | translate }}
-                    </button>
+
                 </div>
 
                 <!-- mensajes de alerta -->

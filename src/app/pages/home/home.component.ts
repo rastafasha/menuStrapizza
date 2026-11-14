@@ -72,7 +72,8 @@ export class HomeComponent {
     const primerSegmento = host.split('.')[0]; // Captura 'pizzeria', 'hamburguesa', etc.
 
     // 2. DICCIONARIO PARA LAS TIENDAS (Siempre en minúsculas y limpio para la URL de tiendas)
-    let nombreTiendaReal = 'pizzeria'; // Fallback por si estás en localhost
+    let nombreTiendaReal = 'casamuseo'; // Fallback por si estás en localhost
+    // let nombreTiendaReal = 'pizzeria'; // Fallback por si estás en localhost
     if (primerSegmento !== 'localhost' && primerSegmento !== '127') {
       nombreTiendaReal = primerSegmento;
     }
@@ -97,7 +98,7 @@ export class HomeComponent {
         if (tienda) {
           // 🌟 ASIGNACIÓN MAESTRA: Asignamos el término con el acento correcto para los productos
           // URL resultante en cas-products: .../category_by_nombre/nombre/Pizzería
-          this.categoriaActiva = mapaCategorias[nombreTiendaReal] || tienda.categoria?.nombre || 'Pizzería';
+          this.categoriaActiva = mapaCategorias[nombreTiendaReal] || tienda.categoria?.nombre || 'casamuseo';
 
           this.titleService.setTitle(`Zlipmenu | ${tienda.nombre || nombreTiendaReal}`);
           

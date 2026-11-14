@@ -21,6 +21,11 @@
    padding-bottom: 40px;
 }
 
+.product-content p{
+   margin: 0;
+   padding: auto;
+}
+
 .infpr{
     display: flex;
     flex-direction: column;

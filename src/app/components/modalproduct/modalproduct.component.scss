@@ -36,7 +36,7 @@ a {
 
 .ft-recipe {
     height: auto;
-    max-height: 440px;
+    // max-height: 440px;
     background: var(--white);
     display: flex;
     flex-direction: column;
@@ -47,7 +47,7 @@ a {
     // @include poCentering;
     .ft-recipe__thumb {
         position: relative;
-        height: 150px;
+        height: 200px;
         border-radius: 18px;
         padding: 15px;
 
@@ -83,8 +83,6 @@ a {
                     font-family: var(--headlinesFont);
                     font-weight: 600;
                 }
-                .user-rating {
-                }
             }
             .recipe-details {
                 display: flex;
@@ -99,6 +97,8 @@ a {
                     }
                     .value {
                         color: #ff4f87;
+                        margin: 0;
+                        padding: 0;
                         margin-left: 0.35em;
                         vertical-align: bottom;
                         font: {
@@ -163,13 +163,53 @@ a {
     font-weight: bold;
 }
 
-.grid-item{
+.grid-item {
     display: grid;
     grid-template-columns: 40% 60%;
-    gap: 15px
+    gap: 15px;
 }
 
-.infoinicial{
+.infoinicial {
     display: flex;
     flex-direction: column;
+    & p {
+        margin: 0;
+        padding: auto;
+    }
+    & h4 {
+        margin: 0;
+        padding: auto;
+    }
+}
+
+.selector-pills-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 8px;
+}
+
+.selector-pill {
+    padding: 8px 18px;
+    border-radius: 50px; /* Forma de globo/píldora */
+    border: 1.5px solid #dee2e6;
+    background-color: #ffffff;
+    color: #333333;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    user-select: none;
+    & :hover {
+        border-color: #111111;
+        background-color: #f8f9fa;
+    }
+    &.active {
+        background-color: #111111; /* Cambia este color por el primario de tu marca */
+        border-color: #111111;
+        color: #ffffff;
+        font-weight: 600;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        transform: translateY(-1px);
+    }
 }

@@ -17,6 +17,7 @@ import { ComentarioService } from '../../services/comentario.service';
 import { Comentario } from '../../models/comentarios.model';
 import { RatingStarComponent } from '../ratingStar/ratingStar.component';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { SolicitudService } from '../../services/solicitud.service';
 
 declare var bootstrap: any;
 
@@ -61,10 +62,13 @@ export class ModalproductComponent implements OnInit, OnDestroy, AfterViewInit {
   private toastr = inject(ToastrService);
 
   private comentarioService = inject(ComentarioService);
+
+  private solicitudService = inject(SolicitudService);
+
   constructor(
-  // Debe ser public para que el HTML pueda leer "translate.currentLang"
-  public translate: TranslateService 
-) {}
+    // Debe ser public para que el HTML pueda leer "translate.currentLang"
+    public translate: TranslateService
+  ) { }
 
   user!: Usuario;
   bandejaList: any[] = [];
@@ -150,7 +154,7 @@ export class ModalproductComponent implements OnInit, OnDestroy, AfterViewInit {
 
     // 🟢 CONDICIÓN UNIVERSAL: Si el plato REQUIERE que el cliente elija un modificador
     if (producto.nombre_selector && producto.nombre_selector.toLowerCase() !== 'unico') {
-      
+
       // Validar de forma segura que no venga vacío o con puros espacios
       if (!this.selector_to_cart || this.selector_to_cart.trim() === '') {
         this.selector_error = true;
@@ -164,24 +168,65 @@ export class ModalproductComponent implements OnInit, OnDestroy, AfterViewInit {
     // 🟢 INYECCIÓN DINÁMICA: Clonamos el objeto y guardamos la elección real
     let productoParaCarrito = {
       ...producto,
-      selector_elegido: (producto.nombre_selector && producto.nombre_selector.toLowerCase() !== 'unico') 
-                        ? this.selector_to_cart 
-                        : 'Único'
+      selector_elegido: (producto.nombre_selector && producto.nombre_selector.toLowerCase() !== 'unico')
+        ? this.selector_to_cart
+        : 'Único'
     };
 
     // Enviamos el objeto con la salsa/opción inyectada al servicio
     this.carritoService.addItem(productoParaCarrito);
-    
+
     // Reset de seguridad para la próxima selección
     this.selector_to_cart = ' ';
     this.toastr.success('Artículo agregado al carrito');
-}
+  }
 
 
   removeItem(producto: Producto) {
     this.carritoService.removeItem(producto);
     this.toastr.success('Artículo removido del carrito');
   }
+
+
+  addItemPedido(producto: Producto) {
+    this.msm_success = false;
+    this.selector_error = false;
+
+    // 🟢 CONDICIÓN UNIVERSAL: Si el plato REQUIERE que el cliente elija un modificador
+    if (producto.nombre_selector && producto.nombre_selector.toLowerCase() !== 'unico') {
+
+      // Validar de forma segura que no venga vacío o con puros espacios
+      if (!this.selector_to_cart || this.selector_to_cart.trim() === '') {
+        this.selector_error = true;
+        setTimeout(() => {
+          this.selector_error = false;
+        }, 3000);
+        return;
+      }
+    }
+
+    // 🟢 INYECCIÓN DINÁMICA: Clonamos el objeto y guardamos la elección real
+    let productoParaCarrito = {
+      ...producto,
+      selector_elegido: (producto.nombre_selector && producto.nombre_selector.toLowerCase() !== 'unico')
+        ? this.selector_to_cart
+        : 'Único'
+    };
+
+    // Enviamos el objeto con la salsa/opción inyectada al servicio
+    this.solicitudService.addItem(productoParaCarrito);
+
+    // Reset de seguridad para la próxima selección
+    this.selector_to_cart = ' ';
+    this.toastr.success('Artículo agregado al pedido');
+  }
+
+
+  removeItemPedido(producto: Producto) {
+    this.solicitudService.removeItem(producto);
+    this.toastr.success('Artículo removido del pedido');
+  }
+
   addToFavorites(producto: Producto) {
 
     const data = {
@@ -211,6 +256,11 @@ export class ModalproductComponent implements OnInit, OnDestroy, AfterViewInit {
     this.selectorService.selectorByProduct(this.product._id).subscribe(
       response => {
         this.selectores = response;
+        // 2. Llama a esta lógica justo donde recibes `this.selectores` del backend
+        // Ejemplo: dentro del .subscribe() donde llenas this.selectores
+        if (this.selectores && this.selectores.length > 0) {
+          this.seleccionarOpcion(this.selectores[0]);
+        }
       },
       error => {
 
@@ -218,30 +268,40 @@ export class ModalproductComponent implements OnInit, OnDestroy, AfterViewInit {
     );
   }
 
-  getComentarios(){
-    this.comentarioService.getByProduct(this.product._id).subscribe((resp:any)=>{
+  // 1. Método al hacer clic en un globo
+  seleccionarOpcion(selector: any) {
+    this.selector_to_cart = this.translate.currentLang() === 'en'
+      ? selector.titulo.en
+      : selector.titulo.es;
+    this.selector_error = false;
+  }
+
+
+
+  getComentarios() {
+    this.comentarioService.getByProduct(this.product._id).subscribe((resp: any) => {
       this.comentarios = resp.comentarios;
     })
     this.getStrellasProduct();
   }
 
-   getStrellasProduct() {
+  getStrellasProduct() {
     this.comentarioService.getByProduct(this.product._id).subscribe((resp: any) => {
-        // 1. Verificamos que existan comentarios en el array
-        if (resp.comentarios && resp.comentarios.length > 0) {
-            
-            // 2. Sumamos todas las estrellas de la lista
-            const sumaTotal = resp.comentarios.reduce((total: number, item: any) => total + item.estrellas, 0);
-            
-            // 3. Sacamos el promedio real redondeado a 1 decimal
-            this.stars = parseFloat((sumaTotal / resp.comentarios.length).toFixed(1));
-            
-        } else {
-            // 4. Si no hay comentarios, el producto arranca con 0 estrellas
-            this.stars = 0;
-        }
-    });
-    }
+      // 1. Verificamos que existan comentarios en el array
+      if (resp.comentarios && resp.comentarios.length > 0) {
 
-  
+        // 2. Sumamos todas las estrellas de la lista
+        const sumaTotal = resp.comentarios.reduce((total: number, item: any) => total + item.estrellas, 0);
+
+        // 3. Sacamos el promedio real redondeado a 1 decimal
+        this.stars = parseFloat((sumaTotal / resp.comentarios.length).toFixed(1));
+
+      } else {
+        // 4. Si no hay comentarios, el producto arranca con 0 estrellas
+        this.stars = 0;
+      }
+    });
+  }
+
+
 }

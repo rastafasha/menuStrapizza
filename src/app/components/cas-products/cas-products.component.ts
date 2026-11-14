@@ -128,7 +128,7 @@ export class CasProductsComponent implements OnInit, OnDestroy {
   cargarProductosPorTiendaId(localId: any) {
     this.isLoading = true;
 
-    this.productoService.find_by_storeId(localId).subscribe({
+    this.productoService.find_by_storeIdActive(localId).subscribe({
       next: (productos: any[]) => {
         this.products = productos || [];
 

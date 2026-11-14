@@ -17,6 +17,9 @@
                     <img [src]="product.img | imagenPipe: 'productos'" [alt]="product.titulo" class="img-fluid mb-5" />
                 </div>
                 <div class="infoinicial">
+                    <span class="badge text-bg-success" *ngIf="product.condition === 'new'">{{product.condition}}</span>
+                    <span class="badge text-bg-warning"
+                        *ngIf="product.condition === 'used'">{{product.condition}}</span>
                     <h2 class="recipe-title">{{ translate.currentLang() === 'en' ? product.titulo.en :
                         product.titulo.es}}</h2>
                     <ul class="recipe-details list-unstyled">
@@ -30,7 +33,6 @@
                             </span>
                         </li>
                     </ul>
-                    <p>Bajo pedido: {{product.bajoPedido}}</p>
                     <app-ratingStar [product]="product"></app-ratingStar>
                 </div>
 
@@ -58,13 +60,14 @@
                 </div>
 
                 <div class="d-grid gap-2 mt-3">
-                    <button class="btn btn-outline-success w-100 py-3 rounded-pill" (click)="addItem(product)">
-                        <i class="fa fa-shopping-bag"></i> {{ 'Agregar al Pedido' | translate }}
-                    </button>
-                    <button class="btn btn-outline-danger w-100 py-3 rounded-pill" *ngIf="user"
+                    <button class="btn btn-outline-danger w-100 py-2 rounded-pill" *ngIf="user"
                         (click)="addToFavorites(product)" type="button">
                         <i class="fa fa-heart"></i> {{ 'Agregar a favoritos' | translate }}
                     </button>
+                    <button class="btn btn-outline-success w-100 py-2 rounded-pill" (click)="addItem(product)">
+                        <i class="fa fa-shopping-bag"></i> {{ 'Agregar al Pedido' | translate }}
+                    </button>
+                    
                 </div>
 
                 <!-- mensajes de alerta -->

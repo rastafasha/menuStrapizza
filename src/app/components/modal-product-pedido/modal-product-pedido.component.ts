@@ -182,6 +182,7 @@ export class ModalProductPedidoComponent {
     this.solicitudService.removeItem(producto);
     this.toastr.success('Artículo removido del pedido');
   }
+  
   addToFavorites(producto: Producto) {
     console.log(this.producto);
 
