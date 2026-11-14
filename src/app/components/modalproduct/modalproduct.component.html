@@ -1,134 +1,133 @@
 <div #offcanvasElement class="offcanvas offcanvas-bottom" [id]="'modalProduct-' + (product?._id || '')" tabindex="-1"
     data-bs-backdrop="true" data-bs-keyboard="true" [attr.aria-labelledby]="'modalProductLabel-' + (product?._id || '')"
-    style="height: auto; max-height: 70vh; border-radius: 25px 25px 0 0;">
-    <!-- Pure Bootstrap 5 Offcanvas with backdrop fix -->
+    style="height: auto; max-height: 95vh; border-radius: 25px 25px 0 0;">
 
-    <div class="offcanvas-header p-4" *ngIf="product">
-        <h5 class="offcanvas-title" [id]="'modalProductLabel-' + product._id">{{product.titulo?.es}}</h5>
-        <!-- El atributo data-bs-dismiss ahora debe ser "offcanvas" -->
-        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" (click)="onModalHidden()"
+
+    <div class="zlip-modal-wrapper">
+        <!-- Botón de cierre flotante para no repetir el título arriba -->
+        <button type="button" class="btn-close zlip-close-btn" data-bs-dismiss="offcanvas" (click)="onModalHidden()"
             aria-label="Close"></button>
-    </div>
 
-    <div class="offcanvas-body" *ngIf="product">
-        <div class="ft-recipe">
-            <div class="ft-recipe__thumb grid-item">
-                <div class="imagen">
-                    <img [src]="product.img | imagenPipe: 'productos'" [alt]="product.titulo" class="img-fluid mb-5" />
-                </div>
-                <div class="infoinicial">
-                    <span class="badge text-bg-success" *ngIf="product.condition === 'new'">{{product.condition}}</span>
-                    <span class="badge text-bg-warning"
-                        *ngIf="product.condition === 'used'">{{product.condition}}</span>
-                    <h2 class="recipe-title">{{ translate.currentLang() === 'en' ? product.titulo.en :
-                        product.titulo.es}}</h2>
-                    <ul class="recipe-details list-unstyled">
-                        <li class="recipe-details-item servings">
-                            <span class="value text-muted me-2" style="text-decoration: line-through;"
-                                *ngIf="+product.precio_antes > +product.precio_ahora">
-                                {{product.precio_antes | number:'1.2-2' | currency:tienda_moneda}}
-                            </span>
-                            <h4>{{product.precio_ahora | number:'1.2-2' | currency:tienda_moneda}}</h4>
-                        </li>
-                    </ul>
-                    <p>Disponible: {{product.stock}}</p>
+        <!-- Cabecera con Imagen Protagonista -->
+        <div class="zlip-hero-image">
+            @if (product.condition) {
+            <span class="badge zlip-condition-badge">{{ product.condition }}</span>
+            }
+            <!-- Reemplaza [src] por la propiedad de imagen de tu modelo -->
+            <img [src]="product.imagen || product.img" [alt]="product.titulo?.es" class="img-fluid">
+        </div>
 
-                    <app-ratingStar [product]="product"></app-ratingStar>
+        <!-- Cuerpo de Información -->
+        <div class="zlip-content p-4">
 
-                </div>
+            <!-- Título y Precios -->
+            <div class="d-flex justify-content-between align-items-start gap-3 mb-2">
+                <h2 class="zlip-title mb-0">
+                    {{ translate.currentLang() === 'en' ? product.titulo?.en : product.titulo?.es }}
+                </h2>
 
-            </div>
-
-            <div *ngIf="product.stock < 2 && product.bajoPedido === true">
-                <div class="alert alert-warning mt-3">
-                    <p class="mb-0">{{ 'Aun puedes solicitarlo para mas tarde' | translate }}</p>
+                <div class="text-end zlip-price-box">
+                    @if (product.precio_antes && product.precio_antes > product.precio_ahora) {
+                    <span class="zlip-old-price d-block">
+                        {{ product.precio_antes | number:'1.2-2' | currency:tienda_moneda }}
+                    </span>
+                    }
+                    <h4 class="zlip-current-price mb-0">
+                        {{ product.precio_ahora | number:'1.2-2' | currency:tienda_moneda }}
+                    </h4>
                 </div>
             </div>
 
-            <div class="ft-recipe__content mt-3">
+            <!-- Calificaciones-->
+            <div class="mb-3">
+               <app-ratingStar [product]="product"></app-ratingStar>
+            </div>
 
-                <p class="description"
+            <!-- Estado de Stock -->
+            <div class="mb-3">
+                @if (product.stock > 0) {
+                <span class="badge bg-success-subtle text-success rounded-pill px-3 py-1">
+                    Disponible: {{ product.stock }}
+                </span>
+                } @else {
+                <span class="badge bg-warning-subtle text-dark rounded-pill px-3 py-1">
+                    {{ 'Aun puedes solicitarlo para mas tarde' | translate }}
+                </span>
+                }
+            </div>
+
+            <!-- Descripción (agrega aquí tu variable de descripción si la tienes) -->
+            <p class="zlip-description text-muted mb-4"
                     [innerHTML]="translate.currentLang() === 'en' ? product.detalle?.en : product.detalle?.es"></p>
 
-
-                <!-- selectores -->
-                <div *ngIf="product.nombre_selector !== 'unico'" class="mb-3 mt-3">
-                    <h4>{{ 'Selecciona alguna opción por favor' | translate }}.</h4>
-                    <div class="selector-pills-container">
-                        <button type="button"
-                            *ngFor="let selector of selectores"
-                            class="selector-pill"
-                            [class.active]="selector_to_cart === (translate.currentLang() === 'en' ? selector.titulo.en : selector.titulo.es)"
-                            (click)="seleccionarOpcion(selector)">
-                            {{ translate.currentLang() === 'en' ? selector.titulo.en : selector.titulo.es }}
-                        </button>
-                    </div>
+            <!-- Selector de Opciones -->
+            <div class="mb-4">
+                <label class="form-label fw-semibold small text-uppercase text-muted mb-2">
+                    {{ 'Selecciona alguna opción por favor' | translate }}
+                </label>
+                <app-loading *ngIf="isLoading"></app-loading>
+                <div class="selector-pills-container animated fadeInUp" *ngIf="!isLoading">
+                    <button type="button" *ngFor="let selector of selectores" class="selector-pill"
+                        [class.active]="selector_to_cart === (translate.currentLang() === 'en' ? selector.titulo.en : selector.titulo.es)"
+                        (click)="seleccionarOpcion(selector)">
+                        {{ translate.currentLang() === 'en' ? selector.titulo.en : selector.titulo.es }}
+                    </button>
                 </div>
+            </div>
 
-                <div class="d-grid gap-2 mt-3">
-                    <div class="d-flex gap-2">
-                        <button class="btn btn-outline-danger w-100 py-2 rounded-pill" *ngIf="user"
-                            (click)="addToFavorites(product)" type="button">
-                            <i class="fa fa-heart"></i>
-                        </button>
-                        <button class="btn btn-outline-warning w-100 py-2 rounded-pill"
-                            (click)="addItemPedido(product)">
-                            <i class="fa fa-shopping-bag"></i>
-                        </button>
-                    </div>
-                    <button class="btn btn-success w-100 py-2 rounded-pill" (click)="addItem(product)">
-                        <i class="fa fa-shopping-cart"></i>
+            <!-- Botones de Acción (Conecta tus eventos (click) originales) -->
+            <div class="zlip-actions d-grid gap-2 mb-4">
+                <button type="button" class="btn btn-success btn-lg fw-semibold zlip-btn-primary"
+                    (click)="addItem(product)">
+                    <i class="fa fa-shopping-cart me-2"></i> {{ 'Agregar al carrito' | translate }}
+                </button>
+
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-warning fw-medium flex-grow-1 zlip-btn-secondary"
+                        (click)="addItemPedido(product)">
+                        <i class="fa fa-shopping-bag me-1"></i> {{ 'Solicitar Pedido' | translate }}
+                    </button>
+                    <button type="button" class="btn btn-outline-danger px-3 zlip-btn-fav"
+                        (click)="addToFavorites(product)">
+                        <i class="fa fa-heart"></i>
                     </button>
 
                 </div>
-
-                <!-- mensajes de alerta -->
-                <div *ngIf="selector_error" class="alert alert-warning mt-3">
-                    <i class="fa fa-close float-end" (click)="closeAviso()" style="cursor:pointer"></i>
-                    <p class="mb-0">{{ 'Selecciona alguna opción por favor' | translate }}</p>
-                </div>
-
-
-
             </div>
-        </div>
 
-        <!-- Datos del pedido-->
-        <span class="text-muted small mt-3"> {{ 'Comentarios' | translate }}</span>
-        @for (item of comentarios || []; track $index) {
-        <div class="bg-light rounded-4 p-3 mb-4 " style="border-radius: 15px;">
+            <!-- Sección de Comentarios (Acordeón o lista limpia) -->
+            <hr class="text-muted opacity-25 my-4">
 
+            <div class="zlip-reviews">
+                <h5 class="fw-bold mb-3" style="font-family: var(--headlinesFont);">
+                    {{ 'Comentarios' | translate }} ({{ comentarios || 0 }})
+                </h5>
 
-            <div class="d-flex justify-content-between mb-3 border-bottom pb-2 flex-column">
-                <span class="text-muted small"> {{ 'Comentario' | translate }}</span>
-                <div class="d-flex flex-column ">
-                    <span class="fw-bold small">{{ item.comentario }}</span>
+                @for (item of comentarios || []; track $index) {
+                <div class="zlip-review-card p-3 mb-2 rounded-3 bg-light">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <strong class="small text-dark">{{ item.user?.first_name || ('usuario' | translate) }}</strong>
+                    </div>
+                    <p class="small text-secondary mb-2">{{ item.comentario }}</p>
+
+                    @if (item.pros) {
+                    <div class="small text-success mb-1">
+                        <strong>{{ 'Pros' | translate }}:</strong> {{ item.pros }}
+                    </div>
+                    }
+                    @if (item.cons) {
+                    <div class="small text-danger">
+                        <strong>{{ 'Contra' | translate }}:</strong> {{ item.cons }}
+                    </div>
+                    }
                 </div>
-            </div>
-            <div class="d-flex justify-content-between mb-3 border-bottom pb-2 flex-column">
-                <span class="text-muted small"> {{ 'Pros' | translate }}</span>
-                <div class="d-flex flex-column ">
-                    <span class="fw-bold small">{{ item.pros }}</span>
-                </div>
-            </div>
-            <div class="d-flex justify-content-between mb-3 border-bottom pb-2 flex-column">
-                <span class="text-muted small"> {{ 'Contra' | translate }}</span>
-                <div class="d-flex flex-column ">
-                    <span class="fw-bold small">{{ item.cons }}</span>
-                </div>
-            </div>
-            <div class="d-flex justify-content-between mb-3 border-bottom pb-2 flex-column">
-                <span class="text-muted small"> {{ 'usuario' | translate }}</span>
-                <div class="d-flex flex-column ">
-                    <span class="fw-bold small">{{ item.user.first_name }}</span>
-                </div>
+                } @empty {
+                <p class="text-muted small fst-italic mb-0">
+                    {{ 'No hay Comentarios registrados en este Producto' | translate }}.
+                </p>
+                }
             </div>
 
         </div>
-        } @empty {
-        <div class="text-center p-4 text-muted">
-            <p class="small mb-0">{{ 'No hay Comentarios registrados en este Producto' | translate }}.</p>
-        </div>
-        }
     </div>
 </div>

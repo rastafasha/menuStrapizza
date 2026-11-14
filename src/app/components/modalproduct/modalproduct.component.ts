@@ -18,6 +18,7 @@ import { Comentario } from '../../models/comentarios.model';
 import { RatingStarComponent } from '../ratingStar/ratingStar.component';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { SolicitudService } from '../../services/solicitud.service';
+import { LoadingComponent } from '../../shared/loading/loading.component';
 
 declare var bootstrap: any;
 
@@ -30,7 +31,8 @@ declare var bootstrap: any;
     FormsModule,
     ImagenPipe,
     RatingStarComponent,
-    TranslatePipe
+    TranslatePipe,
+    LoadingComponent
   ],
   templateUrl: './modalproduct.component.html',
   styleUrl: './modalproduct.component.scss'
@@ -49,6 +51,7 @@ export class ModalproductComponent implements OnInit, OnDestroy, AfterViewInit {
   public msm_error = false;
   public msm_success = false;
   public msm_alert = false;
+  public isLoading = false;
 
   producto: any;
   favoriteItem: any;
@@ -252,6 +255,7 @@ export class ModalproductComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   getSelectorProducto() {
+    this.isLoading =true;
     this.selector_to_cart = ' ';
     this.selectorService.selectorByProduct(this.product._id).subscribe(
       response => {
@@ -261,6 +265,7 @@ export class ModalproductComponent implements OnInit, OnDestroy, AfterViewInit {
         if (this.selectores && this.selectores.length > 0) {
           this.seleccionarOpcion(this.selectores[0]);
         }
+        this.isLoading =false;
       },
       error => {
 
