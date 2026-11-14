@@ -18,7 +18,7 @@ declare var bootstrap: any;
   selector: 'app-cas-products',
   imports: [CommonModule, LoadingComponent,
     ProductItemComponent, ModalproductComponent,
-    // CategoriasPipePipe, 
+    CategoriasPipePipe, 
     TranslatePipe
   ],
   templateUrl: './cas-products.component.html',

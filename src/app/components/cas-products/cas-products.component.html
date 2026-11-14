@@ -22,7 +22,7 @@
       </li>
 
       <!-- Pills únicas de categorías -->
-      <li *ngFor="let category of subcategories">
+      <li *ngFor="let category of subcategories | categoriasPipe">
         <button 
           type="button"
           class="zlip-menu-pill"
