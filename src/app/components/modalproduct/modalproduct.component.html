@@ -1,9 +1,11 @@
-<div #offcanvasElement class="offcanvas offcanvas-bottom" [id]="'modalProduct-' + (product?._id || '')" tabindex="-1"
+<div #offcanvasElement 
+class="offcanvas offcanvas-end zlip-product-offcanvas shadow-lg offcanvas-bottom" 
+[id]="'modalProduct-' + (product?._id || '')" tabindex="-1"
     data-bs-backdrop="true" data-bs-keyboard="true" [attr.aria-labelledby]="'modalProductLabel-' + (product?._id || '')"
-    style="height: auto; max-height: 95vh; border-radius: 25px 25px 0 0;">
+    style="border-radius: 25px 25px 0 0;">
 
-
-    <div class="zlip-modal-wrapper">
+<div class="offcanvas-body" style="border-radius: 25px 25px 0 0;">
+     <div class="zlip-modal-wrapper">
         <!-- Botón de cierre flotante para no repetir el título arriba -->
         <button type="button" class="btn-close zlip-close-btn" data-bs-dismiss="offcanvas" (click)="onModalHidden()"
             aria-label="Close"></button>
@@ -14,7 +16,7 @@
             <span class="badge zlip-condition-badge">{{ product.condition }}</span>
             }
             <!-- Reemplaza [src] por la propiedad de imagen de tu modelo -->
-            <img [src]="product.imagen || product.img" [alt]="product.titulo?.es" class="img-fluid">
+            <img [src]="product.img | imagenPipe: 'productos'"  [alt]="product.titulo?.es" class="img-fluid">
         </div>
 
         <!-- Cuerpo de Información -->
@@ -130,4 +132,6 @@
 
         </div>
     </div>
+</div>
+   
 </div>

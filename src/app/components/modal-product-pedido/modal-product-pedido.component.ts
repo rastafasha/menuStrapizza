@@ -16,6 +16,7 @@ import { SelectorService } from '../../services/selector.service';
 import { TiendaService } from '../../services/tienda.service';
 import { RatingStarComponent } from '../ratingStar/ratingStar.component';
 import { SolicitudService } from '../../services/solicitud.service';
+import { LoadingComponent } from '../../shared/loading/loading.component';
 
 declare var bootstrap: any;
 
@@ -27,8 +28,9 @@ declare var bootstrap: any;
     ReactiveFormsModule,
     FormsModule,
     ImagenPipe,
-    RatingStarComponent,
-    TranslatePipe
+    // RatingStarComponent,
+    TranslatePipe,
+    LoadingComponent
   ],
   templateUrl: './modal-product-pedido.component.html',
   styleUrl: './modal-product-pedido.component.scss'
@@ -53,6 +55,8 @@ export class ModalProductPedidoComponent {
   favoriteItem: any;
   comentarios!: Comentario;
   stars: number = 0;
+
+  public isLoading = false;
 
   private tiendaService = inject(TiendaService);
   private solicitudService = inject(SolicitudService);
@@ -204,23 +208,43 @@ export class ModalProductPedidoComponent {
   }
 
   getSelectorProducto() {
-    this.selector_to_cart = ' ';
-    this.selectorService.selectorByProduct(this.product._id).subscribe(
-      response => {
-        this.selectores = response;
-      },
-      error => {
-
+  this.isLoading = true;
+  this.selector_to_cart = ' ';
+  this.selectorService.selectorByProduct(this.product._id).subscribe({
+    next: (response) => {
+      this.selectores = response || [];
+      if (this.selectores.length > 0) {
+        this.seleccionarOpcion(this.selectores);
       }
-    );
-  }
+      this.isLoading = false;
+    },
+    error: () => {
+      this.isLoading = false;
+    }
+  });
+}
+  
+// 3. Agrega el método seleccionarOpcion(selector):
+seleccionarOpcion(selector: any) {
+  if (!selector || !selector.titulo) return;
+  this.selector_to_cart = this.translate.currentLang() === 'en'
+    ? (selector.titulo.en || selector.titulo.es)
+    : selector.titulo.es;
+  this.selector_error = false;
+}
 
-  getComentarios(){
-    this.comentarioService.getByProduct(this.product._id).subscribe((resp:any)=>{
-      this.comentarios = resp.comentarios;
-    })
-    this.getStrellasProduct();
-  }
+// 4. Unifica getComentarios() para calcular stars sin doble llamada HTTP:
+getComentarios() {
+  this.comentarioService.getByProduct(this.product._id).subscribe((resp: any) => {
+    this.comentarios = resp.comentarios || [];
+    if (resp.comentarios && resp.comentarios.length > 0) {
+      const sumaTotal = resp.comentarios.reduce((total: number, item: any) => total + item.estrellas, 0);
+      this.stars = parseFloat((sumaTotal / resp.comentarios.length).toFixed(1));
+    } else {
+      this.stars = 0;
+    }
+  });
+}
 
    getStrellasProduct() {
     this.comentarioService.getByProduct(this.product._id).subscribe((resp: any) => {
