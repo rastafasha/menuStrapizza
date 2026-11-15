@@ -42,6 +42,8 @@
     "Comienza a agregar productos": "Comienza a agregar productos",
 
     "Reservar": "Reservar",
+    "Catálogo": "Catálogo",
+    "Cotizar": "Cotizar",
 
     "Fecha":"Fecha",
     "Editando Reservación":"Editando Reservación",
@@ -246,6 +248,15 @@
 
     "Descubre el verdadero sabor con nuestros ingredientes frescos y recetas tradicionales transmitidas por generaciones.":"Descubre el verdadero sabor con nuestros ingredientes frescos y recetas tradicionales transmitidas por generaciones.",
 
+
+    "Información del Presupuesto":"Información del Presupuesto",
+    "Título":"Título",
+    "Descripción":"Descripción",
+    "Solicitar":"Solicitar",
+    "Ej. Presupuesto para reunión":"Ej. Presupuesto para reunión",
+    "Detalles generales...":"Detalles generales...",
+    "Productos bajo pedido":"Productos bajo pedido",
+    "Selecciona una Categoría":"Selecciona una Categoría",
 
     "MY_RESERVATIONS": {
     "TITLE": "Sección: Mis Reservaciones",

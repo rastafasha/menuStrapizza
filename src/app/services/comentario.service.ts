@@ -51,7 +51,7 @@ export class ComentarioService {
     let headers = new HttpHeaders().set('Content-Type','application/json');
     return this._http.get(this.url + '/comentarios/comentarios_client/obtener/'+id+'/'+orden,this.headers)
   }
-  getByProduct(id: any):Observable<any>{
+  getComentByProduct(id: any):Observable<any>{
     let headers = new HttpHeaders().set('Content-Type','application/json');
     return this._http.get(this.url + '/comentarios/producto/'+id, this.headers)
   }

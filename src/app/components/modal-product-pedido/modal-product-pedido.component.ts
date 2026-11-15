@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, EventEmitter, inject, Input, Output, ViewChild } from '@angular/core';
+import { Component, inject, Input, Output, OnInit, OnDestroy, EventEmitter, ViewChild, ElementRef, OnChanges, SimpleChanges } from '@angular/core';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
@@ -22,7 +22,7 @@ declare var bootstrap: any;
 
 @Component({
   selector: 'app-modal-product-pedido',
-   imports: [
+  imports: [
     CommonModule,
     RouterModule,
     ReactiveFormsModule,
@@ -35,7 +35,7 @@ declare var bootstrap: any;
   templateUrl: './modal-product-pedido.component.html',
   styleUrl: './modal-product-pedido.component.scss'
 })
-export class ModalProductPedidoComponent {
+export class ModalProductPedidoComponent implements OnInit, OnDestroy, OnChanges {
 
   // Capturamos el elemento HTML usando la referencia local que pusimos en el HTML
   @ViewChild('offcanvasElement', { static: false }) offcanvasElement!: ElementRef;
@@ -66,9 +66,9 @@ export class ModalProductPedidoComponent {
 
   private comentarioService = inject(ComentarioService);
   constructor(
-  // Debe ser public para que el HTML pueda leer "translate.currentLang"
-  public translate: TranslateService 
-) {}
+    // Debe ser public para que el HTML pueda leer "translate.currentLang"
+    public translate: TranslateService
+  ) { }
 
   user!: Usuario;
   bandejaListPedido: any[] = [];
@@ -97,29 +97,64 @@ export class ModalProductPedidoComponent {
     if (!this.product?.img) {
       this.img = '../assets/images/no-image.jpg';
     }
+  }
+
+  // ✅ Detecta cuándo el padre abre el modal (isModalOpen = true)
+  ngOnChanges(changes: SimpleChanges): void {
+  console.log('🚨 Modal activado con producto:', this.product?.titulo, 'isModalOpen:', this.isModalOpen);
+  if (changes['isModalOpen']?.currentValue === true && this.product?._id) {
+    this.abrirOffcanvas();
     this.getSelectorProducto();
-    this.getComentarios();
+    this.getComentariosYEstrellas();
+  }
+}
+
+
+
+  private abrirOffcanvas(): void {
+    // Usamos setTimeout(..., 0) para asegurar que el HTML del modal ya esté renderizado
+    setTimeout(() => {
+      if (this.offcanvasElement?.nativeElement) {
+        const offcanvas = bootstrap.Offcanvas.getOrCreateInstance(this.offcanvasElement.nativeElement);
+        offcanvas.show();
+
+        // { once: true } evita que se acumulen múltiples listeners si abres y cierras varias veces
+        this.offcanvasElement.nativeElement.addEventListener('hidden.bs.offcanvas', () => {
+          this.selector_to_cart = ' ';
+          document.querySelectorAll('.offcanvas-backdrop').forEach(el => el.remove());
+          document.body.style.overflow = 'auto';
+          document.body.style.paddingRight = '0';
+          this.modalClosed.emit();
+        }, { once: true });
+      }
+    }, 0);
   }
 
-  // 🚀 ESTA FUNCIÓN ES LA MAGIA: Se ejecuta AUTOMÁTICAMENTE cuando el HTML ya existe en el DOM
-  ngAfterViewInit() {
-    if (this.offcanvasElement && this.offcanvasElement.nativeElement) {
-      const offcanvas = bootstrap.Offcanvas.getOrCreateInstance(this.offcanvasElement.nativeElement);
-      offcanvas.show();
+  // ✅ Una sola petición HTTP trae los comentarios Y calcula las estrellas
+  getComentariosYEstrellas(): void {
+    if (!this.product?._id) return;
 
-      // 🚀 ESCUCHA CUANDO LA ANIMACIÓN DE CIERRE TERMINA POR COMPLETO
-      this.offcanvasElement.nativeElement.addEventListener('hidden.bs.offcanvas', () => {
-        // Ejecutamos la limpieza interna
-        this.selector_to_cart = ' ';
-        document.querySelectorAll('.offcanvas-backdrop').forEach(el => el.remove());
-        document.body.style.overflow = 'auto';
-        document.body.style.paddingRight = '0';
+    this.comentarioService.getComentByProduct(this.product._id).subscribe({
+      next: (resp: any) => {
+        const lista = resp.comentarios || [];
+        this.comentarios = lista;
+        console.log(this.comentarios)
 
-        // Ahora sí, le avisamos al padre que ponga la variable en null
-        this.modalClosed.emit();
-      });
-    }
+        if (lista.length > 0) {
+          const sumaTotal = lista.reduce((total: number, item: any) => total + item.estrellas, 0);
+          this.stars = parseFloat((sumaTotal / lista.length).toFixed(1));
+        } else {
+          this.stars = 0;
+        }
+      },
+      error: (err) => {
+        console.error('Error al obtener comentarios:', err);
+        this.comentarios = [] as any;
+        this.stars = 0;
+      }
+    });
   }
+
 
   ngOnDestroy(): void {
     if (this.pedidoSubscription) {
@@ -154,7 +189,7 @@ export class ModalProductPedidoComponent {
 
     // 🟢 CONDICIÓN UNIVERSAL: Si el plato REQUIERE que el cliente elija un modificador
     if (producto.nombre_selector && producto.nombre_selector.toLowerCase() !== 'unico') {
-      
+
       // Validar de forma segura que no venga vacío o con puros espacios
       if (!this.selector_to_cart || this.selector_to_cart.trim() === '') {
         this.selector_error = true;
@@ -168,25 +203,25 @@ export class ModalProductPedidoComponent {
     // 🟢 INYECCIÓN DINÁMICA: Clonamos el objeto y guardamos la elección real
     let productoParaCarrito = {
       ...producto,
-      selector_elegido: (producto.nombre_selector && producto.nombre_selector.toLowerCase() !== 'unico') 
-                        ? this.selector_to_cart 
-                        : 'Único'
+      selector_elegido: (producto.nombre_selector && producto.nombre_selector.toLowerCase() !== 'unico')
+        ? this.selector_to_cart
+        : 'Único'
     };
 
     // Enviamos el objeto con la salsa/opción inyectada al servicio
     this.solicitudService.addItem(productoParaCarrito);
-    
+
     // Reset de seguridad para la próxima selección
     this.selector_to_cart = ' ';
     this.toastr.success('Artículo agregado al pedido');
-}
+  }
 
 
   removeItem(producto: Producto) {
     this.solicitudService.removeItem(producto);
     this.toastr.success('Artículo removido del pedido');
   }
-  
+
   addToFavorites(producto: Producto) {
     console.log(this.producto);
 
@@ -208,61 +243,31 @@ export class ModalProductPedidoComponent {
   }
 
   getSelectorProducto() {
-  this.isLoading = true;
-  this.selector_to_cart = ' ';
-  this.selectorService.selectorByProduct(this.product._id).subscribe({
-    next: (response) => {
-      this.selectores = response || [];
-      if (this.selectores.length > 0) {
-        this.seleccionarOpcion(this.selectores);
-      }
-      this.isLoading = false;
-    },
-    error: () => {
-      this.isLoading = false;
-    }
-  });
-}
-  
-// 3. Agrega el método seleccionarOpcion(selector):
-seleccionarOpcion(selector: any) {
-  if (!selector || !selector.titulo) return;
-  this.selector_to_cart = this.translate.currentLang() === 'en'
-    ? (selector.titulo.en || selector.titulo.es)
-    : selector.titulo.es;
-  this.selector_error = false;
-}
-
-// 4. Unifica getComentarios() para calcular stars sin doble llamada HTTP:
-getComentarios() {
-  this.comentarioService.getByProduct(this.product._id).subscribe((resp: any) => {
-    this.comentarios = resp.comentarios || [];
-    if (resp.comentarios && resp.comentarios.length > 0) {
-      const sumaTotal = resp.comentarios.reduce((total: number, item: any) => total + item.estrellas, 0);
-      this.stars = parseFloat((sumaTotal / resp.comentarios.length).toFixed(1));
-    } else {
-      this.stars = 0;
-    }
-  });
-}
-
-   getStrellasProduct() {
-    this.comentarioService.getByProduct(this.product._id).subscribe((resp: any) => {
-        // 1. Verificamos que existan comentarios en el array
-        if (resp.comentarios && resp.comentarios.length > 0) {
-            
-            // 2. Sumamos todas las estrellas de la lista
-            const sumaTotal = resp.comentarios.reduce((total: number, item: any) => total + item.estrellas, 0);
-            
-            // 3. Sacamos el promedio real redondeado a 1 decimal
-            this.stars = parseFloat((sumaTotal / resp.comentarios.length).toFixed(1));
-            
-        } else {
-            // 4. Si no hay comentarios, el producto arranca con 0 estrellas
-            this.stars = 0;
+    this.isLoading = true;
+    this.selector_to_cart = ' ';
+    this.selectorService.selectorByProduct(this.product._id).subscribe(
+      response => {
+        this.selectores = response;
+        // 2. Llama a esta lógica justo donde recibes `this.selectores` del backend
+        // Ejemplo: dentro del .subscribe() donde llenas this.selectores
+        if (this.selectores && this.selectores.length > 0) {
+          this.seleccionarOpcion(this.selectores[0]);
         }
-    });
-    }
+        this.isLoading = false;
+      },
+      error => {
+
+      }
+    );
+  }
+
+  // 1. Método al hacer clic en un globo
+  seleccionarOpcion(selector: any) {
+    this.selector_to_cart = this.translate.currentLang() === 'en'
+      ? selector.titulo.en
+      : selector.titulo.es;
+    this.selector_error = false;
+  }
 
 
 }

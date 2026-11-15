@@ -1,10 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, Input, Output, OnInit, OnDestroy, EventEmitter, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, inject, Input, Output, OnInit, OnDestroy, EventEmitter,  ViewChild, ElementRef, OnChanges, SimpleChanges } from '@angular/core';
 import { Producto } from '../../models/producto.model';
-import { StorageService } from '../../services/storage.service';
 import { Router, RouterModule } from '@angular/router';
 import { Usuario } from '../../models/usuario.model';
-import { TiendaService } from '../../services/tienda.service';
 import { Tienda } from '../../models/tienda.model';
 import { CarritoService } from '../../services/carrito.service';
 import { Subscription } from 'rxjs';
@@ -37,7 +35,7 @@ declare var bootstrap: any;
   templateUrl: './modalproduct.component.html',
   styleUrl: './modalproduct.component.scss'
 })
-export class ModalproductComponent implements OnInit, OnDestroy, AfterViewInit {
+export class ModalproductComponent implements OnInit, OnDestroy, OnChanges {
   // Capturamos el elemento HTML usando la referencia local que pusimos en el HTML
   @ViewChild('offcanvasElement', { static: false }) offcanvasElement!: ElementRef;
 
@@ -88,41 +86,70 @@ export class ModalproductComponent implements OnInit, OnDestroy, AfterViewInit {
 
   ngOnInit(): void {
     this.msm_alert = false;
-    let USER = localStorage.getItem("user");
+    const USER = localStorage.getItem("user");
     this.user = USER ? JSON.parse(USER) : null;
-    // Subscribe to cart changes to keep local copy updated
+
     this.cartSubscription = this.carritoService.bandejaList$.subscribe(items => {
       this.bandejaList = items;
     });
 
-    this.product;
-    this.activeCategory;
     if (!this.product?.img) {
       this.img = '../assets/images/no-image.jpg';
     }
-    this.getSelectorProducto();
-    this.getComentarios();
   }
-
-  // 🚀 ESTA FUNCIÓN ES LA MAGIA: Se ejecuta AUTOMÁTICAMENTE cuando el HTML ya existe en el DOM
-  ngAfterViewInit() {
-    if (this.offcanvasElement && this.offcanvasElement.nativeElement) {
-      const offcanvas = bootstrap.Offcanvas.getOrCreateInstance(this.offcanvasElement.nativeElement);
-      offcanvas.show();
-
-      // 🚀 ESCUCHA CUANDO LA ANIMACIÓN DE CIERRE TERMINA POR COMPLETO
-      this.offcanvasElement.nativeElement.addEventListener('hidden.bs.offcanvas', () => {
-        // Ejecutamos la limpieza interna
-        this.selector_to_cart = ' ';
-        document.querySelectorAll('.offcanvas-backdrop').forEach(el => el.remove());
-        document.body.style.overflow = 'auto';
-        document.body.style.paddingRight = '0';
-
-        // Ahora sí, le avisamos al padre que ponga la variable en null
-        this.modalClosed.emit();
-      });
+  // ✅ Detecta cuándo el padre abre el modal (isModalOpen = true)
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['isModalOpen']?.currentValue === true && this.product?._id) {
+      this.abrirOffcanvas();
+      this.getSelectorProducto();
+      this.getComentariosYEstrellas();
     }
   }
+
+  private abrirOffcanvas(): void {
+    // Usamos setTimeout(..., 0) para asegurar que el HTML del modal ya esté renderizado
+    setTimeout(() => {
+      if (this.offcanvasElement?.nativeElement) {
+        const offcanvas = bootstrap.Offcanvas.getOrCreateInstance(this.offcanvasElement.nativeElement);
+        offcanvas.show();
+
+        // { once: true } evita que se acumulen múltiples listeners si abres y cierras varias veces
+        this.offcanvasElement.nativeElement.addEventListener('hidden.bs.offcanvas', () => {
+          this.selector_to_cart = ' ';
+          document.querySelectorAll('.offcanvas-backdrop').forEach(el => el.remove());
+          document.body.style.overflow = 'auto';
+          document.body.style.paddingRight = '0';
+          this.modalClosed.emit();
+        }, { once: true });
+      }
+    }, 0);
+  }
+
+  // ✅ Una sola petición HTTP trae los comentarios Y calcula las estrellas
+  getComentariosYEstrellas(): void {
+    if (!this.product?._id) return;
+
+    this.comentarioService.getComentByProduct(this.product._id).subscribe({
+      next: (resp: any) => {
+        const lista = resp.comentarios || [];
+        this.comentarios = lista;
+
+        if (lista.length > 0) {
+          const sumaTotal = lista.reduce((total: number, item: any) => total + item.estrellas, 0);
+          this.stars = parseFloat((sumaTotal / lista.length).toFixed(1));
+        } else {
+          this.stars = 0;
+        }
+      },
+      error: (err) => {
+        console.error('Error al obtener comentarios:', err);
+        this.comentarios = [] as any;
+        this.stars = 0;
+      }
+    });
+  }
+
+  
 
   ngOnDestroy(): void {
     if (this.cartSubscription) {
@@ -133,7 +160,6 @@ export class ModalproductComponent implements OnInit, OnDestroy, AfterViewInit {
     backdrops.forEach((backdrop: Element) => backdrop.remove());
   }
 
-  // ngOnChanges removed - no longer needed with Bootstrap data attributes
 
   // Modificamos la función de la "X" para que NO emita directo, sino que use el JS de Bootstrap
   onModalHidden(): void {
@@ -282,31 +308,6 @@ export class ModalproductComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
 
-
-  getComentarios() {
-    this.comentarioService.getByProduct(this.product._id).subscribe((resp: any) => {
-      this.comentarios = resp.comentarios;
-    })
-    this.getStrellasProduct();
-  }
-
-  getStrellasProduct() {
-    this.comentarioService.getByProduct(this.product._id).subscribe((resp: any) => {
-      // 1. Verificamos que existan comentarios en el array
-      if (resp.comentarios && resp.comentarios.length > 0) {
-
-        // 2. Sumamos todas las estrellas de la lista
-        const sumaTotal = resp.comentarios.reduce((total: number, item: any) => total + item.estrellas, 0);
-
-        // 3. Sacamos el promedio real redondeado a 1 decimal
-        this.stars = parseFloat((sumaTotal / resp.comentarios.length).toFixed(1));
-
-      } else {
-        // 4. Si no hay comentarios, el producto arranca con 0 estrellas
-        this.stars = 0;
-      }
-    });
-  }
 
 
 }

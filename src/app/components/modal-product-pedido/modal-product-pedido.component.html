@@ -76,33 +76,20 @@ class="offcanvas offcanvas-end zlip-product-offcanvas shadow-lg offcanvas-bottom
           </p>
         }
 
-        <!-- SELECTOR DE OPCIONES (Píldoras interactivas) -->
-        @if (selectores && selectores.length > 0 && product.nombre_selector?.toLowerCase() !== 'unico') {
-          <div class="mb-4">
-            <div class="d-flex justify-content-between align-items-center mb-2">
-              <label class="form-label fw-bold small text-uppercase text-muted mb-0">
-                {{ product.nombre_selector || ('Selecciona alguna opción por favor' | translate) }}
-              </label>
-              @if (selector_error) {
-                <span class="text-danger small fw-semibold">
-                  {{ 'Selecciona alguna opción por favor' | translate }}
-                </span>
-              }
+        <!-- Selector de Opciones -->
+            <div class="mb-4">
+                <label class="form-label fw-semibold small text-uppercase text-muted mb-2">
+                    {{ 'Selecciona alguna opción por favor' | translate }}
+                </label>
+                <app-loading *ngIf="isLoading"></app-loading>
+                <div class="selector-pills-container animated fadeInUp" *ngIf="!isLoading">
+                    <button type="button" *ngFor="let selector of selectores" class="selector-pill"
+                        [class.active]="selector_to_cart === (translate.currentLang() === 'en' ? selector.titulo.en : selector.titulo.es)"
+                        (click)="seleccionarOpcion(selector)">
+                        {{ translate.currentLang() === 'en' ? selector.titulo.en : selector.titulo.es }}
+                    </button>
+                </div>
             </div>
-
-            <div class="selector-pills-container">
-              @for (selector of selectores; track $index) {
-                <button 
-                  type="button" 
-                  class="selector-pill"
-                  [class.active]="selector_to_cart === (translate.currentLang() === 'en' ? selector.titulo?.en : selector.titulo?.es)"
-                  (click)="seleccionarOpcion(selector)">
-                  {{ translate.currentLang() === 'en' ? selector.titulo?.en : selector.titulo?.es }}
-                </button>
-              }
-            </div>
-          </div>
-        }
 
         <!-- BOTONES DE ACCIÓN (Agregar al Pedido + Favoritos) -->
         <div class="zlip-actions d-flex gap-2 mb-4">

@@ -40,6 +40,8 @@
     
     "Comienza a agregar productos": "Start Add products",
     "Reservar": "Reserv",
+    "Catálogo": "Catalog",
+    "Cotizar": "Get a Quote",
 
     "Editando Reservación":"Editing Reservation",
     "Creando Reservación":"Making Reservation",
@@ -231,6 +233,15 @@
     
 
      "Descubre el verdadero sabor con nuestros ingredientes frescos y recetas tradicionales transmitidas por generaciones.": "Discover the true flavor with our fresh ingredients and traditional recipes passed down through generations.",
+
+    "Información del Presupuesto": "Quote Information",
+    "Título": "Title",
+    "Descripción": "Description",
+    "Solicitar": "Request Quote",
+    "Ej. Presupuesto para reunión": "e.g. Quote for meeting",
+    "Detalles generales...": "General details...",
+    "Productos bajo pedido":"On-Demand Products",
+    "Selecciona una Categoría":"Select one Category",
 
     "Bienvenido a Zlipmenu": "Welcome to Zlipmenu",
     "Arma tu pedido en pocos pasos": "Build your order in just a few steps",

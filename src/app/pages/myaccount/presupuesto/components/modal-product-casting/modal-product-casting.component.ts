@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, EventEmitter, inject, Input, Output, ViewChild } from '@angular/core';
+import { Component, inject, Input, Output, OnInit, OnDestroy, EventEmitter, ViewChild, ElementRef, OnChanges, SimpleChanges } from '@angular/core';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
@@ -35,7 +35,7 @@ declare var bootstrap: any;
   templateUrl: './modal-product-casting.component.html',
   styleUrl: './modal-product-casting.component.scss'
 })
-export class ModalProductCastingComponent {
+export class ModalProductCastingComponent implements OnInit, OnDestroy, OnChanges {
 
   // Capturamos el elemento HTML usando la referencia local que pusimos en el HTML
   @ViewChild('offcanvasElement', { static: false }) offcanvasElement!: ElementRef;
@@ -57,7 +57,6 @@ export class ModalProductCastingComponent {
   comentarios!: Comentario;
   stars: number = 0;
 
-  private tiendaService = inject(TiendaService);
   private castingService = inject(CastingService);
   private selectorService = inject(SelectorService);
   private favoritoService = inject(FavoritoService);
@@ -65,9 +64,9 @@ export class ModalProductCastingComponent {
 
   private comentarioService = inject(ComentarioService);
   constructor(
-  // Debe ser public para que el HTML pueda leer "translate.currentLang"
-  public translate: TranslateService 
-) {}
+    // Debe ser public para que el HTML pueda leer "translate.currentLang"
+    public translate: TranslateService
+  ) { }
 
   user!: Usuario;
   bandejaList: any[] = [];
@@ -96,29 +95,62 @@ export class ModalProductCastingComponent {
     if (!this.product?.img) {
       this.img = '../assets/images/no-image.jpg';
     }
-    this.getSelectorProducto();
-    this.getComentarios();
+
   }
 
-  // 🚀 ESTA FUNCIÓN ES LA MAGIA: Se ejecuta AUTOMÁTICAMENTE cuando el HTML ya existe en el DOM
-  ngAfterViewInit() {
-    if (this.offcanvasElement && this.offcanvasElement.nativeElement) {
-      const offcanvas = bootstrap.Offcanvas.getOrCreateInstance(this.offcanvasElement.nativeElement);
-      offcanvas.show();
-
-      // 🚀 ESCUCHA CUANDO LA ANIMACIÓN DE CIERRE TERMINA POR COMPLETO
-      this.offcanvasElement.nativeElement.addEventListener('hidden.bs.offcanvas', () => {
-        // Ejecutamos la limpieza interna
-        this.selector_to_cart = ' ';
-        document.querySelectorAll('.offcanvas-backdrop').forEach(el => el.remove());
-        document.body.style.overflow = 'auto';
-        document.body.style.paddingRight = '0';
-
-        // Ahora sí, le avisamos al padre que ponga la variable en null
-        this.modalClosed.emit();
-      });
+  // ✅ Detecta cuándo el padre abre el modal (isModalOpen = true)
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['isModalOpen']?.currentValue === true && this.product?._id) {
+      this.abrirOffcanvas();
+      this.getSelectorProducto();
+      this.getComentariosYEstrellas();
     }
   }
+
+
+  private abrirOffcanvas(): void {
+    // Usamos setTimeout(..., 0) para asegurar que el HTML del modal ya esté renderizado
+    setTimeout(() => {
+      if (this.offcanvasElement?.nativeElement) {
+        const offcanvas = bootstrap.Offcanvas.getOrCreateInstance(this.offcanvasElement.nativeElement);
+        offcanvas.show();
+
+        // { once: true } evita que se acumulen múltiples listeners si abres y cierras varias veces
+        this.offcanvasElement.nativeElement.addEventListener('hidden.bs.offcanvas', () => {
+          this.selector_to_cart = ' ';
+          document.querySelectorAll('.offcanvas-backdrop').forEach(el => el.remove());
+          document.body.style.overflow = 'auto';
+          document.body.style.paddingRight = '0';
+          this.modalClosed.emit();
+        }, { once: true });
+      }
+    }, 0);
+  }
+
+  // ✅ Una sola petición HTTP trae los comentarios Y calcula las estrellas
+  getComentariosYEstrellas(): void {
+    if (!this.product?._id) return;
+
+    this.comentarioService.getComentByProduct(this.product._id).subscribe({
+      next: (resp: any) => {
+        const lista = resp.comentarios || [];
+        this.comentarios = lista;
+
+        if (lista.length > 0) {
+          const sumaTotal = lista.reduce((total: number, item: any) => total + item.estrellas, 0);
+          this.stars = parseFloat((sumaTotal / lista.length).toFixed(1));
+        } else {
+          this.stars = 0;
+        }
+      },
+      error: (err) => {
+        console.error('Error al obtener comentarios:', err);
+        this.comentarios = [] as any;
+        this.stars = 0;
+      }
+    });
+  }
+
 
   ngOnDestroy(): void {
     if (this.cartSubscription) {
@@ -153,7 +185,7 @@ export class ModalProductCastingComponent {
 
     // 🟢 CONDICIÓN UNIVERSAL: Si el plato REQUIERE que el cliente elija un modificador
     if (producto.nombre_selector && producto.nombre_selector.toLowerCase() !== 'unico') {
-      
+
       // Validar de forma segura que no venga vacío o con puros espacios
       if (!this.selector_to_cart || this.selector_to_cart.trim() === '') {
         this.selector_error = true;
@@ -167,18 +199,18 @@ export class ModalProductCastingComponent {
     // 🟢 INYECCIÓN DINÁMICA: Clonamos el objeto y guardamos la elección real
     let productoParaCarrito = {
       ...producto,
-      selector_elegido: (producto.nombre_selector && producto.nombre_selector.toLowerCase() !== 'unico') 
-                        ? this.selector_to_cart 
-                        : 'Único'
+      selector_elegido: (producto.nombre_selector && producto.nombre_selector.toLowerCase() !== 'unico')
+        ? this.selector_to_cart
+        : 'Único'
     };
 
     // Enviamos el objeto con la salsa/opción inyectada al servicio
     this.castingService.addItem(productoParaCarrito);
-    
+
     // Reset de seguridad para la próxima selección
     this.selector_to_cart = ' ';
     this.toastr.success('Artículo agregado al presupuesto');
-}
+  }
 
 
   removeItem(producto: Producto) {
@@ -206,7 +238,7 @@ export class ModalProductCastingComponent {
   }
 
   getSelectorProducto() {
-    this.isLoading =true;
+    this.isLoading = true;
     this.selector_to_cart = ' ';
     this.selectorService.selectorByProduct(this.product._id).subscribe(
       response => {
@@ -216,7 +248,7 @@ export class ModalProductCastingComponent {
         if (this.selectores && this.selectores.length > 0) {
           this.seleccionarOpcion(this.selectores[0]);
         }
-        this.isLoading =false;
+        this.isLoading = false;
       },
       error => {
 
@@ -233,29 +265,6 @@ export class ModalProductCastingComponent {
   }
 
 
-  getComentarios(){
-    this.comentarioService.getByProduct(this.product._id).subscribe((resp:any)=>{
-      this.comentarios = resp.comentarios;
-    })
-    this.getStrellasProduct();
-  }
 
-   getStrellasProduct() {
-    this.comentarioService.getByProduct(this.product._id).subscribe((resp: any) => {
-        // 1. Verificamos que existan comentarios en el array
-        if (resp.comentarios && resp.comentarios.length > 0) {
-            
-            // 2. Sumamos todas las estrellas de la lista
-            const sumaTotal = resp.comentarios.reduce((total: number, item: any) => total + item.estrellas, 0);
-            
-            // 3. Sacamos el promedio real redondeado a 1 decimal
-            this.stars = parseFloat((sumaTotal / resp.comentarios.length).toFixed(1));
-            
-        } else {
-            // 4. Si no hay comentarios, el producto arranca con 0 estrellas
-            this.stars = 0;
-        }
-    });
-    }
 
 }

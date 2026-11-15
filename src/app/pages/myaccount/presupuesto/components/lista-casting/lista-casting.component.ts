@@ -12,14 +12,16 @@ import { TiendaService } from '../../../../../services/tienda.service';
 import { LoadingComponent } from '../../../../../shared/loading/loading.component';
 import { ModalProductCastingComponent } from '../modal-product-casting/modal-product-casting.component';
 import { ProductItemCastingComponent } from '../product-item-casting/product-item-casting.component';
+
 declare var bootstrap: any;
+
 @Component({
   selector: 'app-lista-casting',
   imports: [CommonModule, LoadingComponent,
-      ProductItemCastingComponent, 
-      ModalProductCastingComponent,
-      CategoriasPipePipe, TranslatePipe
-    ],
+    ProductItemCastingComponent,
+    ModalProductCastingComponent,
+    CategoriasPipePipe, TranslatePipe
+  ],
   templateUrl: './lista-casting.component.html',
   styleUrl: './lista-casting.component.scss'
 })
@@ -36,11 +38,15 @@ export class ListaCastingComponent {
   private _activeCategory: string = 'all';
 
   @Input()
-  set activeCategory(value: string) {
-    // 🚨 OJO: Asignamos a la variable con guion bajo (_activeCategory), NO a 'this.activeCategory'
-    this._activeCategory = value || 'all';
+  set activeCategory(value: any) {
+    if (!value) {
+      this._activeCategory = 'all';
+    } else if (typeof value === 'object') {
+      this._activeCategory = value.es || value.nombre?.es || 'all';
+    } else {
+      this._activeCategory = String(value);
+    }
 
-    // Llamamos a tu función de carga de forma segura
     if (this.localIdActual) {
       this.cargarProductosPorTiendaId(this.localIdActual);
     }
@@ -69,6 +75,7 @@ export class ListaCastingComponent {
   todo: Producto[] = [];
   selectedProduct: Producto | null = null;
   localIdActual: any;
+  isModalOpen: boolean = false;
 
   private categoryService = inject(CategoryService);
   private productoService = inject(ProductoService);
@@ -127,59 +134,49 @@ export class ListaCastingComponent {
   cargarProductosPorTiendaId(localId: any) {
     this.isLoading = true;
 
-    this.productoService.find_by_storeId(localId).subscribe({
-      next: (productos: any[]) => {
-        this.products = productos || [];
+    this.productoService.find_by_storeIdActive(localId).subscribe({
+      next: (resp: any) => {
+        const lista = Array.isArray(resp) ? resp : (resp?.productos || []);
+        this.products = lista;
 
-        // 1. Extraemos el texto base (ID o string en minúsculas) de la subcategoría del producto
-        const subcategoriasEspanol = this.products.map((producto: any) => {
-          if (producto.subcategoria) {
-            return typeof producto.subcategoria === 'string'
-              ? producto.subcategoria.trim().toLowerCase()
-              : producto.subcategoria.es?.trim().toLowerCase();
+        // 🟢 Mapa estricto para garantizar CERO categorías duplicadas
+        const mapaSubcategorias = new Map<string, {
+          clave: string;
+          nombre: { es: string; en: string };
+          products: Producto[];
+        }>();
+
+        this.products.forEach((producto: any) => {
+          // 1. Apuntamos a producto.categoria.subcategorias o producto.categoria.nombre
+          const dataCat = producto.categoria?.subcategorias || producto.categoria?.nombre || producto.subcategoria;
+          if (!dataCat) return;
+
+          // 2. Extraemos ES y EN de forma segura
+          const rawEs = typeof dataCat === 'object' ? (dataCat.es || '') : String(dataCat);
+          const rawEn = typeof dataCat === 'object' ? (dataCat.en || rawEs) : rawEs;
+
+          const nombreLimpioEs = rawEs.trim();
+          if (!nombreLimpioEs) return;
+
+          const claveNormalizada = nombreLimpioEs.toLowerCase();
+
+          if (!mapaSubcategorias.has(claveNormalizada)) {
+            mapaSubcategorias.set(claveNormalizada, {
+              clave: claveNormalizada,
+              nombre: {
+                es: nombreLimpioEs,
+                en: rawEn.trim() || nombreLimpioEs
+              },
+              products: []
+            });
           }
-          return null;
+
+          mapaSubcategorias.get(claveNormalizada)!.products.push(producto);
         });
 
-        // 2. Eliminamos duplicados
-        const subcategoriasUnicasEs = [...new Set(subcategoriasEspanol.filter((sub: any) => !!sub))];
+        this.subcategories = Array.from(mapaSubcategorias.values());
 
-        // 3. Construimos el arreglo bilingüe agrupado buscando en el objeto 'categoria'
-        this.subcategories = subcategoriasUnicasEs.map((subcatBase: string) => {
-
-          // Buscamos un producto que tenga el objeto 'categoria' cargado
-          const productoConDataCompleta = this.products.find((p: any) => {
-            const actualSub = typeof p.subcategoria === 'string' ? p.subcategoria : p.subcategoria?.es;
-            return actualSub?.trim().toLowerCase() === subcatBase?.trim().toLowerCase() && p.categoria?.subcategorias;
-          });
-
-          let estructuraFinalNombre = { es: subcatBase, en: subcatBase };
-
-          // 🧠 CORRECCIÓN EXACTA: 'subcategorias' es un objeto directo { es, en }
-          if (productoConDataCompleta && productoConDataCompleta.categoria.subcategorias) {
-            const subcatBD = productoConDataCompleta.categoria.subcategorias;
-
-            // Si viene como objeto bilingüe, extraemos sus traducciones directo
-            if (typeof subcatBD === 'object') {
-              estructuraFinalNombre = {
-                es: subcatBD.es || subcatBase,
-                en: subcatBD.en || subcatBD.es || subcatBase
-              };
-            }
-          }
-
-          return {
-            nombre: estructuraFinalNombre,
-
-            products: this.products.filter((product: any) => {
-              if (!product.subcategoria) return false;
-              const actualSub = typeof product.subcategoria === 'object' ? product.subcategoria.es : product.subcategoria;
-              return actualSub?.trim().toLowerCase() === subcatBase?.trim().toLowerCase();
-            })
-          };
-        }) || [];
-
-        // 4. Sincronizamos la grilla de platos
+        // 4. Sincronizamos la grilla
         this.updateTodo();
         this.isLoading = false;
       },
@@ -190,13 +187,8 @@ export class ListaCastingComponent {
     });
   }
 
-
-
-
-
   selectCategory(category: string) {
-    console.log('selectCategory called with:', category);
-    this.activeCategory = category;
+    this._activeCategory = category || 'all';
     this.updateTodo();
   }
 
@@ -230,6 +222,7 @@ export class ListaCastingComponent {
         myOffcanvas.show();
       }
     }, 0);
+    this.isModalOpen = true;
   }
 
   onMsmSuccess(value: boolean): void {

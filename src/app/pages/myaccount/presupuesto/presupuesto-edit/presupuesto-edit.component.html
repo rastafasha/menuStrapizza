@@ -93,19 +93,20 @@
         <div class="card shadow-sm border-0 mb-4 mt-3">
             <div class="card-body p-4">
                 <h5 class="text-secondary text-uppercase fs-7 fw-bold mb-3">
-                    <i class="bi bi-file-earmark-text-fill me-2"></i>Información del Presupuesto
+                    <i class="bi bi-file-earmark-text-fill me-2"></i>
+                     {{ 'Información del Presupuesto' | translate }}
                 </h5>
                 <div class="row g-3">
                     <!-- El contenedor padre maneja Reactive Forms, aquí asignamos correctamente tus formControlName -->
                     <div class="col-12 col-md-4">
-                        <label class="form-label fw-semibold">Título <span class="text-danger">*</span></label>
+                        <label class="form-label fw-semibold">{{ 'Título' | translate }}<span class="text-danger">*</span></label>
                         <input class="form-control" formControlName="title" type="text"
-                            placeholder="Ej. Presupuesto para reunión">
+                            [placeholder]="'Ej. Presupuesto para reunión' | translate" >
                     </div>
                     <div class="col-12 col-md-8">
-                        <label class="form-label fw-semibold">Descripción <span class="text-danger">*</span></label>
+                        <label class="form-label fw-semibold">{{ 'Descripción' | translate }} <span class="text-danger">*</span></label>
                         <textarea class="form-control" formControlName="description" rows="1"
-                            placeholder="Detalles generales..."></textarea>
+                            [placeholder]= "'Detalles generales...' | translate"></textarea>
                     </div>
                 </div>
             </div>
@@ -117,7 +118,7 @@
         <div class="row align-items-center">
             <div class="col-12">
                 <div class="doctor-submit ">
-                    <button type="button" class="btn btn-outline-success w-100 py-3 rounded-pill" (click)="save()">Guardar</button>
+                    <button type="button" class="btn btn-outline-success w-100 py-3 rounded-pill" (click)="save()">{{ 'Solicitar' | translate }}</button>
 
                 </div>
             </div>

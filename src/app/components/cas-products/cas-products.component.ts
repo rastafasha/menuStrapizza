@@ -9,16 +9,16 @@ import { ModalproductComponent } from "../modalproduct/modalproduct.component";
 import { LoadingComponent } from '../../shared/loading/loading.component';
 import { Subscription } from 'rxjs';
 import { ProductoService } from '../../services/product.service';
-import { environment } from '../../../environments/environment';
 import { Categoria } from '../../models/categoria.model';
 import { CategoriasPipePipe } from '../../pipes/categorias-pipe.pipe';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+
 declare var bootstrap: any;
 @Component({
   selector: 'app-cas-products',
   imports: [CommonModule, LoadingComponent,
     ProductItemComponent, ModalproductComponent,
-    CategoriasPipePipe, 
+    CategoriasPipePipe,
     TranslatePipe
   ],
   templateUrl: './cas-products.component.html',
@@ -27,15 +27,15 @@ declare var bootstrap: any;
 export class CasProductsComponent implements OnInit, OnDestroy {
   @Output() msm_success: EventEmitter<boolean> = new EventEmitter<boolean>();
   @Input() refreshCasProducts: EventEmitter<void> | null = null;
-  
-  
+
+
   @Input() activeSubCategory: string = 'all';
   @Input() title!: string;
   @Input() isVisible = false;
   @Input() tienda_moneda!: any;
   @Input() isLoading: boolean = false;
 
-  
+isModalOpen: boolean = false;
 
   private _activeCategory: string = 'all';
 
@@ -104,16 +104,11 @@ export class CasProductsComponent implements OnInit, OnDestroy {
     }
   }
 
-
-
-
   ngOnDestroy() {
     if (this.tiendaSubscription) {
       this.tiendaSubscription.unsubscribe();
     }
   }
-
-
 
   // Mantenemos tu función por si la necesitas, pero limpia de llamadas duplicadas
   getProductosCatName() {
@@ -132,7 +127,7 @@ export class CasProductsComponent implements OnInit, OnDestroy {
   }
 
   // 🟢 TU NUEVA FUNCIÓN MAESTRA INTEGRAL (Limpia, rápida y libre de cruce de datos)
- cargarProductosPorTiendaId(localId: any) {
+  cargarProductosPorTiendaId(localId: any) {
     this.isLoading = true;
 
     this.productoService.find_by_storeIdActive(localId).subscribe({
@@ -148,23 +143,19 @@ export class CasProductsComponent implements OnInit, OnDestroy {
         }>();
 
         this.products.forEach((producto: any) => {
-          if (!producto.subcategoria) return;
+          // 1. Apuntamos a producto.categoria.subcategorias o producto.categoria.nombre
+          const dataCat = producto.categoria?.subcategorias || producto.categoria?.nombre || producto.subcategoria;
+          if (!dataCat) return;
 
-          // 1. Obtenemos el nombre real de la subcategoría en ES y EN
-          const rawEs = typeof producto.subcategoria === 'object'
-            ? (producto.subcategoria.es || '')
-            : String(producto.subcategoria);
-
-          const rawEn = typeof producto.subcategoria === 'object'
-            ? (producto.subcategoria.en || rawEs)
-            : rawEs;
+          // 2. Extraemos ES y EN de forma segura
+          const rawEs = typeof dataCat === 'object' ? (dataCat.es || '') : String(dataCat);
+          const rawEn = typeof dataCat === 'object' ? (dataCat.en || rawEs) : rawEs;
 
           const nombreLimpioEs = rawEs.trim();
           if (!nombreLimpioEs) return;
 
           const claveNormalizada = nombreLimpioEs.toLowerCase();
 
-          // 2. Si aún no existe en el mapa, la creamos una sola vez
           if (!mapaSubcategorias.has(claveNormalizada)) {
             mapaSubcategorias.set(claveNormalizada, {
               clave: claveNormalizada,
@@ -176,7 +167,6 @@ export class CasProductsComponent implements OnInit, OnDestroy {
             });
           }
 
-          // 3. Agregamos el producto a su grupo correspondiente
           mapaSubcategorias.get(claveNormalizada)!.products.push(producto);
         });
 
@@ -193,7 +183,7 @@ export class CasProductsComponent implements OnInit, OnDestroy {
     });
   }
 
-selectCategory(category: string) {
+  selectCategory(category: string) {
     this._activeCategory = category || 'all';
     this.updateTodo();
   }
@@ -223,6 +213,7 @@ selectCategory(category: string) {
         myOffcanvas.show();
       }
     }, 0);
+    this.isModalOpen = true;
   }
 
   onMsmSuccess(value: boolean): void {

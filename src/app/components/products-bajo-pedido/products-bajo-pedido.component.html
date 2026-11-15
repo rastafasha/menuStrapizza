@@ -12,7 +12,7 @@
                     {{product.precio_antes|number:'1.2-2'| currency:tienda_moneda}}</div>
                 <div class="product-price">{{product.precio_ahora|number:'1.2-2'| currency:tienda_moneda}}</div>
                 
-                <app-ratingStar [product]="product"></app-ratingStar>
+                <!-- <app-ratingStar [product]="product"></app-ratingStar> -->
             </div>
             <div class="botns">
                  <span class="badge text-bg-success" *ngIf="product.condition === 'new'">{{product.condition}}</span>

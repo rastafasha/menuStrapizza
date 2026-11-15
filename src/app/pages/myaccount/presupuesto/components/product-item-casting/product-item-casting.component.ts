@@ -17,7 +17,6 @@ declare var bootstrap: any;
     CommonModule,
     RouterModule,
     ImagenPipe,
-    RatingStarComponent
   ],
   templateUrl: './product-item-casting.component.html',
   styleUrl: './product-item-casting.component.scss'

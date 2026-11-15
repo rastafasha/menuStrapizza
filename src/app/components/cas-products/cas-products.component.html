@@ -1,5 +1,5 @@
 <div class="zlip-catalog-section">
-  
+
   <!-- Título de sección -->
   <div class="title-section mb-2">
     <h2 class="title mb-0">{{ title || ('Catálogo' | translate) }}</h2>
@@ -8,13 +8,10 @@
   <!-- BARRA HORIZONTAL DESLIZABLE DE PILLS (Sin saltos de línea hacia abajo) -->
   <div class="categories-scroll-container px-3 mb-3">
     <ul class="categories-nav-list">
-      
+
       <!-- Pill "Todo" siempre primero -->
       <li>
-        <button 
-          type="button"
-          class="zlip-menu-pill"
-          [class.active]="activeCategory === 'all'"
+        <button type="button" class="zlip-menu-pill" [class.active]="activeCategory === 'all'"
           (click)="selectCategory('all')">
           <span>{{ 'Todo' | translate }}</span>
           <span class="zlip-pill-count">{{ products.length }}</span>
@@ -23,17 +20,17 @@
 
       <!-- Pills únicas de categorías -->
       <li *ngFor="let category of subcategories | categoriasPipe">
-        <button 
-          type="button"
-          class="zlip-menu-pill"
-          [class.active]="activeCategory?.toLowerCase() === category.clave"
-          (click)="selectCategory(category.nombre.es)">
-          <span>
-            {{ (translate.currentLang() === 'en' ? category.nombre.en : category.nombre.es) | titlecase }}
-          </span>
-          <span class="zlip-pill-count">{{ category.products.length }}</span>
-        </button>
-      </li>
+  <button 
+    type="button" 
+    class="zlip-menu-pill" 
+    [class.active]="activeCategory?.toLowerCase() === category.clave"
+    (click)="selectCategory(category.nombre.es)">
+    <span>
+     {{ ((translate.currentLang() === 'en' ? category.nombre?.en : category.nombre?.es) || category.nombre?.es) | titlecase }}
+    </span>
+    <span class="zlip-pill-count">{{ category.products.length }}</span>
+  </button>
+</li>
 
     </ul>
   </div>
@@ -46,18 +43,15 @@
   <!-- Grilla de productos filtrados (todo) -->
   <div *ngIf="!isLoading" class="container-fluid px-3">
     <div class="row g-3">
-      <div  *ngFor="let product of todo">
-        <app-product-item 
-          [product]="product" 
-          [tienda_moneda]="tienda_moneda"
-          (click)="openModal(product)">
+      <div *ngFor="let product of todo">
+        <app-product-item [product]="product" [tienda_moneda]="tienda_moneda" (click)="openModal(product)">
         </app-product-item>
       </div>
     </div>
 
     <!-- Estado vacío si no hay productos -->
     <div *ngIf="!todo || todo.length === 0" class="text-center py-5 text-muted small">
-      {{ 'No hay productos disponibles en esta categoría' | translate }}.
+      {{ 'Selecciona una Categoría' | translate }}.
     </div>
   </div>
 
@@ -74,6 +68,10 @@
 <div class="clear"></div>
 
 <!-- Modal global e independiente para el detalle del plato seleccionado -->
-<app-modalproduct [product]="selectedProduct" [activeCategory]="activeCategory" [tienda_moneda]="tienda_moneda"
-    (modalClosed)="selectedProduct = null" *ngIf="selectedProduct && !isLoading">
+<app-modalproduct [product]="selectedProduct" 
+[activeCategory]="activeCategory" 
+[tienda_moneda]="tienda_moneda"
+[isModalOpen]="isModalOpen"
+  (modalClosed)="selectedProduct = null" 
+  *ngIf="selectedProduct && !isLoading">
 </app-modalproduct>

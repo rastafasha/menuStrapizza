@@ -35,7 +35,7 @@ export class RatingStarComponent implements OnInit{
     }
 
     getStrellasProduct() {
-    this.comentarioService.getByProduct(this.product._id).subscribe((resp: any) => {
+    this.comentarioService.getComentByProduct(this.product._id).subscribe((resp: any) => {
         // 1. Verificamos que existan comentarios en el array
         if (resp.comentarios && resp.comentarios.length > 0) {
             

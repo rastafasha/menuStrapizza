@@ -1,15 +1,13 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, OnInit, TrackByFunction } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, TrackByFunction } from '@angular/core';
 import { ReactiveFormsModule, FormsModule, FormBuilder } from '@angular/forms';
 import { Router } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ToastrService } from 'ngx-toastr';
 import { AuthService } from '../../../services/auth.service';
-import { ReservacionService } from '../../../services/reservacion.service';
 import { TiendaService } from '../../../services/tienda.service';
 import { ProductoService } from '../../../services/product.service';
 import { Producto } from '../../../models/producto.model';
-import { CasProductsComponent } from '../../../components/cas-products/cas-products.component';
 import { HeaderComponent } from '../../../shared/header/header.component';
 import { ProductsBajoPedidoComponent } from '../../../components/products-bajo-pedido/products-bajo-pedido.component';
 import { Subscription } from 'rxjs';
@@ -39,23 +37,35 @@ declare var bootstrap: any;
   styleUrl: './bajo-pedido.component.scss'
 })
 export class BajoPedidoComponent implements OnInit {
+  @Output() msm_success: EventEmitter<boolean> = new EventEmitter<boolean>();
+  
   user: any;
   tiendaSelected: any;
   products: Producto[] = [];
   isLoading = false;
   private tiendaSubscription!: Subscription;
-  title = 'Productos por pedido'
+  title = 'Productos por pedido';
+  isModalOpen: boolean = false;
 
-    @Input()
-    set activeCategory(value: string) {
-      // 🚨 OJO: Asignamos a la variable con guion bajo (_activeCategory), NO a 'this.activeCategory'
-      this._activeCategory = value || 'all';
-  
-      // Llamamos a tu función de carga de forma segura
-      if (this.localIdActual) {
-        this.cargarProductosPorTiendaId(this.localIdActual);
-      }
+   isRefreshing = false;
+  isEdnOfList = false;
+  nextUrl: string = '';
+  loadingTitle: string = '';
+
+   @Input()
+  set activeCategory(value: any) {
+    if (!value) {
+      this._activeCategory = 'all';
+    } else if (typeof value === 'object') {
+      this._activeCategory = value.es || value.nombre?.es || 'all';
+    } else {
+      this._activeCategory = String(value);
     }
+
+    if (this.localIdActual) {
+      this.cargarProductosPorTiendaId(this.localIdActual);
+    }
+  }
 
   categories: Categoria[] = [];
   subcategories: any[] = [];
@@ -87,9 +97,6 @@ export class BajoPedidoComponent implements OnInit {
     this.user = this.authService.getLocalStorage();
   }
 
-
-
-
   ngOnInit() {
     this.isLoading = true;
 
@@ -106,75 +113,59 @@ export class BajoPedidoComponent implements OnInit {
 
   }
 
-
-
-
   ngOnDestroy() {
     if (this.tiendaSubscription) {
       this.tiendaSubscription.unsubscribe();
     }
   }
 
-
-
-
   // 🟢 TU NUEVA FUNCIÓN MAESTRA INTEGRAL (Limpia, rápida y libre de cruce de datos)
-  cargarProductosPorTiendaId(localId: any) {
+ cargarProductosPorTiendaId(localId: any) {
     this.isLoading = true;
 
     this.productoService.bypedido(localId).subscribe({
       next: (resp: any) => {
-        this.products = resp|| [];
+        const lista = Array.isArray(resp) ? resp : (resp?.productos || []);
+        this.products = lista;
 
-        // 1. Extraemos el texto base (ID o string en minúsculas) de la subcategoría del producto
-        const subcategoriasEspanol = this.products.map((producto: any) => {
-          if (producto.subcategoria) {
-            return typeof producto.subcategoria === 'string'
-              ? producto.subcategoria.trim().toLowerCase()
-              : producto.subcategoria.es?.trim().toLowerCase();
+        // 🟢 Mapa estricto para garantizar CERO categorías duplicadas
+        const mapaSubcategorias = new Map<string, {
+          clave: string;
+          nombre: { es: string; en: string };
+          products: Producto[];
+        }>();
+
+        this.products.forEach((producto: any) => {
+          // 1. Apuntamos a producto.categoria.subcategorias o producto.categoria.nombre
+          const dataCat = producto.categoria?.subcategorias || producto.categoria?.nombre || producto.subcategoria;
+          if (!dataCat) return;
+
+          // 2. Extraemos ES y EN de forma segura
+          const rawEs = typeof dataCat === 'object' ? (dataCat.es || '') : String(dataCat);
+          const rawEn = typeof dataCat === 'object' ? (dataCat.en || rawEs) : rawEs;
+
+          const nombreLimpioEs = rawEs.trim();
+          if (!nombreLimpioEs) return;
+
+          const claveNormalizada = nombreLimpioEs.toLowerCase();
+
+          if (!mapaSubcategorias.has(claveNormalizada)) {
+            mapaSubcategorias.set(claveNormalizada, {
+              clave: claveNormalizada,
+              nombre: {
+                es: nombreLimpioEs,
+                en: rawEn.trim() || nombreLimpioEs
+              },
+              products: []
+            });
           }
-          return null;
+
+          mapaSubcategorias.get(claveNormalizada)!.products.push(producto);
         });
 
-        // 2. Eliminamos duplicados
-        const subcategoriasUnicasEs = [...new Set(subcategoriasEspanol.filter((sub: any) => !!sub))];
+        this.subcategories = Array.from(mapaSubcategorias.values());
 
-        // 3. Construimos el arreglo bilingüe agrupado buscando en el objeto 'categoria'
-        this.subcategories = subcategoriasUnicasEs.map((subcatBase: string) => {
-
-          // Buscamos un producto que tenga el objeto 'categoria' cargado
-          const productoConDataCompleta = this.products.find((p: any) => {
-            const actualSub = typeof p.subcategoria === 'string' ? p.subcategoria : p.subcategoria?.es;
-            return actualSub?.trim().toLowerCase() === subcatBase?.trim().toLowerCase() && p.categoria?.subcategorias;
-          });
-
-          let estructuraFinalNombre = { es: subcatBase, en: subcatBase };
-
-          // 🧠 CORRECCIÓN EXACTA: 'subcategorias' es un objeto directo { es, en }
-          if (productoConDataCompleta && productoConDataCompleta.categoria.subcategorias) {
-            const subcatBD = productoConDataCompleta.categoria.subcategorias;
-
-            // Si viene como objeto bilingüe, extraemos sus traducciones directo
-            if (typeof subcatBD === 'object') {
-              estructuraFinalNombre = {
-                es: subcatBD.es || subcatBase,
-                en: subcatBD.en || subcatBD.es || subcatBase
-              };
-            }
-          }
-
-          return {
-            nombre: estructuraFinalNombre,
-
-            products: this.products.filter((product: any) => {
-              if (!product.subcategoria) return false;
-              const actualSub = typeof product.subcategoria === 'object' ? product.subcategoria.es : product.subcategoria;
-              return actualSub?.trim().toLowerCase() === subcatBase?.trim().toLowerCase();
-            })
-          };
-        }) || [];
-
-        // 4. Sincronizamos la grilla de platos
+        // 4. Sincronizamos la grilla
         this.updateTodo();
         this.isLoading = false;
       },
@@ -185,13 +176,8 @@ export class BajoPedidoComponent implements OnInit {
     });
   }
 
-
-
-
-
   selectCategory(category: string) {
-    console.log('selectCategory called with:', category);
-    this.activeCategory = category;
+    this._activeCategory = category || 'all';
     this.updateTodo();
   }
 
@@ -225,44 +211,45 @@ export class BajoPedidoComponent implements OnInit {
         myOffcanvas.show();
       }
     }, 0);
+    this.isModalOpen = true;
   }
 
-  // onMsmSuccess(value: boolean): void {
-  //   this.msm_success.emit(value);
-  // }
+  onMsmSuccess(value: boolean): void {
+    this.msm_success.emit(value);
+  }
 
-  // onScrollDown() {
-  //   if (!this.nextUrl || this.isLoading) return;
-  //   this.categoryService.find_by_nombre(this.nextUrl).subscribe({
-  //     next: (resp: any) => {
-  //       if (resp.info.next) {
-  //         this.nextUrl = resp.info.next;
-  //         this.products = [...this.products, ...resp.results];
-  //       } else {
-  //         this.isEdnOfList = true;
-  //         this.loadingTitle = 'No hay más personajes para mostrar';
-  //       }
-  //     },
-  //     error: () => this.isLoading = false
-  //   });
-  // }
+  onScrollDown() {
+    if (!this.nextUrl || this.isLoading) return;
+    this.categoryService.find_by_nombre(this.nextUrl).subscribe({
+      next: (resp: any) => {
+        if (resp.info.next) {
+          this.nextUrl = resp.info.next;
+          this.products = [...this.products, ...resp.results];
+        } else {
+          this.isEdnOfList = true;
+          this.loadingTitle = 'No hay más personajes para mostrar';
+        }
+      },
+      error: () => this.isLoading = false
+    });
+  }
 
-  // onScrollUp() {
-  //   this.refreshData();
-  // }
+  onScrollUp() {
+    this.refreshData();
+  }
 
   trackByCharacterId: TrackByFunction<any> = (index: number, character: any) => character.id;
 
   // Actualizamos la función de refresco para que use el nuevo flujo limpio
-  // refreshData() {
-  //   this.isRefreshing = true;
-  //   setTimeout(() => {
-  //     this.isRefreshing = false;
-  //     if (this.tiendaSelected?._id) {
-  //       this.cargarProductosPorTiendaId(this.tiendaSelected._id);
-  //     }
-  //   }, 2000);
-  // }
+  refreshData() {
+    this.isRefreshing = true;
+    setTimeout(() => {
+      this.isRefreshing = false;
+      if (this.tiendaSelected?._id) {
+        this.cargarProductosPorTiendaId(this.tiendaSelected._id);
+      }
+    }, 2000);
+  }
 
 
 }
