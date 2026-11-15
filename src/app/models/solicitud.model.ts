@@ -6,6 +6,8 @@ export class Solicitud{
         public user: string,
         public pedidoList: Array<any>,
         public tienda: Tienda,
+        public fechaSolicitud: string,
+        public horaSolicitud: string,
         public status: string,
         public createdAt: Date,
     ){

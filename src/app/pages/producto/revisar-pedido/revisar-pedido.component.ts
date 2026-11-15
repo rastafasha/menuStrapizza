@@ -71,6 +71,7 @@ export class RevisarPedidoComponent {
 
   public expressForm!: FormGroup;
   public direccionForm!: FormGroup;
+  public solicitudForm!: FormGroup;
 
 
   public whatsapp!: string;
@@ -123,10 +124,18 @@ export class RevisarPedidoComponent {
     this.loadBandejaListFromLocalStorage();
     this.chekpedidoguardado();
     this.crearFormularioExpress();
+    this.validarFormulario();
 
     this.expressForm.valueChanges.subscribe(() => {
       this.actualizarUrlWhatsApp();
     });
+  }
+
+  validarFormulario() {
+    this.solicitudForm = this.fb.group({
+      fechaSolicitud: [''],
+      horaSolicitud: [''],
+    })
   }
 
   SubscribeToCart() {
@@ -158,6 +167,7 @@ export class RevisarPedidoComponent {
       }
     });
   }
+
   total() {
     const total = this.bandejaListPedido.reduce((sum, item) =>
       sum + (item.precio_ahora * item.cantidad), 0
@@ -529,6 +539,10 @@ export class RevisarPedidoComponent {
       tienda: this.tiendaSelected._id,
       pedidoList: this.bandejaListPedido,
       status: estatusSeguro,
+      // Extraemos cada campo por separado 
+      fechaSolicitud: this.solicitudForm.value.fechaSolicitud || this.solicitudForm.value.fecha,
+      horaSolicitud: this.solicitudForm.value.horaSolicitud || this.solicitudForm.value.hora,
+      
       
       // 🛵 INYECCIÓN DE DELIVERY COMPATIBLE: Captura los datos del formulario express
       // delivery: esDelivery,
@@ -570,18 +584,23 @@ export class RevisarPedidoComponent {
 
     // SALVAVIDAS: Si expressForm no existe o no tiene datos, usamos datos de la sesión para que NO se rompa
     const formValues = this.expressForm?.value || {};
+    const formValues2 = this.solicitudForm?.value || {};
+
     const nombreCliente = formValues.first_name || this.identity.first_name || 'Cliente';
-    const tipoEntrega = formValues.tipoEntrega || 'No especificado';
     const telefonoCliente = formValues.telefono || this.identity.telefono || 'No registrado';
+    const fechaSol = formValues2.fechaSolicitud || 'No registrado';
+    const horaSol = formValues2.horaSolicitud || 'No registrado';
     
     const isEn = this.activeLang === 'en';
 
     let message = `*${isEn ? 'New Order from Zlipmenu App' : 'Nuevo Pedido desde App Zlipmenu'} #${this.randomNum}*\n\n`;
-    message += `*${isEn ? 'Customer' : 'Cliente'}:* ${nombreCliente}\n`;
-    // message += `*${isEn ? 'Delivery Type' : 'Tipo Entrega'}:* ${tipoEntrega}\n`;
-    message += `*${isEn ? 'Phone' : 'Teléfono'}:* ${telefonoCliente}\n\n`;
-    message += `*${isEn ? 'Order Details' : 'Detalles del Pedido'}:*\n`;
-    message += `─────────────────────\n`;
+      message += `*${isEn ? 'Customer' : 'Cliente'}:* ${nombreCliente}\n`;
+      // message += `*${isEn ? 'Delivery Type' : 'Tipo Entrega'}:* ${tipoEntrega}\n`;
+      message += `*${isEn ? 'Phone' : 'Teléfono'}:* ${telefonoCliente}\n\n`;
+      message += `*${isEn ? 'Date' : 'Fecha'}:* ${fechaSol}\n\n`;
+      message += `*${isEn ? 'Time' : 'Hora'}:* ${horaSol}\n\n`;
+      message += `*${isEn ? 'Order Details' : 'Detalles del Pedido'}:*\n`;
+      message += `─────────────────────\n`;
 
     
 

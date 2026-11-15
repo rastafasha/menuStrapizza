@@ -16,6 +16,7 @@ import { SelectorService } from '../../../../../services/selector.service';
 import { TiendaService } from '../../../../../services/tienda.service';
 import { RatingStarComponent } from '../../../../../components/ratingStar/ratingStar.component';
 import { CastingService } from '../../../../../services/casting.service';
+import { LoadingComponent } from '../../../../../shared/loading/loading.component';
 
 declare var bootstrap: any;
 
@@ -28,7 +29,8 @@ declare var bootstrap: any;
     FormsModule,
     ImagenPipe,
     RatingStarComponent,
-    TranslatePipe
+    TranslatePipe,
+    LoadingComponent
   ],
   templateUrl: './modal-product-casting.component.html',
   styleUrl: './modal-product-casting.component.scss'
@@ -48,6 +50,7 @@ export class ModalProductCastingComponent {
   public msm_error = false;
   public msm_success = false;
   public msm_alert = false;
+  public isLoading = false;
 
   producto: any;
   favoriteItem: any;
@@ -203,16 +206,32 @@ export class ModalProductCastingComponent {
   }
 
   getSelectorProducto() {
+    this.isLoading =true;
     this.selector_to_cart = ' ';
     this.selectorService.selectorByProduct(this.product._id).subscribe(
       response => {
         this.selectores = response;
+        // 2. Llama a esta lógica justo donde recibes `this.selectores` del backend
+        // Ejemplo: dentro del .subscribe() donde llenas this.selectores
+        if (this.selectores && this.selectores.length > 0) {
+          this.seleccionarOpcion(this.selectores[0]);
+        }
+        this.isLoading =false;
       },
       error => {
 
       }
     );
   }
+
+  // 1. Método al hacer clic en un globo
+  seleccionarOpcion(selector: any) {
+    this.selector_to_cart = this.translate.currentLang() === 'en'
+      ? selector.titulo.en
+      : selector.titulo.es;
+    this.selector_error = false;
+  }
+
 
   getComentarios(){
     this.comentarioService.getByProduct(this.product._id).subscribe((resp:any)=>{
