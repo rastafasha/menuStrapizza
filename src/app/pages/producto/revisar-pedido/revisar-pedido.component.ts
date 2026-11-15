@@ -50,6 +50,7 @@ export class RevisarPedidoComponent {
   fechaHoy: string = new Date().toISOString().split('T')[0];
   randomNum: number = 0;
   isbandejaListPedido: boolean = false;
+  mostarFechYhora: boolean = false;
 
   tiendaSelected: any;
   tienda_moneda: any;
@@ -104,7 +105,7 @@ export class RevisarPedidoComponent {
   private toastr = inject(ToastrService);
   private router = inject(Router);
   private fb = inject(FormBuilder);
-  private translate = inject(TranslateService);
+  public translate = inject(TranslateService);
 
   private solitudSubscription!: Subscription;
 
@@ -683,7 +684,10 @@ export class RevisarPedidoComponent {
 
 
 
-
+toggleComentario(event: Event): void {
+    event.preventDefault();
+    this.mostarFechYhora = !this.mostarFechYhora;
+  }
 
 
 

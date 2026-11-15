@@ -109,7 +109,7 @@ export class ReviewOrderComponent implements OnInit, OnDestroy {
   private toastr = inject(ToastrService);
   private router = inject(Router);
   private fb = inject(FormBuilder);
-  private translate = inject(TranslateService);
+  public translate = inject(TranslateService);
 
   private cartSubscription!: Subscription;
 
