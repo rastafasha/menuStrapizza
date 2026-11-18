@@ -304,10 +304,6 @@ export class ReviewOrderComponent implements OnInit, OnDestroy {
     });
   }
 
-
-  
- 
-
   onChangeDireccion(event: Event) {
     const target = event.target as HTMLSelectElement; 
     
