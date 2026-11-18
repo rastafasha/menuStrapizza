@@ -21,7 +21,7 @@ declare var $: any;
   imports: [CommonModule,
     RouterLink, ImagenPipe],
   templateUrl: './promocion.component.html',
-  styleUrls: ['./promocion.component.css']
+  styleUrls: ['./promocion.component.scss']
 })
 export class PromocionComponent implements OnInit {
 
@@ -61,19 +61,19 @@ export class PromocionComponent implements OnInit {
 
 
   ngAfterViewInit() {
-    const USER = localStorage.getItem("user");
-    // Check if dismissed
-    if (localStorage.getItem('modalPromoDismissed')) {
-      return;
-    }
-    // Auto open modal after DOM ready
-    setTimeout(() => {
-      const modalElement = document.getElementById('modalPromo');
-      if (modalElement) {
-        const modal = new (window as any).bootstrap.Modal(modalElement);
-        modal.show();
-      }
-    }, 500);
+    // const USER = localStorage.getItem("user");
+    // // Check if dismissed
+    // if (localStorage.getItem('modalPromoDismissed')) {
+    //   return;
+    // }
+    // // Auto open modal after DOM ready
+    // setTimeout(() => {
+    //   const modalElement = document.getElementById('modalPromo');
+    //   if (modalElement) {
+    //     const modal = new (window as any).bootstrap.Modal(modalElement);
+    //     modal.show();
+    //   }
+    // }, 500);
   }
 
   onNoShowMore() {
@@ -98,79 +98,85 @@ export class PromocionComponent implements OnInit {
     }, 100);
   }
 
-  
+
   startCountdown(index: number, fecha: string | number | Date) {
-  const second = 1000,
-        minute = second * 60,
-        hour = minute * 60,
-        day = hour * 24;
+    const second = 1000,
+      minute = second * 60,
+      hour = minute * 60,
+      day = hour * 24;
 
-  const countDown = new Date(fecha).getTime();
+    const countDown = new Date(fecha).getTime();
 
-  // Si ya había un reloj corriendo en ese índice, lo limpia primero
-  if (this.intervals[index]) {
-    clearInterval(this.intervals[index]);
-  }
-
-  const updateCountdown = () => {
-    const now = new Date().getTime();
-    const distance = countDown - now;
-
-    if (distance < 0) {
-      this.countdownValues[index] = { days: 0, hours: 0, minutes: 0, seconds: 0 };
+    // Si ya había un reloj corriendo en ese índice, lo limpia primero
+    if (this.intervals[index]) {
       clearInterval(this.intervals[index]);
-      return;
     }
 
-    this.countdownValues[index] = {
-      days: Math.floor(distance / day),
-      hours: Math.floor((distance % day) / hour),
-      minutes: Math.floor((distance % hour) / minute),
-      seconds: Math.floor((distance % minute) / second)
-    };
-  };
+    const updateCountdown = () => {
+      const now = new Date().getTime();
+      const distance = countDown - now;
 
-  updateCountdown();
-  this.intervals[index] = setInterval(updateCountdown, second);
-}
-
-  data_banner() {
-  // Evita hacer la petición si aún no hay una tienda seleccionada
-  if (!this.tiendaSelected?._id) {
-    return;
-  }
-
-  this.isLoading = true;
-
-  this.promocionService.getPromocionActivoByIdLocal(this.tiendaSelected._id).subscribe({
-    next: (response: any) => {
-      // Soporta tanto si el backend devuelve { promociones: [...] } como un arreglo directo [...]
-      const listaPromociones = response?.promociones || response || [];
-
-      if (listaPromociones.length > 0) {
-        this.promocion = listaPromociones[0];
-        this.promociones = listaPromociones;
-        this.estado = this.promocion?.estado ?? false;
-
-        // Solo inicia el contador si existe una fecha de finalización
-        if (this.promocion?.end) {
-          this.startCountdown(0, this.promocion.end);
-        }
-      } else {
-        this.promocion = null;
-        this.estado = false;
+      if (distance < 0) {
+        this.countdownValues[index] = { days: 0, hours: 0, minutes: 0, seconds: 0 };
+        clearInterval(this.intervals[index]);
+        return;
       }
 
-      this.isLoading = false;
-    },
-    error: (err) => {
-      console.error('Error al cargar la promoción del banner:', err);
-      this.promocion = null;
-      this.estado = false;
-      this.isLoading = false;
-    }
-  });
-}
+      this.countdownValues[index] = {
+        days: Math.floor(distance / day),
+        hours: Math.floor((distance % day) / hour),
+        minutes: Math.floor((distance % hour) / minute),
+        seconds: Math.floor((distance % minute) / second)
+      };
+    };
+
+    updateCountdown();
+    this.intervals[index] = setInterval(updateCountdown, second);
+  }
+
+  // 2. En data_banner(): iniciamos todos los contadores y abrimos el modal solo si hay datos
+  data_banner() {
+    if (!this.tiendaSelected?._id) return;
+
+    this.isLoading = true;
+
+    this.promocionService.getPromocionActivoByIdLocal(this.tiendaSelected._id).subscribe({
+      next: (response: any) => {
+        const listaPromociones = response?.promociones || response || [];
+
+        if (listaPromociones.length > 0) {
+          this.promociones = listaPromociones;
+          this.promocion = listaPromociones[0];
+          this.estado = this.promocion?.estado ?? true;
+
+          // Iniciamos el contador para TODAS las promociones activas
+          this.promociones.forEach((promo, idx) => {
+            if (promo.end) {
+              this.startCountdown(idx, promo.end);
+            }
+          });
+
+          // Abrimos el modal automáticamente solo si no fue descartado hoy
+          if (!localStorage.getItem('modalPromoDismissed')) {
+            this.open();
+          }
+        } else {
+          this.promociones = [];
+          this.promocion = null;
+          this.estado = false;
+        }
+
+        this.isLoading = false;
+      },
+      error: (err) => {
+        console.error('Error al cargar la promoción:', err);
+        this.promociones = [];
+        this.promocion = null;
+        this.estado = false;
+        this.isLoading = false;
+      }
+    });
+  }
   selectSlide(index: number) {
     this.currentSlide = index;
   }
@@ -189,9 +195,13 @@ export class PromocionComponent implements OnInit {
   }
 
   // Asegúrate de implementar OnDestroy en tu componente
+  //  Limpieza completa de memoria en ngOnDestroy
   ngOnDestroy() {
-    if (this.intervalId) {
-      clearInterval(this.intervalId);
+    if (this.tiendaSubscription) {
+      this.tiendaSubscription.unsubscribe();
+    }
+    if (this.intervals && this.intervals.length > 0) {
+      this.intervals.forEach(interval => clearInterval(interval));
     }
   }
 

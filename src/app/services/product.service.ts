@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { throwError } from 'rxjs';
-import { catchError, map, tap } from 'rxjs/operators';
+import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
+import { of, throwError } from 'rxjs';
+import { catchError, map, shareReplay, tap } from 'rxjs/operators';
 import { Producto } from '../models/producto.model';
 import { Observable } from "rxjs";
 import { Categoria, CatProducModel } from '../models/categoria.model';
@@ -19,6 +19,8 @@ export class ProductoService {
 
   public producto!: Producto;
   public categoria!: CatProducModel;
+  private cacheTiendaId: string | null = null;
+private productosTiendaCache$: Observable<Producto[]> | null = null;
 
   constructor(
     private http: HttpClient
@@ -137,13 +139,40 @@ export class ProductoService {
       map((resp:{ok: boolean, productos: Producto}) => resp.productos)
       );
   }
-  find_by_storeIdActive(tienda: any):Observable<any>{
-    const url = `${base_url}/productos/by_tiendaId_active/${tienda}`;
-    return this.http.get<any>(url)
-    .pipe(
-      map((resp:{ok: boolean, productos: Producto}) => resp.productos)
-      );
+
+  
+
+  // 1. Método para cat-adicionales (con caché para que 4 secciones hagan solo 1 petición)
+find_by_storeIdActive(tienda: any): Observable<Producto[]> {
+  if (!tienda) return of([]);
+
+  // Si es la misma tienda y ya tenemos la petición en caché, la reutilizamos
+  if (this.cacheTiendaId === tienda && this.productosTiendaCache$) {
+    return this.productosTiendaCache$;
   }
+
+  this.cacheTiendaId = tienda;
+  const url = `${base_url}/productos/by_tiendaId_active/${tienda}`;
+  
+  this.productosTiendaCache$ = this.http.get<any>(url).pipe(
+    map((resp: any) => Array.isArray(resp) ? resp : (resp?.productos || [])),
+    shareReplay(1) // Comparte el resultado entre todas las instancias de cat-adicionales
+  );
+
+  return this.productosTiendaCache$;
+}
+
+// 2. Método exclusivo para el Infinite Scroll de cas-products.component.ts
+find_by_storeIdActivePaginado(tienda: any, page: number = 1, limit: number = 20): Observable<any> {
+  const url = `${base_url}/productos/by_tiendaId_active/${tienda}`;
+  const params = new HttpParams()
+    .set('page', page.toString())
+    .set('limit', limit.toString());
+
+  return this.http.get<any>(url, { params });
+}
+
+
 
   reducir_stock(id: any,cantidad: any):Observable<any>{
 

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, inject, Input, Output, TrackByFunction } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, EventEmitter, inject, Input, OnDestroy, OnInit, Output, TrackByFunction, ViewChild } from '@angular/core';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
 import { Categoria } from '../../../../../models/categoria.model';
@@ -25,7 +25,10 @@ declare var bootstrap: any;
   templateUrl: './lista-casting.component.html',
   styleUrl: './lista-casting.component.scss'
 })
-export class ListaCastingComponent {
+export class ListaCastingComponent implements OnInit, AfterViewInit, OnDestroy {
+
+  @ViewChild('centinela') centinela!: ElementRef;
+
   @Output() msm_success: EventEmitter<boolean> = new EventEmitter<boolean>();
   @Input() refreshCasProducts: EventEmitter<void> | null = null;
   // @Input() activeCategory: string = 'all';
@@ -36,6 +39,7 @@ export class ListaCastingComponent {
   @Input() isLoading: boolean = false;
 
   private _activeCategory: string = 'all';
+  private observer!: IntersectionObserver;
 
   @Input()
   set activeCategory(value: any) {
@@ -77,6 +81,14 @@ export class ListaCastingComponent {
   localIdActual: any;
   isModalOpen: boolean = false;
 
+  // Propiedades para la paginación
+  paginaActual = 1;
+  limite = 20;
+  hasMore = true;
+  isLoadingMore = false;  // Para el spinner pequeño al final del scroll
+
+  categoriasTienda: any[] = [];
+
   private categoryService = inject(CategoryService);
   private productoService = inject(ProductoService);
   private tiendasService = inject(TiendaService);
@@ -85,7 +97,6 @@ export class ListaCastingComponent {
 
 
   ngOnInit() {
-    this.isLoading = true;
 
     // 1. Escuchamos la tienda activa resuelta en la caché
     this.tiendaSubscription = this.tiendasService.getTiendaByNameCached().subscribe(tienda => {
@@ -103,14 +114,40 @@ export class ListaCastingComponent {
     }
   }
 
+  // 1. Función trackBy para que Angular solo renderice los productos nuevos
+  trackByProductId(index: number, item: any): string {
+    return item._id || item.id || index;
+  }
+
+  // 2. Dentro de ngAfterViewInit():
+  ngAfterViewInit(): void {
+    this.observer = new IntersectionObserver((entries) => {
+      const enPantalla = entries[0].isIntersecting;
+
+      // Solo pedimos más páginas si el centinela es visible, no está cargando y quedan más productos
+      if (enPantalla && !this.isLoading && !this.isLoadingMore && this.hasMore) {
+        this.cargarProductosPorTiendaId(this.localIdActual, false);
+      }
+    }, {
+      rootMargin: '250px' // Empieza a descargar 250px antes de llegar al fondo
+    });
+
+    if (this.centinela) {
+      this.observer.observe(this.centinela.nativeElement);
+    }
+  }
+
 
 
 
   ngOnDestroy() {
-    if (this.tiendaSubscription) {
-      this.tiendaSubscription.unsubscribe();
-    }
+  if (this.tiendaSubscription) {
+    this.tiendaSubscription.unsubscribe();
   }
+  if (this.observer) {
+    this.observer.disconnect();
+  }
+}
 
 
 
@@ -131,61 +168,118 @@ export class ListaCastingComponent {
   }
 
   // 🟢 TU NUEVA FUNCIÓN MAESTRA INTEGRAL (Limpia, rápida y libre de cruce de datos)
-  cargarProductosPorTiendaId(localId: any) {
-    this.isLoading = true;
+  cargarProductosPorTiendaId(localId: any, esCargaInicial: boolean = true) {
+    // Evitamos peticiones duplicadas o si ya no hay más productos
+    if (this.isLoading || this.isLoadingMore || (!esCargaInicial && !this.hasMore)) {
+      return;
+    }
 
-    this.productoService.find_by_storeIdActive(localId).subscribe({
+    // Si es carga inicial (o cambió de tienda), reseteamos todo
+    if (esCargaInicial) {
+      this.localIdActual = localId;
+      this.paginaActual = 1;
+      this.hasMore = true;
+      this.products = [];
+      this.subcategories = [];
+      this.isLoading = true;
+    } else {
+      this.isLoadingMore = true;
+    }
+
+    this.productoService.find_by_storeIdActivePaginado(localId, this.paginaActual, this.limite).subscribe({
       next: (resp: any) => {
-        const lista = Array.isArray(resp) ? resp : (resp?.productos || []);
-        this.products = lista;
+        // Extraemos los productos nuevos y la info de paginación
+        const nuevosProductos = Array.isArray(resp) ? resp : (resp?.productos || []);
+        const paginacion = resp?.paginacion;
 
-        // 🟢 Mapa estricto para garantizar CERO categorías duplicadas
-        const mapaSubcategorias = new Map<string, {
-          clave: string;
-          nombre: { es: string; en: string };
-          products: Producto[];
-        }>();
+        if (esCargaInicial) {
+          this.categoriasTienda = resp?.categoriasDisponibles || [];
+        }
 
-        this.products.forEach((producto: any) => {
-          // 1. Apuntamos a producto.categoria.subcategorias o producto.categoria.nombre
-          const dataCat = producto.categoria?.subcategorias || producto.categoria?.nombre || producto.subcategoria;
-          if (!dataCat) return;
+        // Actualizamos si quedan más páginas por pedir
+        if (paginacion) {
+          this.hasMore = paginacion.hasMore;
+        } else {
+          this.hasMore = nuevosProductos.length === this.limite;
+        }
 
-          // 2. Extraemos ES y EN de forma segura
-          const rawEs = typeof dataCat === 'object' ? (dataCat.es || '') : String(dataCat);
-          const rawEn = typeof dataCat === 'object' ? (dataCat.en || rawEs) : rawEs;
+        // 🟢 CONCATENAMOS los nuevos productos a los que ya teníamos (NO sobrescribir)
+        this.products = [...this.products, ...nuevosProductos];
+        this.paginaActual++;
 
-          const nombreLimpioEs = rawEs.trim();
-          if (!nombreLimpioEs) return;
+        // Reconstruimos el mapa de subcategorías con todos los productos acumulados
+        this.agruparPorSubcategorias();
 
-          const claveNormalizada = nombreLimpioEs.toLowerCase();
-
-          if (!mapaSubcategorias.has(claveNormalizada)) {
-            mapaSubcategorias.set(claveNormalizada, {
-              clave: claveNormalizada,
-              nombre: {
-                es: nombreLimpioEs,
-                en: rawEn.trim() || nombreLimpioEs
-              },
-              products: []
-            });
-          }
-
-          mapaSubcategorias.get(claveNormalizada)!.products.push(producto);
-        });
-
-        this.subcategories = Array.from(mapaSubcategorias.values());
-
-        // 4. Sincronizamos la grilla
+        // Sincronizamos la grilla
         this.updateTodo();
+
         this.isLoading = false;
+        this.isLoadingMore = false;
       },
       error: (err) => {
+        if (err.status === 404) {
+          this.hasMore = false;
+        }
         console.error('Error al obtener los productos por tienda:', err);
         this.isLoading = false;
+        this.isLoadingMore = false;
       }
     });
   }
+
+  private agruparPorSubcategorias(): void {
+  const mapaSubcategorias = new Map<string, {
+    clave: string;
+    nombre: { es: string; en: string };
+    products: Producto[];
+  }>();
+
+  // PASO 1: Llenamos el menú superior con TODAS las categorías de la tienda desde el inicio
+  this.categoriasTienda.forEach((cat: any) => {
+    const dataCat = cat.subcategorias?.es ? cat.subcategorias : cat.nombre;
+    if (!dataCat) return;
+
+    const rawEs = typeof dataCat === 'object' ? (dataCat.es || '') : String(dataCat);
+    const rawEn = typeof dataCat === 'object' ? (dataCat.en || rawEs) : rawEs;
+    const nombreLimpioEs = rawEs.trim();
+    if (!nombreLimpioEs) return;
+
+    const claveNormalizada = nombreLimpioEs.toLowerCase();
+    if (!mapaSubcategorias.has(claveNormalizada)) {
+      mapaSubcategorias.set(claveNormalizada, {
+        clave: claveNormalizada,
+        nombre: { es: nombreLimpioEs, en: rawEn.trim() || nombreLimpioEs },
+        products: []
+      });
+    }
+  });
+
+  // PASO 2: Asociamos los productos ya descargados a su categoría
+  this.products.forEach((producto: any) => {
+    const dataCat = (producto.categoria?.subcategorias?.es ? producto.categoria.subcategorias : null) 
+                    || producto.categoria?.nombre 
+                    || producto.subcategoria;
+    if (!dataCat) return;
+
+    const rawEs = typeof dataCat === 'object' ? (dataCat.es || '') : String(dataCat);
+    const rawEn = typeof dataCat === 'object' ? (dataCat.en || rawEs) : rawEs;
+    const nombreLimpioEs = rawEs.trim();
+    if (!nombreLimpioEs) return;
+
+    const claveNormalizada = nombreLimpioEs.toLowerCase();
+    if (!mapaSubcategorias.has(claveNormalizada)) {
+      mapaSubcategorias.set(claveNormalizada, {
+        clave: claveNormalizada,
+        nombre: { es: nombreLimpioEs, en: rawEn.trim() || nombreLimpioEs },
+        products: []
+      });
+    }
+
+    mapaSubcategorias.get(claveNormalizada)!.products.push(producto);
+  });
+
+  this.subcategories = Array.from(mapaSubcategorias.values());
+}
 
   selectCategory(category: string) {
     this._activeCategory = category || 'all';

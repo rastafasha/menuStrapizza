@@ -1,35 +1,51 @@
-<div class="products-grid">
-    <div class="product-card">
-        <!-- 1. Quitamos data-bs de la imagen y agregamos (click) -->
-        <div class="product-image" (click)="verDetalles()">
-            <img [src]="product.img | imagenPipe: 'productos'" [alt]="product.titulo?.es">
-        </div>
-        <div class="product-content">
-            <div class="infpr">
-                <h4>{{ translate.currentLang() === 'en' ? product.titulo.en?.substring(0,25) : product.titulo.es?.substring(0,25)}}...</h4>
-                <div class="product-price text-danger" style="text-decoration: line-through;"
-                    *ngIf="product.precio_antes > product.precio_ahora">
-                    {{product.precio_antes|number:'1.2-2'| currency:tienda_moneda}}</div>
-                <div class="product-price">{{product.precio_ahora|number:'1.2-2'| currency:tienda_moneda}}</div>
-                <!-- <p>Disponible: {{product.stock}}</p> -->
-                
-            </div>
-            <div class="botns">
-                <!-- <p>{{product.condition}}</p> -->
-                <span class="badge text-bg-success" *ngIf="product.condition === 'new'">{{product.condition}}</span>
-                     <span class="badge text-bg-warning" *ngIf="product.condition === 'used'">{{product.condition}}</span>
-                <!-- 2. Quitamos data-bs del botón del ojo y agregamos (click) -->
-                <div class="botns">
-                    <button class="btn-secondary btn" (click)="verDetalles()">
-                        <i class="fa fa-eye"></i>
-                    </button>
-                    <!-- Tu botón de agregar se queda igual, sin propagar -->
-                    <button class="btn-success btn" *ngIf="product.nombre_selector === 'unico'"
-                        (click)="addItem(product); $event.stopPropagation()">
-                        <i class="fa fa-shopping-bag"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
+<div class="product-card-item">
+  
+  <!-- 1. Contenedor de Imagen -->
+  <div class="product-thumb-wrapper">
+    <img [src]="(product.img || product.galeria?.[0]) | imagenPipe:'productos'" 
+         [alt]="translate.currentLang() === 'en' ? product.titulo?.en : product.titulo?.es"
+         loading="lazy"
+         class="product-thumb-img">
+         
+    <!-- Badge de condición (new / usado / oferta) superpuesto sutilmente o en esquina -->
+    <span *ngIf="product.condition" 
+          class="condition-pill"
+          [ngClass]="product.condition.toLowerCase() === 'new' ? 'badge-new' : 'badge-default'">
+      {{ product.condition }}
+    </span>
+  </div>
+
+  <!-- 2. Información Central (Título + Precios) -->
+  <div class="product-info-body">
+    <h4 class="product-title" [title]="translate.currentLang() === 'en' ? product.titulo?.en : product.titulo?.es">
+      {{ (translate.currentLang() === 'en' ? product.titulo?.en : product.titulo?.es) || product.titulo?.es }}
+    </h4>
+
+    <!-- Breve descripción opcional si existe -->
+    <p class="product-subtitle" *ngIf="product.subtitulo || product.descripcion">
+      {{ product.subtitulo || product.descripcion }}
+    </p>
+
+    <!-- Bloque de Precios -->
+    <div class="price-row">
+      <span class="price-current">
+        {{ product.precio_ahora | number:'1.2-2' | currency:tienda_moneda }}
+      </span>
+
+      <span class="price-old" *ngIf="product.precio_antes && product.precio_antes > product.precio_ahora">
+        {{ product.precio_antes | number:'1.2-2' | currency:tienda_moneda }}
+      </span>
     </div>
+  </div>
+
+  <!-- 3. Acción Rápida Derecha -->
+  <div class="product-action-side">
+    <button type="button" class="btn-quick-view" aria-label="Ver producto">
+      <svg xmlns="http://w3.org" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+        <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8M1.173 8a13 13 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5s3.879 1.168 5.168 2.457A13 13 0 0 1 14.828 8q-.086.13-.195.288c-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5s-3.879-1.168-5.168-2.457A13 13 0 0 1 1.172 8z"/>
+        <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5M4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0"/>
+      </svg>
+    </button>
+  </div>
+
 </div>

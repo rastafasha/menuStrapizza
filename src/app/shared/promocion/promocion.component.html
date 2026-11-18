@@ -1,153 +1,124 @@
-<!-- Modal -->
-<div class="modal fade" *ngIf="promocion && estado === true " id="modalPromo" tabindex="-1"
-    aria-labelledby="modalPromoLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h1 class="modal-title fs-5" id="modalPromoLabel">{{promocion.producto_title}}</h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body m-0 p-0">
-                <section class=" promocion" *ngIf=" promocion.tipo === 'IMAGEN'">
-                    <img [src]="promocion.img | imagenPipe: 'promocions'" [alt]="promocion.producto_title"
-                        class="img-responsive">
-                </section>
+<!-- Modal de Promociones Unificado -->
+<div class="modal fade" id="modalPromo" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm-md">
+    <div class="modal-content promo-modal-card border-0 overflow-hidden shadow-lg" *ngIf="promociones && promociones.length > 0">
 
-                <section class=" promocion" *ngIf="promocion.tipo === 'DESING'"
-                    [style.background]="promocion.colorfondo">
+      <!-- Botón cerrar flotante -->
+      <button type="button" class="btn-close-floating" data-bs-dismiss="modal" aria-label="Close">
+        ✕
+      </button>
 
-                    <div *ngIf="(promociones?.length ?? 0) > 1 && (promocion?.estado === true)">
-                        <div id="carouselPromoIndicators" class="carousel animated fadeIn" data-ride="carousel"
-                            data-interval="8000">
+      <!-- UNIFICADO: Siempre toma el slide actual (si hay 1 solo, currentSlide es 0) -->
+      <ng-container *ngIf="promociones[currentSlide] as promoActiva">
 
+        <!-- ========================================================= -->
+        <!-- CONDICIÓN 1: MODO SOLO IMAGEN (ej. promoActiva.tipo === 'imagen') -->
+        <!-- ========================================================= -->
+        <div *ngIf="promoActiva.tipo === 'IMAGEN'" class="promo-only-image-container">
+          <a *ngIf="promoActiva.enlace; else soloImgSinEnlace" 
+             [routerLink]="sanitizeEnlace(promoActiva.enlace)" 
+             data-bs-dismiss="modal" 
+             class="d-block w-100">
+            <img [src]="promoActiva.img | imagenPipe:'promocions'" 
+                 [alt]="promoActiva.producto_title || 'Promoción'" 
+                 class="w-100 d-block promo-full-banner">
+          </a>
 
-                            <ol class="carousel-indicators">
-                                <!-- <li  *ngFor="let slider of sliders; let i = index"  [class.active]="i === currentSlide" (click)="selectSlide(i)"></li> -->
-                                <li *ngFor="let promocion of promociones; let i = index"
-                                    [class.active]="i === currentSlide"></li>
-                            </ol>
-                            <div class="carousel-inner">
-                                <div class="carousel-item active animated fadeIn"
-                                    *ngFor="let promocion of promociones ; let i=index; " [class.active]="i === 0">
-                                    <section class=" promocion" *ngIf="promocion && promocion.estado === true"
-                                        [style.background]="promocion.colorfondo">
-                                        <div class="container">
-                                            <div class="row p-2">
-                                                <div class="col-md-4">
-                                                    <div class="px-4 pr-sm-0 pl-sm-5"><span
-                                                            class="badge badge-danger">{{promocion.etiqueta}}</span>
-                                                        <h3 class="mt-4 mb-1 text-body font-weight-light">
-                                                            {{promocion.first_title}}</h3>
-                                                        <h1 class="mb-1">{{promocion.producto_title}}</h1>
-                                                        <p class="h5 text-body font-weight-light">
-                                                            {{promocion.subtitulo}}</p>
-                                                        <div class="countdown py-2 h4 "
-                                                            data-countdown="07/01/2021 07:00:00 PM">
-                                                            <div class="cz-countdown-days">
-                                                                <span
-                                                                    class="cz-countdown-value">{{countdownValues[i]?.days}}</span>
-                                                                <span class="cz-countdown-label text-muted">d</span>
-                                                            </div>
-                                                            <div class="cz-countdown-hours">
-                                                                <span
-                                                                    class="cz-countdown-value">{{countdownValues[i]?.hours}}</span>
-                                                                <span class="cz-countdown-label text-muted">h</span>
-                                                            </div>
-                                                            <div class="cz-countdown-minutes">
-                                                                <span
-                                                                    class="cz-countdown-value">{{countdownValues[i]?.minutes}}</span>
-                                                                <span class="cz-countdown-label text-muted">m</span>
-                                                            </div>
-                                                            <div class="cz-countdown-seconds">
-                                                                <span
-                                                                    class="cz-countdown-value">{{countdownValues[i]?.seconds}}</span>
-                                                                <span class="cz-countdown-label text-muted">s</span>
-                                                            </div>
-                                                        </div>
-                                                        <a class="btn btn-success"
-                                                            [routerLink]="['/producto/', sanitizeEnlace(promocion.enlace)]">Ver
-                                                            oferta<i class="czi-arrow-right font-size-ms ml-1"></i></a>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <img [src]="(promocion.img ?? '') | imagenPipe: 'promocions'"
-                                                        alt="promocion.producto_title" class="w-100">
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </section>
-                                </div>
-
-                            </div>
-                            <button class="carousel-control-prev" type="button" data-target="#carouselPromoIndicators"
-                                data-slide="prev">
-                                <span class="fa fa-chevron-circle-left fa-2x  text-success" aria-hidden="true"></span>
-                                <span class="sr-only">Previous</span>
-                            </button>
-                            <button class="carousel-control-next" type="button" data-target="#carouselPromoIndicators"
-                                data-slide="next">
-                                <span class="fa fa-chevron-circle-right fa-2x text-success" aria-hidden="true"></span>
-                                <span class="sr-only">Next</span>
-                            </button>
-                        </div>
-
-                    </div>
-                    
-                    <div *ngIf="(promociones?.length ?? 0) === 1 && (promocion?.estado === true)">
-
-                        <section class=" promocion" *ngIf="promocion && promocion.estado === true"
-                            [style.background]="promocion.colorfondo">
-                            <div class="container">
-                                <div class="row p-2">
-                                    <div class="col-md-4">
-                                        <div class="px-4 pr-sm-0 pl-sm-5"><span
-                                                class="badge badge-danger">{{promocion.etiqueta}}</span>
-                                            <h3 class="text-body font-weight-light">{{promocion.first_title}}</h3>
-                                            <h1 class="mb-1">{{promocion.producto_title}}</h1>
-                                            <p class="h5 text-body font-weight-light">{{promocion.subtitulo}}</p>
-                                            <div class="countdown py-2 h4 " data-countdown="07/01/2026 07:00:00 PM">
-                                                <div class="cz-countdown-days">
-                                                    <span class="cz-countdown-value">{{countdownValues[0]?.days}}</span>
-                                                    <span class="cz-countdown-label text-muted">d</span>
-                                                </div>
-                                                <div class="cz-countdown-hours">
-                                                    <span
-                                                        class="cz-countdown-value">{{countdownValues[0]?.hours}}</span>
-                                                    <span class="cz-countdown-label text-muted">h</span>
-                                                </div>
-                                                <div class="cz-countdown-minutes">
-                                                    <span
-                                                        class="cz-countdown-value">{{countdownValues[0]?.minutes}}</span>
-                                                    <span class="cz-countdown-label text-muted">m</span>
-                                                </div>
-                                                <div class="cz-countdown-seconds">
-                                                    <span
-                                                        class="cz-countdown-value">{{countdownValues[0]?.seconds}}</span>
-                                                    <span class="cz-countdown-label text-muted">s</span>
-                                                </div>
-                                            </div>
-                                            <a class="btn btn-success"
-                                                [routerLink]="['/producto/', sanitizeEnlace(promocion.enlace)]">Ver
-                                                oferta<i class="czi-arrow-right font-size-ms ml-1"></i></a>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <img [src]="(promocion.img ?? '') | imagenPipe: 'promocions'"
-                                            alt="promocion.producto_title">
-                                    </div>
-                                </div>
-                            </div>
-                        </section>
-                    </div>
-
-                </section>
-
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-outline-success" data-bs-dismiss="modal">
-                    {{'Ok'}}!</button>
-                <!-- <button type="button" class="btn btn-outline-danger" (click)="onNoShowMore()">{{'No quiero ver más este mensaje'|translate}}</button> -->
-            </div>
+          <ng-template #soloImgSinEnlace>
+            <img [src]="promoActiva.img | imagenPipe:'promocions'" 
+                 [alt]="promoActiva.producto_title || 'Promoción'" 
+                 class="w-100 d-block promo-full-banner">
+          </ng-template>
         </div>
+
+        <!-- ========================================================= -->
+        <!-- CONDICIÓN 2: MODO DESIGN COMPLETO (ej. promoActiva.tipo !== 'imagen') -->
+        <!-- ========================================================= -->
+        <div *ngIf="promoActiva.tipo !== 'IMAGEN'" 
+             class="promo-body" 
+             [style.background]="promoActiva.colorfondo || 'linear-gradient(160deg, #1e3c72 0%, #2a5298 100%)'">
+          
+          <div class="promo-header-content text-center px-4 pt-4 pb-2">
+            <span class="promo-badge mb-2" *ngIf="promoActiva.etiqueta">
+              {{ promoActiva.etiqueta }}
+            </span>
+
+            <p class="promo-subtitle-top mb-1" *ngIf="promoActiva.first_title">
+              {{ promoActiva.first_title }}
+            </p>
+
+            <h2 class="promo-main-title mb-1">
+              {{ promoActiva.producto_title }}
+            </h2>
+
+            <p class="promo-description mb-3" *ngIf="promoActiva.subtitulo">
+              {{ promoActiva.subtitulo }}
+            </p>
+
+            <!-- Contador unificado usando currentSlide -->
+            <div class="countdown-grid mb-3" *ngIf="countdownValues[currentSlide]">
+              <div class="time-box">
+                <span class="time-value">{{ countdownValues[currentSlide]?.days | number:'2.0-0' }}</span>
+                <span class="time-label">Días</span>
+              </div>
+              <div class="time-box">
+                <span class="time-value">{{ countdownValues[currentSlide]?.hours | number:'2.0-0' }}</span>
+                <span class="time-label">Hrs</span>
+              </div>
+              <div class="time-box">
+                <span class="time-value">{{ countdownValues[currentSlide]?.minutes | number:'2.0-0' }}</span>
+                <span class="time-label">Min</span>
+              </div>
+              <div class="time-box">
+                <span class="time-value">{{ countdownValues[currentSlide]?.seconds | number:'2.0-0' }}</span>
+                <span class="time-label">Seg</span>
+              </div>
+            </div>
+
+            <!-- Botón CTA -->
+            <a *ngIf="promoActiva.enlace" 
+               [routerLink]="sanitizeEnlace(promoActiva.enlace)" 
+               data-bs-dismiss="modal"
+               class="btn-promo-cta">
+              <span>Ver oferta</span>
+              <span class="arrow">→</span>
+            </a>
+          </div>
+
+          <!-- Imagen del producto -->
+          <div class="promo-image-wrapper" *ngIf="promoActiva.img">
+            <img [src]="promoActiva.img | imagenPipe:'promocions'" 
+                 [alt]="promoActiva.producto_title" 
+                 class="promo-product-img">
+          </div>
+        </div>
+
+      </ng-container>
+
+      <!-- ========================================================= -->
+      <!-- CONDICIÓN 3: CONTROLES DE CARRUSEL (Solo si vienen varias) -->
+      <!-- ========================================================= -->
+      <div class="promo-carousel-controls" *ngIf="promociones.length > 1">
+        <button type="button" class="nav-arrow" (click)="prevSlide()">‹</button>
+        <div class="dots">
+          <span *ngFor="let p of promociones; let idx = index" 
+                class="dot" 
+                [class.active]="idx === currentSlide"
+                (click)="selectSlide(idx)"></span>
+        </div>
+        <button type="button" class="nav-arrow" (click)="nextSlide()">›</button>
+      </div>
+
+      <!-- Footer discreto -->
+      <div class="promo-footer text-center py-2 d-flex justify-content-between align-items-center px-3">
+        <button type="button" class="btn-dismiss-forever" (click)="onNoShowMore()">
+          No volver a mostrar
+        </button>
+        <button type="button" class="btn btn-sm btn-dark rounded-pill px-3" data-bs-dismiss="modal">
+          Ok!
+        </button>
+      </div>
+
     </div>
+  </div>
 </div>

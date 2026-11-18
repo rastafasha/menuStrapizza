@@ -5,7 +5,7 @@
     <h2 class="title mb-0">{{ title || ('Catálogo' | translate) }}</h2>
   </div>
 
-  <!-- BARRA HORIZONTAL DESLIZABLE DE PILLS (Sin saltos de línea hacia abajo) -->
+  <!-- BARRA HORIZONTAL DESLIZABLE DE PILLS -->
   <div class="categories-scroll-container px-3 mb-3">
     <ul class="categories-nav-list">
 
@@ -33,15 +33,16 @@
     </ul>
   </div>
 
-  <!-- Loader -->
+  <!-- Loader inicial (Solo para la página 1) -->
   <div *ngIf="isLoading" class="py-5 text-center">
     <app-loading></app-loading>
   </div>
 
   <!-- Grilla de productos filtrados (todo) -->
-  <div *ngIf="!isLoading" class="container-fluid px-3">
+  <div *ngIf="!isLoading">
     <div class="row g-3">
-      <div *ngFor="let product of todo">
+      <!-- 🟢 Agregamos trackBy para que Angular NO vuelva a pintar las tarjetas anteriores -->
+      <div *ngFor="let product of todo; trackBy: trackByProductId">
         <app-product-item-casting [product]="product" [tienda_moneda]="tienda_moneda" (click)="openModal(product)">
         </app-product-item-casting>
       </div>
@@ -53,22 +54,22 @@
     </div>
   </div>
 
-</div>
+  <!-- 🟢 Loader pequeño al final cuando carga la página 2, 3, etc. -->
+  <div *ngIf="isLoadingMore" class="py-3 text-center">
+    <app-loading></app-loading>
+  </div>
 
-<!-- Offcanvas / Modal de producto -->
-<!-- <app-modalproduct 
-  *ngIf="selectedProduct"
-  [product]="selectedProduct"
-  [tienda_moneda]="tienda_moneda"
-  (msm_success)="onMsmSuccess($event)">
-</app-modalproduct> -->
+  <!-- 🟢 CENTINELA: Fuera del *ngIf="!isLoading" para que nunca se pierda la referencia -->
+  <div #centinela style="height: 20px; width: 100%;"></div>
+
+</div>
 
 <div class="clear"></div>
 
 <!-- Modal global e independiente para el detalle del plato seleccionado -->
 <app-modal-product-casting [product]="selectedProduct" 
-[activeCategory]="activeCategory" 
-[tienda_moneda]="tienda_moneda"
+  [activeCategory]="activeCategory" 
+  [tienda_moneda]="tienda_moneda"
   (modalClosed)="selectedProduct = null" 
   [isModalOpen]="isModalOpen"
   *ngIf="selectedProduct && !isLoading">

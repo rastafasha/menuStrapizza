@@ -5,7 +5,7 @@
     <h2 class="title mb-0">{{ title || ('Catálogo' | translate) }}</h2>
   </div>
 
-  <!-- BARRA HORIZONTAL DESLIZABLE DE PILLS (Sin saltos de línea hacia abajo) -->
+  <!-- BARRA HORIZONTAL DESLIZABLE DE PILLS -->
   <div class="categories-scroll-container px-3 mb-3">
     <ul class="categories-nav-list">
 
@@ -20,30 +20,29 @@
 
       <!-- Pills únicas de categorías -->
       <li *ngFor="let category of subcategories | categoriasPipe">
-  <button 
-    type="button" 
-    class="zlip-menu-pill" 
-    [class.active]="activeCategory?.toLowerCase() === category.clave"
-    (click)="selectCategory(category.nombre.es)">
-    <span>
-     {{ ((translate.currentLang() === 'en' ? category.nombre?.en : category.nombre?.es) || category.nombre?.es) | titlecase }}
-    </span>
-    <span class="zlip-pill-count">{{ category.products.length }}</span>
-  </button>
-</li>
+        <button type="button" class="zlip-menu-pill" [class.active]="activeCategory?.toLowerCase() === category.clave"
+          (click)="selectCategory(category.nombre.es)">
+          <span>
+            {{ ((translate.currentLang() === 'en' ? category.nombre?.en : category.nombre?.es) || category.nombre?.es) |
+            titlecase }}
+          </span>
+          <span class="zlip-pill-count">{{ category.products.length }}</span>
+        </button>
+      </li>
 
     </ul>
   </div>
 
-  <!-- Loader -->
+  <!-- Loader inicial (Solo para la página 1) -->
   <div *ngIf="isLoading" class="py-5 text-center">
     <app-loading></app-loading>
   </div>
 
   <!-- Grilla de productos filtrados (todo) -->
-  <div *ngIf="!isLoading" class="container-fluid px-3">
+  <div *ngIf="!isLoading">
     <div class="row g-3">
-      <div *ngFor="let product of todo">
+      <!-- 🟢 Agregamos trackBy para que Angular NO vuelva a pintar las tarjetas anteriores -->
+      <div *ngFor="let product of todo; trackBy: trackByProductId">
         <app-product-item [product]="product" [tienda_moneda]="tienda_moneda" (click)="openModal(product)">
         </app-product-item>
       </div>
@@ -51,19 +50,20 @@
 
     <!-- Estado vacío si no hay productos -->
     <div *ngIf="!todo || todo.length === 0" class="text-center py-5 text-muted small">
-      {{ 'Selecciona una Categoría' | translate }}.
+      {{ 'No hay productos disponibles en esta categoría' | translate }}.
     </div>
   </div>
 
+  <!-- 🟢 Loader pequeño al final cuando carga la página 2, 3, etc. -->
+  <div *ngIf="isLoadingMore" class="py-3 text-center">
+    <app-loading></app-loading>
+  </div>
+
+  <!-- 🟢 CENTINELA: Fuera del *ngIf="!isLoading" para que nunca se pierda la referencia -->
+  <div #centinela style="height: 20px; width: 100%;"></div>
+
 </div>
 
-<!-- Offcanvas / Modal de producto -->
-<!-- <app-modalproduct 
-  *ngIf="selectedProduct"
-  [product]="selectedProduct"
-  [tienda_moneda]="tienda_moneda"
-  (msm_success)="onMsmSuccess($event)">
-</app-modalproduct> -->
 
 <div class="clear"></div>
 
