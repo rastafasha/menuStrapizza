@@ -15,6 +15,7 @@ import { Title } from '@angular/platform-browser';
 import { CatAdicionalesComponent } from '../../components/cat-adicionales/cat-adicionales.component';
 import { AuthService } from '../../services/auth.service';
 import { TranslatePipe } from '@ngx-translate/core';
+import { PromocionComponent } from '../../shared/promocion/promocion.component';
 
 @Component({
   selector: 'app-home',
@@ -26,8 +27,9 @@ import { TranslatePipe } from '@ngx-translate/core';
     LoadingComponent,
     PwaNotifInstallerComponent,
     CatAdicionalesComponent,
-    TranslatePipe
-  ],
+    TranslatePipe,
+    PromocionComponent
+],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })

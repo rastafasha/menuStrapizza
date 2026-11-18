@@ -2,53 +2,54 @@
 
 <app-loading *ngIf="isLoading"></app-loading>
 <div *ngIf="!isLoading">
-    
-    
+
+
     <br>
     <!-- Catálogo Principal (Carga de inmediato) -->
     <!-- Eliminamos el filtro manual por texto; el componente interno ya sabe qué cargar usando la tienda activa -->
-    <app-cas-products 
-    *ngIf="!isLoading" 
-    [activeCategory]="categoriaActiva" 
-    [isVisible]="true" 
-    [title]="'Catálogo' | translate"  
-    (msm_success)="onMsmSuccess($event)" 
-    [refreshCasProducts]="refreshCasProducts" style="margin-top: 15px;">
-</app-cas-products>
-    
+    <app-cas-products *ngIf="!isLoading" [activeCategory]="categoriaActiva" [isVisible]="true"
+        [title]="'Catálogo' | translate" (msm_success)="onMsmSuccess($event)" [refreshCasProducts]="refreshCasProducts"
+        style="margin-top: 15px;">
+    </app-cas-products>
+
     <!-- Hero Section -->
     <app-hero></app-hero>
-   
+
     <!-- Subcategorías adicionales con Lazy Loading (Se cargan al hacer scroll) -->
     <!-- Lazy loaded secondary sections -->
-@defer (on viewport) {
-    <app-cat-adicionales *ngIf="!isLoading && categoriaActiva" [activeCategory]="'Entradas' " [title]="'Entradas' | translate"></app-cat-adicionales>
-} @placeholder {
+    @defer (on viewport) {
+    <app-cat-adicionales *ngIf="!isLoading && categoriaActiva" [activeCategory]="'Entradas' "
+        [title]="'Entradas' | translate"></app-cat-adicionales>
+    } @placeholder {
     <div class="loading-placeholder" style="text-align: center; padding: 20px;">...</div>
-}
-@defer (on viewport) {
-    <app-cat-adicionales *ngIf="!isLoading && categoriaActiva" [activeCategory]="'Combos' " [title]="'Combos' | translate"></app-cat-adicionales>
-} @placeholder {
+    }
+    @defer (on viewport) {
+    <app-cat-adicionales *ngIf="!isLoading && categoriaActiva" [activeCategory]="'Combos' "
+        [title]="'Combos' | translate"></app-cat-adicionales>
+    } @placeholder {
     <div class="loading-placeholder" style="text-align: center; padding: 20px;">...</div>
-}
+    }
 
-@defer (on viewport) {
-    <app-cat-adicionales *ngIf="!isLoading && categoriaActiva" [activeCategory]="'Bebidas'" [title]="'Bebidas' | translate"></app-cat-adicionales>
-} @placeholder {
+    @defer (on viewport) {
+    <app-cat-adicionales *ngIf="!isLoading && categoriaActiva" [activeCategory]="'Bebidas'"
+        [title]="'Bebidas' | translate"></app-cat-adicionales>
+    } @placeholder {
     <div class="loading-placeholder" style="text-align: center; padding: 20px;">...</div>
-}
+    }
 
-@defer (on viewport) {
-    <app-cat-adicionales *ngIf="!isLoading && categoriaActiva" [activeCategory]="'Postres' " [title]="'Postres' | translate"></app-cat-adicionales>
-} @placeholder {
+    @defer (on viewport) {
+    <app-cat-adicionales *ngIf="!isLoading && categoriaActiva" [activeCategory]="'Postres' "
+        [title]="'Postres' | translate"></app-cat-adicionales>
+    } @placeholder {
     <div class="loading-placeholder" style="text-align: center; padding: 20px;">...</div>
-}
+    }
 
 
 
-   
+
     <app-pwa-notif-installer></app-pwa-notif-installer>
-    
+    <app-promocion ></app-promocion>
+
     <!-- Footer -->
     <app-menu-footer></app-menu-footer>
     <app-footer></app-footer>

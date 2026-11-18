@@ -1,8 +1,8 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
-import { AuthService } from './auth.service';
 import { map } from 'rxjs';
+import { Presupuesto } from '../models/presupuesto';
 
 const url_servicios = environment.baseUrl;
 
@@ -14,7 +14,6 @@ export class PresupuestoService {
 
   constructor(
     public http: HttpClient,
-    public authService: AuthService,
 
   ) { }
 
@@ -32,16 +31,21 @@ export class PresupuestoService {
   }
 
   list() {
-    let headers = new HttpHeaders({ 'Authorization': 'Bearer' + this.authService.token })
-    let URL = url_servicios + '/presupuestos';
-    return this.http.get(URL, this.headers);
+
+    const url = `${url_servicios}/presupuestos`;
+    return this.http.get<any>(url, this.headers)
+      .pipe(
+        map((resp: { ok: boolean, presupuestos: Presupuesto }) => resp.presupuestos)
+      )
   }
 
 
-  getPresupuesto(id: any) {
-    let headers = new HttpHeaders({ 'Authorization': 'Bearer' + this.authService.token });
-    let URL = url_servicios + '/presupuestos/' + id;
-    return this.http.get(URL, this.headers);
+  getPresupuesto(_id: any) {
+    const url = `${url_servicios}/presupuestos/${_id}`;
+    return this.http.get<any>(url, this.headers)
+      .pipe(
+        map((resp: { ok: boolean, presupuesto: Presupuesto }) => resp.presupuesto)
+      );
   }
 
   getPrByUser(usuario: any, page: number = 1, limit: number = 6,) {
@@ -54,36 +58,32 @@ export class PresupuestoService {
         map((resp: { ok: boolean, presupuestos: any[] }) => resp.presupuestos)
       );
   }
-  getPrByCliente(usuario: any, page: number = 1, limit: number = 6,) {
-    // Construimos la URL con parámetros de paginación
-    const url = `${url_servicios}/presupuestos/cliente/${usuario}?page=${page}&limit=${limit}`;
 
+  getByTiendaId(_id: string) {
+    const url = `${url_servicios}/presupuestos/by_tiendaId/${_id}`;
     return this.http.get<any>(url, this.headers)
       .pipe(
-        // Importante: Si la API devuelve un array, asegúrate que el tipado sea Payment[]
-        map((resp: { ok: boolean, presupuestos: any[] }) => resp.presupuestos)
+        map((resp: { ok: boolean, presupuestos: Presupuesto[] }) => resp.presupuestos)
       );
+
   }
 
-  createPresupuesto(data: any) {
-    const headers = new HttpHeaders({ 'Authorization': 'Bearer' + this.authService.token })
-    const URL = url_servicios + '/presupuestos/crear';
-    return this.http.post(URL, data, this.headers);
+  createPresupuesto(presupuesto: any) {
+    const url = `${url_servicios}/presupuestos/crear`;
+    return this.http.post(url, presupuesto, this.headers);
   }
   editPresupuesto(data: any, presupuesto_id: any) {
-    const headers = new HttpHeaders({ 'Authorization': 'Bearer' + this.authService.token })
-    const URL = url_servicios + '/presupuestos/editar/' + presupuesto_id;
-    return this.http.put(URL, data, this.headers);
+    const url = `${url_servicios}/presupuestos/editar/${presupuesto_id}`;
+    return this.http.put(url, data, this.headers);
   }
 
-   updateStatus(data: any, document_id: any) {
+  updateStatus(data: any, document_id: any) {
     const url = `${url_servicios}/presupuestos/update-status/${document_id}`;
     return this.http.put(url, data, this.headers);
   }
   deletePresupuesto(presupuesto_id: string) {
-    const headers = new HttpHeaders({ 'Authorization': 'Bearer' + this.authService.token })
-    const URL = url_servicios + '/presupuestos/borrar/' + presupuesto_id;
-    return this.http.delete(URL, this.headers);
+    const url = `${url_servicios}/presupuestos/remove/${presupuesto_id}`;
+    return this.http.delete(url, this.headers);
   }
 
 

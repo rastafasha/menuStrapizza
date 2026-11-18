@@ -1,0 +1,22 @@
+.promocion{
+    position: relative;
+    width: 98vw;
+    left: 0;
+    top: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    flex-direction: row;
+}
+.promocion img{ 
+    width: 100%;
+    height: fit-content;
+}
+
+
+.countdown{
+    display: flex;
+    gap: 5px;
+}
+
