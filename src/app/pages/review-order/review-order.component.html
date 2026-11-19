@@ -76,7 +76,7 @@
         </div>
 
         <!-- PASO 2: FORMULARIO EXPRESS (Nombre, Teléfono ) -->
-        <div class="checkout-container animated fadeInUp title-top" *ngIf="pasoActual === 2">
+        <div class="step-container checkout-container animated fadeInUp title-top" *ngIf="pasoActual === 2">
             <h3>👤 {{'Datos del Cliente'|translate}}</h3>
             <form [formGroup]="expressForm">
                 <div class="form-group">
@@ -124,8 +124,9 @@
         </div>
 
         <!-- PASO 3: FORMULARIO EXPRESS (Tipo entrega, direccion y envio ) -->
-        <div *ngIf="pasoActual === 3">
-            <div class="form-group">
+        <div class="step-container mt-5" *ngIf="pasoActual === 3">
+            <form [formGroup]="expressForm">
+                <div class="form-group">
                 <label>{{'¿Cómo deseas tu pedido?'|translate}}</label>
                 <select formControlName="tipoEntrega" class="form-control" (change)="onDeliveryMethodChange()">
                     <option value="" selected>{{'Seleccione'|translate}}</option>
@@ -134,10 +135,7 @@
                 </select>
             </div>
 
-            <!-- Tu select de tipoEntrega (delivery / pickup), select de direcciones y botón Crear Dirección -->
             <!-- delivery options -->
-
-
             <div
                 *ngIf="expressForm.get('tipoEntrega')?.value === 'delivery' && usaDelivery === true && tiendaSelected.tipoFlujo === 'WHATSAPP'">
                 <div class="mt-3 animated fadeIn">
@@ -183,6 +181,8 @@
 
                 </div>
             </div>
+            </form>
+            
 
 
             <div class="d-flex gap-2 mt-3">
