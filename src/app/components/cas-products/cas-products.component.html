@@ -71,6 +71,7 @@
 <app-modalproduct [product]="selectedProduct" 
 [activeCategory]="activeCategory" 
 [tienda_moneda]="tienda_moneda"
+[localIdActual]="localIdActual"
 [isModalOpen]="isModalOpen"
   (modalClosed)="selectedProduct = null" 
   *ngIf="selectedProduct && !isLoading">

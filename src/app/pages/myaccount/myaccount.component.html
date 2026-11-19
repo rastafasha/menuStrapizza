@@ -104,10 +104,10 @@
 
 
                 </div>
-                <div class="d-flex flex-column " style="margin-bottom: 100px;">
+                <div class="d-flex flex-column botonsinf" style="margin-bottom: 100px;">
                     <!-- configurar notificaciones push -->
-                    <div class="setting-row" *ngIf="!isLoading" [class.loading]="pushService.isProcessing$ | async">
-                        <div class="setting-info">
+                    <div class="setting-row btinf" *ngIf="!isLoading" [class.loading]="pushService.isProcessing$ | async">
+                        <div class="setting-info ">
                             <i class="fa fa-bell"></i>
                             <div class="text-container">
                                 <strong> {{ 'Notificaciones Push' | translate }}</strong>
@@ -115,7 +115,7 @@
                             </div>
                         </div>
 
-                        <div class="switch-wrapper">
+                        <div class="switch-wrapper ">
                             <!-- Spinner pequeño que solo aparece al cargar -->
                             <div *ngIf="pushService.isProcessing$ | async" class="mini-spinner"></div>
 
@@ -127,7 +127,7 @@
                         </div>
                     </div>
                     <!-- configurar notificaciones push -->
-                    <div class="setting-row shadow-sm">
+                    <div class="setting-row btinf shadow-sm">
                         <a (click)="logout()">
                             <div class="setting-info ">
                                 <i class="fa fa-power-off"></i>

@@ -14,20 +14,22 @@ import { HeaderComponent } from "../../../shared/header/header.component";
 import { AsideCuentaComponent } from "../aside-cuenta/aside-cuenta.component";
 import { TranslatePipe } from '@ngx-translate/core';
 import { ModalCrearDireccionComponent } from '../../../components/modal-crear-direccion/modal-crear-direccion.component';
+import { DireccionEditComponent } from './direccion-edit/direccion-edit.component';
 
 @Component({
   selector: 'app-direcciones',
   templateUrl: './direcciones.component.html',
   imports: [
     LoadingComponent,
-    CommonModule, 
+    CommonModule,
     RouterModule,
-    AvisoComponent, 
-    HeaderComponent, 
+    AvisoComponent,
+    HeaderComponent,
     AsideCuentaComponent,
     TranslatePipe,
-    ModalCrearDireccionComponent
-  ],
+    ModalCrearDireccionComponent,
+    DireccionEditComponent
+],
     styleUrls: ['./direcciones.component.scss']
 })
 export class DireccionesComponent implements OnInit {
@@ -50,6 +52,7 @@ public url:any;
   pageTitle!:string;
   usuarioId!:any;
   identity!:any;
+  addresSelected:any;
 
   public modalAbierto: string | null = null;
 
@@ -147,6 +150,13 @@ despertarMapaHijo() {
     );
   }
 
+
+
+  verDetalles(item: any) {
+  this.addresSelected = item;
+  console.log(item)
+
+}
   
 
 }

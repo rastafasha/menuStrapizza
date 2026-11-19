@@ -1,0 +1,18 @@
+.order-history-card {
+  border: 1px solid #edf2f7 !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06) !important;
+  }
+
+  // En pantallas medianas en adelante quita el borde superior de la columna derecha
+  @media (min-width: 768px) {
+    .border-md-top-0 {
+      border-top: 0 !important;
+      border-left: 1px solid #edf2f7;
+      padding-left: 1.5rem;
+    }
+  }
+}

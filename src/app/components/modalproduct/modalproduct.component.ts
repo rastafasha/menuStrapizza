@@ -42,6 +42,7 @@ export class ModalproductComponent implements OnInit, OnDestroy, OnChanges {
   @Input() product: any;
   @Input() selectedProduct: any;
   @Input() tienda_moneda!: any;
+  @Input() localIdActual!: any;
   @Input() activeCategory!: string;
   @Input() isModalOpen: boolean = false;
   @Output() modalClosed = new EventEmitter<void>();
@@ -61,9 +62,7 @@ export class ModalproductComponent implements OnInit, OnDestroy, OnChanges {
   private selectorService = inject(SelectorService);
   private favoritoService = inject(FavoritoService);
   private toastr = inject(ToastrService);
-
   private comentarioService = inject(ComentarioService);
-
   private solicitudService = inject(SolicitudService);
 
   constructor(
@@ -261,6 +260,7 @@ export class ModalproductComponent implements OnInit, OnDestroy, OnChanges {
     const data = {
       producto: producto._id,
       usuario: this.user.uid,
+      local: this.localIdActual,
     };
 
     this.favoritoService.registro(data).subscribe((res: any) => {

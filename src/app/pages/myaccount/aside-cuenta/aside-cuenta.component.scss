@@ -45,8 +45,8 @@ a {
 
 .active {
     color: var(--light-brown);
-    & i{
-       color: var(--light-brown); 
+    & i {
+        color: var(--light-brown);
     }
 }
 
@@ -57,7 +57,6 @@ a {
     padding: 16px;
     background: white;
     border-bottom: 1px solid #eee;
-    width: 50%;
     margin: auto;
 
     .setting-info {
@@ -82,7 +81,6 @@ a {
         }
     }
 }
-
 
 .switch {
     position: relative;
@@ -157,4 +155,67 @@ a {
     100% {
         transform: rotate(360deg);
     }
+}
+
+/* Efecto persiana suave */
+.persiana-nativa {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.3s ease-out;
+    background: #f3f3f3;
+    padding: 20px;
+    border-radius: 8px;
+    &.abierta {
+        grid-template-rows: 1fr;
+        &.persiana-contenido {
+            padding: 15px;
+            border-top: 1px solid #ddd;
+        }
+    }
+}
+
+.persiana-contenido {
+    overflow: hidden;
+    padding: 0 15px;
+}
+
+.persiana-summary {
+    padding: 12px 15px;
+    background-color: #f8f9fa;
+    font-weight: 600;
+    color: #444;
+    cursor: pointer;
+    user-select: none; /* Evita que se seleccione el texto al hacer clic rápido */
+    list-style: none; /* Oculta la flecha por defecto en algunos navegadores */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+/* Oculta la flecha por defecto en Chrome y Safari */
+.persiana-summary::-webkit-details-marker {
+    display: none;
+}
+
+/* Agrega una flecha limpia a la derecha */
+.persiana-summary::after {
+    content: "▼";
+    font-size: 11px;
+    color: #777;
+    transition: transform 0.25s ease;
+}
+
+/* Rota la flecha cuando la persiana está abierta */
+.persiana-form[open] .persiana-summary::after {
+    transform: rotate(180deg);
+}
+
+.persiana-form[open] .persiana-summary {
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.persiana-contenido {
+    padding: 15px;
+    margin: 0; /* Corrige el margen negativo de la clase .row de Bootstrap */
 }

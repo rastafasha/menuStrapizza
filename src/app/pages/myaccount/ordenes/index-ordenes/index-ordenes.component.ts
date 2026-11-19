@@ -31,7 +31,7 @@ declare var $:any;
     TranslatePipe
 ],
   templateUrl: './index-ordenes.component.html',
-  styleUrls: ['./index-ordenes.component.css']
+  styleUrls: ['./index-ordenes.component.scss']
 })
 export class IndexOrdenesComponent implements OnInit {
 

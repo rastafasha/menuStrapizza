@@ -6,94 +6,135 @@
 <!-- Page Content-->
 <div class="container pb-5 mb-2 mb-md-3">
     <div class="row">
-        
+
         <!-- Content  -->
         <app-loading *ngIf="isLoading"></app-loading>
         <div *ngIf="!isLoading && pedidos?.length == 0">
             <h4 class="text-center mt-3">{{'No posees Pedidos'|translate}}</h4>
-         </div>
-        <section class="col-lg-8"*ngIf="!isLoading">
+        </div>
+        <section class="col-lg-8" *ngIf="!isLoading">
             <div *ngFor="let item_pedido of pedidos ">
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <p class="product-title font-size-base" style="margin-bottom: 0px;">
-                            {{'Pedido'|translate}}: N°-{{item_pedido._id.toUpperCase()}}
-                        </p>
-                        <p class="product-title font-size-base" style="margin-bottom: 0px;">
-                            <a>{{'Status'|translate}}:{{item_pedido.status}}</a></p>
+                <div class="card border-0 shadow-sm rounded-4 mb-4 pending-order-card">
+  
+  <!-- Encabezado: Número de pedido, Status y Acciones -->
+  <div class="card-header bg-white border-bottom py-3 px-4">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-2">
+      
+      <!-- ID y Fecha -->
+      <div>
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+          <span class="text-muted small fw-semibold text-uppercase">{{ 'Pedido' | translate }}</span>
+          <h6 class="mb-0 fw-bold text-dark font-monospace">
+            N°-{{ item_pedido._id.toUpperCase() }}
+          </h6>
+        </div>
+        <div class="text-muted small mt-1">
+          <i class="fa fa-clock me-1"></i>
+          {{ item_pedido.createdAt | date:'MMM d, y, h:mm:ss a' }}
+        </div>
+      </div>
 
-                        <a *ngIf="item_pedido.status ==='ONDEVICE'"  class="nav-link-style text-danger btn-sm btn"
-                            (click)="abrirModal(item_pedido._id)" style="cursor:pointer">
-                            <div class="fa fa-trash"></div>
-                        </a>
-                        <button type="button" *ngIf="item_pedido.status ==='INPROCESS'"  class="nav-link-style btn-outline-success btn-sm btn mt-2"
-                            [routerLink]="['/pay', item_pedido._id ]" style="cursor:pointer">
-                            {{'Completar mi compra'|translate}}
-                        </button>
-                        <!-- Modal backdrop -->
-                        <div *ngIf="modalAbierto === item_pedido._id" 
-                            class="modal-backdrop fade show" 
-                            style="z-index: 1040;"
-                            (click)="cerrarModal()"></div>
-                        <!-- modal eliminar -->
-                        <div class="modal fade" [class.show]="modalAbierto === item_pedido._id" 
-                            [style.display]="modalAbierto === item_pedido._id ? 'block' : 'none'" 
-                            tabindex="-1" role="dialog"
-                            aria-hidden="true">
-                            <div class="modal-dialog modal-dialog-centered" role="document">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h4 class="modal-title">{{'Confirmación'|translate}}</h4>
-                                        <button class="close" type="button" (click)="cerrarModal()"
-                                            aria-label="Close">
-                                            <span aria-hidden="true">×</span>
-                                        </button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <p class="font-size-sm">{{'¿Desea eliminar definitivamente el regsitro?'|translate}}</p>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button class="btn btn-secondary btn-sm" type="button"
-                                            (click)="cerrarModal()">{{'Cancelar'|translate}}</button>
-                                        <button class="btn btn-primary btn-shadow btn-sm" type="button"
-                                            (click)="eliminar(item_pedido._id)">{{'Suprimir'|translate}}</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- modal eliminar -->
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-lg-5">
-                                <div class="font-size-sm">
-                                    <span class="text-muted mr-2">{{'Fecha'|translate}}:</span>
-                                    {{ item_pedido.createdAt | date:'MMM d, y, h:mm:ss a' }}
-                                </div>
-                                
-                                <ul class="listpedido" *ngFor="let item_pedido of item_pedido.pedidoList">
-                                    <li>
-                                        <div class="itempedido " >
-                                            <div class="infoitempedi">
-                                                <h2 [ngStyle]="{'color': tiendaSelected?.color_primario }">{{ translate.currentLang() === 'en' ? item_pedido.titulo.en : item_pedido.titulo.es}}</h2>
-                                                <p *ngIf="item_pedido.selector_elegido" class="small">{{item_pedido.selector_elegido | slice:0:8}}...</p>
-                                            </div>
-                                            <div class="preciocantidad">
-                                                <p>{{'Cant'|translate}}:&nbsp;{{ item_pedido.cantidad }}</p>
-                                            <p>{{item_pedido.precio_ahora|currency}}</p>
-                                            </div>
-                                        </div>
-                                    </li>
+      <!-- Status y Botones de Acción -->
+      <div class="d-flex align-items-center gap-2 flex-wrap">
+        <!-- Badge de Estado -->
+        <span class="badge rounded-pill px-3 py-2 fw-semibold"
+              [ngClass]="{
+                'bg-warning-subtle text-warning-emphasis': item_pedido.status === 'ONDEVICE',
+                'bg-primary-subtle text-primary': item_pedido.status === 'INPROCESS',
+                'bg-secondary-subtle text-secondary': item_pedido.status !== 'ONDEVICE' && item_pedido.status !== 'INPROCESS'
+              }">
+          {{ item_pedido.status === 'ONDEVICE' ? ('En carrito' | translate) : 
+             item_pedido.status === 'INPROCESS' ? ('En proceso de pago' | translate) : item_pedido.status }}
+        </span>
 
-                                        
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+        <!-- Botón Completar compra -->
+        <button type="button" 
+                *ngIf="item_pedido.status === 'INPROCESS'"
+                class="btn btn-sm btn-success rounded-pill px-3 fw-semibold shadow-sm"
+                [routerLink]="['/pay', item_pedido._id]">
+          <i class="fa fa-credit-card me-1"></i>
+          {{ 'Completar mi compra' | translate }}
+        </button>
+
+        <!-- Botón Eliminar -->
+        <button type="button"
+                *ngIf="item_pedido.status === 'ONDEVICE'"
+                class="btn btn-sm btn-outline-danger rounded-circle delete-btn"
+                (click)="abrirModal(item_pedido._id)"
+                title="{{ 'Eliminar' | translate }}">
+          <i class="fa fa-trash"></i>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Cuerpo: Lista de productos del pedido -->
+  <div class="card-body p-4">
+    <h6 class="text-muted text-uppercase small fw-bold mb-3">
+      {{ 'Productos incluidos' | translate }} ({{ item_pedido.pedidoList?.length || 0 }})
+    </h6>
+
+    <div class="d-flex flex-column gap-2">
+      <div *ngFor="let prod of item_pedido.pedidoList" 
+           class="d-flex justify-content-between align-items-center p-3 rounded-3 bg-light border border-light-subtle product-row">
+        
+        <!-- Nombre y selector -->
+        <div class="pe-3">
+          <h6 class="fw-bold mb-1 product-name"
+              [ngStyle]="{'color': tiendaSelected?.color_primario || '#212529'}">
+            {{ translate.currentLang() === 'en' ? prod.titulo.en : prod.titulo.es }}
+          </h6>
+          <span *ngIf="prod.selector_elegido" 
+                class="badge bg-white text-secondary border fw-normal">
+            {{ prod.selector_elegido | slice:0:12 }}{{ prod.selector_elegido.length > 12 ? '...' : '' }}
+          </span>
+        </div>
+
+        <!-- Cantidad y Precio -->
+        <div class="text-end flex-shrink-0">
+          <div class="fw-bold text-dark">
+            {{ prod.precio_ahora | currency }}
+          </div>
+          <small class="text-muted">
+            {{ 'Cant' | translate }}: <strong class="text-dark">{{ prod.cantidad }}</strong>
+          </small>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de confirmación de eliminación (fuera de card-header) -->
+<ng-container *ngIf="modalAbierto === item_pedido._id">
+  <div class="modal-backdrop fade show" style="z-index: 1040;" (click)="cerrarModal()"></div>
+  <div class="modal fade show d-block" style="z-index: 1050;" tabindex="-1" role="dialog" aria-modal="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm" role="document">
+      <div class="modal-content border-0 shadow rounded-4">
+        <div class="modal-header border-bottom-0 pb-0">
+          <h5 class="modal-title fw-bold">{{ 'Confirmación' | translate }}</h5>
+          <button type="button" class="btn-close" (click)="cerrarModal()" aria-label="Close"></button>
+        </div>
+        <div class="modal-body text-muted small py-3">
+          {{ '¿Desea eliminar definitivamente el registro?' | translate }}
+        </div>
+        <div class="modal-footer border-top-0 pt-0">
+          <button type="button" class="btn btn-sm btn-light rounded-pill px-3" (click)="cerrarModal()">
+            {{ 'Cancelar' | translate }}
+          </button>
+          <button type="button" class="btn btn-sm btn-danger rounded-pill px-3" (click)="eliminar(item_pedido._id)">
+            {{ 'Suprimir' | translate }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-container>
+
             </div>
-            
-                
+
+
             <!-- paginador -->
             <div class="row">
                 <div class="col-md-12 text-right">

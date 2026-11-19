@@ -1,5 +1,5 @@
 <div class="container mt-3 mb-3">
-  <details>
+  <details class="persiana-nativa col-xs-12">
     <summary class="">{{ 'Menú Navegación' | translate }}</summary>
     <div class="row">
       <div class="cz-sidebar-static ">
@@ -61,20 +61,14 @@
               {{ 'Reservaciones' | translate }}
             </a>
           </li>
-          <li *ngIf="identity.telefono && tiendaSelected.has_cotizacion === true">
+          <li *ngIf="identity.telefono && tiendaSelected?.has_cotizacion === true">
             <a class="nav-links shadow-sm" [routerLink]="['/mis-cotizaciones']" routerLinkActive="active"
               [routerLinkActiveOptions]="{exact: true}">
               <i class="fa fa-receipt"></i>
               {{ 'Cotizaciones' | translate }}
             </a>
           </li>
-          <li *ngIf="identity.telefono && tiendaSelected.has_cotizacion === true">
-            <a class="nav-links shadow-sm" [routerLink]="['/mis-cotizaciones']" routerLinkActive="active"
-              [routerLinkActiveOptions]="{exact: true}">
-              <i class="fa fa-receipt"></i>
-              {{ 'Inicio Cuenta' | translate }}
-            </a>
-          </li>
+          
           <li *ngIf="identity.telefono">
             <!-- Idioma Switch -->
             <div class="nav-links shadow-sm">

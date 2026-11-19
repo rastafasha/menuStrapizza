@@ -200,3 +200,34 @@
         transform: rotate(360deg);
     }
 }
+
+.opciones .iconop
+  {
+    transition-property: transform, opacity;
+    transition-duration: .3s;
+    transition-delay:calc(sibling-index() * .2s);
+
+    /* color:currentColor; */
+    opacity:1;
+    transform:scale(1);
+
+    @starting-style{
+        opacity:0;
+        transform:scale(2);
+    }
+}
+
+.botonsinf .btinf{
+    transition-property: transform, opacity;
+    transition-duration: .2s;
+    transition-delay:calc(sibling-index() * .3s);
+
+    /* color:currentColor; */
+    opacity:1;
+    transform:translateY(0px);
+
+    @starting-style{
+        opacity:0;
+        transform:translateY(-6px);
+    }
+}

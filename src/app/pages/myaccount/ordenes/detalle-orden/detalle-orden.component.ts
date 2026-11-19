@@ -19,6 +19,8 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { AsignardeliveryService } from '../../../../services/asignardelivery.service';
 import { Asignacion } from '../../../../models/asignaciondelivery.model';
 import { PedidomenuService } from '../../../../services/pedidomenu.service';
+import { BackComponent } from '../../../../shared/back/back.component';
+import { LoadingComponent } from '../../../../shared/loading/loading.component';
 
 declare var jQuery: any;
 declare var $: any;
@@ -28,18 +30,18 @@ declare var $: any;
   imports: [
     HeaderComponent,
     CommonModule,
-    AsideCuentaComponent,
     RouterModule,
     ReactiveFormsModule,
     FormsModule,
     ImagenPipe,
     ModalCancelarComponent,
     ModalComentariosComponent,
-    TranslatePipe
-
-  ],
+    TranslatePipe,
+    BackComponent,
+    LoadingComponent
+],
   templateUrl: './detalle-orden.component.html',
-  styleUrls: ['./detalle-orden.component.css']
+  styleUrls: ['./detalle-orden.component.scss']
 })
 export class DetalleOrdenComponent implements OnInit {
 
@@ -48,6 +50,7 @@ export class DetalleOrdenComponent implements OnInit {
   public msm_error = false;
   public msm_success = false;
   public usaDelivery = false;
+  public isLoading = false;
   public id!: string;
   public detalle: any = {};
   public venta!: Venta;
@@ -113,11 +116,13 @@ export class DetalleOrdenComponent implements OnInit {
   }
 
   init_data() {
+    this.isLoading = true;
     this._ventaService.detalle(this.id).subscribe(
       response => {
         this.detalle = response.detalle;
         this.venta = response.venta;
-        this.local = this.venta.local
+        this.local = this.venta.local;
+        this.isLoading = false;
         // this.data_reviews();
         this.evaluar_cancelacion();
         this.getTienda();

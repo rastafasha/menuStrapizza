@@ -1,0 +1,118 @@
+.topedesc{
+    display: grid;
+    grid-template-columns: 30% 70%;
+    gap: 15px;
+    padding: 15px;
+}
+
+.order-header {
+  .order-id {
+    font-size: 0.92rem;
+    letter-spacing: 0.02em;
+    word-break: break-all; // Evita desbordes en pantallas muy pequeñas (320px)
+  }
+}
+
+
+.order-summary-grid {
+  .summary-card {
+    background-color: #f8f9fa;
+    border: 1px solid #edf2f7;
+    transition: all 0.2s ease-in-out;
+
+    .icon-box {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background-color: #ffffff;
+      color: #4a5568;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.04);
+    }
+
+    // Variante: Venta en proceso
+    &.status-process {
+      background-color: rgba(13, 110, 253, 0.05);
+      border-color: rgba(13, 110, 253, 0.15);
+
+      .icon-box {
+        background-color: #0d6efd;
+        color: #ffffff;
+      }
+
+      .status-text {
+        color: #0d6efd;
+      }
+    }
+
+    // Variante: Enviado / Completado
+    &.status-completed {
+      background-color: rgba(25, 135, 84, 0.06);
+      border-color: rgba(25, 135, 84, 0.2);
+
+      .icon-box {
+        background-color: #198754;
+        color: #ffffff;
+      }
+
+      .status-text {
+        color: #198754;
+      }
+    }
+
+    // Variante: Total pagado
+    &.summary-total {
+      background-color: #ffffff;
+      border: 1px solid #dee2e6;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+
+      .icon-box {
+        background-color: rgba(13, 110, 253, 0.1);
+        color: #0d6efd;
+      }
+    }
+  }
+}
+
+
+.order-actions-bar {
+  border-color: #edf2f7 !important;
+
+  .btn {
+    font-size: 0.9rem;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+
+    &:active {
+      transform: scale(0.98);
+    }
+  }
+}
+
+
+.product-order-card {
+  border-color: #edf2f7 !important;
+  background-color: #ffffff;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+
+  &:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  }
+
+  .product-thumb {
+    width: 88px;
+    height: 88px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #f1f5f9;
+
+    img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+  }
+}

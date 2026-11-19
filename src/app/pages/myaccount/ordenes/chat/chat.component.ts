@@ -31,7 +31,7 @@ import { BackComponent } from '../../../../shared/back/back.component';
     LoadingComponent
 ],
   templateUrl: './chat.component.html',
-  styleUrl: './chat.component.css'
+  styleUrl: './chat.component.scss'
 })
 export class ChatComponent implements OnInit, OnDestroy {
 

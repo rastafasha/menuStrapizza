@@ -13,36 +13,64 @@
             <div class="div-responsive1">
                 <div>
                     <div class="post navTabs" *ngFor="let product of favoritos">
-                        <div class="products-grid">
-                            <div class="product-card">
-                                <!-- 1. Quitamos data-bs de la imagen y agregamos (click) -->
-                                <div class="product-image" (click)="verDetalles(product.producto)">
-                                    <img [src]="product.producto.img | imagenPipe: 'productos'" [alt]="product.producto.titulo">
-                                </div>
-                                <div class="product-content">
-                                    <div class="infpr">
-                                        <h4>{{product.producto.titulo?.es}}</h4>
-                                        <div class="product-price text-danger" style="text-decoration: line-through;"
-                                            *ngIf="product.producto.precio_antes > product.producto.precio_ahora">
-                                            {{product.producto.precio_antes|number:'1.2-2'| currency:tienda_moneda}}
-                                        </div>
-                                        <div class="product-price">{{product.producto.precio_ahora|number:'1.2-2'|
-                                            currency:tienda_moneda}}</div>
-                                    </div>
-                                    <div class="botns">
-                                        <!-- 2. Quitamos data-bs del botón del ojo y agregamos (click) -->
-                                        <div class="botns">
-                                            <button class="btn-secondary btn" (click)="verDetalles(product.producto)">
-                                                <i class="fa fa-eye"></i>
-                                            </button>
-                                            <!-- Tu botón de agregar se queda igual, sin propagar -->
-                                            <button class="btn-danger btn" (click)="removeFavorito(product._id)"><i
-                                                    class="fa fa-trash" id="myBtn "></i></button>
-                                        </div>
-                                    </div>
+                        <div class="product-card-item">
+
+                            <!-- 1. Contenedor de Imagen -->
+                            <div class="product-thumb-wrapper">
+                                <img [src]="(product.producto.img ) | imagenPipe:'productos'"
+                                    [alt]="translate.currentLang() === 'en' ? product.producto.titulo?.en : product.producto.titulo?.es"
+                                    loading="lazy" class="product-thumb-img">
+
+                                <!-- Badge de condición (new / usado / oferta) superpuesto sutilmente o en esquina -->
+                                <span *ngIf="product.producto.condition" class="condition-pill"
+                                    [ngClass]="product.producto.condition.toLowerCase() === 'new' ? 'badge-new' : 'badge-default'">
+                                    {{ product.producto.condition }}
+                                </span>
+                            </div>
+
+                            <!-- 2. Información Central (Título + Precios) -->
+                            <div class="product-info-body">
+                                <h4 class="product-title"
+                                    [title]="translate.currentLang() === 'en' ? product.producto.titulo?.en : product.producto.titulo?.es">
+                                    {{ (translate.currentLang() === 'en' ? product.producto.titulo?.en : product.producto.titulo?.es) ||
+                                    product.producto.titulo?.es }}
+                                </h4>
+
+                                <!-- Breve descripción opcional si existe -->
+                                <p class="product-subtitle" *ngIf="product.producto.subtitulo || product.producto.descripcion">
+                                    {{ product.producto.subtitulo || product.producto.descripcion }}
+                                </p>
+
+                                <!-- Bloque de Precios -->
+                                <div class="price-row">
+                                    <span class="price-current">
+                                        {{ product.producto.precio_ahora | number:'1.2-2' | currency:tienda_moneda }}
+                                    </span>
+
+                                    <span class="price-old"
+                                        *ngIf="product.producto.precio_antes && product.producto.precio_antes > product.producto.precio_ahora">
+                                        {{ product.producto.precio_antes | number:'1.2-2' | currency:tienda_moneda }}
+                                    </span>
                                 </div>
                             </div>
+
+                            <!-- 3. Acción Rápida Derecha -->
+                            <div class="product-action-side">
+                                <button type="button" class="btn-quick-view" aria-label="Ver producto" (click)="verDetalles(product.producto)">
+                                    <svg xmlns="http://w3.org" width="18" height="18" fill="currentColor"
+                                        viewBox="0 0 16 16">
+                                        <path
+                                            d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8M1.173 8a13 13 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5s3.879 1.168 5.168 2.457A13 13 0 0 1 14.828 8q-.086.13-.195.288c-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5s-3.879-1.168-5.168-2.457A13 13 0 0 1 1.172 8z" />
+                                        <path
+                                            d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5M4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0" />
+                                    </svg>
+                                </button>
+                                <!-- <button class="btn-danger btn" (click)="removeFavorito(product.producto._id)"><i
+                                        class="fa fa-trash" id="myBtn "></i></button> -->
+                            </div>
+
                         </div>
+
                     </div>
                 </div>
             </div>
@@ -55,75 +83,138 @@
 
 <!-- modal -->
 
-<div #offcanvasElement class="offcanvas offcanvas-bottom" id="offcanvasProducto" data-bs-backdrop="true"
-    data-bs-keyboard="true" [attr.aria-labelledby]="'modalProductLabel-' + (selectedProduct?._id || '')"
-    style="height: auto; max-height: 90vh; border-radius: 25px 25px 0 0;">
-    <!-- Pure Bootstrap 5 Offcanvas with backdrop fix -->
+<div #offcanvasElement 
+class="offcanvas offcanvas-end zlip-product-offcanvas shadow-lg offcanvas-bottom" 
+[id]="'offcanvasProducto-' + (selectedProduct?._id || '')" tabindex="-1"
+    data-bs-backdrop="true" data-bs-keyboard="true" [attr.aria-labelledby]="'modalProductLabel-' + (selectedProduct?._id || '')"
+    style="border-radius: 25px 25px 0 0;">
 
-    <div class="offcanvas-header p-3" *ngIf="selectedProduct">
-        <h5 class="offcanvas-title" [id]="'modalProductLabel-' + selectedProduct._id">{{selectedProduct.titulo?.es}}</h5>
-        <!-- El atributo data-bs-dismiss ahora debe ser "offcanvas" -->
-        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-    </div>
+<div class="offcanvas-body" style="border-radius: 25px 25px 0 0;">
+     <div class="zlip-modal-wrapper">
+        <!-- Botón de cierre flotante para no repetir el título arriba -->
+        <button type="button" class="btn-close zlip-close-btn" data-bs-dismiss="offcanvas" (click)="onModalHidden()"
+            aria-label="Close"></button>
 
-    <div class="offcanvas-body" *ngIf="selectedProduct">
-        <div class="ft-recipe">
-            <div class="ft-recipe__thumb grid-item">
-                <!-- Imagen del producto -->
-                <div class="imagen">
-                    <img [src]="selectedProduct.img | imagenPipe: 'productos'" [alt]="selectedProduct.titulo"
-                        class="img-fluid mb-5" />
+        <!-- Cabecera con Imagen Protagonista -->
+        <div class="zlip-hero-image">
+            @if (selectedProduct?.condition) {
+            <span class="badge zlip-condition-badge">{{ selectedProduct?.condition }}</span>
+            }
+            <!-- Reemplaza [src] por la propiedad de imagen de tu modelo -->
+            <img [src]="selectedProduct?.img | imagenPipe: 'productos'"  [alt]="selectedProduct?.titulo?.es" class="img-fluid">
+        </div>
 
+        <!-- Cuerpo de Información -->
+        <div class="zlip-content p-4">
+
+            <!-- Título y Precios -->
+            <div class="d-flex justify-content-between align-items-start gap-3 mb-2">
+                <h2 class="zlip-title mb-0">
+                    {{ translate.currentLang() === 'en' ? selectedProduct?.titulo?.en : selectedProduct?.titulo?.es }}
+                </h2>
+
+                <div class="text-end zlip-price-box">
+                    @if (selectedProduct?.precio_antes && selectedProduct?.precio_antes > selectedProduct?.precio_ahora) {
+                    <span class="zlip-old-price d-block">
+                        {{ selectedProduct?.precio_antes | number:'1.2-2' | currency:tienda_moneda }}
+                    </span>
+                    }
+                    <h4 class="zlip-current-price mb-0">
+                        {{ selectedProduct?.precio_ahora | number:'1.2-2' | currency:tienda_moneda }}
+                    </h4>
                 </div>
-                <div class="infoinicial">
-                    <h2 class="recipe-title">{{selectedProduct.titulo?.es}}</h2>
-                    <ul class="recipe-details list-unstyled">
-                        <li class="recipe-details-item servings">
-                            <span class="value text-muted me-2" style="text-decoration: line-through;"
-                                *ngIf="+selectedProduct.precio_antes > +selectedProduct.precio_ahora">
-                                {{selectedProduct.precio_antes | number:'1.2-2' | currency:tienda_moneda}}
-                            </span>
-                            <span class="value fw-bold">
-                                {{selectedProduct.precio_ahora | number:'1.2-2' | currency:tienda_moneda}}
-                            </span>
-                        </li>
-                    </ul>
-                </div>
-
             </div>
 
-            <div class="ft-recipe__content mt-3">
+            <!-- Calificaciones-->
+            <div class="mb-3">
+               <!-- <app-ratingStar [product]="product"></app-ratingStar> -->
+            </div>
 
+            <!-- Estado de Stock -->
+            <div class="mb-3">
+                @if (selectedProduct?.stock > 0) {
+                <span class="badge bg-success-subtle text-success rounded-pill px-3 py-1">
+                    Disponible: {{ selectedProduct?.stock }}
+                </span>
+                } @else {
+                <span class="badge bg-warning-subtle text-dark rounded-pill px-3 py-1">
+                    {{ 'Aun puedes solicitarlo para mas tarde' | translate }}
+                </span>
+                }
+            </div>
 
-                <p class="description" [innerHTML]="selectedProduct.detalle?.es"></p>
+            <!-- Descripción (agrega aquí tu variable de descripción si la tienes) -->
+            <p class="zlip-description text-muted mb-4"
+                    [innerHTML]="translate.currentLang() === 'en' ? selectedProduct?.detalle?.en : selectedProduct?.detalle?.es"></p>
 
-                <!-- selectores -->
-                <div *ngIf="selectedProduct.nombre_selector !== 'unico'" class="mb-3">
-                    <p class="small">{{ 'Selecciona alguna opción por favor' | translate }}</p>
-                    <select class="form-select" id="product-size" name="selector_to_cart" [(ngModel)]="selector_to_cart"
-                        (change)="selector_error = false">
-                        <option value=" " selected disabled>{{ 'Selecciona' | translate }}</option>
-                        <option value="{{selector.titulo}}" *ngFor="let selector of selectores">
-                            {{selector.titulo?.es}}
-                        </option>
-                    </select>
-                </div>
-
-                <div class="d-grid gap-2">
-                    <button class="btn btn-outline-success w-100 py-3 rounded-pill" (click)="addItem(selectedProduct)">
-                        <i class="fa fa-shopping-bag"></i>  {{ 'Agregar al Pedido' | translate }}
+            <!-- Selector de Opciones -->
+            <div class="mb-4">
+                <label class="form-label fw-semibold small text-uppercase text-muted mb-2">
+                    {{ 'Selecciona alguna opción por favor' | translate }}
+                </label>
+                <app-loading *ngIf="isLoadingModal"></app-loading>
+                <div class="selector-pills-container animated fadeInUp" *ngIf="!isLoadingModal">
+                    <button type="button" *ngFor="let selector of selectores" class="selector-pill"
+                        [class.active]="selector_to_cart === (translate.currentLang() === 'en' ? selector.titulo.en : selector.titulo.es)"
+                        (click)="seleccionarOpcion(selector)">
+                        {{ translate.currentLang() === 'en' ? selector.titulo.en : selector.titulo.es }}
                     </button>
                 </div>
-
-                <!-- mensajes de alerta -->
-                <div *ngIf="selector_error" class="alert alert-warning mt-3">
-                    <i class="fa fa-close float-end" (click)="closeAviso()" style="cursor:pointer"></i>
-                    <p class="mb-0"> {{ 'Selecciona alguna opción por favor' | translate }}</p>
-                </div>
-
             </div>
+
+            <!-- Botones de Acción (Conecta tus eventos (click) originales) -->
+            <div class="zlip-actions d-grid gap-2 mb-4">
+                <button type="button" class="btn btn-success btn-lg fw-semibold zlip-btn-primary"
+                    (click)="addItem(selectedProduct)">
+                    <i class="fa fa-shopping-cart me-2"></i> {{ 'Agregar al carrito' | translate }}
+                </button>
+
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-warning fw-medium flex-grow-1 zlip-btn-secondary"
+                        (click)="addItemPedido(selectedProduct)">
+                        <i class="fa fa-shopping-bag me-1"></i> {{ 'Solicitar Pedido' | translate }}
+                    </button>
+
+                </div>
+            </div>
+
+            <!-- Sección de Comentarios (Acordeón o lista limpia) -->
+            <hr class="text-muted opacity-25 my-4">
+
+            <div class="zlip-reviews">
+                <h5 class="fw-bold mb-3" style="font-family: var(--headlinesFont);">
+                    {{ 'Comentarios' | translate }} ({{ comentarios || 0 }})
+                </h5>
+
+                @for (item of comentarios || []; track $index) {
+                <div class="zlip-review-card p-3 mb-2 rounded-3 bg-light">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <strong class="small text-dark">{{ item.user?.first_name || ('usuario' | translate) }}</strong>
+                    </div>
+                    <p class="small text-secondary mb-2">{{ item.comentario }}</p>
+
+                    @if (item.pros) {
+                    <div class="small text-success mb-1">
+                        <strong>{{ 'Pros' | translate }}:</strong> {{ item.pros }}
+                    </div>
+                    }
+                    @if (item.cons) {
+                    <div class="small text-danger">
+                        <strong>{{ 'Contra' | translate }}:</strong> {{ item.cons }}
+                    </div>
+                    }
+                </div>
+                } @empty {
+                <p class="text-muted small fst-italic mb-0">
+                    {{ 'No hay Comentarios registrados en este Producto' | translate }}.
+                </p>
+                }
+            </div>
+
         </div>
     </div>
+</div>
+   
 </div>
 
 <!-- modal -->

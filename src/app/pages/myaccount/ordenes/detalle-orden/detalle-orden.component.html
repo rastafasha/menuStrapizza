@@ -6,74 +6,95 @@
     <div class="row">
         <!-- Sidebar-->
         <aside class="col-lg-4  pt-lg-0">
-            <app-aside-cuenta></app-aside-cuenta>
+            <app-back></app-back>
         </aside>
         <h3 class="heading-style-3">{{'Orden detalle' |translate}}</h3>
         <!-- Content  -->
-        <section class="col-lg-8">
+         <app-loading *ngIf="isLoading"></app-loading>
+        <section class="col-12 animated fadeInUp" *ngIf="!isLoading">
 
             <div class="row">
                 <div class="col-lg-12">
                     <div class="card">
-                        <div class="card-header">
-                            <div class="row">
-                                <div class="col-lg-6">
-                                    <b>N° {{venta._id}}</b>
+                        <div class="card-header bg-white border-bottom py-3 px-4 order-header">
+                            <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-2">
+
+                                <!-- Número de orden -->
+                                <div class="d-flex align-items-center gap-2 flex-wrap">
+                                    <span class="badge bg-light text-secondary border fw-semibold px-2 py-1">
+                                        {{ 'Orden' | translate }}
+                                    </span>
+                                    <span class="fw-bold text-dark font-monospace order-id" title="{{ venta._id }}">
+                                        #{{ venta._id }}
+                                    </span>
                                 </div>
-                                <div class="col-lg-6 text-right">
+
+                                <!-- Fecha de creación -->
+                                <div class="text-muted small d-flex align-items-center">
+                                    <i class="fa fa-calendar-alt me-2 text-secondary"></i>
                                     <span>{{ venta.createdAt | date:'EEEE, MMMM d, y' }}</span>
                                 </div>
+
                             </div>
                         </div>
+
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-lg-12">
                                     <!-- Steps based on media tabs -->
-                                    <ul class="nav nav-tabs media-tabs nav-justified">
-                                        <li class="nav-item">
-                                            <div class="nav-link active">
-                                                <div class="media align-items-center">
-                                                    <div class="media-tab-media mr-3">
-                                                        <i class="fa fa-money-bill"></i>
-                                                    </div>
-                                                    <div class="media-body">
-                                                        <div class="media-tab-subtitle text-muted font-size-xs mb-1">
-                                                            {{'Método'|translate}}</div>
-                                                        <h6 class="media-tab-title text-nowrap mb-0">
-                                                            {{venta.metodo_pago.tipo}}</h6>
-                                                    </div>
+                                    <div class="row g-2 g-md-3 order-summary-grid mb-4">
+                                        <!-- Método de pago -->
+                                        <div class="col-6 col-md-4">
+                                            <div class="summary-card p-3 rounded-3 h-100 d-flex align-items-center">
+                                                <div class="icon-box me-3 flex-shrink-0">
+                                                    <i class="fa fa-money-bill"></i>
+                                                </div>
+                                                <div class="overflow-hidden">
+                                                    <div class="text-muted small mb-0">{{ 'Método' | translate }}</div>
+                                                    <h6 class="fw-bold text-dark text-capitalize text-truncate mb-0">
+                                                        {{ venta.metodo_pago.tipo }}
+                                                    </h6>
                                                 </div>
                                             </div>
-                                        </li>
-                                        <li class="nav-item">
-                                            <div class="nav-link" [ngClass]="{completed: venta.estado == 'Enviado'}">
-                                                <div class="media align-items-center">
-                                                    <div class="media-tab-media mr-3"><i class="fa fa-bag"></i></div>
-                                                    <div class="media-body">
-                                                        <div class="media-tab-subtitle text-muted font-size-xs mb-1">
-                                                            {{'Estado'|translate}}</div>
-                                                        <h6 class="media-tab-title text-nowrap mb-0">{{venta.estado}}
-                                                        </h6>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </li>
+                                        </div>
 
-                                        <li class="nav-item">
-                                            <div class="nav-link">
-                                                <div class="media align-items-center">
-                                                    <div class="media-tab-media mr-3"><i class="fa fa-dollar"></i></div>
-                                                    <div class="media-body">
-                                                        <div class="media-tab-subtitle text-muted font-size-xs mb-1">
-                                                            {{'Total pagado'|translate}}</div>
-                                                        <h6 class="media-tab-title text-nowrap mb-0">
-                                                            {{venta.total_pagado | currency:tienda_moneda}} </h6>
-                                                    </div>
+                                        <!-- Estado -->
+                                        <div class="col-6 col-md-4">
+                                            <div class="summary-card p-3 rounded-3 h-100 d-flex align-items-center"
+                                                [ngClass]="{
+                                                    'status-completed': venta.estado === 'Enviado' || venta.estado === 'Entregado',
+                                                    'status-process': venta.estado === 'Venta en proceso'
+                                                    }">
+                                                <div class="icon-box me-3 flex-shrink-0">
+                                                    <i class="fa fa-shopping-bag"></i>
+                                                </div>
+                                                <div class="overflow-hidden">
+                                                    <div class="text-muted small mb-0">{{ 'Estado' | translate }}</div>
+                                                    <h6 class="fw-bold status-text text-truncate mb-0">
+                                                        {{ venta.estado }}
+                                                    </h6>
                                                 </div>
                                             </div>
-                                        </li>
+                                        </div>
 
-                                    </ul>
+                                        <!-- Total pagado (ocupa ancho completo en móvil para resaltar el monto) -->
+                                        <div class="col-12 col-md-4">
+                                            <div
+                                                class="summary-card summary-total p-3 rounded-3 h-100 d-flex align-items-center">
+                                                <div class="icon-box me-3 flex-shrink-0">
+                                                    <i class="fa fa-dollar-sign"></i>
+                                                </div>
+                                                <div class="overflow-hidden">
+                                                    <div class="text-muted small mb-0">{{ 'Total pagado' | translate }}
+                                                    </div>
+                                                    <h5 class="fw-bold text-primary mb-0">
+                                                        {{ venta.total_pagado | currency:tienda_moneda }}
+                                                    </h5>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                 </div>
 
                                 <div class="col-lg-12">
@@ -93,26 +114,40 @@
 
                                         </div>
                                         <!-- Confirmar entrega -->
-                                        <div class="btn-group mr-2 mb-2" role="group" aria-bs-label="Apply settings"
+                                        <div class="order-actions-bar pt-3 mt-3 border-top"
                                             *ngIf="venta.estado == 'Enviado'">
-                                            <button type="button" class="btn btn-success" data-bs-toggle="modal"
-                                                [attr.data-bs-target]="'#finalizar'">
-                                                <i class="fa fa-check mr-2"></i>
-                                                {{'Confirmar entrega'|translate}}
-                                            </button>
-                                            <button *ngIf="usaDelivery === true" type="button" class="btn btn-info"
-                                                [routerLink]="['/mapa-page/',venta._id]">
-                                                <i class="fa fa-eye mr-2"></i>
-                                                {{'seguimiento'|translate}}
-                                            </button>
-                                            <button *ngIf="usaDelivery === true" type="button" class="btn btn-warning"
-                                                [routerLink]="['/chat/',venta._id]">
-                                                <i class="fa fa-pencil mr-2"></i>
-                                                {{'Chat'|translate}}
-                                            </button>
+                                            <div
+                                                class="d-flex flex-column flex-sm-row align-items-stretch align-items-sm-center justify-content-end gap-2">
 
+                                                <!-- Acciones secundarias (Delivery) -->
+                                                <div class="d-flex gap-2" *ngIf="usaDelivery === true">
+                                                    <button type="button"
+                                                        class="btn btn-outline-primary flex-fill flex-sm-grow-0 rounded-pill px-3"
+                                                        [routerLink]="['/mapa-page/', venta._id]">
+                                                        <i class="fa fa-map-marker-alt me-2"></i>
+                                                        <span class="text-capitalize">{{ 'seguimiento' | translate
+                                                            }}</span>
+                                                    </button>
 
+                                                    <button type="button"
+                                                        class="btn btn-outline-secondary flex-fill flex-sm-grow-0 rounded-pill px-3"
+                                                        [routerLink]="['/chat/', venta._id]">
+                                                        <i class="fa fa-comments me-2"></i>
+                                                        {{ 'Chat' | translate }}
+                                                    </button>
+                                                </div>
+
+                                                <!-- Acción principal -->
+                                                <button type="button"
+                                                    class="btn btn-success rounded-pill px-4 fw-semibold shadow-sm"
+                                                    data-bs-toggle="modal" [attr.data-bs-target]="'#finalizar'">
+                                                    <i class="fa fa-check-circle me-2"></i>
+                                                    {{ 'Confirmar entrega' | translate }}
+                                                </button>
+
+                                            </div>
                                         </div>
+
 
                                     </div>
                                 </div>
@@ -194,74 +229,91 @@
                                 <ng-container>
                                     <div class="col-lg-12 mb-4" *ngFor="let item of detalle">
                                         <!-- Horizontal card layout -->
-                                        <div class="card">
-                                            <div class="row ">
-                                                <div class="col-sm-3 topedesc">
-                                                    <img [src]="item.producto.img | imagenPipe: 'productos'"
-                                                        style="width:100%" class="rounded-left" alt="Card image">
-                                                    <div class="ifdet">
-                                                        <h3 class="product-title font-size-base mb-2">
-                                                            {{ translate.currentLang() === 'en' ?
-                                                            item.producto?.titulo?.en : item.producto?.titulo?.es }}
-                                                        </h3>
-                                                        <div class="font-size-sm"><span
-                                                                class="text-muted mr-2">{{'Cantidad'|translate}}:</span>
-                                                            {{item.cantidad}}
-                                                        </div>
-                                                        <div class="font-size-lg text-accent">
-                                                            <span class="font-size-sm text-muted mr-2">
-                                                                {{'Precio unitario'|translate}}:</span><br>
-                                                            {{item.precio |currency: tienda_moneda}}
-                                                        </div>
+                                        <div class="card product-order-card border rounded-3 mb-3 overflow-hidden">
+                                            <div class="card-body p-3">
+                                                <div class="d-flex flex-column flex-sm-row align-items-start gap-3">
+
+                                                    <!-- Imagen del producto -->
+                                                    <div
+                                                        class="product-thumb rounded-3 bg-light p-2 flex-shrink-0 mx-auto mx-sm-0">
+                                                        <img [src]="item.producto.img | imagenPipe: 'productos'"
+                                                            [alt]="translate.currentLang() === 'en' ? item.producto?.titulo?.en : item.producto?.titulo?.es"
+                                                            class="img-fluid">
                                                     </div>
-                                                </div>
-                                                <div class="col-sm-9">
-                                                    <div class="card-body">
-                                                        <div class="media-body pt-2">
-                                                            <div class="row">
-                                                                <div class="col-lg-6">
-                                                                    <div class="font-size-sm">
-                                                                        <span
-                                                                            class="text-muted mr-2">{{item.producto.nombre_selector}}:</span>
-                                                                        {{item.selector}}
-                                                                    </div>
-                                                                    <div class="font-size-sm">
-                                                                        <span
-                                                                            class="text-muted mr-2">{{'Selector'|translate}}:</span>
-                                                                        {{item.selector_elegido}}
-                                                                    </div>
-                                                                    <!-- <div class="font-size-sm"><span
-                                                                            class="text-muted mr-2">Color:</span>
-                                                                        <span
-                                                                            [ngStyle]="{'background': item.color,'color': item.color}"
-                                                                            style="font-weight: 900;">||||||||||||||||||||</span>
-                                                                    </div> -->
 
+                                                    <!-- Información principal y atributos -->
+                                                    <div class="flex-grow-1 w-100">
+                                                        <div
+                                                            class="d-flex flex-column flex-md-row justify-content-between align-items-start gap-2">
+
+                                                            <!-- Título y precios -->
+                                                            <div>
+                                                                <h6 class="fw-bold text-dark mb-1">
+                                                                    {{ translate.currentLang() === 'en' ?
+                                                                    item.producto?.titulo?.en :
+                                                                    item.producto?.titulo?.es }}
+                                                                </h6>
+
+                                                                <div
+                                                                    class="d-flex flex-wrap align-items-center gap-2 text-muted small">
+                                                                    <span>
+                                                                        {{ 'Cantidad' | translate }}: <strong
+                                                                            class="text-dark">{{ item.cantidad
+                                                                            }}</strong>
+                                                                    </span>
+                                                                    <span class="text-secondary">&bull;</span>
+                                                                    <span>
+                                                                        {{ 'Precio unitario' | translate }}:
+                                                                        <strong class="text-primary">{{ item.precio | currency: tienda_moneda }}</strong>
+                                                                    </span>
                                                                 </div>
-                                                                <div class="col-lg-6">
+                                                            </div>
 
-                                                                    <ng-container
-                                                                        *ngIf="venta.estado == 'Finalizado' || venta.estado == 'Enviado'">
-
-                                                                        <button type="button"
-                                                                            class="btn btn-outline-info mt-3"
-                                                                            (click)="onEditComentario(item)"
-                                                                            data-bs-toggle="modal"
-                                                                            data-bs-target="#editCommentModal">
-                                                                            <i style="color: gold;"
-                                                                                class="fa fa-star mr-2"></i>
-                                                                            {{'Emitir comentario'|translate}}
-                                                                        </button>
-                                                                    </ng-container>
-
-                                                                </div>
-
+                                                            <!-- Subtotal por línea (opcional, aporta claridad) -->
+                                                            <div class="text-md-end">
+                                                                <span class="fw-bold text-dark fs-6">
+                                                                    {{ (item.precio * item.cantidad) | currency: tienda_moneda }}
+                                                                </span>
                                                             </div>
                                                         </div>
+
+                                                        <!-- Selectores / Variantes como etiquetas (Pills) -->
+                                                        <div class="d-flex flex-wrap gap-2 mt-2 pt-2 border-top"
+                                                            *ngIf="item.selector || item.selector_elegido">
+
+                                                            <span
+                                                                class="badge bg-light text-secondary border fw-normal px-2 py-1"
+                                                                *ngIf="item.selector">
+                                                                {{ item.producto.nombre_selector }}: <strong
+                                                                    class="text-dark">{{ item.selector }}</strong>
+                                                            </span>
+
+                                                            <span
+                                                                class="badge bg-light text-secondary border fw-normal px-2 py-1"
+                                                                *ngIf="item.selector_elegido">
+                                                                {{ 'Selector' | translate }}: <strong
+                                                                    class="text-dark">{{ item.selector_elegido
+                                                                    }}</strong>
+                                                            </span>
+                                                        </div>
+
+                                                        <!-- Botón de comentario (solo si está Finalizado o Enviado) -->
+                                                        <div class="mt-3 text-end"
+                                                            *ngIf="venta.estado == 'Finalizado' || venta.estado == 'Enviado'">
+                                                            <button type="button"
+                                                                class="btn btn-sm btn-outline-primary rounded-pill px-3"
+                                                                (click)="onEditComentario(item)" data-bs-toggle="modal"
+                                                                data-bs-target="#editCommentModal">
+                                                                <i class="fa fa-star text-warning me-2"></i>
+                                                                {{ 'Emitir comentario' | translate }}
+                                                            </button>
+                                                        </div>
+
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
+
                                     </div>
                                 </ng-container>
                             </div>
@@ -270,9 +322,6 @@
                     </div>
                 </div>
             </div>
-
-
-
         </section>
     </div>
 </div>

@@ -26,7 +26,7 @@ declare var bootstrap: any;
 export class ModalCrearDireccionComponent implements OnInit, OnDestroy {
   @ViewChild('mapContainer') mapContainer!: ElementRef;
 
-  @Input() dieccionSeleccionado!: any;
+  @Input() addresSelected!: any;
   @Output() closeModal: EventEmitter<void> = new EventEmitter<void>();
   @Output() refreshPostList: EventEmitter<void> = new EventEmitter<void>();
 
@@ -105,11 +105,11 @@ export class ModalCrearDireccionComponent implements OnInit, OnDestroy {
     this.isLoading = true;
 
     if (
-      changes['dieccionSeleccionado'] &&
-      changes['dieccionSeleccionado'].currentValue
+      changes['addresSelected'] &&
+      changes['addresSelected'].currentValue
     ) {
       this.pageTitle = 'Editando Dirección';
-      const direccion = changes['dieccionSeleccionado'].currentValue;
+      const direccion = changes['addresSelected'].currentValue;
 
       this.direccionForm.patchValue({
         id: direccion.id,
@@ -121,7 +121,7 @@ export class ModalCrearDireccionComponent implements OnInit, OnDestroy {
         zip: direccion.zip,
         user: this.user.uid,
       });
-      this.dieccionSeleccionado = direccion;
+      this.addresSelected = direccion;
       this.isEditing = true;
       this.pageTitle = 'Editando Dirección';
     } else {
@@ -133,7 +133,7 @@ export class ModalCrearDireccionComponent implements OnInit, OnDestroy {
 
 
   onClose() {
-    this.dieccionSeleccionado = null;
+    this.addresSelected = null;
     this.direccionForm.reset();
     this.pageTitle = 'Creando Dirección';
     // Also reset default values if needed

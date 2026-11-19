@@ -14,69 +14,94 @@
         <section class="col-lg-8" *ngIf="!isLoading">
             <!-- <div *ngFor="let item_venta of ventas |  paginate: { itemsPerPage: count, currentPage: p }"> -->
             <div *ngFor="let item_venta of ventas  ">
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h3 class="product-title font-size-base" style="margin-bottom: 0px;">
-                            {{'Compra'|translate}}: N°-{{item_venta._id.toUpperCase()}}
-                        </h3>
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-lg-5">
-                                <div class="font-size-sm">
-                                    <span class="text-muted mr-2">{{'Fecha'|translate}}:</span>
-                                    {{ item_venta.createdAt | date:'MMM d, y, h:mm:ss a' }}
-                                </div>
-                                <div class="font-size-sm">
-                                    <span class="text-muted mr-2">{{'Entrega'|translate}}:</span>
-                                    {{ item_venta.tiempo_estimado }}
-                                </div>
-                                <div class="font-size-sm">
-                                    <span class="text-muted mr-2">{{'Estado'|translate}}:</span>
-                                    <span class="text-accent" *ngIf="item_venta.estado == 'Venta en proceso'">{{item_venta.estado}}</span>
-                                    <span class="text-success" *ngIf="item_venta.estado == 'Enviado'">{{item_venta.estado}}</span>
-                                    <span class="text-info" *ngIf="item_venta.estado == 'Finalizado'">{{item_venta.estado}}</span>
-                                    <span *ngIf="item_venta.estado == 'Cancelado'" style="color: #ff0000">{{item_venta.estado}}</span>
-                                    <span *ngIf="item_venta.estado == 'Reembolsado'" style="color: #ff0000">{{item_venta.estado}}</span>
-                                </div>
-                                <div class="font-size-sm"><span class="text-muted mr-2">Tracking:</span>
-                                    <span *ngIf="item_venta.tracking_number">
-                                        {{item_venta.tracking_number}}
-                                    </span>
-                                    <span *ngIf="!item_venta.tracking_number" class="badge badge-dark">
-                                        {{'No disponible'|translate}}
-                                    </span>
-                                </div>
-                                <div class="font-size-lg text-accent pt-2">
-                                    <span class="text-muted mr-2">{{'Total pagado'|translate}}:</span>{{item_venta.total_pagado | currency:tienda_moneda}}</div>
-                                
-                                <div *ngIf="item_venta.estado !== 'Cancelado' && item_venta.estado !== 'Reembolsado'">
-                                    <div class="btn-group btn-group mt-4" role="group" aria-label="Small group">
-                                        <div *ngIf="item_venta.estado == 'Enviado'">
-                                            <!-- <div *ngIf="item_venta.tracking_number">
-                                                <a class="btn btn-accent" [routerLink]="['/my-account/ordenes/tracking/',item_venta._id]"><span class="czi-plane"></span> Track</a>
-                                            </div> -->
-                                            <div *ngIf="!item_venta.tracking_number">
-                                                <button class="btn btn-accent" style="color:white !important" disabled>
-                                                    <span class="czi-plane" style="color:white !important"></span>
-                                                     {{'Sin seguimiento'|translate}}
-                                                    </button>
-                                            </div>
-                                        </div>
-                                        <!-- <div *ngIf="item_venta.estado == 'Venta en proceso' || item_venta.estado == 'Finalizado'">
-                                            <button disabled class="btn btn-accent"><span class="czi-plane"></span> Track</button>
-                                        </div> -->
+                <div class="card border-0 shadow-sm rounded-4 mb-3 order-history-card">
+  <!-- Encabezado con N° de Compra y Badge de Estado -->
+  <div class="card-header bg-white border-bottom py-3 px-4 d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-2">
+    <div class="d-flex align-items-center gap-2 flex-wrap">
+      <span class="text-muted small fw-semibold text-uppercase">{{ 'Compra' | translate }}</span>
+      <h6 class="mb-0 fw-bold text-dark font-monospace">
+        N°-{{ item_venta._id.toUpperCase() }}
+      </h6>
+    </div>
 
-                                        <a class="btn btn-dark" [routerLink]="['/my-account/ordenes/detalles/',item_venta._id]">
-                                            <span class="czi-package"></span> {{'Detalles'|translate}}
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+    <!-- Badge dinámico según el estado -->
+    <span class="badge rounded-pill px-3 py-2 fw-semibold"
+          [ngClass]="{
+            'bg-primary-subtle text-primary': item_venta.estado == 'Venta en proceso',
+            'bg-success-subtle text-success': item_venta.estado == 'Enviado',
+            'bg-info-subtle text-info-emphasis': item_venta.estado == 'Finalizado',
+            'bg-danger-subtle text-danger': item_venta.estado == 'Cancelado' || item_venta.estado == 'Reembolsado'
+          }">
+      ● {{ item_venta.estado }}
+    </span>
+  </div>
 
-                    </div>
-                </div>
+  <!-- Cuerpo distribuido en cuadrícula responsiva -->
+  <div class="card-body p-4">
+    <div class="row g-3 align-items-center">
+      
+      <!-- Datos de fecha, entrega y tracking -->
+      <div class="col-12 col-md-7 col-lg-8">
+        <div class="row g-2 small">
+          <div class="col-12 col-sm-6">
+            <span class="text-muted d-block">{{ 'Fecha' | translate }}</span>
+            <span class="fw-medium text-dark">
+              {{ item_venta.createdAt | date:'MMM d, y, h:mm:ss a' }}
+            </span>
+          </div>
+
+          <div class="col-12 col-sm-6" *ngIf="item_venta.tiempo_estimado">
+            <span class="text-muted d-block">{{ 'Entrega' | translate }}</span>
+            <span class="fw-medium text-dark">
+              {{ item_venta.tiempo_estimado }}
+            </span>
+          </div>
+
+          <div class="col-12 mt-2">
+            <span class="text-muted me-2">Tracking:</span>
+            <span *ngIf="item_venta.tracking_number" class="fw-semibold text-dark font-monospace">
+              {{ item_venta.tracking_number }}
+            </span>
+            <span *ngIf="!item_venta.tracking_number" class="badge bg-light text-secondary border fw-normal">
+              {{ 'No disponible' | translate }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Total pagado y acciones (alineados a la derecha en desktop) -->
+      <div class="col-12 col-md-5 col-lg-4 border-top border-md-top-0 pt-3 pt-md-0 text-md-end">
+        <div class="mb-3">
+          <span class="text-muted small d-block">{{ 'Total pagado' | translate }}</span>
+          <span class="fs-5 fw-bold text-primary">
+            {{ item_venta.total_pagado | currency:tienda_moneda }}
+          </span>
+        </div>
+
+        <!-- Botones de acción -->
+        <div class="d-flex flex-wrap justify-content-md-end gap-2">
+          <ng-container *ngIf="item_venta.estado !== 'Cancelado' && item_venta.estado !== 'Reembolsado'">
+            <button *ngIf="item_venta.estado == 'Enviado' && !item_venta.tracking_number"
+                    type="button"
+                    class="btn btn-sm btn-outline-secondary rounded-pill px-3"
+                    disabled>
+              <span class="czi-plane me-1"></span>
+              {{ 'Sin seguimiento' | translate }}
+            </button>
+          </ng-container>
+
+          <a class="btn btn-sm btn-dark rounded-pill px-4 fw-medium"
+             [routerLink]="['/my-account/ordenes/detalles/', item_venta._id]">
+            <span class="czi-package me-1"></span>
+            {{ 'Detalles' | translate }}
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
 
 
             </div>

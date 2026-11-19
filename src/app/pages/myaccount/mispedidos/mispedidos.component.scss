@@ -27,3 +27,33 @@
     align-items: end;
     flex-direction: column;
 }
+
+.pending-order-card {
+  border: 1px solid #edf2f7 !important;
+  transition: box-shadow 0.2s ease;
+
+  &:hover {
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05) !important;
+  }
+
+  .delete-btn {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .product-row {
+    transition: background-color 0.15s ease;
+
+    &:hover {
+      background-color: #f1f5f9 !important;
+    }
+
+    .product-name {
+      font-size: 0.95rem;
+    }
+  }
+}

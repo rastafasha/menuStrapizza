@@ -1,100 +1,121 @@
-<section class="page pedido mt-3">
-  <div class="saludo">
-    <app-back></app-back>
-    <h3>Chat</h3>
-  </div>
-  @if (isLoading) {
-    <app-loading></app-loading>
+ @if (isLoading) {
+  <app-loading></app-loading>
   }
   <!--cuadromodal-->
   @if (!isLoading) {
-    <div class="container cuadro-modal">
-      <div class="lineamedio"></div>
-      <div class="row">
-        <div class="areagris"></div>
-        <div class="areablanc areablanc-interna animated fadeInUp">
-          <div class="div-responsive1">
-            <!-- tabs navigation -->
-            <div class="post-inner ">
-              <div class="container">
-                <div class="col-lg-12 form-group">
-                  <div class="card">
-                    <div class="card-header">
-                      <!-- <h6 style="margin-bottom: 0px;"><b>Asunto: </b> &nbsp;{{ticket.tema}}</h6> -->
-                    </div>
-                                    <div class="card-body" style="height: 500px;max-height: 500px;
-                                overflow-y: auto;padding-top: 0px;" #scrollMe>
-                      <div class="row">
-                        @for (item of mensajes; track item) {
-                          <!-- MENSAJE DE OTROS (Chofer/Cliente/Moderador) -->
-                          @if (user.uid !== item.de) {
-                            <div class="col-lg-12 p-4"
-                              style="background: #ededed;">
-                              <div class="media border-bottom">
-                                <div class="media-body pl-3">
-                                  <h6 class="font-size-md mb-2">Receptor:</h6>
-                                  <p class="font-size-md mb-1">{{item.msm}}</p>
-                                  <span class="font-size-ms text-muted">{{item.createdAt |
-                                  date:'shortTime'}}</span>
-                                </div>
-                              </div>
-                            </div>
-                          }
-                          <!-- MENSAJE MÍO (El que está logueado) -->
-                          @if (user.uid === item.de) {
-                            <div class="col-lg-12 p-4 border-bottom"
-                              style="background: #f8f8f8;">
-                              <div class="media text-right">
-                                <div class="media-body pr-3">
-                                  <h6 class="font-size-md mb-2">Yo: {{user.first_name}}</h6>
-                                  <p class="font-size-md mb-1">{{item.msm}}</p>
-                                  <span class="font-size-ms text-muted">{{item.createdAt |
-                                  date:'shortTime'}}</span>
-                                </div>
-                                <img class="rounded-circle" width="50"
-                                  [src]="url+'user/data/'+user.uid">
-                                </div>
-                              </div>
-                            }
-                          }
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="col-lg-12">
-                    <form #msmForm="ngForm" (ngSubmit)="sendMessage(msmForm)">
-                      <div class="form-group">
-                        <textarea class="form-control" rows="3" placeholder="Mensaje" required=""
-                        name="msm" [(ngModel)]="msn"></textarea>
-                        @if (msm_error) {
-                          <div class="invalid-tooltip" style="display: block;">Por favor
-                          escriba un mensaje!</div>
-                        }
-                      </div>
-                      <div class="d-flex flex-wrap justify-content-between align-items-center">
-                        <div class="custom-control custom-checkbox d-block">
-                          <input class="custom-control-input" type="checkbox" id="close-ticket"
-                            name="close_ticket" [(ngModel)]="close_ticket">
-                          <!-- <label class="custom-control-label" for="close-ticket">Enviar y cerrar el
-                        ticket</label> -->
-                      </div>
-                      <button class="btn btn-primary my-2" type="submit">Enviar</button>
-                    </div>
-                  </form>
-                </div>
-              </div>
-            </div>
-            <!-- tabs navigation -->
+  <div class="container  chat-wrapper">
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden chat-card">
+
+      <!-- Header del Chat -->
+      <div class="card-header bg-white border-bottom py-3 px-4 d-flex align-items-center justify-content-between">
+        <div class="d-flex align-items-center gap-3">
+          <app-back></app-back>
+          <div>
+            <h6 class="mb-0 fw-bold text-dark d-flex align-items-center gap-2">
+              <i class="fa fa-comments text-primary"></i>
+              <span>Chat de Entrega</span>
+            </h6>
+            <small class="text-muted" *ngIf="usuario">
+              <span class="status-dot bg-success me-1"></span> Conectado
+            </small>
+            <small class="text-warning fw-medium" *ngIf="!usuario && !isLoading">
+              <span class="status-dot bg-warning me-1"></span> Esperando repartidor...
+            </small>
           </div>
         </div>
+
+        <span class="badge bg-light text-secondary border font-monospace d-none d-sm-inline-block">
+          #{{ id | slice:0:8 }}...
+        </span>
       </div>
+
+      <!-- Loading -->
+      @if (isLoading) {
+      <div class="chat-body d-flex align-items-center justify-content-center p-5">
+        <app-loading></app-loading>
+      </div>
+      }
+
+      <!-- Área de Mensajes (Conectada a @ViewChild('scrollMe')) -->
+      @if (!isLoading) {
+      <div #scrollMe class="chat-body p-3 p-md-4">
+
+        <!-- Estado vacío cuando aún no hay mensajes -->
+        @if (mensajes.length === 0) {
+        <div class="h-100 d-flex flex-column align-items-center justify-content-center text-center text-muted py-5">
+          <div class="empty-icon-circle mb-3">
+            <i class="fa fa-paper-plane fs-4 text-primary"></i>
+          </div>
+          <h6 class="fw-semibold text-dark mb-1">Aún no hay mensajes</h6>
+          <p class="small mb-0">Envía un mensaje para coordinar la entrega de tu pedido.</p>
+        </div>
+        }
+
+        <!-- Lista de mensajes -->
+        @for (item of mensajes; track item) {
+
+        <!-- Mensaje del Receptor (Izquierda) -->
+        @if (user.uid !== item.de) {
+        <div class="d-flex flex-column align-items-start mb-3 message-row">
+          <span class="sender-label text-muted small mb-1 ms-1">
+            {{ user.role === 'USER' ? 'Repartidor' : 'Cliente' }}
+          </span>
+          <div class="message-bubble bubble-received shadow-sm">
+            <p class="mb-1 message-text">{{ item.msm }}</p>
+            <div class="text-end">
+              <span class="message-time text-muted">
+                {{ item.createdAt | date:'shortTime' }}
+              </span>
+            </div>
+          </div>
+        </div>
+        }
+
+        <!-- Mensaje Propio (Derecha) -->
+        @if (user.uid === item.de) {
+        <div class="d-flex flex-column align-items-end mb-3 message-row">
+          <span class="sender-label text-muted small mb-1 me-1">
+            Tú ({{ user.first_name }})
+          </span>
+          <div class="message-bubble bubble-sent shadow-sm">
+            <p class="mb-1 message-text">{{ item.msm }}</p>
+            <div class="text-end">
+              <span class="message-time">
+                {{ item.createdAt | date:'shortTime' }}
+              </span>
+            </div>
+          </div>
+        </div>
+        }
+
+        }
+      </div>
+
+      <!-- Alerta de validación -->
+      @if (msm_error) {
+      <div class="alert alert-danger py-2 px-3 mb-0 rounded-0 small border-0">
+        <i class="fa fa-exclamation-circle me-1"></i> {{ msm_error }}
+      </div>
+      }
+
+      <!-- Formulario de Envío -->
+      <div class="card-footer bg-white border-top p-3">
+        <form #msmForm="ngForm" (ngSubmit)="sendMessage(msmForm)" class="d-flex align-items-center gap-2">
+          <input type="text" name="msm" [(ngModel)]="msn" required autocomplete="off" [disabled]="!usuario"
+            [placeholder]="usuario ? 'Escribe un mensaje aquí...' : 'Esperando asignación de repartidor...'"
+            class="form-control rounded-pill bg-light border-0 px-4 py-2 chat-input">
+
+          <button type="submit" [disabled]="msmForm.invalid || !usuario"
+            class="btn btn-primary rounded-circle send-btn flex-shrink-0 d-flex align-items-center justify-content-center"
+            title="Enviar mensaje">
+            <i class="fa fa-paper-plane"></i>
+          </button>
+        </form>
+      </div>
+      }
+
     </div>
+  </div>
+
   }
   <!--cuadromodal-->
-
-
-
-
-
-
-</section>
