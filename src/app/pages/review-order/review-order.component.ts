@@ -46,7 +46,7 @@ export class ReviewOrderComponent implements OnInit, OnDestroy {
   @ViewChild('direccionEditModal') direccionEditModal!: any;
   @ViewChild('mapContainer') mapContainer!: ElementRef;
   @ViewChild('direccionEditModal') direccionModal!: any; // O el tipo de tu componente si lo tienes a mano
-  
+
   public datosDireccionRecibidos: any = null;
   public totalGeneral: number = 0;
 
@@ -98,6 +98,7 @@ export class ReviewOrderComponent implements OnInit, OnDestroy {
   public urlWhatsApp: string = '';
 
   public activeLang = 'es';
+  isCreandoCliente = false;
 
   private tiendaService = inject(TiendaService);
   private carritoService = inject(CarritoService);
@@ -305,16 +306,16 @@ export class ReviewOrderComponent implements OnInit, OnDestroy {
   }
 
   onChangeDireccion(event: Event) {
-    const target = event.target as HTMLSelectElement; 
-    
+    const target = event.target as HTMLSelectElement;
+
     // Buscamos la dirección seleccionada dentro de la lista del Padre
     this.direccionSelected = this.direcciones.filter(method => method._id === target.value)[0]
-    
+
     // 🚀 LE MANDAMOS LAS COORDENADAS AL HIJO DE PRECIOS
     if (this.direccionSelected && this.direccionSelected.latitud && this.direccionSelected.longitud) {
       const lat = Number(this.direccionSelected.latitud);
       const lng = Number(this.direccionSelected.longitud);
-      
+
       if (this.preciosComponent) {
         // Forzamos al hijo de precios a ejecutar la fórmula Haversine con la dirección seleccionada
         this.preciosComponent.procesarUbicacionYCalcularPrecio(lat, lng);
@@ -324,14 +325,15 @@ export class ReviewOrderComponent implements OnInit, OnDestroy {
     if (this.direccionSelected) {
       this.get_direccion(this.direccionSelected);
     }
-}
+    setTimeout(() => this.actualizarUrlWhatsApp(), 150);
+  }
 
   get_direccion(direccionSelected: any) {
     this.data_direccion = direccionSelected._id;
     this._direccionService.get_direccion(this.data_direccion).subscribe(
       response => {
         this.data_direccion = response;
-        
+
       }
     );
 
@@ -365,29 +367,81 @@ export class ReviewOrderComponent implements OnInit, OnDestroy {
   }
 
 
-  // Esta es la función que conectaremos al evento (onDireccionCapturada) del HTML del hijo
 
-  procesarDireccionHijo(event: any): void {
-    console.log('📍 Coordenadas recibidas del modal express:', event);
+  registrarYContinuar(): void {
+    const nombre = this.expressForm.get('first_name')?.value || 'Cliente POS';
+    const telefono = this.expressForm.get('telefono')?.value || '0000000000';
 
-    // 1. Guardamos el paquete en memoria para tu backend
-    this.datosDireccionRecibidos = event;
-
-    // 💡 EL TRUCO PARA EL BOTÓN: Extraemos el texto de la calle que escribió el hijo
-    const textoCalle = event.direccionText || event.direccion || 'Ubicación GPS Capturada';
-
-    // 2. Parcheamos el formulario principal para que Angular sepa que ya NO está vacío
-    this.expressForm.patchValue({
-      direccion: textoCalle
-    });
-
-    // 3. Despertamos al motor matemático de los precios si vienen coordenadas
-    if (event?.latitud && event?.longitud && this.preciosComponent) {
-      this.preciosComponent.procesarUbicacionYCalcularPrecio(event.latitud, event.longitud);
+    if (this.tiendaSelected.tipoFlujo !== 'POS_DIRECTO') {
+      if (this.expressForm.get('first_name')?.invalid || this.expressForm.get('telefono')?.invalid) {
+        this.toastr.warning('Ingresa tu nombre y teléfono para continuar', 'Datos requeridos');
+        return;
+      }
     }
+
+    this.isCreandoCliente = true;
+
+    const payload = {
+      first_name: nombre,
+      telefono: telefono,
+      local: this.tiendaSelected._id
+    };
+
+    this.usuarioService.crearClienteExpress(payload).subscribe({
+      next: (resp: any) => {
+        this.userId = resp.uid || resp.usuario?._id || resp.usuario?.uid || resp.id;
+        this.identity = resp.usuario || { uid: this.userId, first_name: nombre, telefono };
+
+        // 🟢 Guardamos en localStorage para que el modal hijo y futuras recargas lo reconozcan
+        if (!localStorage.getItem('user')) {
+          localStorage.setItem('user', JSON.stringify(this.identity));
+        }
+
+        this.getDireccionbyUser();
+        this.actualizarUrlWhatsApp(); // 🟢 Pre-calculamos la URL desde ya
+
+        this.isCreandoCliente = false;
+        this.pasoActual = 3;
+      },
+      error: (err) => {
+        this.isCreandoCliente = false;
+        this.toastr.error(err.error?.msg || 'No se pudo registrar tus datos', 'Error');
+      }
+    });
   }
 
+  // Esta es la función que conectaremos al evento (onDireccionCapturada) del HTML del hijo
+  procesarDireccionHijo(event: any): void {
+    this.datosDireccionRecibidos = event;
 
+  // 1. Siempre calculamos el precio del delivery en vivo con las coordenadas
+  if (event?.latitud && event?.longitud && this.preciosComponent) {
+    this.preciosComponent.procesarUbicacionYCalcularPrecio(event.latitud, event.longitud);
+  }
+
+  // 2. Solo si la dirección YA FUE GUARDADA en BD (trae _id), la seleccionamos en el dropdown
+  if (event?._id) {
+    this.direccionSelected = event;
+    this.getDireccionbyUser(); // Refresca el <select> para que aparezca la nueva dirección marcada
+    this.expressForm.patchValue({
+      direccion: event.direccion || 'Ubicación GPS Capturada'
+    });
+  }
+
+  setTimeout(() => this.actualizarUrlWhatsApp(), 150);
+  }
+
+  finalizarPedido(): void {
+    const esDelivery = this.expressForm.get('tipoEntrega')?.value === 'delivery';
+    const direccionId = this.direccionSelected?._id || this.datosDireccionRecibidos?._id || null;
+
+    if (esDelivery && !direccionId) {
+      this.toastr.warning('Por favor selecciona o crea una dirección de entrega', 'Dirección requerida');
+      return;
+    }
+
+    this.guardarPedido(this.userId, direccionId);
+  }
 
 
   //proceso para registro express
@@ -420,12 +474,14 @@ export class ReviewOrderComponent implements OnInit, OnDestroy {
 
 
   avanzarAlRegistroExpress() {
-    // Si el usuario ya está logueado en tu app, saltamos directo al mapa o al envío
-    // Si no, lo mandamos al paso 2 (formulario express de datos básicos)
-    this.pasoActual = 2;
+    if (this.userId) {
+      this.pasoActual = 3;
+    } else {
+      this.pasoActual = 2;
+    }
   }
 
-    procesarClienteExpress() {
+  procesarClienteExpress() {
     // 🧠 EL POLICÍA INTELIGENTE: 
     // Si es modo WHATSAPP, el formulario DEBE ser válido (exige nombre, teléfono, etc.).
     // Si es modo POS_DIRECTO, dejamos pasar al cliente aunque el formulario esté incompleto o inválido.
@@ -441,19 +497,19 @@ export class ReviewOrderComponent implements OnInit, OnDestroy {
     const telefonoForm = this.expressForm.value.telefono || '0000000000';
 
     // 1. Resolvemos la dirección de forma limpia
-    const direccionFinal = this.direccionSelected 
+    const direccionFinal = this.direccionSelected
       ? (this.direccionSelected.direccion || this.direccionSelected)
-      : (this.expressForm.value.tipoEntrega === 'delivery' ? 
-          (this.datosDireccionRecibidos?.direccionText || this.datosDireccionRecibidos?.direccion || '') 
-          : 'Retiro en tienda (Pickup)');
+      : (this.expressForm.value.tipoEntrega === 'delivery' ?
+        (this.datosDireccionRecibidos?.direccionText || this.datosDireccionRecibidos?.direccion || '')
+        : 'Retiro en tienda (Pickup)');
 
     // 2. Control de duplicados: Si ya está seleccionada una dirección existente, 
     // mandamos las coordenadas en '0,0' o null para que el backend NO cree otra.
     let posicionGPS = '0,0';
     if (this.expressForm.value.tipoEntrega === 'delivery' && !this.direccionSelected) {
-        const lat = this.datosDireccionRecibidos?.latitud || 0;
-        const lng = this.datosDireccionRecibidos?.longitud || 0;
-        posicionGPS = `${lat},${lng}`;
+      const lat = this.datosDireccionRecibidos?.latitud || 0;
+      const lng = this.datosDireccionRecibidos?.longitud || 0;
+      posicionGPS = `${lat},${lng}`;
     }
 
     const payloadExpress = {
@@ -481,7 +537,7 @@ export class ReviewOrderComponent implements OnInit, OnDestroy {
           // 🇺🇸 CARRIL A: MODO POS DIRECTO (Internacional / Autónomo)
           // =========================================================================
           console.log('📦 Checkout POS activado. Mudando el flujo al componente Pay.');
-          
+
           // En modo POS enviamos el UID directo. La dirección va null si no aplica.
           this.guardarPedido(uidDirecto, direccionIdDirecto);
           return;
@@ -531,14 +587,14 @@ export class ReviewOrderComponent implements OnInit, OnDestroy {
       tienda: this.tiendaSelected._id,
       pedidoList: this.bandejaList,
       status: estatusSeguro,
-      
+
       // 🛵 INYECCIÓN DE DELIVERY COMPATIBLE: Captura los datos del formulario express
       delivery: esDelivery,
-      
+
       // 💡 ENGRANAJE LOGÍSTICO FINAL:
       direccion: esDelivery ? direccionId : null,
       total: esDelivery ? this.totalGeneral : this.total(),
-      
+
       // 🚀 AQUÍ SE SOLUCIONA EL CERO DEFINITIVAMENTE:
       // Leemos la variable en tiempo real desde el componente hijo usando la referencia del HTML
       costoDelivery: esDelivery ? Number(this.preciosComponent?.costoDeliveryAplicado || 0) : 0
@@ -571,7 +627,12 @@ export class ReviewOrderComponent implements OnInit, OnDestroy {
           // =========================================================================
           // 🇻🇪 CARRIL B: MODO WHATSAPP (Híbrido tradicional de Venezuela)
           // =========================================================================
+          // 🇻🇪 CARRIL B: MODO WHATSAPP
           this.actualizarUrlWhatsApp();
+          
+          // 🟢 Limpiamos el carrito para evitar pedidos duplicados
+          localStorage.removeItem('bandejaItems');
+          this.carritoService.clearCart();
         }
       },
       error: (err) => {
@@ -595,7 +656,7 @@ export class ReviewOrderComponent implements OnInit, OnDestroy {
     const nombreCliente = formValues.first_name || this.identity.first_name || 'Cliente';
     const tipoEntrega = formValues.tipoEntrega || 'No especificado';
     const telefonoCliente = formValues.telefono || this.identity.telefono || 'No registrado';
-    
+
     const isEn = this.activeLang === 'en';
 
     let message = `*${isEn ? 'New Order from Zlipmenu App' : 'Nuevo Pedido desde App Zlipmenu'} #${this.randomNum}*\n\n`;
@@ -605,13 +666,13 @@ export class ReviewOrderComponent implements OnInit, OnDestroy {
     message += `*${isEn ? 'Order Details' : 'Detalles del Pedido'}:*\n`;
     message += `─────────────────────\n`;
 
-    
+
 
     this.bandejaList.forEach((item: any) => {
       const itemTotal = (item.precio_ahora * item.cantidad).toFixed(2);
-      
+
       // 💡 SOLUCIÓN MULTIDIOMA Y ANTICAÍDAS: Usamos 'isEn' y el operador '?' de navegación segura
-      const nombreProducto = isEn 
+      const nombreProducto = isEn
         ? (item.titulo?.en || item.titulo?.es || item.titulo || 'Producto')
         : (item.titulo?.es || item.titulo?.en || item.titulo || 'Producto');
 
@@ -630,26 +691,26 @@ export class ReviewOrderComponent implements OnInit, OnDestroy {
     // 💡 1. CALCULAMOS LAS VARIABLES FINANCIERAS PARA EL MENSAJE
     const subtotalComida = this.total(); // Tus $21.00 netos de los productos
     const esDelivery = tipoEntrega === 'delivery';
-    
+
     // Si es delivery jala tus $5.00, si es pickup se queda en $0.00
-    const montoDelivery = esDelivery ? (this.totalGeneral - subtotalComida) : 0; 
+    const montoDelivery = esDelivery ? (this.totalGeneral - subtotalComida) : 0;
     const totalFinalMoneda = esDelivery ? this.totalGeneral : subtotalComida;
 
     // 💡 2. INYECTAMOS EL DESGLOSE DE COBRO TRANSPARENTE EN EL TEXTO DE WHATSAPP
     message += `*${isEn ? 'Subtotal' : 'Subtotal Comida'}:* $${subtotalComida.toFixed(2)}\n`;
-    
+
     if (esDelivery) {
       message += `*${isEn ? 'Delivery Fee' : 'Costo de Envío'}:* $${montoDelivery.toFixed(2)}\n`;
     }
-    
+
     message += `─────────────────────\n`;
-    
+
     // 💡 3. EL TOTAL REAL ACTUALIZADO CON EL DELIVERY INCLUIDO ($26.00)
     message += `*TOTAL A PAGAR:* ${this.tienda_moneda} ${totalFinalMoneda.toFixed(2)}\n\n`;
     message += `*${isEn ? 'Please confirm availability and payment method' : 'Por favor confirmar disponibilidad y método de pago'}:*`;
 
     return encodeURIComponent(message);
-}
+  }
 
 
 
@@ -685,6 +746,31 @@ export class ReviewOrderComponent implements OnInit, OnDestroy {
   }
 
 
+  // 1. Verifica de forma limpia si tiene todo listo para finalizar
+  puedeFinalizarPedido(): boolean {
+    const tipo = this.expressForm?.get('tipoEntrega')?.value;
+    if (!tipo) return false;
+
+    if (tipo === 'delivery') {
+      const tieneDireccion = !!(this.direccionSelected?._id || this.datosDireccionRecibidos?._id);
+      return tieneDireccion;
+    }
+
+    return true; // Si es pickup, basta con haber seleccionado pickup
+  }
+
+  // 2. Valida, actualiza la URL de WhatsApp al instante y guarda el pedido en BD
+  validarYAbrirWhatsApp(event: Event): void {
+    if (!this.puedeFinalizarPedido()) {
+      event.preventDefault();
+      this.toastr.warning('Por favor selecciona el método de entrega y dirección', 'Faltan datos');
+      return;
+    }
+
+    // Aseguramos que la URL de WhatsApp tenga el total con delivery y datos actualizados antes de abrir
+    this.actualizarUrlWhatsApp();
+    this.finalizarPedido();
+  }
 
 
 

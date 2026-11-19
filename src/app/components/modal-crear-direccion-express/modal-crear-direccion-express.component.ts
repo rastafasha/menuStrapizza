@@ -29,6 +29,7 @@ export class ModalCrearDireccionExpressComponent {
   @Output() onDireccionCapturada = new EventEmitter<any>();
 
   @Input() dieccionSeleccionado!: any;
+  @Input() userId: any;
   @Output() closeModal: EventEmitter<void> = new EventEmitter<void>();
   @Output() refreshPostList: EventEmitter<void> = new EventEmitter<void>();
 
@@ -38,6 +39,7 @@ export class ModalCrearDireccionExpressComponent {
   isLoading = false;
   pageTitle!: string;
   isEditing = false;
+  isSaving = false;
 
   // Variables del mapa
   private map: L.Map | null = null;
@@ -308,33 +310,56 @@ export class ModalCrearDireccionExpressComponent {
 
 
   onSubmit() {
-    console.log('Submit debug Express:', {
-      selectedCoords: this.selectedCoords,
-      formLat: this.direccionForm.value.latitud,
-      formLng: this.direccionForm.value.longitud
-    });
-
-    // 2. Mantenemos tu extracción exacta de coordenadas que ya funciona perfecto
-    const data: any = {
-      ...this.direccionForm.value,
-      latitud: this.selectedCoords?.lat || this.direccionForm.value.latitud || 0,
-      longitud: this.selectedCoords?.lng || this.direccionForm.value.longitud || 0
-    };
-
-    // 💡 3. LA MAGIA: En lugar de usar el servicio HTTP viejo, le emitimos la data al padre
-    this.onDireccionCapturada.emit(data);
-
-    // 4. Si esta dirección estaba metida en un modal, mantenemos tu lógica limpia de cierre
-    const modalElement = document.getElementById('add_direccion');
-    if (modalElement) {
-      const modal = (window as any).bootstrap.Modal.getInstance(modalElement);
-      if (modal) {
-        modal.hide();
-      }
-    }
-    
-    this.onClose();
+  if (this.direccionForm.invalid) {
+    this.direccionForm.markAllAsTouched();
+    this.toastr.warning('Por favor completa los campos obligatorios de la dirección', 'Formulario incompleto');
+    return;
   }
+
+  // Obtenemos el ID del usuario desde el @Input() userId (del Paso 2) o desde localStorage
+  const uidUsuario = this.userId || this.user?.uid || this.authService.getLocalStorage()?.uid;
+
+  if (!uidUsuario) {
+    this.toastr.error('No se encontró el usuario para asociar la dirección', 'Error');
+    return;
+  }
+
+  this.isSaving = true;
+
+  const data: any = {
+    ...this.direccionForm.value,
+    user: uidUsuario, // 🟢 Vinculamos directamente con el cliente recién registrado
+    latitud: this.selectedCoords?.lat || this.direccionForm.value.latitud || 0,
+    longitud: this.selectedCoords?.lng || this.direccionForm.value.longitud || 0
+  };
+
+  // 🟢 Guardamos la dirección en el backend para obtener su _id real de MongoDB
+  this.direccionService.registro(data).subscribe({
+    next: (resp: any) => {
+      this.isSaving = false;
+      this.toastr.success('Dirección guardada correctamente', '¡Listo!');
+
+      // Extraemos el objeto dirección creado (ajusta 'resp.direccion || resp' según devuelva tu backend)
+      const direccionCreada = resp.direccion || resp;
+
+      // Emitimos la dirección completa (YA CON SU _id, latitud y longitud) al padre
+      this.onDireccionCapturada.emit(direccionCreada);
+
+      // Cerramos el modal de Bootstrap limpio
+      const modalElement = document.getElementById('add_direccion');
+      if (modalElement && (window as any).bootstrap) {
+        const modal = (window as any).bootstrap.Modal.getInstance(modalElement);
+        if (modal) modal.hide();
+      }
+
+      this.onClose();
+    },
+    error: (err) => {
+      this.isSaving = false;
+      this.toastr.error(err.error?.msg || 'No se pudo guardar la dirección', 'Error');
+    }
+  });
+}
 
 
   ngOnDestroy() {
