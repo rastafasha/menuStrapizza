@@ -7,7 +7,7 @@ import { PreciosDeliveryComponent } from '../../../components/precios-delivery/p
 import { ImagenPipe } from '../../../pipes/imagen-pipe.pipe';
 import { HeaderComponent } from '../../../shared/header/header.component';
 import { ToastrService } from 'ngx-toastr';
-import { Subscription } from 'rxjs';
+import { debounceTime, Subject, Subscription, takeUntil } from 'rxjs';
 import { Direccion } from '../../../models/direccion.model';
 import { Producto } from '../../../models/producto.model';
 import { Tienda } from '../../../models/tienda.model';
@@ -18,6 +18,7 @@ import { PostalService } from '../../../services/postal.service';
 import { TiendaService } from '../../../services/tienda.service';
 import { UsuarioService } from '../../../services/usuario.service';
 import { SolicitudService } from '../../../services/solicitud.service';
+import { ModalCrearDireccionExpressComponent } from '../../../components/modal-crear-direccion-express/modal-crear-direccion-express.component';
 
 @Component({
   selector: 'app-revisar-pedido',
@@ -29,8 +30,9 @@ import { SolicitudService } from '../../../services/solicitud.service';
     ReactiveFormsModule,
     FormsModule,
     TranslatePipe,
-    PreciosDeliveryComponent
-  ],
+    PreciosDeliveryComponent,
+    ModalCrearDireccionExpressComponent
+],
   templateUrl: './revisar-pedido.component.html',
   styleUrl: './revisar-pedido.component.scss'
 })
@@ -78,6 +80,7 @@ export class RevisarPedidoComponent {
   public whatsapp!: string;
 
   pedidoGuardado = false;
+  loadingAddress = false;
   pedidoaProcesar!: string;
   // Variables del mapa
   public direccion: any;
@@ -95,6 +98,7 @@ export class RevisarPedidoComponent {
   public urlWhatsApp: string = '';
 
   public activeLang = 'es';
+  isCreandoCliente = false;
 
   private tiendaService = inject(TiendaService);
   private solicitudService = inject(SolicitudService);
@@ -108,29 +112,45 @@ export class RevisarPedidoComponent {
   public translate = inject(TranslateService);
 
   private solitudSubscription!: Subscription;
-
+  private destroy$ = new Subject<void>();
 
   ngOnInit() {
-    window.scrollTo(0, 0);
-    this.identity = this.authService.getLocalStorage() as Usuario;
-    if (this.identity) {
-      this.userId = this.identity.uid;
-      // this.getDireccionbyUser();
+  window.scrollTo(0, 0);
+  this.identity = this.authService.getLocalStorage() as Usuario;
+
+  this.SubscribeToCart();
+  this.escucharTiendaActiva();
+  this.geneardorOrdeneNumero();
+  this.loadBandejaListFromLocalStorage();
+  this.chekpedidoguardado();
+  this.crearFormularioExpress();
+
+  if (this.identity) {
+    this.userId = this.identity.uid;
+    if (this.expressForm.get('tipoEntrega')?.value === 'delivery') {
+      this.getDireccionbyUser();
     }
+  }
 
-    // Subscribe to cart changes from CarritoService
-    this.SubscribeToCart();
-    this.escucharTiendaActiva();
-    this.geneardorOrdeneNumero();
-    this.loadBandejaListFromLocalStorage();
-    this.chekpedidoguardado();
-    this.crearFormularioExpress();
-    this.validarFormulario();
-
-    this.expressForm.valueChanges.subscribe(() => {
+  // Escucha cambios del formulario con pausa de 300ms para evitar lentitud
+  this.expressForm.valueChanges
+    .pipe(
+      debounceTime(300),
+      takeUntil(this.destroy$)
+    )
+    .subscribe(() => {
       this.actualizarUrlWhatsApp();
     });
-  }
+
+  // Escucha específicamente cuando el usuario cambia entre pickup y delivery
+  this.expressForm.get('tipoEntrega')?.valueChanges
+    .pipe(takeUntil(this.destroy$))
+    .subscribe((tipo) => {
+      if (tipo === 'delivery' && this.userId && this.direcciones.length === 0) {
+        this.getDireccionbyUser();
+      }
+    });
+}
 
   validarFormulario() {
     this.solicitudForm = this.fb.group({
@@ -140,15 +160,17 @@ export class RevisarPedidoComponent {
   }
 
   SubscribeToCart() {
-    this.solitudSubscription = this.solicitudService.bandejaListPedido$.subscribe(items => {
+  this.solitudSubscription?.unsubscribe();
+  this.solitudSubscription = this.solicitudService.bandejaListPedido$
+    .pipe(takeUntil(this.destroy$))
+    .subscribe(items => {
       this.bandejaListPedido = items;
       this.isbandejaListPedido = items.length > 0;
-      // If cart becomes empty, navigate to home
       if (items.length === 0 && this.router.url.includes('/review-solicitud')) {
         this.router.navigate(['/home']);
       }
     });
-  }
+}
 
   ngOnDestroy() {
     if (this.solitudSubscription) {
@@ -160,14 +182,16 @@ export class RevisarPedidoComponent {
   //tienda
 
   escucharTiendaActiva() {
-    this.tiendaService.selectedTiendaObservable$.subscribe(tienda => {
+  this.tiendaService.selectedTiendaObservable$
+    .pipe(takeUntil(this.destroy$))
+    .subscribe(tienda => {
       if (tienda) {
         this.tiendaSelected = tienda;
         this.tienda_moneda = this.tiendaSelected.moneda;
         this.usaDelivery = this.tiendaSelected.usaDelivery;
       }
     });
-  }
+}
 
   total() {
     const total = this.bandejaListPedido.reduce((sum, item) =>
@@ -252,7 +276,7 @@ export class RevisarPedidoComponent {
       }
 
       // Convertir storedItems a objeto para comparar
-      const bandejaItems = JSON.parse(storedItems);
+      const bandejaPedidoItems = JSON.parse(storedItems);
 
       // Verificar si existe algún pedido que coincida con los items actuales
       // Comparamos el contenido de los arrays, no por referencia
@@ -261,7 +285,7 @@ export class RevisarPedidoComponent {
         const mismaTienda = pedido.tienda === this.tiendaSelected?._id;
 
         // Comparamos que los pedidos tengan los mismos items (misma longitud y mismos IDs)
-        const mismaBandeja = pedido.pedido && pedido.pedido.length === bandejaItems.length;
+        const mismaBandeja = pedido.pedido && pedido.pedido.length === bandejaPedidoItems.length;
         return mismaTienda && mismaBandeja;
       });
 
@@ -280,161 +304,215 @@ export class RevisarPedidoComponent {
 
 
   // Método que se llama cuando cambia el select
-  // onDeliveryMethodChange(): void {
-  //   // 1. Capturamos el valor seleccionado directamente desde el Formic Reactivo
-  //   const metodoSeleccionado = this.expressForm.get('tipoEntrega')?.value;
+  onDeliveryMethodChange(): void {
+    // 1. Capturamos el valor seleccionado directamente desde el Formic Reactivo
+    const metodoSeleccionado = this.expressForm.get('tipoEntrega')?.value;
 
-  //   console.log('Método de entrega cambiado a:', metodoSeleccionado);
+    console.log('Método de entrega cambiado a:', metodoSeleccionado);
 
-  //   // 2. Filtro estricto: Solo si es igual a 'delivery' ejecutamos la lógica
-  //   if (metodoSeleccionado === 'delivery') {
-  //     // Aquí puedes ejecutar el validador de coordenadas o la alerta del GPS nativo
-  //     this.getDeliveryStore();
-  //   } else {
-  //     // Opcional: Si eligen 'pickup', puedes limpiar los costos de envío o esconder el mapa
-  //     // this.costoDeliveryCalculado = 0;
-  //     // this.mensajeDelivery = '';
-  //   }
-  // }
+    // 2. Filtro estricto: Solo si es igual a 'delivery' ejecutamos la lógica
+    if (metodoSeleccionado === 'delivery') {
+      // Aquí puedes ejecutar el validador de coordenadas o la alerta del GPS nativo
+      this.getDeliveryStore();
+    } else {
+      // Opcional: Si eligen 'pickup', puedes limpiar los costos de envío o esconder el mapa
+      // this.costoDeliveryCalculado = 0;
+      // this.mensajeDelivery = '';
+    }
+  }
 
-  // getDeliveryStore(): void {
+  getDeliveryStore(): void {
 
-  //   this.postalService.getPostalesLocal(this.tiendaSelected._id).subscribe({
-  //     next: (resp: any) => {
-  //       // Guardamos la lista de tarifas que viene del backend
-  //       this.listaDeliveries = Array.isArray(resp) ? resp : [];
-  //       console.log(this.listaDeliveries)
-  //     },
-  //     error: (err) => console.error("Error al traer tarifas:", err)
-  //   });
-  // }
+    this.postalService.getPostalesLocal(this.tiendaSelected._id).subscribe({
+      next: (resp: any) => {
+        // Guardamos la lista de tarifas que viene del backend
+        this.listaDeliveries = Array.isArray(resp) ? resp : [];
+        console.log(this.listaDeliveries)
+      },
+      error: (err) => console.error("Error al traer tarifas:", err)
+    });
+  }
+
+
+ onChangeDireccion(event: Event) {
+    const target = event.target as HTMLSelectElement;
+
+    // Buscamos la dirección seleccionada dentro de la lista del Padre
+    this.direccionSelected = this.direcciones.filter(method => method._id === target.value)[0]
+
+    // 🚀 LE MANDAMOS LAS COORDENADAS AL HIJO DE PRECIOS
+    if (this.direccionSelected && this.direccionSelected.latitud && this.direccionSelected.longitud) {
+      const lat = Number(this.direccionSelected.latitud);
+      const lng = Number(this.direccionSelected.longitud);
+
+      if (this.preciosComponent) {
+        // Forzamos al hijo de precios a ejecutar la fórmula Haversine con la dirección seleccionada
+        this.preciosComponent.procesarUbicacionYCalcularPrecio(lat, lng);
+      }
+    }
+
+    if (this.direccionSelected) {
+      this.get_direccion(this.direccionSelected);
+    }
+    setTimeout(() => this.actualizarUrlWhatsApp(), 150);
+  }
+
+  get_direccion(direccionSelected: any) {
+    this.data_direccion = direccionSelected._id;
+    this._direccionService.get_direccion(this.data_direccion).subscribe(
+      response => {
+        this.data_direccion = response;
+        
+      }
+    );
+
+  }
+
+  getDireccionbyUser() {
+    this.loadingAddress = true;
+    this._direccionService.listarUsuario(this.userId).subscribe((resp: any) => {
+      this.direcciones = resp.direcciones;
+      this.loadingAddress = false;
+    })
+  }
+
+  despertarMapaHijo() {
+    // 🧠 Esperamos 400ms a que el off-canvas de Bootstrap termine de abrirse en la pantalla
+    setTimeout(() => {
+      if (this.direccionModal && typeof this.direccionModal.inicializarMapa === 'function') {
+        console.log('🗺️ Comunicando con el componente hijo: Despertando mapa...');
+        this.direccionModal.inicializarMapa();
+      }
+    }, 400);
+  }
+
+  dispararGpsDirecto(): void {
+    // 🚀 LA MAGIA: Despertamos la función nativa del GPS que vive dentro del modal,
+    // pero de forma invisible sin abrir la ventana gris en la pantalla.
+    if (this.direccionEditModal) {
+      console.log('Disparando satélites de forma directa desde el carrito...');
+
+      // Invocamos el método exacto que busca la latitud y longitud en tu modal hijo
+      this.direccionEditModal.useCurrentLocation();
+    }
+  }
 
 
   
- 
+  registrarYContinuar(): void {
+    const nombre = this.expressForm.get('first_name')?.value || 'Cliente POS';
+    const telefono = this.expressForm.get('telefono')?.value || '0000000000';
 
-//   onChangeDireccion(event: Event) {
-//     const target = event.target as HTMLSelectElement; 
-    
-//     // Buscamos la dirección seleccionada dentro de la lista del Padre
-//     this.direccionSelected = this.direcciones.filter(method => method._id === target.value)[0]
-    
-//     // 🚀 LE MANDAMOS LAS COORDENADAS AL HIJO DE PRECIOS
-//     if (this.direccionSelected && this.direccionSelected.latitud && this.direccionSelected.longitud) {
-//       const lat = Number(this.direccionSelected.latitud);
-//       const lng = Number(this.direccionSelected.longitud);
-      
-//       if (this.preciosComponent) {
-//         // Forzamos al hijo de precios a ejecutar la fórmula Haversine con la dirección seleccionada
-//         this.preciosComponent.procesarUbicacionYCalcularPrecio(lat, lng);
-//       }
-//     }
+    if (this.tiendaSelected.tipoFlujo !== 'POS_DIRECTO') {
+      if (this.expressForm.get('first_name')?.invalid || this.expressForm.get('telefono')?.invalid) {
+        this.toastr.warning('Ingresa tu nombre y teléfono para continuar', 'Datos requeridos');
+        return;
+      }
+    }
 
-//     if (this.direccionSelected) {
-//       this.get_direccion(this.direccionSelected);
-//     }
-// }
+    this.isCreandoCliente = true;
 
-//   get_direccion(direccionSelected: any) {
-//     this.data_direccion = direccionSelected._id;
-//     this._direccionService.get_direccion(this.data_direccion).subscribe(
-//       response => {
-//         this.data_direccion = response;
-        
-//       }
-//     );
+    const payload = {
+      first_name: nombre,
+      telefono: telefono,
+      local: this.tiendaSelected._id
+    };
 
-//   }
+    this.usuarioService.crearClienteExpress(payload).subscribe({
+      next: (resp: any) => {
+        this.userId = resp.uid || resp.usuario?._id || resp.usuario?.uid || resp.id;
+        this.identity = resp.usuario || { uid: this.userId, first_name: nombre, telefono };
 
-//   getDireccionbyUser() {
-//     this._direccionService.listarUsuario(this.userId).subscribe((resp: any) => {
-//       this.direcciones = resp.direcciones;
-//     })
-//   }
+        // 🟢 Guardamos en localStorage para que el modal hijo y futuras recargas lo reconozcan
+        if (!localStorage.getItem('user')) {
+          localStorage.setItem('user', JSON.stringify(this.identity));
+        }
 
-//   despertarMapaHijo() {
-//     // 🧠 Esperamos 400ms a que el off-canvas de Bootstrap termine de abrirse en la pantalla
-//     setTimeout(() => {
-//       if (this.direccionModal && typeof this.direccionModal.inicializarMapa === 'function') {
-//         console.log('🗺️ Comunicando con el componente hijo: Despertando mapa...');
-//         this.direccionModal.inicializarMapa();
-//       }
-//     }, 400);
-//   }
+        this.getDireccionbyUser();
+        this.actualizarUrlWhatsApp(); // 🟢 Pre-calculamos la URL desde ya
 
-//   dispararGpsDirecto(): void {
-//     // 🚀 LA MAGIA: Despertamos la función nativa del GPS que vive dentro del modal,
-//     // pero de forma invisible sin abrir la ventana gris en la pantalla.
-//     if (this.direccionEditModal) {
-//       console.log('Disparando satélites de forma directa desde el carrito...');
-
-//       // Invocamos el método exacto que busca la latitud y longitud en tu modal hijo
-//       this.direccionEditModal.useCurrentLocation();
-//     }
-//   }
-
+        this.isCreandoCliente = false;
+        this.pasoActual = 3;
+      },
+      error: (err) => {
+        this.isCreandoCliente = false;
+        this.toastr.error(err.error?.msg || 'No se pudo registrar tus datos', 'Error');
+      }
+    });
+  }
 
   // Esta es la función que conectaremos al evento (onDireccionCapturada) del HTML del hijo
+  procesarDireccionHijo(event: any): void {
+    this.datosDireccionRecibidos = event;
 
-  // procesarDireccionHijo(event: any): void {
-  //   console.log('📍 Coordenadas recibidas del modal express:', event);
+  // 1. Siempre calculamos el precio del delivery en vivo con las coordenadas
+  if (event?.latitud && event?.longitud && this.preciosComponent) {
+    this.preciosComponent.procesarUbicacionYCalcularPrecio(event.latitud, event.longitud);
+  }
 
-  //   // 1. Guardamos el paquete en memoria para tu backend
-  //   this.datosDireccionRecibidos = event;
+  // 2. Solo si la dirección YA FUE GUARDADA en BD (trae _id), la seleccionamos en el dropdown
+  if (event?._id) {
+    this.direccionSelected = event;
+    this.getDireccionbyUser(); // Refresca el <select> para que aparezca la nueva dirección marcada
+    this.expressForm.patchValue({
+      direccion: event.direccion || 'Ubicación GPS Capturada'
+    });
+  }
 
-  //   // 💡 EL TRUCO PARA EL BOTÓN: Extraemos el texto de la calle que escribió el hijo
-  //   const textoCalle = event.direccionText || event.direccion || 'Ubicación GPS Capturada';
+  setTimeout(() => this.actualizarUrlWhatsApp(), 150);
+  }
 
-  //   // 2. Parcheamos el formulario principal para que Angular sepa que ya NO está vacío
-  //   this.expressForm.patchValue({
-  //     direccion: textoCalle
-  //   });
+finalizarPedido(): void {
+    const esDelivery = this.expressForm.get('tipoEntrega')?.value === 'delivery';
+    const direccionId = this.direccionSelected?._id || this.datosDireccionRecibidos?._id || null;
 
-  //   // 3. Despertamos al motor matemático de los precios si vienen coordenadas
-  //   if (event?.latitud && event?.longitud && this.preciosComponent) {
-  //     this.preciosComponent.procesarUbicacionYCalcularPrecio(event.latitud, event.longitud);
-  //   }
-  // }
+    if (esDelivery && !direccionId) {
+      this.toastr.warning('Por favor selecciona o crea una dirección de entrega', 'Dirección requerida');
+      return;
+    }
 
-
+    this.guardarPedido(this.userId, direccionId);
+  }
 
 
   //proceso para registro express
   crearFormularioExpress() {
-    this.expressForm = this.fb.group({
-      // 💡 SOLUCIÓN: Envolvemos los dos validadores dentro de [ corchetes ] en la segunda posición
-      first_name: ['', [Validators.required, Validators.minLength(3)]],
-
-      telefono: ['', [
-        Validators.required,
-        Validators.minLength(7),
-        Validators.maxLength(15),
-        Validators.pattern('^[0-9]+$')
-      ]],
-      // tipoEntrega: ['', Validators.required],
-      // direccion: ['']
-    });
-
-    // Tu lógica de escucha de cambios (Se queda idéntica, está perfecta)
-    // this.expressForm.get('tipoEntrega')?.valueChanges.subscribe(tipo => {
-    //   const direccionControl = this.expressForm.get('direccion');
-    //   if (tipo === 'pickup') {
-    //     direccionControl?.clearValidators();
-    //   } else {
-    //     direccionControl?.setValidators([Validators.required]);
-    //   }
-    //   direccionControl?.updateValueAndValidity();
-    // });
-  }
+      this.expressForm = this.fb.group({
+        // 💡 SOLUCIÓN: Envolvemos los dos validadores dentro de [ corchetes ] en la segunda posición
+        first_name: ['', [Validators.required, Validators.minLength(3)]],
+  
+        telefono: ['', [
+          Validators.required,
+          Validators.minLength(7),
+          Validators.maxLength(15),
+          Validators.pattern('^[0-9]+$')
+        ]],
+        tipoEntrega: ['', Validators.required],
+        direccion: ['']
+      });
+  
+      // Tu lógica de escucha de cambios (Se queda idéntica, está perfecta)
+      this.expressForm.get('tipoEntrega')?.valueChanges.subscribe(tipo => {
+        const direccionControl = this.expressForm.get('direccion');
+        if (tipo === 'pickup') {
+          direccionControl?.clearValidators();
+        } else {
+          direccionControl?.setValidators([Validators.required]);
+        }
+        direccionControl?.updateValueAndValidity();
+      });
+    }
 
 
   avanzarAlRegistroExpress() {
-    // Si el usuario ya está logueado en tu app, saltamos directo al mapa o al envío
-    // Si no, lo mandamos al paso 2 (formulario express de datos básicos)
-    this.pasoActual = 2;
+    if (this.userId) {
+      this.pasoActual = 3;
+    } else {
+      this.pasoActual = 2;
+    }
   }
 
-    procesarClienteExpress() {
+  procesarClienteExpress() {
     // 🧠 EL POLICÍA INTELIGENTE: 
     // Si es modo WHATSAPP, el formulario DEBE ser válido (exige nombre, teléfono, etc.).
     // Si es modo POS_DIRECTO, dejamos pasar al cliente aunque el formulario esté incompleto o inválido.
@@ -450,29 +528,29 @@ export class RevisarPedidoComponent {
     const telefonoForm = this.expressForm.value.telefono || '0000000000';
 
     // 1. Resolvemos la dirección de forma limpia
-    // const direccionFinal = this.direccionSelected 
-    //   ? (this.direccionSelected.direccion || this.direccionSelected)
-    //   : (this.expressForm.value.tipoEntrega === 'delivery' ? 
-    //       (this.datosDireccionRecibidos?.direccionText || this.datosDireccionRecibidos?.direccion || '') 
-    //       : 'Retiro en tienda (Pickup)');
+    const direccionFinal = this.direccionSelected
+      ? (this.direccionSelected.direccion || this.direccionSelected)
+      : (this.expressForm.value.tipoEntrega === 'delivery' ?
+        (this.datosDireccionRecibidos?.direccionText || this.datosDireccionRecibidos?.direccion || '')
+        : 'Retiro en tienda (Pickup)');
 
     // 2. Control de duplicados: Si ya está seleccionada una dirección existente, 
     // mandamos las coordenadas en '0,0' o null para que el backend NO cree otra.
-    // let posicionGPS = '0,0';
-    // if (this.expressForm.value.tipoEntrega === 'delivery' && !this.direccionSelected) {
-    //     const lat = this.datosDireccionRecibidos?.latitud || 0;
-    //     const lng = this.datosDireccionRecibidos?.longitud || 0;
-    //     posicionGPS = `${lat},${lng}`;
-    // }
+    let posicionGPS = '0,0';
+    if (this.expressForm.value.tipoEntrega === 'delivery' && !this.direccionSelected) {
+      const lat = this.datosDireccionRecibidos?.latitud || 0;
+      const lng = this.datosDireccionRecibidos?.longitud || 0;
+      posicionGPS = `${lat},${lng}`;
+    }
 
     const payloadExpress = {
       first_name: nombreForm,
       telefono: telefonoForm,
       local: localId,
-      // referencia: this.direccionSelected ? this.direccionSelected.referencia : (this.datosDireccionRecibidos?.referencia || 'Sin referencia'),
-      // nombres_completos: this.direccionSelected ? this.direccionSelected.nombres_completos : (this.datosDireccionRecibidos?.nombres_completos || nombreForm),
-      // direccion: direccionFinal,
-      // deliveryPosition: posicionGPS, // 🚀 '0,0' si ya existía, evitando el duplicado en la DB
+      referencia: this.direccionSelected ? this.direccionSelected.referencia : (this.datosDireccionRecibidos?.referencia || 'Sin referencia'),
+      nombres_completos: this.direccionSelected ? this.direccionSelected.nombres_completos : (this.datosDireccionRecibidos?.nombres_completos || nombreForm),
+      direccion: direccionFinal,
+      deliveryPosition: posicionGPS, // 🚀 '0,0' si ya existía, evitando el duplicado en la DB
     };
 
     // 1. Registramos al cliente express en segundo plano de forma invisible
@@ -490,7 +568,7 @@ export class RevisarPedidoComponent {
           // 🇺🇸 CARRIL A: MODO POS DIRECTO (Internacional / Autónomo)
           // =========================================================================
           console.log('📦 Checkout POS activado. Mudando el flujo al componente Pay.');
-          
+
           // En modo POS enviamos el UID directo. La dirección va null si no aplica.
           this.guardarPedido(uidDirecto, direccionIdDirecto);
           return;
@@ -502,7 +580,7 @@ export class RevisarPedidoComponent {
           this.guardarPedido(uidDirecto, direccionIdDirecto);
           // SALVAVIDAS: Solo borramos el carrito si la URL de WhatsApp se calculó con éxito
           if (this.urlWhatsApp && this.urlWhatsApp !== '') {
-            localStorage.removeItem('bandejaItems');
+            localStorage.removeItem('bandejaPedidoItems');
             this.solicitudService.clearCart();
           }
         }
@@ -546,15 +624,15 @@ export class RevisarPedidoComponent {
       
       
       // 🛵 INYECCIÓN DE DELIVERY COMPATIBLE: Captura los datos del formulario express
-      // delivery: esDelivery,
+      delivery: esDelivery,
       
       // 💡 ENGRANAJE LOGÍSTICO FINAL:
-      // direccion: esDelivery ? direccionId : null,
-      // total: esDelivery ? this.totalGeneral : this.total(),
+      direccion: esDelivery ? direccionId : null,
+      total: esDelivery ? this.totalGeneral : this.total(),
       
       // 🚀 AQUÍ SE SOLUCIONA EL CERO DEFINITIVAMENTE:
       // Leemos la variable en tiempo real desde el componente hijo usando la referencia del HTML
-      // costoDelivery: esDelivery ? Number(this.preciosComponent?.costoDeliveryAplicado || 0) : 0
+      costoDelivery: esDelivery ? Number(this.preciosComponent?.costoDeliveryAplicado || 0) : 0
     };
 
 
@@ -565,7 +643,31 @@ export class RevisarPedidoComponent {
         // console.log('pedido guardado', resp)
         this.toastr.success('¡Éxito!', 'Pedido Agregado');
 
-        this.actualizarUrlWhatsApp();
+        if (this.tiendaSelected.tipoFlujo === 'POS_DIRECTO') {
+
+          // =========================================================================
+          // 🇺🇸 CARRIL A: MODO POS DIRECTO (Internacional / Autónomo)
+          // =========================================================================
+          console.log('🛒 Pedido procesado. Redireccionando a la pasarela de pago.');
+
+          // 🧹 Limpieza inmediata del carrito local
+          localStorage.removeItem('bandejaPedidoItems');
+          this.solicitudService.clearCart();
+
+          // 🔀 REDIRECCIÓN CRÍTICA: Lo mandas directo al componente de pago usando el ID de la respuesta
+          this.router.navigate(['/pay', this.pedidoaProcesar]);
+
+        } else {
+          // =========================================================================
+          // 🇻🇪 CARRIL B: MODO WHATSAPP (Híbrido tradicional de Venezuela)
+          // =========================================================================
+          // 🇻🇪 CARRIL B: MODO WHATSAPP
+          this.actualizarUrlWhatsApp();
+          
+          // 🟢 Limpiamos el carrito para evitar pedidos duplicados
+          localStorage.removeItem('bandejaPedidoItems');
+          this.solicitudService.clearCart();
+        }
       },
       error: (err) => {
         this.toastr.error('Error al guardar', err.error.msg || 'No se pudo registrar el pedido');
@@ -586,30 +688,31 @@ export class RevisarPedidoComponent {
     // SALVAVIDAS: Si expressForm no existe o no tiene datos, usamos datos de la sesión para que NO se rompa
     const formValues = this.expressForm?.value || {};
     const formValues2 = this.solicitudForm?.value || {};
-
+    
     const nombreCliente = formValues.first_name || this.identity.first_name || 'Cliente';
+    const tipoEntrega = formValues.tipoEntrega || 'No especificado';
     const telefonoCliente = formValues.telefono || this.identity.telefono || 'No registrado';
-    const fechaSol = formValues2.fechaSolicitud || 'No registrado';
+     const fechaSol = formValues2.fechaSolicitud || 'No registrado';
     const horaSol = formValues2.horaSolicitud || 'No registrado';
     
     const isEn = this.activeLang === 'en';
 
     let message = `*${isEn ? 'New Order from Zlipmenu App' : 'Nuevo Pedido desde App Zlipmenu'} #${this.randomNum}*\n\n`;
-      message += `*${isEn ? 'Customer' : 'Cliente'}:* ${nombreCliente}\n`;
-      // message += `*${isEn ? 'Delivery Type' : 'Tipo Entrega'}:* ${tipoEntrega}\n`;
-      message += `*${isEn ? 'Phone' : 'Teléfono'}:* ${telefonoCliente}\n\n`;
-      message += `*${isEn ? 'Date' : 'Fecha'}:* ${fechaSol}\n\n`;
+    message += `*${isEn ? 'Customer' : 'Cliente'}:* ${nombreCliente}\n`;
+    message += `*${isEn ? 'Delivery Type' : 'Tipo Entrega'}:* ${tipoEntrega}\n`;
+    message += `*${isEn ? 'Phone' : 'Teléfono'}:* ${telefonoCliente}\n\n`;
+    message += `*${isEn ? 'Date' : 'Fecha'}:* ${fechaSol}\n\n`;
       message += `*${isEn ? 'Time' : 'Hora'}:* ${horaSol}\n\n`;
-      message += `*${isEn ? 'Order Details' : 'Detalles del Pedido'}:*\n`;
-      message += `─────────────────────\n`;
+    message += `*${isEn ? 'Order Details' : 'Detalles del Pedido'}:*\n`;
+    message += `─────────────────────\n`;
 
-    
+
 
     this.bandejaListPedido.forEach((item: any) => {
       const itemTotal = (item.precio_ahora * item.cantidad).toFixed(2);
-      
+
       // 💡 SOLUCIÓN MULTIDIOMA Y ANTICAÍDAS: Usamos 'isEn' y el operador '?' de navegación segura
-      const nombreProducto = isEn 
+      const nombreProducto = isEn
         ? (item.titulo?.en || item.titulo?.es || item.titulo || 'Producto')
         : (item.titulo?.es || item.titulo?.en || item.titulo || 'Producto');
 
@@ -627,27 +730,27 @@ export class RevisarPedidoComponent {
 
     // 💡 1. CALCULAMOS LAS VARIABLES FINANCIERAS PARA EL MENSAJE
     const subtotalComida = this.total(); // Tus $21.00 netos de los productos
-    // const esDelivery = tipoEntrega === 'delivery';
-    
+    const esDelivery = tipoEntrega === 'delivery';
+
     // Si es delivery jala tus $5.00, si es pickup se queda en $0.00
-    // const montoDelivery = esDelivery ? (this.totalGeneral - subtotalComida) : 0; 
-    // const totalFinalMoneda = esDelivery ? this.totalGeneral : subtotalComida;
+    const montoDelivery = esDelivery ? (this.totalGeneral - subtotalComida) : 0;
+    const totalFinalMoneda = esDelivery ? this.totalGeneral : subtotalComida;
 
     // 💡 2. INYECTAMOS EL DESGLOSE DE COBRO TRANSPARENTE EN EL TEXTO DE WHATSAPP
     message += `*${isEn ? 'Subtotal' : 'Subtotal Comida'}:* $${subtotalComida.toFixed(2)}\n`;
-    
-    // if (esDelivery) {
-    //   message += `*${isEn ? 'Delivery Fee' : 'Costo de Envío'}:* $${montoDelivery.toFixed(2)}\n`;
-    // }
-    
+
+    if (esDelivery) {
+      message += `*${isEn ? 'Delivery Fee' : 'Costo de Envío'}:* $${montoDelivery.toFixed(2)}\n`;
+    }
+
     message += `─────────────────────\n`;
-    
+
     // 💡 3. EL TOTAL REAL ACTUALIZADO CON EL DELIVERY INCLUIDO ($26.00)
-    // message += `*TOTAL A PAGAR:* ${this.tienda_moneda} ${totalFinalMoneda.toFixed(2)}\n\n`;
+    message += `*TOTAL A PAGAR:* ${this.tienda_moneda} ${totalFinalMoneda.toFixed(2)}\n\n`;
     message += `*${isEn ? 'Please confirm availability and payment method' : 'Por favor confirmar disponibilidad y método de pago'}:*`;
 
     return encodeURIComponent(message);
-}
+  }
 
 
 
@@ -688,6 +791,34 @@ toggleComentario(event: Event): void {
     event.preventDefault();
     this.mostarFechYhora = !this.mostarFechYhora;
   }
+
+
+  // 1. Verifica de forma limpia si tiene todo listo para finalizar
+  puedeFinalizarPedido(): boolean {
+    const tipo = this.expressForm?.get('tipoEntrega')?.value;
+    if (!tipo) return false;
+
+    if (tipo === 'delivery') {
+      const tieneDireccion = !!(this.direccionSelected?._id || this.datosDireccionRecibidos?._id);
+      return tieneDireccion;
+    }
+
+    return true; // Si es pickup, basta con haber seleccionado pickup
+  }
+
+  // 2. Valida, actualiza la URL de WhatsApp al instante y guarda el pedido en BD
+  validarYAbrirWhatsApp(event: Event): void {
+    if (!this.puedeFinalizarPedido()) {
+      event.preventDefault();
+      this.toastr.warning('Por favor selecciona el método de entrega y dirección', 'Faltan datos');
+      return;
+    }
+
+    // Aseguramos que la URL de WhatsApp tenga el total con delivery y datos actualizados antes de abrir
+    this.actualizarUrlWhatsApp();
+    this.finalizarPedido();
+  }
+
 
 
 

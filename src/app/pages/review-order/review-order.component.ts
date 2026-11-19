@@ -7,7 +7,7 @@ import { Producto } from '../../models/producto.model';
 import { Tienda } from '../../models/tienda.model';
 import { TiendaService } from '../../services/tienda.service';
 import { CarritoService } from '../../services/carrito.service';
-import { Subscription } from 'rxjs';
+import { debounceTime, Subject, Subscription, takeUntil } from 'rxjs';
 import { PedidomenuService } from '../../services/pedidomenu.service';
 import { FormBuilder, FormGroup, FormsModule, NgForm, ReactiveFormsModule, Validators } from '@angular/forms';
 
@@ -113,39 +113,61 @@ export class ReviewOrderComponent implements OnInit, OnDestroy {
   public translate = inject(TranslateService);
 
   private cartSubscription!: Subscription;
+  private destroy$ = new Subject<void>();
 
 
   ngOnInit() {
-    window.scrollTo(0, 0);
-    this.identity = this.authService.getLocalStorage() as Usuario;
-    if (this.identity) {
-      this.userId = this.identity.uid;
+  window.scrollTo(0, 0);
+  this.identity = this.authService.getLocalStorage() as Usuario;
+
+  this.SubscribeToCart();
+  this.escucharTiendaActiva();
+  this.geneardorOrdeneNumero();
+  this.loadBandejaListFromLocalStorage();
+  this.chekpedidoguardado();
+  this.crearFormularioExpress();
+
+  if (this.identity) {
+    this.userId = this.identity.uid;
+    if (this.expressForm.get('tipoEntrega')?.value === 'delivery') {
       this.getDireccionbyUser();
     }
-
-    // Subscribe to cart changes from CarritoService
-    this.SubscribeToCart();
-    this.escucharTiendaActiva();
-    this.geneardorOrdeneNumero();
-    this.loadBandejaListFromLocalStorage();
-    this.chekpedidoguardado();
-    this.crearFormularioExpress();
-
-    this.expressForm.valueChanges.subscribe(() => {
-      this.actualizarUrlWhatsApp();
-    });
   }
 
+  // Escucha cambios del formulario con pausa de 300ms para evitar lentitud
+  this.expressForm.valueChanges
+    .pipe(
+      debounceTime(300),
+      takeUntil(this.destroy$)
+    )
+    .subscribe(() => {
+      this.actualizarUrlWhatsApp();
+    });
+
+  // Escucha específicamente cuando el usuario cambia entre pickup y delivery
+  this.expressForm.get('tipoEntrega')?.valueChanges
+    .pipe(takeUntil(this.destroy$))
+    .subscribe((tipo) => {
+      if (tipo === 'delivery' && this.userId && this.direcciones.length === 0) {
+        this.getDireccionbyUser();
+      }
+    });
+}
+
+
   SubscribeToCart() {
-    this.cartSubscription = this.carritoService.bandejaList$.subscribe(items => {
+  this.cartSubscription?.unsubscribe();
+  this.cartSubscription = this.carritoService.bandejaList$
+    .pipe(takeUntil(this.destroy$))
+    .subscribe(items => {
       this.bandejaList = items;
       this.isbandejaList = items.length > 0;
-      // If cart becomes empty, navigate to home
       if (items.length === 0 && this.router.url.includes('/review')) {
         this.router.navigate(['/home']);
       }
     });
-  }
+}
+
 
   ngOnDestroy() {
     if (this.cartSubscription) {
@@ -157,14 +179,16 @@ export class ReviewOrderComponent implements OnInit, OnDestroy {
   //tienda
 
   escucharTiendaActiva() {
-    this.tiendaService.selectedTiendaObservable$.subscribe(tienda => {
+  this.tiendaService.selectedTiendaObservable$
+    .pipe(takeUntil(this.destroy$))
+    .subscribe(tienda => {
       if (tienda) {
         this.tiendaSelected = tienda;
         this.tienda_moneda = this.tiendaSelected.moneda;
         this.usaDelivery = this.tiendaSelected.usaDelivery;
       }
     });
-  }
+}
   total() {
     const total = this.bandejaList.reduce((sum, item) =>
       sum + (item.precio_ahora * item.cantidad), 0
