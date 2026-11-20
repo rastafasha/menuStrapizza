@@ -47,9 +47,12 @@ export class FavoritoService {
     return this._http.get(this.url + '/favoritos/',{headers:headers})
   }
 
-  listarFaoritosporUsuario(userId:any):Observable<any>{
-    let headers = new HttpHeaders().set('Content-Type','application/json');
-    return this._http.get(this.url + '/favoritos/user/'+userId,{headers:headers})
+  listarFaoritosporUsuario(userId:any, localId?: string):Observable<any>{
+    const url = localId 
+    ? `${base_url}/favoritos/user/${userId}/${localId}`
+    : `${base_url}/favoritos/user/${userId}`;
+    
+    return this._http.get(url);
 
   }
 

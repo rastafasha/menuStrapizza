@@ -19,6 +19,7 @@ import { ModalproductComponent } from '../../../components/modalproduct/modalpro
 import { SolicitudService } from '../../../services/solicitud.service';
 import { Comentario } from '../../../models/comentarios.model';
 import { ComentarioService } from '../../../services/comentario.service';
+import { TiendaService } from '../../../services/tienda.service';
 declare var bootstrap: any;
 
 @Component({
@@ -52,13 +53,14 @@ export class FavoritesComponent implements OnInit {
   isModalOpen: boolean = false;
   comentarios!: Comentario;
   stars: number = 0;
-
+  tiendaSelected!: any;
 
   constructor(
     private http: HttpClient,
     private solicitudService: SolicitudService,
     private comentarioService: ComentarioService,
     private favoritosService: FavoritoService,
+    private tiendaService: TiendaService,
     public usuarioService: UsuarioService,
     public activatedRoute: ActivatedRoute,
     public authService: AuthService,
@@ -75,6 +77,7 @@ export class FavoritesComponent implements OnInit {
   ngOnInit(): void {
 
     window.scrollTo(0, 0);
+    this.escucharTiendaActiva();
     this.usuario = this.authService.getLocalStorage();
     this.getFavoritos();
   }
@@ -86,9 +89,18 @@ export class FavoritesComponent implements OnInit {
     }
   }
 
+    escucharTiendaActiva() {
+    this.tiendaService.selectedTiendaObservable$.subscribe(tienda => {
+      if (tienda) {
+        this.tiendaSelected = tienda;
+        this.tienda_moneda  = this.tiendaSelected.moneda
+      }
+    });
+  }
+
   getFavoritos() {
     this.isLoading = true;
-    this.favoritosService.listarFaoritosporUsuario(this.usuario.uid).subscribe((resp: any) => {
+    this.favoritosService.listarFaoritosporUsuario(this.usuario.uid, this.tiendaSelected._id).subscribe((resp: any) => {
       this.favoritos = resp.favoritos;
       this.isLoading = false;
     })
