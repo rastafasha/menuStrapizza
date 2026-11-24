@@ -19,7 +19,7 @@
             <div class="d-flex flex-column ">
               <h2>{{translate.currentLang() === 'en' ? item.titulo.en : item.titulo.es | slice:0:8}}...
 
-                
+
               </h2>
               <p class="small">{{item.selector_elegido | slice:0:8}}...</p>
             </div>
@@ -42,34 +42,28 @@
       <!-- Fila única de montos (Estilo la imagen enviada) -->
       <div class="row g-3 mb-4">
         <!-- Columna 2: Equivalente en Bolívares + Tasa del día -->
-        <!-- 🧠 Columna 2: Solo se renderiza si la tienda tiene activo el flag 'mostrarTasas' -->
-        <div class="col-12 col-sm-6" *ngIf="tiendaSelected?.mostrarTasas && (tienda_moneda === 'USD' || tienda_moneda === 'EUR')">
+        <!-- 🧠 Columna 2: Se renderiza si cualquiera de los 3 flags de tasa está activo -->
+        <div class="col-12 col-sm-6"
+          *ngIf="(mostrarTasas || euroTasa || tasaPersonalizada) && (tienda_moneda === 'USD' || tienda_moneda === 'EUR')">
           <div class="d-flex justify-content-between align-items-center mb-2">
             <label class="form-label fw-semibold text-secondary small text-uppercase tracking-wider mb-0">
               {{'Equivalente'|translate}} Bs.
             </label>
 
-            <!-- Tasa del Día dinámica según la divisa -->
+            <!-- Tasa del Día dinámica (BCV USD, EUR o Personalizada) -->
             <span class="badge bg-secondary-subtle text-secondary rounded-2 px-2 py-1 fw-bold"
               style="font-size: 0.75rem;">
               <i class="fas fa-money-bill-trend-up me-1"></i> {{'Tasa'|translate}}:
-              @if (tienda_moneda === 'USD') {
-              {{ (tasadollar() || 0) | number:'1.2-2' }}
-              } @else {
-              {{ (tasaeuro() || 0) | number:'1.2-2' }}
-              } Bs.
+              {{ obtenerTasaAplicada() | number:'1.2-2' }} Bs.
             </span>
           </div>
 
           <div
             class="form-control form-control-lg bg-white rounded-3 fw-bold text-success py-2 px-3 border border-success">
-            @if (tienda_moneda === 'USD') {
-            {{ (totalAmount * (tasadollar() || 0)) | number:'1.2-2' }}
-            } @else {
-            {{ (totalAmount * (tasaeuro() || 0)) | number:'1.2-2' }}
-            }
+            {{ (totalAmount * obtenerTasaAplicada()) | number:'1.2-2' }}
           </div>
         </div>
+
 
 
       </div>
@@ -80,12 +74,12 @@
           <div class="card p-3" id="card-pay">
             <label class="form-label">Desea delivery?</label>
             <select id="paymentMethod" class="form-control" (change)="onDeliveryMethodChange($event)"
-               formControlName="delivery">
+              formControlName="delivery">
               <option value=" ">Seleccione</option>
               <option value="Delivery">Si</option>
               <option value="Pickup">Voy por la tienda</option>
             </select>
-            
+
             <div *ngIf="habilitacionAddresLocal" class="mt-1 mb-1 ">
               <div class="card mb-3">
                 <div class="card-body alert-warning ">
@@ -100,21 +94,20 @@
 
               <!-- precios Delivery -->
               <app-precios-delivery #preciosComponent [totalAmount]="totalAmount" [tiendaSelected]="tiendaSelected"
-                            [listaDeliveries]="listaDeliveries"
-                            (onTotalCalculado)="totalGeneral = $event"></app-precios-delivery>
+                [listaDeliveries]="listaDeliveries" (onTotalCalculado)="totalGeneral = $event"></app-precios-delivery>
 
               <!-- 💡 EL BOTÓN DIRECTO: Activa el GPS con 1 solo clic sin abrir el modal -->
-                    <button type="button" class="btn btn-primary w-100 fw-bold shadow-sm py-2 mb-3 mt-3 animated fadeIn"
-                        (click)="dispararGpsDirecto()">
-                        📍 {{ 'Calcular mi Delivery Automático con GPS' | translate }}
-                    </button>
-                    <!-- Total a Pagar -->
-                    <div class="info_pago total mt-3 animated fadeIn">
-                        <div class="info_pago_titulo1"><span>{{'Total con delivery'|translate}}</span> </div>
-                        <div class="info_pagod_data3"><span>{{totalGeneral |number:'1.2-2'| currency:tienda_moneda}}</span>
-                        </div>
-                    </div>
-             
+              <button type="button" class="btn btn-primary w-100 fw-bold shadow-sm py-2 mb-3 mt-3 animated fadeIn"
+                (click)="dispararGpsDirecto()">
+                📍 {{ 'Calcular mi Delivery Automático con GPS' | translate }}
+              </button>
+              <!-- Total a Pagar -->
+              <div class="info_pago total mt-3 animated fadeIn">
+                <div class="info_pago_titulo1"><span>{{'Total con delivery'|translate}}</span> </div>
+                <div class="info_pagod_data3"><span>{{totalGeneral |number:'1.2-2'| currency:tienda_moneda}}</span>
+                </div>
+              </div>
+
               <!-- precios Delivery -->
 
               <form [formGroup]="formDelivery">
@@ -127,26 +120,25 @@
                       {{direccion.direccion | slice:0:30 }}...
                     </option>
                   </select>
-                  <div *ngIf="formDelivery.get('deliveryAddres')?.touched && formDelivery.get('deliveryAddres')?.invalid"
-                        class="text-danger">
-                        <div *ngIf="formDelivery.get('deliveryAddres')?.errors?.['required']">
-                            {{'Campo Requerido'|translate}}
-                        </div>
-                        <div *ngIf="formDelivery.get('deliveryAddres')?.errors?.['minlength']">
-                            {{'Seleccione o agregue una dirección'|translate}}
-                        </div>
+                  <div
+                    *ngIf="formDelivery.get('deliveryAddres')?.touched && formDelivery.get('deliveryAddres')?.invalid"
+                    class="text-danger">
+                    <div *ngIf="formDelivery.get('deliveryAddres')?.errors?.['required']">
+                      {{'Campo Requerido'|translate}}
                     </div>
+                    <div *ngIf="formDelivery.get('deliveryAddres')?.errors?.['minlength']">
+                      {{'Seleccione o agregue una dirección'|translate}}
+                    </div>
+                  </div>
                 </div>
               </form>
-              <div class="botns" >
-                <button class="btn btn-primary rounded-rounded" 
-                      data-bs-target="#add_direccion"
-                      data-bs-toggle="offcanvas"
-                      (click)="despertarMapaHijo()">
+              <div class="botns">
+                <button class="btn btn-primary rounded-rounded" data-bs-target="#add_direccion"
+                  data-bs-toggle="offcanvas" (click)="despertarMapaHijo()">
                   {{'Crear Direccion' | translate}}
-              </button>
+                </button>
 
-            </div> 
+              </div>
             </div>
           </div>
         </form>
@@ -177,7 +169,8 @@
               <div class="mb-3">
                 <i class="fab fa-paypal fs-2 text-primary me-2"></i>
                 <span class="fw-semibold text-secondary">{{'Pago rápido con tu cuenta PayPal'|translate}}</span>
-                <p class="small text-muted mt-1 mb-0">{{'Inicia sesión en tu cuenta para procesar el monto de forma segura'|translate}}.
+                <p class="small text-muted mt-1 mb-0">{{'Inicia sesión en tu cuenta para procesar el monto de forma
+                  segura'|translate}}.
                 </p>
               </div>
 
@@ -194,7 +187,8 @@
                   <i class="fas fa-credit-card fs-4 text-secondary"></i>
                   <span class="fw-semibold text-dark">{{'Pago Seguro con Tarjeta'|translate}}</span>
                 </div>
-                <p class="small text-muted mb-0">{{'Procesado de forma cifrada a través de la pasarela de PayPal'|translate}}.</p>
+                <p class="small text-muted mb-0">{{'Procesado de forma cifrada a través de la pasarela de
+                  PayPal'|translate}}.</p>
               </div>
 
               <div class="p-2 bg-white rounded-2 border border-secondary-subtle">
@@ -208,7 +202,8 @@
 
                 <!-- Tipo de Transferencia -->
                 <div class="mb-4">
-                  <label for="metodo_pago" class="form-label fw-semibold text-secondary mb-2">{{'Tipo de Transferencia'|translate}}</label>
+                  <label for="metodo_pago" class="form-label fw-semibold text-secondary mb-2">{{'Tipo de
+                    Transferencia'|translate}}</label>
                   <select formControlName="metodo_pago" class="form-select rounded-3" (change)="onChangePayment($event)"
                     name="metodo_pago" id="metodo_pago">
                     <option value=" ">{{'Seleccione Tipo de Transferencia'|translate}}</option>
@@ -228,33 +223,42 @@
                     {{'Entre a su Aplicación Bancaria y realice el pago con la siguiente información'|translate}}:</p>
 
                   <div class="row g-2 text-dark small bg-white bg-opacity-50 p-2 rounded-2">
-                    <div class="col-12 col-md-6" *ngIf="paymentSelected.bankName"><strong>{{'Banco'|translate}}:</strong>
+                    <div class="col-12 col-md-6" *ngIf="paymentSelected.bankName">
+                      <strong>{{'Banco'|translate}}:</strong>
                       {{paymentSelected.bankName}}</div>
-                    <div class="col-12 col-md-6" *ngIf="paymentSelected.username"><strong>{{'Nombre Titular'|translate}}:</strong>
+                    <div class="col-12 col-md-6" *ngIf="paymentSelected.username"><strong>{{'Nombre
+                        Titular'|translate}}:</strong>
                       {{paymentSelected.username}}</div>
-                    <div class="col-12 col-md-6" *ngIf="paymentSelected.bankAccount"><strong>{{'Nº Cuenta'|translate}}:</strong>
+                    <div class="col-12 col-md-6" *ngIf="paymentSelected.bankAccount"><strong>{{'Nº
+                        Cuenta'|translate}}:</strong>
                       {{paymentSelected.bankAccount}}</div>
-                    <div class="col-12 col-md-6" *ngIf="paymentSelected.phone"><strong>{{'Teléfono'|translate}}:</strong>
+                    <div class="col-12 col-md-6" *ngIf="paymentSelected.phone">
+                      <strong>{{'Teléfono'|translate}}:</strong>
                       {{paymentSelected.phone}}</div>
                     <div class="col-12 col-md-6" *ngIf="paymentSelected.email"><strong>{{'Email'|translate}}:</strong>
                       {{paymentSelected.email}}</div>
-                    <div class="col-12 col-md-6" *ngIf="paymentSelected.ciorif"><strong>{{'CI / RIF'|translate}}:</strong>
+                    <div class="col-12 col-md-6" *ngIf="paymentSelected.ciorif"><strong>{{'CI /
+                        RIF'|translate}}:</strong>
                       {{paymentSelected.ciorif}}</div>
                   </div>
                 </div>
 
                 <div class="row g-3 mb-3" *ngIf="paymentSelected">
-                  
+
                   <!-- Número de referencia genérico -->
                   <div class="col-12 col-sm-6">
                     <label for="referencia" class="form-label fw-medium text-secondary">
-                      {{ (paymentSelected.tipo === 'zelle') ? ('Núm. de Referencia / Nombre Titular'|translate) : ('Núm. de Referencia'|translate) }}
+                      {{ (paymentSelected.tipo === 'zelle') ? ('Núm. de Referencia / Nombre Titular'|translate) : ('Núm.
+                      de Referencia'|translate) }}
                     </label>
                     <input type="text" formControlName="referencia" class="form-control rounded-3"
                       [ngClass]="{'is-invalid': formTransferencia.get('referencia')?.touched && formTransferencia.get('referencia')?.invalid}"
-                      name="referencia" id="referencia" [placeholder]="paymentSelected.tipo === 'zelle' ? 'Ej: Confirmación Zelle' : 'Ej: 123456'">
-                    
-                    <div *ngIf="formTransferencia.get('referencia')?.touched && formTransferencia.get('referencia')?.invalid" class="invalid-feedback">
+                      name="referencia" id="referencia"
+                      [placeholder]="paymentSelected.tipo === 'zelle' ? 'Ej: Confirmación Zelle' : 'Ej: 123456'">
+
+                    <div
+                      *ngIf="formTransferencia.get('referencia')?.touched && formTransferencia.get('referencia')?.invalid"
+                      class="invalid-feedback">
                       {{'El número de referencia es requerido (mínimo 4 caracteres)'|translate}}.
                     </div>
                   </div>
@@ -276,9 +280,10 @@
 
                     <div *ngIf="!imagePreview()">
                       <i class="fas fa-cloud-arrow-up fs-2 text-primary mb-2 animate-bounce"></i>
-                      <p class="mb-0 small text-dark fw-medium">{{'Toca para subir o tomar foto del comprobante'|translate}}</p>
+                      <p class="mb-0 small text-dark fw-medium">{{'Toca para subir o tomar foto del
+                        comprobante'|translate}}</p>
                       <span class="text-muted text-xs block mt-1" style="font-size: 0.75rem;">
-                        {{'Formatos aceptados'|translate}}: JPG,  PNG</span>
+                        {{'Formatos aceptados'|translate}}: JPG, PNG</span>
                     </div>
 
                     <div *ngIf="imagePreview()" class="position-relative d-inline-block">

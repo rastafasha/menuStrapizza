@@ -151,6 +151,7 @@ export class PayComponent {
   public selectedFile: File | null = null;
   tasadollar = signal(0);
   tasaeuro = signal(0);
+  tasapersonalizada = signal<number>(0);
 
   formTransferencia = new FormGroup({
     metodo_pago: new FormControl(this.paymentMethodinfo, Validators.required),
@@ -321,16 +322,35 @@ export class PayComponent {
     // Cargamos los métodos de pago y configuraciones de la tienda pasándole el ID
     this.getTiposdePagoByLocal();
     this.getPaypalByTienda();
-    
-    // Evaluamos las tasas de cambio según la moneda internacional configurada
-    if (this.mostrarTasas === true) {
-      this.getTasadelDia();
+
+    // 1️⃣ AQUÍ cargamos la tasa desde el servicio correspondiente
+    this.cargarTasaActiva();
+  }
+
+  cargarTasaActiva() {
+    if (this.tasaPersonalizada === true) {
+      this.getTasaPersona();
     } else if (this.euroTasa === true) {
       this.getTasaeuro();
-    }else if (this.tasaPersonalizada === true) {
-      this.getTasaPersona();
+    } else if (this.mostrarTasas === true) {
+      this.getTasadelDia();
     }
   }
+
+  // 2️⃣ ESTE método solo lee el Signal que ya se llenó arriba (para el HTML y dataTransferencia)
+  obtenerTasaAplicada(): number {
+    if (this.tasaPersonalizada === true) {
+      return this.tasapersonalizada() || 0;
+    }
+    if (this.euroTasa === true || this.tienda_moneda === 'EUR') {
+      return this.tasaeuro() || 0;
+    }
+    if (this.mostrarTasas === true || this.tienda_moneda === 'USD') {
+      return this.tasadollar() || 0;
+    }
+    return 1;
+  }
+
 
   getTasadelDia() {
     this.tasaDollarService.getUltimaTasa().subscribe((resp: any) => {
@@ -344,11 +364,12 @@ export class PayComponent {
     })
   }
 
-   getTasaPersona() {
+  getTasaPersona() {
     this.tasaPersonService.getTasasByUser(this.tiendaSelected._id).subscribe((resp: any) => {
-      this.tasadollar.set(resp.precio_dia);
+      this.tasapersonalizada.set(resp.precio_dia);
     })
   }
+
 
 
 
@@ -532,7 +553,6 @@ export class PayComponent {
     this._direccionService.get_direccion(this.data_direccion).subscribe(
       response => {
         this.data_direccion = response;
-        console.log(this.data_direccion)
       }
     );
 
@@ -859,9 +879,7 @@ export class PayComponent {
                 referencia: this.formTransferencia.value.referencia,
                 bankName: this.paymentSelected.bankName,
                 pedido: idVentaReal, // 🚨 Vinculado al ObjectId limpio como String puro
-                tasa: this.tienda_moneda === 'USD'
-                  ? (this.tasadollar() || 0)
-                  : (this.tienda_moneda === 'EUR' ? (this.tasaeuro() || 0) : 1),
+                tasa: this.obtenerTasaAplicada(),
                 img: imgUrl,
                 ...this.formTransferencia.value
               };
