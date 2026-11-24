@@ -68,11 +68,12 @@
 <div class="clear"></div>
 
 <!-- Modal global e independiente para el detalle del plato seleccionado -->
-<app-modalproduct [product]="selectedProduct" 
+<app-modalproduct 
+[product]="selectedProduct" 
 [activeCategory]="activeCategory" 
 [tienda_moneda]="tienda_moneda"
 [localIdActual]="localIdActual"
 [isModalOpen]="isModalOpen"
-  (modalClosed)="selectedProduct = null" 
-  *ngIf="selectedProduct && !isLoading">
+(modalClosed)="selectedProduct = null" 
+*ngIf="selectedProduct && !isLoading">
 </app-modalproduct>

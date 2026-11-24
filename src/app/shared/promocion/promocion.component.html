@@ -76,13 +76,15 @@
             </div>
 
             <!-- Botón CTA -->
-            <a *ngIf="promoActiva.enlace" 
-               [routerLink]="sanitizeEnlace(promoActiva.enlace)" 
-               data-bs-dismiss="modal"
-               class="btn-promo-cta">
-              <span>Ver oferta</span>
-              <span class="arrow">→</span>
-            </a>
+            <a *ngIf="promoActiva.enlace"
+            [routerLink]="[]"
+            [queryParams]="{ producto: sanitizeEnlace(promoActiva.enlace) }"
+            queryParamsHandling="merge"
+            data-bs-dismiss="modal"
+            class="btn-promo-cta">
+            <span>Ver oferta</span>
+            <span class="arrow">→</span>
+          </a>
           </div>
 
           <!-- Imagen del producto -->

@@ -45,6 +45,8 @@ export class Tienda{
     public usaMercadoLibre?: boolean,
     public has_cotizacion?: boolean,
     public mostrarTasas?: boolean,
+    public euroTasa?: boolean,
+    public tasaPersonalizada?: boolean,
     public state_banner?: boolean,
     public usaDelivery?: boolean,
     public usaPedido?: boolean,

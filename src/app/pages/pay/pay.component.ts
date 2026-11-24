@@ -33,6 +33,7 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ModalCrearDireccionComponent } from '../../components/modal-crear-direccion/modal-crear-direccion.component';
 import { PreciosDeliveryComponent } from '../../components/precios-delivery/precios-delivery.component';
 import { PostalService } from '../../services/postal.service';
+import { TasaPersonalizadaService } from '../../services/tasa-personalizada.service';
 declare var $: any;
 
 declare var bootstrap: any;
@@ -136,6 +137,9 @@ export class PayComponent {
   public totalGeneral: number = 0;
   public costoDeliveryAplicado: number = 0;
   cargandoGps: boolean = false;
+  mostrarTasas: boolean = false;
+  euroTasa: boolean = false;
+  tasaPersonalizada: boolean = false;
 
 
 
@@ -181,6 +185,7 @@ export class PayComponent {
     private toastr: ToastrService,
     private tasaDollarService: TasadollarbcvService,
     private tasaEuroService: TasaeurobcvService,
+    private tasaPersonService: TasaPersonalizadaService,
     private authService: AuthService,
     private postalService: PostalService,
     public translate: TranslateService,
@@ -234,7 +239,6 @@ export class PayComponent {
       const tiendaGuardada = localStorage.getItem('tienda_checkout_temporal');
       if (tiendaGuardada) {
         this.tiendaSelected = JSON.parse(tiendaGuardada);
-        console.log('🏪 Tienda restaurada con éxito desde persistencia:', this.tiendaSelected);
       }
     }
   }
@@ -302,7 +306,6 @@ export class PayComponent {
       const tiendaGuardada = localStorage.getItem('tienda_checkout_temporal');
       if (tiendaGuardada) {
         const tiendaParseada = JSON.parse(tiendaGuardada);
-        console.log('🏪 Tienda rescatada del localStorage para inicializar pagos:', tiendaParseada);
         this.inicializarDatosTienda(tiendaParseada);
       }
     }
@@ -311,16 +314,21 @@ export class PayComponent {
   inicializarDatosTienda(tienda: any) {
     this.tiendaSelected = tienda;
     this.tienda_moneda = this.tiendaSelected.moneda;
+    this.mostrarTasas = this.tiendaSelected.mostrarTasas;
+    this.euroTasa = this.tiendaSelected.euroTasa;
+    this.tasaPersonalizada = this.tiendaSelected.tasaPersonalizada;
 
     // Cargamos los métodos de pago y configuraciones de la tienda pasándole el ID
     this.getTiposdePagoByLocal();
     this.getPaypalByTienda();
-
+    
     // Evaluamos las tasas de cambio según la moneda internacional configurada
-    if (this.tienda_moneda === 'USD') {
+    if (this.mostrarTasas === true) {
       this.getTasadelDia();
-    } else if (this.tienda_moneda === 'EUR') {
+    } else if (this.euroTasa === true) {
       this.getTasaeuro();
+    }else if (this.tasaPersonalizada === true) {
+      this.getTasaPersona();
     }
   }
 
@@ -335,6 +343,14 @@ export class PayComponent {
       this.tasaeuro.set(resp.precio_dia);
     })
   }
+
+   getTasaPersona() {
+    this.tasaPersonService.getTasasByUser(this.tiendaSelected._id).subscribe((resp: any) => {
+      this.tasadollar.set(resp.precio_dia);
+    })
+  }
+
+
 
 
 

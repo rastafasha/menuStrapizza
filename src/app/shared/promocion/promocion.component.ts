@@ -6,7 +6,7 @@ import { Subscription } from 'rxjs';
 import { Tienda } from '../../models/tienda.model';
 import { TiendaService } from '../../services/tienda.service';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ImagenPipe } from '../../pipes/imagen-pipe.pipe';
 
 declare let tns: any;
@@ -47,6 +47,8 @@ export class PromocionComponent implements OnInit {
   tiendaSelected: Tienda | undefined | null = null;
   private tiendaSubscription!: Subscription;
   private tiendaService = inject(TiendaService);
+  private route = inject(ActivatedRoute);
+private router = inject(Router);
 
   constructor(
     private promocionService: PromocionService
@@ -204,6 +206,18 @@ export class PromocionComponent implements OnInit {
       this.intervals.forEach(interval => clearInterval(interval));
     }
   }
+
+  verOferta(promo: any) {
+  // Cierra el modal de la promoción aquí si lo controlas por JS/Bootstrap
+  
+  this.router.navigate([], {
+    relativeTo: this.route,
+    queryParams: { producto: promo.producto_id }, // <-- Verifica si el campo se llama producto, producto_id o productoId
+    queryParamsHandling: 'merge'
+  });
+
+  
+}
 
 
 }

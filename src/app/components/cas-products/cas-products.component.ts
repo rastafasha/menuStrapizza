@@ -12,6 +12,7 @@ import { ProductoService } from '../../services/product.service';
 import { Categoria } from '../../models/categoria.model';
 import { CategoriasPipePipe } from '../../pipes/categorias-pipe.pipe';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { ActivatedRoute, Router } from '@angular/router';
 
 declare var bootstrap: any;
 @Component({
@@ -93,6 +94,10 @@ isModalOpen: boolean = false;
   private productoService = inject(ProductoService);
   private tiendasService = inject(TiendaService);
   public translate = inject(TranslateService);
+
+  private route = inject(ActivatedRoute);
+private router = inject(Router);
+private queryParamsSubscription!: Subscription;
   private tiendaSubscription!: Subscription;
 
 
@@ -107,6 +112,14 @@ isModalOpen: boolean = false;
 
         // 2. 🚀 CONEXIÓN DIRECTA: Ejecutamos el filtro usando tu función nativa por ID
         this.cargarProductosPorTiendaId(this.tiendaSelected._id);
+      }
+    });
+
+    // 3. Escuchamos si llega ?producto=ID desde una promoción o enlace directo
+    this.queryParamsSubscription = this.route.queryParams.subscribe(params => {
+      const productoPromoId = params['producto'];
+      if (productoPromoId) {
+        this.abrirProductoDesdePromocion(productoPromoId);
       }
     });
 
@@ -149,6 +162,8 @@ isModalOpen: boolean = false;
   if (this.observer) {
     this.observer.disconnect();
   }
+
+  this.queryParamsSubscription?.unsubscribe()
 }
 
   // Mantenemos tu función por si la necesitas, pero limpia de llamadas duplicadas
@@ -349,6 +364,46 @@ isModalOpen: boolean = false;
         this.cargarProductosPorTiendaId(this.tiendaSelected._id);
       }
     }, 2000);
+  }
+
+  private abrirProductoDesdePromocion(productoSlug: string): void {
+    const slugLimpio = productoSlug.replace(/^\//, '').trim().toLowerCase();
+
+    // 1. Buscamos si ya está en los productos cargados en pantalla
+    const yaCargado = this.products.find(
+      p => p.slug?.toLowerCase() === slugLimpio
+    );
+
+    if (yaCargado) {
+      this.openModal(yaCargado);
+      return;
+    }
+
+    // 2. Si no está en la primera página (20 items), lo pedimos por slug al backend
+    // ⚠️ Ajusta `find_by_slug` al nombre exacto del método en tu ProductoService
+    this.productoService.find_by_slug(slugLimpio).subscribe({
+      next: (resp: any) => {
+        const productoEncontrado = resp?.producto || resp;
+        if (productoEncontrado && productoEncontrado._id) {
+          this.openModal(productoEncontrado);
+        }
+      },
+      error: (err) => {
+        console.error('No se pudo cargar el producto por slug:', err);
+      }
+    });
+  }
+
+  // Limpia la URL cuando el usuario cierra el modal
+  onModalClosed(): void {
+    this.isModalOpen = false;
+    this.selectedProduct = null;
+
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { producto: null },
+      queryParamsHandling: 'merge'
+    });
   }
 
 }
